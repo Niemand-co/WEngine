@@ -9,7 +9,7 @@ struct Vertex
 	Vec2 uv;
 
 	Vertex() : position(Vec3()), normal(Vec3(0.0f, 1.0f, 0.0f)), color(Vec3()), uv(Vec2()){}
-	Vertex(Vec3 pos = Vec3(), Vec3 norm = Vec3(0.0f, 1.0f, 0.0f), Vec3 color = Vec3(), Vec2 uv = Vec2()) : position(pos), normal(norm), color(color), uv(uv){}
+	Vertex(Vec3 pos, Vec3 norm = Vec3(0.0f, 1.0f, 0.0f), Vec3 color = Vec3(), Vec2 uv = Vec2()) : position(pos), normal(norm), color(color), uv(uv){}
 	~Vertex() = default;
 };
 

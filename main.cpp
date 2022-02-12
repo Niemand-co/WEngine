@@ -3,7 +3,7 @@
 
 int main()
 {
-	Application* app = new Application();
+	Application* app = Application::CreateApplication();
 	app->Init();
 	app->Tick();
 	return 0;

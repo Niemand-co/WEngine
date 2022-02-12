@@ -426,6 +426,13 @@ inline void Translate(Matrix4x4f& matrix, const Vec3& pos) {
 
 }
 
+inline void Scale(Matrix4x4f& matrix, const Vec3& scale)
+{
+	matrix[0][0] *= scale.x;
+	matrix[1][1] *= scale.y;
+	matrix[2][2] *= scale.z;
+}
+
 inline void Rotation(Matrix4x4f& matrix, const float& tangle, Vec3& axis)
 {
 	Normalize(axis);
