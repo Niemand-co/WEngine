@@ -2,6 +2,7 @@
 #include "Utils/Shader.h"
 #include "Utils/OBJLoader.h"
 #include "Camera/Camera.h"
+#include "Render/Framebuffer.h"
 
 Application* Application::m_instance = nullptr;
 
@@ -31,15 +32,22 @@ void Application::Init()
 {
 	//Mesh mesh = OBJLoader::Load("assets/sphere.obj");
 	std::vector<Vertex> vertices = {
-		Vertex(Vec3(-10.0f, -5.0f, 0.0f)),
-		Vertex(Vec3(10.0f, -5.0f, 0.0f)),
-		Vertex(Vec3(0.0f, 5.0f, 0.0f))
+		Vertex(Vec3(-10.0f, -5.0f, 0.0f), Vec3(), Vec3(1.0f, 0.0f, 0.0f)),
+		Vertex(Vec3(10.0f, -5.0f, 0.0f), Vec3(), Vec3(0.0f, 1.0f, 0.0f)),
+		Vertex(Vec3(0.0f, 5.0f, 0.0f), Vec3(), Vec3(0.0f, 0.0f, 1.0f))
 	};
 	std::vector<uint32_t> indices = {0, 1, 2};
 
 
 	const char windowName[] = "SoftRenderer";
 	m_window = new Window(windowName, 640, 480);
+
+	Framebuffer::SetClearColor(Vec4(0.2f, 0.2f, 0.2f, 1.0f));
+	Framebuffer FBO(640, 480);
+	Framebuffer::BindFramebuffer(&FBO);
+	FBO.SetBufferType(COLOR_BUFFER, 1);
+	FBO.SetDepthTest(true);
+	FBO.ClearBuffer(COLOR_BUFFER | DEPTH_BUFFER);
 
 	m_world = World::CreateWorld();
 	Entity* sphere = World::CreateEntity(m_world);
@@ -57,11 +65,12 @@ void Application::Init()
 	Matrix4x4f model = Matrix4x4f::GetIdentityMatrix();
 	Scale(model, Vec3(0.05f, 0.05f, 0.05f));
 	Shader shader(model, camera->GetViewMatrix(), proj);
-	Renderer renderer(m_window, Renderer::Primitive::TRIANGLE);
+	Renderer renderer(Renderer::Primitive::TRIANGLE);
 	renderer.SetShader(&shader);
 	m_world->SetRenderer(sphere, &renderer);
 
 	m_world->Render();
+	FBO.RenderToScreen(m_window);
 }
 
 void Application::Tick()

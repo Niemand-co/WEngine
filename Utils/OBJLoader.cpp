@@ -4,7 +4,7 @@
 #include <fstream>
 #include <vector>
 #include "Math/Vector.h"
-#include "Renderer/Vertex.h"
+#include "Render/Vertex.h"
 
 Mesh OBJLoader::Load(char* filePath)
 {

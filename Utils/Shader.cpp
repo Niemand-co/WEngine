@@ -21,7 +21,10 @@ V2F Shader::VertexShader(const Vertex& vert)
 	return v2f;
 }
 
-Vec4 Shader::FragmentShader(const V2F& v2f)
+std::vector<Vec4> Shader::FragmentShader(const V2F& v2f)
 {
-	return Vec4(v2f.Color, 1.0f);
+	std::vector<Vec4> result;
+	result.push_back(Vec4(v2f.Color, 1.0f));
+	result.push_back(v2f.ScreenPos);
+	return result;
 }

@@ -3,7 +3,7 @@
 #define SR_MESH_H
 
 #include "Component.h"
-#include "Renderer/Vertex.h"
+#include "Render/Vertex.h"
 #include <vector>
 
 class Mesh : public Component

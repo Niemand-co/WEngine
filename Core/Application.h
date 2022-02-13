@@ -1,6 +1,6 @@
 #pragma once
 #include "utils/Window.h"
-#include "Renderer/Rasterizer.h"
+#include "Render/Rasterizer.h"
 #include "Scene/World.h"
 
 class Application
@@ -18,5 +18,4 @@ private:
 	static Application* m_instance;
 	Window* m_window;
 	World* m_world;
-	Rasterizer* m_rasterizer;
 };

@@ -168,7 +168,7 @@ struct Vector4Type {
 		return *this;
 	}
 
-	Vector4Type& operator=(const T& f) {
+	Vector4Type<T>& operator=(const T& f) {
 		memcpy(data, f, sizeof(T) * 4);
 		return *this;
 	}

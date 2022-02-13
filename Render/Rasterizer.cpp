@@ -1,14 +1,15 @@
 #include "Rasterizer.h"
 #include "Math/Matrix.h"
+#include "Render/Framebuffer.h"
 
-Rasterizer::Rasterizer(Window* window)
-	: m_window(window)
+Rasterizer::Rasterizer()
+	: m_shader(nullptr)
 {
 }
 
 void Rasterizer::ScreenMapping(V2F& v)
 {
-	Matrix4x4f viewportMatrix = ViewportMatrix(0.0f, 0.0f, float(m_window->GetWidth()), float(m_window->GetHeight()));
+	Matrix4x4f viewportMatrix = ViewportMatrix(0.0f, 0.0f, float(Framebuffer::cur_framebuffer->GetWidth()), float(Framebuffer::cur_framebuffer->GetHeight()));
 	v.ScreenPos = v.ScreenPos * float(1.0 / v.ScreenPos.w);
 	v.ScreenPos.w = 1.0f;
 	v.ScreenPos = viewportMatrix * v.ScreenPos;
@@ -65,6 +66,11 @@ void Rasterizer::RasterizePoint(const V2F& v)
 {
 }
 
+void Rasterizer::SetPixelShader(Shader* shader)
+{
+	m_shader = shader;
+}
+
 void Rasterizer::ScanUpTriangle(V2F& v1, V2F& v2, V2F& v3)
 {
 	V2F& left = v1;
@@ -106,6 +112,6 @@ void Rasterizer::ScanLine(const V2F& v1, const V2F& v2)
 		if(dx != 0)
 			weight = float(i) / float(dx);
 		V2F cur = V2F::Lerp(v1, v2, weight);
-		m_window->DrawPixel(cur.ScreenPos.x, cur.ScreenPos.y, cur.Color);
+		Framebuffer::cur_framebuffer->WriteToBuffer(cur.ScreenPos.x, cur.ScreenPos.y, m_shader->FragmentShader(cur));
 	}
 }

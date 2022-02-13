@@ -4,7 +4,7 @@
 
 #include "Utils/Shader.h"
 #include "Scene/Entity.h"
-#include "Renderer/Rasterizer.h"
+#include "Render/Rasterizer.h"
 #include <vector>
 
 class Renderer
@@ -17,7 +17,7 @@ public:
 		POINT
 	};
 
-	Renderer(Window* window, Primitive type);
+	Renderer(Primitive type);
 	~Renderer() = default;
 
 	void SetShader(Shader* shader);

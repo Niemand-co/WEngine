@@ -13,11 +13,13 @@ set(MATH_SRC
     "Math/Vector.h")
 
 set(RENDERER_SRC
-    "Renderer/Rasterizer.h"
-    "Renderer/Rasterizer.cpp"
-    "Renderer/Renderer.h"
-    "Renderer/Renderer.cpp"
-    "Renderer/Vertex.h")
+    "Render/Rasterizer.h"
+    "Render/Rasterizer.cpp"
+    "Render/Renderer.h"
+    "Render/Renderer.cpp"
+    "Render/Framebuffer.h"
+    "Render/Framebuffer.cpp"
+    "Render/Vertex.h")
 
 set(COMP_SRC
     "Components/Component.h"
@@ -60,7 +62,7 @@ set(SR_SRC
 
 source_group(Core FILES ${CORE_SRC})
 source_group(Math FILES ${MATH_SRC})
-source_group(Renderer FILES ${RENDERER_SRC})
+source_group(Render FILES ${RENDERER_SRC})
 source_group(Utils FILES ${UTILS_SRC})
 source_group(Src FILES ${ROOT_SRC})
 source_group(Components FILES ${COMP_SRC})

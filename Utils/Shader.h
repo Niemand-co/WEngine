@@ -2,7 +2,8 @@
 #ifndef SR_SHADER_H
 #define SR_SHADER_H
 #include "Math/Matrix.h"
-#include "Renderer/Vertex.h"
+#include "Render/Vertex.h"
+#include <vector>
 
 class Shader
 {
@@ -12,7 +13,7 @@ public:
 	~Shader() = default;
 
 	V2F VertexShader(const Vertex& vert);
-	Vec4 FragmentShader(const V2F& v2f);
+	std::vector<Vec4> FragmentShader(const V2F& v2f);
 
 private:
 	Matrix4x4f Model;

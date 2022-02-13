@@ -1,9 +1,9 @@
 #include "Renderer.h"
 
-Renderer::Renderer(Window* window, Primitive type = Primitive::TRIANGLE)
+Renderer::Renderer(Primitive type = Primitive::TRIANGLE)
 	: m_type(type), m_shader(nullptr)
 {
-	m_rasterizer = new Rasterizer(window);
+	m_rasterizer = new Rasterizer();
 }
 
 void Renderer::SetShader(Shader* shader)
@@ -19,6 +19,8 @@ void Renderer::DrawByIndices(Entity* entity)
 	else if(m_type == Primitive::POINT)
 		step = 1;
 
+	m_rasterizer->SetPixelShader(m_shader);
+
 	std::vector<Vertex>& vertices = entity->GetMesh()->GetVertices();
 	std::vector<uint32_t>& indices = entity->GetMesh()->GetIndices();
 	for (int i = 0; i <= indices.size() - step; i += step)
@@ -27,7 +29,6 @@ void Renderer::DrawByIndices(Entity* entity)
 		for (int vert_id = 0; vert_id < step; ++vert_id)
 		{
 			primitive_vertices[vert_id] = m_shader->VertexShader(vertices[indices[int(long long(vert_id) + long long(i))]]);
-			m_shader->FragmentShader(primitive_vertices[vert_id]);
 		}
 		if(m_type == Primitive::TRIANGLE)
 			m_rasterizer->RasterizeTriangle(primitive_vertices[0], primitive_vertices[1], primitive_vertices[2]);
