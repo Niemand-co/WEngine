@@ -59,5 +59,5 @@ Matrix4x4f Camera::GetViewMatrix()
 void Camera::UpdateViewMatrix()
 {
 	m_viewMatrix = Matrix4x4f::GetIdentityMatrix();
-	LookAt(m_viewMatrix, m_pos, m_pos + m_front, Vec3(0.0f, 1.0f, 0.0f));
+	LookAt(m_viewMatrix, m_pos, Vec3(), Vec3(0.0f, 1.0f, 0.0f));
 }

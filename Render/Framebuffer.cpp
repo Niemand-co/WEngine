@@ -48,6 +48,7 @@ void Framebuffer::SetBufferType(BUFFER_TYPE type, uint8_t num)
 void Framebuffer::WriteToBuffer(uint32_t x, uint32_t y, std::vector<Vec4> buffer)
 {
 	uint32_t coord = x + y * m_width;
+	if(coord >= m_width * m_height)return;
 	if (isDepthTest)
 	{
 		if (m_depthbuffer[coord].z < buffer[buffer.size() - 1].z)

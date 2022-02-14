@@ -73,8 +73,8 @@ void Rasterizer::SetPixelShader(Shader* shader)
 
 void Rasterizer::ScanUpTriangle(V2F& v1, V2F& v2, V2F& v3)
 {
-	V2F& left = v1;
-	V2F& right = v2;
+	V2F left = v1;
+	V2F right = v2;
 	if (v1.ScreenPos.x > v2.ScreenPos.x)
 	{
 		left = v2;
@@ -98,7 +98,27 @@ void Rasterizer::ScanUpTriangle(V2F& v1, V2F& v2, V2F& v3)
 
 void Rasterizer::ScanDownTriangle(V2F& v1, V2F& v2, V2F& v3)
 {
-
+	V2F left = v2;
+	V2F right = v3;
+	if (v2.ScreenPos.x > v3.ScreenPos.x)
+	{
+		left = v3;
+		right = v2;
+	}
+	int startY = int(v1.ScreenPos.y);
+	int endY = int(v3.ScreenPos.y);
+	int dy = endY - startY;
+	for (int i = startY; i <= endY; ++i)
+	{
+		float weight = 0.0f;
+		if (dy != 0)
+			weight = float(i - startY) / float(dy);
+		V2F newLeft = V2F::Lerp(v1, left, weight);
+		V2F newRight = V2F::Lerp(v1, right, weight);
+		newLeft.ScreenPos.y = i;
+		newRight.ScreenPos.y = i;
+		ScanLine(newLeft, newRight);
+	}
 }
 
 void Rasterizer::ScanLine(const V2F& v1, const V2F& v2)
