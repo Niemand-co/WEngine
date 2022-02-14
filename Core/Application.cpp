@@ -30,7 +30,7 @@ Application* Application::CreateApplication()
 
 void Application::Init()
 {
-	//Mesh mesh = OBJLoader::Load("assets/sphere.obj");
+	Mesh mesh = OBJLoader::Load("assets/sphere.obj");
 	std::vector<Vertex> vertices = {
 		Vertex(Vec3(-10.0f, -5.0f, 0.0f), Vec3(), Vec3(1.0f, 0.0f, 0.0f)),
 		Vertex(Vec3(10.0f, -5.0f, 0.0f), Vec3(), Vec3(0.0f, 1.0f, 0.0f)),
@@ -56,14 +56,14 @@ void Application::Init()
 	Mesh triangle;
 	triangle.AddVertices(&vertices[0], 3);
 	triangle.AddIndices(&indices[0], 3);
-	sphere->AddComponent<Mesh>(&triangle);
+	sphere->AddComponent<Mesh>(&mesh);
 	Material material;
 	sphere->AddComponent<Material>(&material);
 
 	Matrix4x4f proj = Matrix4x4f::GetIdentityMatrix();
 	PerspectiveProjection(proj, 45.0f, 640.0f / 480.0f, 1.0f, 100.0f);
 	Matrix4x4f model = Matrix4x4f::GetIdentityMatrix();
-	Scale(model, Vec3(0.05f, 0.05f, 0.05f));
+	Scale(model, Vec3(0.1f, 0.1f, 0.1f));
 	Shader shader(model, camera->GetViewMatrix(), proj);
 	Renderer renderer(Renderer::Primitive::TRIANGLE);
 	renderer.SetShader(&shader);

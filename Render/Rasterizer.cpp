@@ -25,19 +25,19 @@ void Rasterizer::RasterizeTriangle(const V2F& v1, const V2F& v2, const V2F& v3)
 	if (v2fArray[0].ScreenPos.y > v2fArray[1].ScreenPos.y)
 	{
 		V2F tmp = v2fArray[0];
-		v2fArray[0] = v2;
+		v2fArray[0] = v2fArray[1];
 		v2fArray[1] = tmp;
 	}
 	if (v2fArray[1].ScreenPos.y > v2fArray[2].ScreenPos.y)
 	{
 		V2F tmp = v2fArray[1];
-		v2fArray[1] = v2;
+		v2fArray[1] = v2fArray[2];
 		v2fArray[2] = tmp;
 	}
 	if (v2fArray[0].ScreenPos.y > v2fArray[1].ScreenPos.y)
 	{
 		V2F tmp = v2fArray[0];
-		v2fArray[0] = v2;
+		v2fArray[0] = v2fArray[1];
 		v2fArray[1] = tmp;
 	}
 
