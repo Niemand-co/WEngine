@@ -33,11 +33,17 @@ void World::Render()
 	for (Entity* entity : m_entities)
 	{
 		if(!entity->GetVisible())continue;
-		m_renderqueque[entity]->DrawByIndices(entity);
+		for(Light* light : m_lights)
+			m_renderqueque[entity]->DrawByIndices(entity, light, m_camera);
 	}
 }
 
 void World::SetRenderer(Entity* entity, Renderer* renderer)
 {
 	m_renderqueque[entity] = renderer;
+}
+
+void World::AddLight(Light* light)
+{
+	m_lights.emplace_back(light);
 }

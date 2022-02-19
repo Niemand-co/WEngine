@@ -1,10 +1,11 @@
 #pragma once
 #ifndef SR_WINDOW_H
 #define SR_WINDOW_H
+#include "Math/Vector.h"
 #include <stdint.h>
 #include <windows.h>
 #include <iostream>
-#include "Math/Vector.h"
+#include <vector>
 
 class Window
 {

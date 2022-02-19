@@ -6,3 +6,12 @@ Material::Material()
 
 }
 
+void Material::SetShader(Shader* shader)
+{
+	m_shader = shader;
+}
+
+Shader* Material::GetShader()
+{
+	return m_shader;
+}

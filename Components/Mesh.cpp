@@ -1,4 +1,7 @@
 #include "Mesh.h"
+#include "Utils/OBJLoader.h"
+
+std::vector<Mesh> MeshLibrary::m_meshes;
 
 Mesh::Mesh()
 {
@@ -33,4 +36,17 @@ std::vector<Vertex>& Mesh::GetVertices()
 std::vector<uint32_t>& Mesh::GetIndices()
 {
 	return m_indices;
+}
+
+Mesh* MeshLibrary::Allocate()
+{
+	m_meshes.emplace_back();
+	return &m_meshes[m_meshes.size() - 1];
+}
+
+Mesh* MeshLibrary::Allocate(char* filePath)
+{
+	Mesh mesh = OBJLoader::Load(filePath);
+	m_meshes.emplace_back(mesh);
+	return &m_meshes[m_meshes.size() - 1];
 }

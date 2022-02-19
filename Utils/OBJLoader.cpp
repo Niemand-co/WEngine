@@ -11,6 +11,7 @@ Mesh OBJLoader::Load(char* filePath)
 	std::ifstream obj(filePath);
 	std::string line;
 	std::vector<Vertex> vertices;
+	std::vector<Vec3> verts;
 	std::vector<Vec3> normals;
 	std::vector<Vec2> uvs;
 	std::vector<uint32_t> indices;
@@ -40,17 +41,19 @@ Mesh OBJLoader::Load(char* filePath)
 			in>>x;
 			in>>y;
 			in>>z;
-			vertices.emplace_back(Vec3(x, y, z));
+			verts.emplace_back(x, y, z);
 		}
 		else if (line.substr(0, 1) == "f")
 		{
 			std::istringstream in(line.substr(2));
+			int offset = vertices.size();
 			for (int i = 0; i < 3; ++i)
 			{
 				std::string str;
 				std::vector<int> index;
 				index.reserve(3);
 				in>>str;
+
 				for (int l = 0, r = 1; r < str.size(); ++r)
 				{
 					if (str[r] == '/')
@@ -64,9 +67,12 @@ Mesh OBJLoader::Load(char* filePath)
 						break;
 					}
 				}
-				indices.push_back(index[0] - 1);
-				vertices[int(long long(index[0]) - 1)].uv = uvs[int(long long(index[1]) - 1)];
-				vertices[int(long long(index[0]) - 1)].normal = normals[int(long long(index[2]) - 1)];
+				indices.push_back(offset + i);
+				Vertex vert;
+				vert.position = verts[int(long long(index[0]) - 1)];
+				vert.uv = uvs[int(long long(index[1]) - 1)];
+				vert.normal = normals[int(long long(index[2]) - 1)];
+				vertices.emplace_back(vert);
 			}
 		}
 		else if (line.substr(0, 1) == "#")

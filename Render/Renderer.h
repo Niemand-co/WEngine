@@ -2,9 +2,11 @@
 #ifndef SR_RENDERER_H
 #define SR_RENDERER_H
 
-#include "Utils/Shader.h"
 #include "Scene/Entity.h"
 #include "Render/Rasterizer.h"
+#include "Utils/Shader.h"
+#include "Scene/Light.h"
+#include "Camera/Camera.h"
 #include <vector>
 
 class Renderer
@@ -20,13 +22,18 @@ public:
 	Renderer(Primitive type);
 	~Renderer() = default;
 
-	void SetShader(Shader* shader);
-
-	void DrawByIndices(Entity* entity);
+	void DrawByIndices(Entity* entity, Light* light, Camera* camera);
 private:
-	Shader* m_shader;
 	Rasterizer* m_rasterizer;
 	Primitive m_type;
+};
+
+class RendererLibrary
+{
+public:
+	static Renderer* Allocate(Renderer::Primitive type);
+private:
+	static std::vector<Renderer> m_renderers;
 };
 
 #endif

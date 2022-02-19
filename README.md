@@ -1,7 +1,3 @@
----
-typora-root-url: ./
----
-
 # SoftRenderer
 
 <strong>使用方式:</strong></br>

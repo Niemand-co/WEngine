@@ -1,9 +1,9 @@
 #include "Rasterizer.h"
 #include "Math/Matrix.h"
 #include "Render/Framebuffer.h"
+#include "Utils/Shader.h"
 
 Rasterizer::Rasterizer()
-	: m_shader(nullptr)
 {
 }
 
@@ -64,11 +64,6 @@ void Rasterizer::RasterizeLine(const V2F& v1, const V2F& v2)
 
 void Rasterizer::RasterizePoint(const V2F& v)
 {
-}
-
-void Rasterizer::SetPixelShader(Shader* shader)
-{
-	m_shader = shader;
 }
 
 void Rasterizer::ScanUpTriangle(V2F& v1, V2F& v2, V2F& v3)
@@ -132,6 +127,6 @@ void Rasterizer::ScanLine(const V2F& v1, const V2F& v2)
 		if(dx != 0)
 			weight = float(i) / float(dx);
 		V2F cur = V2F::Lerp(v1, v2, weight);
-		Framebuffer::cur_framebuffer->WriteToBuffer(cur.ScreenPos.x, cur.ScreenPos.y, m_shader->FragmentShader(cur));
+		Framebuffer::cur_framebuffer->WriteToBuffer(cur.ScreenPos.x, cur.ScreenPos.y, Shader::cur_shader->FragmentShader(cur));
 	}
 }

@@ -14,4 +14,10 @@ bool isSameTpye(T1 para_one, T2 para_two)
 	return false;
 }
 
+template<typename T>
+bool isSameType(T para)
+{
+	return true;
+}
+
 #endif

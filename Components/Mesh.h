@@ -23,4 +23,13 @@ private:
 	std::vector<uint32_t> m_indices;
 };
 
+class MeshLibrary
+{
+public:
+	static Mesh* Allocate();
+	static Mesh* Allocate(char* filePath);
+private:
+	static std::vector<Mesh> m_meshes;
+};
+
 #endif

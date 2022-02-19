@@ -26,13 +26,17 @@ set(COMP_SRC
     "Components/Material.h"
     "Components/Material.cpp"
     "Components/Mesh.h"
-    "Components/Mesh.cpp")
+    "Components/Mesh.cpp"
+    "Components/Transformer.h"
+    "Components/Transformer.cpp")
 
 set(SCENE_SRC
     "Scene/World.h"
     "Scene/World.cpp"
     "Scene/Entity.h"
-    "Scene/Entity.cpp")
+    "Scene/Entity.cpp"
+    "Scene/Light.h"
+    "Scene/Light.cpp")
 
 set(CAMERA_SRC
     "Camera/Camera.h"
@@ -47,6 +51,11 @@ set(UTILS_SRC
     "Utils/OBJLoader.cpp"
     "Utils/Tools.h")
 
+set(EVENT_SRC
+    "Event/Event.h"
+    "Event/Event.cpp"
+    "Event/Input.h")
+
 set(ROOT_SRC
     "main.cpp")
 
@@ -58,6 +67,7 @@ set(SR_SRC
     ${SCENE_SRC}
     ${CAMERA_SRC}
     ${UTILS_SRC}
+    ${EVENT_SRC}
     ${ROOT_SRC})
 
 source_group(Core FILES ${CORE_SRC})
@@ -68,6 +78,7 @@ source_group(Src FILES ${ROOT_SRC})
 source_group(Components FILES ${COMP_SRC})
 source_group(Scene FILES ${SCENE_SRC})
 source_group(Camera FILES ${CAMERA_SRC})
+source_group(Event FILES ${EVENT_SRC})
 
 add_executable(SoftRenderer ${SR_SRC})
 

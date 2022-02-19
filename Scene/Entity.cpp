@@ -2,7 +2,7 @@
 #include <iostream>
 
 Entity::Entity()
-	: isVisible(true), m_mesh(nullptr), m_material(nullptr)
+	: isVisible(false), m_mesh(nullptr), m_material(nullptr), m_transformer(nullptr)
 {
 
 }
@@ -30,4 +30,9 @@ Mesh* Entity::GetMesh()
 Material* Entity::GetMaterial()
 {
 	return m_material;
+}
+
+Transformer* Entity::GetTransformer()
+{
+	return m_transformer;
 }

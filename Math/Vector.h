@@ -126,6 +126,15 @@ struct Vector3Type {
 
 	T distance() { return static_cast<T>(sqrt(((double)data[0] * data[0] + (double)data[1] * data[1] + (double)data[2] * data[2]))); }
 	T squareDistance() { return static_cast<T>(((double)data[0] * data[0] + (double)data[1] * data[1] + (double)data[2] * data[2])); }
+	Vector3Type<T> Norm()
+	{
+		Vector3Type<T> result;
+		T length = x * x + y * y + z * z;
+		length = (T)(1.0 / sqrt(length));
+		for (size_t i = 0; i < 3; ++i)
+			result[i] = data[i] * length;
+		return result;
+	}
 
 	inline void Set(float _x, float _y, float _z)
 	{
@@ -202,13 +211,13 @@ TT<T> operator*(int factor, const TT<T>& vector) {
 }
 
 template<template<typename> class TT, typename T>
-TT<T> operator*(float factor, const TT<T>& vector) {
+TT<T> operator*(const TT<T>& vec1, const TT<T>& vec2) {
 
 	TT<T> result;
 
-	size_t cnt = ElementCount(vector.data);
+	size_t cnt = ElementCount(vec1.data);
 	for (size_t i = 0; i < cnt; ++i)
-		result[i] = vector[i] * factor;
+		result[i] = vec1[i] * vec2[i];
 
 	return result;
 

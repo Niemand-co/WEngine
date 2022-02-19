@@ -24,6 +24,8 @@ public:
 
 	void Move(direction dir, float dis);
 
+	Vec3 GetPos(){return m_pos;}
+
 	Matrix4x4f GetViewMatrix();
 private:
 	void UpdateViewMatrix();
