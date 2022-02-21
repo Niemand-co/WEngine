@@ -10,15 +10,26 @@ Rasterizer::Rasterizer()
 void Rasterizer::ScreenMapping(V2F& v)
 {
 	Matrix4x4f viewportMatrix = ViewportMatrix(0.0f, 0.0f, float(Framebuffer::cur_framebuffer->GetWidth()), float(Framebuffer::cur_framebuffer->GetHeight()));
+	v.ScreenPos = viewportMatrix * v.ScreenPos;
+}
+
+bool OutofNDC(V2F& v)
+{
 	v.ScreenPos = v.ScreenPos * float(1.0 / v.ScreenPos.w);
 	v.ScreenPos.w = 1.0f;
-	v.ScreenPos = viewportMatrix * v.ScreenPos;
+ 	if(v.ScreenPos.x > 1.0f || v.ScreenPos.x < -1.0f || v.ScreenPos.y > 1.0f || v.ScreenPos.y < -1.0f)
+		return true;
+	return false;
 }
 
 void Rasterizer::RasterizeTriangle(const V2F& v1, const V2F& v2, const V2F& v3)
 {
 	
 	V2F v2fArray[3] = {v1, v2, v3};
+	bool discard = true;
+	for(uint32_t i = 0; i < 3; ++i)
+		discard &= OutofNDC(v2fArray[i]);
+	if(discard)return;
 	ScreenMapping(v2fArray[0]);
 	ScreenMapping(v2fArray[1]);
 	ScreenMapping(v2fArray[2]);
