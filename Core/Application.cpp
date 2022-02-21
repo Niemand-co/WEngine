@@ -29,7 +29,7 @@ Application* Application::CreateApplication()
 
 void Application::Init()
 {
-	//Mesh* mesh = MeshLibrary::Allocate("assets/sphere.obj");
+	Mesh* Sphere = MeshLibrary::Allocate("assets/sphere.obj");
 	std::vector<Vertex> vertices = {
 		Vertex(Vec3(-1.0f, -1.0f, 1.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.5f, 0.0f, 0.0f)),
 		Vertex(Vec3(1.0f, -1.0f, 1.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.5f, 0.0f, 0.0f)),
@@ -83,22 +83,28 @@ void Application::Init()
 
 	m_world = World::CreateWorld();
 	Entity* sphere = World::CreateEntity(m_world);
+	Entity* cube = World::CreateEntity(m_world);
 	Camera* camera = World::CreateEntity<Camera>(m_world);
 	m_world->m_camera = camera;
 	camera->Move(Camera::direction::BACKWARD, 3.0f);
 	camera->Move(Camera::direction::RIGHT, 1.0f);
 	camera->Move(Camera::direction::UP, 3.0f);
+
 	Mesh* Cube = MeshLibrary::Allocate();
 	Cube->AddVertices(&vertices[0], vertices.size());
 	Cube->AddIndices(&indices[0], indices.size());
-	sphere->AddComponent<Mesh>(Cube);
+	sphere->AddComponent<Mesh>(Sphere);
+	cube->AddComponent<Mesh>(Cube);
 
 	Matrix4x4f proj = Matrix4x4f::GetIdentityMatrix();
 	PerspectiveProjection(proj, 45.0f, 640.0f / 480.0f, 1.0f, 100.0f);
 	Matrix4x4f model = Matrix4x4f::GetIdentityMatrix();
-	Scale(model, Vec3(0.2f, 0.2f, 0.2f));
-	Transformer* transformer = sphere->AddComponent<Transformer>();
-	transformer->SetScale(model);
+	sphere->AddComponent<Transformer>();
+	sphere->GetTransformer()->SetScale(Vec3(0.2f, 0.2f, 0.2f));
+	cube->AddComponent<Transformer>();
+	cube->GetTransformer()->SetTranslate(Vec3(-1.0f, 0.0f, 1.0f));
+	cube->GetTransformer()->SetScale(Vec3(0.4f, 0.4f, 0.4f));
+
 
 	PointLight* light = World::CreateEntity<PointLight>(m_world);
 	light->SetColor(Vec3(0.5f));
@@ -106,12 +112,17 @@ void Application::Init()
 	m_world->AddLight(light);
 	
 	sphere->AddComponent<Material>();
-	sphere->GetMaterial()->SetShader(ShaderLibrary::Allocate(camera->GetViewMatrix(), proj));
+	cube->AddComponent<Material>();
+	Shader* shader = ShaderLibrary::Allocate(camera->GetViewMatrix(), proj);
+	sphere->GetMaterial()->SetShader(shader);
+	cube->GetMaterial()->SetShader(shader);
 
 	sphere->SetVisible(true);
+	cube->SetVisible(true);
 
 	Renderer* renderer = RendererLibrary::Allocate(Renderer::Primitive::TRIANGLE);
 	m_world->SetRenderer(sphere, renderer);
+	m_world->SetRenderer(cube, renderer);
 }
 
 void Application::Tick()

@@ -29,7 +29,7 @@ public:
 	static Mesh* Allocate();
 	static Mesh* Allocate(char* filePath);
 private:
-	static std::vector<Mesh> m_meshes;
+	static std::vector<Mesh*> m_meshes;
 };
 
 #endif

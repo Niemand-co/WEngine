@@ -1,4 +1,5 @@
 #include "Window.h"
+#include <iostream>
 
 LRESULT WINAPI WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -7,6 +8,11 @@ LRESULT WINAPI WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_DESTROY:
 		{
 			exit(0);
+		}
+		case WM_KEYDOWN:
+		{
+			std::cout<<char(wParam)<<std::endl;
+			break;
 		}
 	}
 

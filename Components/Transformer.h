@@ -11,15 +11,18 @@ public:
 	Transformer();
 	~Transformer() = default;
 
-	void SetScale(Matrix4x4f scale);
-	void SetRotate(Matrix4x4f rotate);
-	void SetTranslate(Matrix4x4f translate);
+	void SetScale(Vec3 scale);
+	void SetRotate(Vec3 rotate);
+	void SetTranslate(Vec3 translate);
 
 	Matrix4x4f GetModelMatrix();
 private:
-	Matrix4x4f m_scale;
-	Matrix4x4f m_rotate;
-	Matrix4x4f m_translate;
+	Vec3 m_scale;
+	Vec3 m_rotate;
+	Vec3 m_translate;
+	Matrix4x4f ScaleMatrix;
+	Matrix4x4f RotateMatrix;
+	Matrix4x4f TranslateMatrix;
 	Matrix4x4f Model;
 };
 

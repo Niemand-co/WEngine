@@ -43,7 +43,7 @@ public:
 	static Shader* Allocate();
 	static Shader* Allocate(Matrix4x4f view, Matrix4x4f projection);
 private:
-	static std::vector<Shader> m_shaders;
+	static std::vector<Shader*> m_shaders;
 };
 
 #endif

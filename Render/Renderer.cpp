@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include <thread>
 
 std::vector<Renderer> RendererLibrary::m_renderers;
 
@@ -20,6 +21,7 @@ void Renderer::DrawByIndices(Entity* entity, Light* light, Camera* camera)
 	Shader::cur_shader->SetLightColor(light->GetColor());
 	Shader::cur_shader->SetLightPos(static_cast<PointLight*>(light)->GetPos());
 	Shader::cur_shader->SetCameraPos(camera->GetPos());
+	Shader::cur_shader->SetModel(entity->GetTransformer()->GetModelMatrix());
 
 	std::vector<Vertex>& vertices = entity->GetMesh()->GetVertices();
 	std::vector<uint32_t>& indices = entity->GetMesh()->GetIndices();

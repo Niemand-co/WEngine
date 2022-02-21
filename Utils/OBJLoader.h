@@ -7,7 +7,7 @@
 class OBJLoader
 {
 public:
-	static Mesh Load(char* filePath);
+	static Mesh* Load(char* filePath);
 };
 
 #endif

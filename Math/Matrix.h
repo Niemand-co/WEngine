@@ -433,7 +433,7 @@ inline void Scale(Matrix4x4f& matrix, const Vec3& scale)
 	matrix[2][2] *= scale.z;
 }
 
-inline void Rotation(Matrix4x4f& matrix, const float& tangle, Vec3& axis)
+inline void Rotate(Matrix4x4f& matrix, const float& tangle, Vec3& axis)
 {
 	Normalize(axis);
 	Matrix4x4f tmp = Matrix4x4f::GetIdentityMatrix();

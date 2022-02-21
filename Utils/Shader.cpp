@@ -1,7 +1,7 @@
 #include "Shader.h"
 #include <math.h>
 
-std::vector<Shader> ShaderLibrary::m_shaders;
+std::vector<Shader*> ShaderLibrary::m_shaders;
 Shader* Shader::cur_shader = nullptr;
 
 Shader::Shader()
@@ -43,6 +43,7 @@ std::vector<Vec4> Shader::FragmentShader(const V2F& v2f)
 	Vec3 color = v2f.Color * 0.2 + v2f.Color * diffuse_light + specular * LightColor * v2f.Color;
 
 	result.push_back(Vec4(color, 1.0f));
+	//result.push_back(Vec4(v2f.Color, 1.0f));
 	result.push_back(v2f.ScreenPos);
 	return result;
 }
@@ -86,12 +87,13 @@ void Shader::SetCameraPos(const Vec3& pos)
 
 Shader* ShaderLibrary::Allocate()
 {
-	m_shaders.emplace_back(Shader());
-	return &m_shaders[m_shaders.size() - 1];
+	m_shaders.emplace_back(new Shader());
+	return m_shaders[m_shaders.size() - 1];
 }
 
 Shader* ShaderLibrary::Allocate(Matrix4x4f view, Matrix4x4f projection)
 {
-	m_shaders.emplace_back(view, projection);
-	return &m_shaders[m_shaders.size() - 1];
+	Shader* shader = new Shader(view, projection);
+	m_shaders.push_back(shader);
+	return shader;
 }

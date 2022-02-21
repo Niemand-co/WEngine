@@ -6,7 +6,7 @@
 #include "Math/Vector.h"
 #include "Render/Vertex.h"
 
-Mesh OBJLoader::Load(char* filePath)
+Mesh* OBJLoader::Load(char* filePath)
 {
 	std::ifstream obj(filePath);
 	std::string line;
@@ -72,6 +72,7 @@ Mesh OBJLoader::Load(char* filePath)
 				vert.position = verts[int(long long(index[0]) - 1)];
 				vert.uv = uvs[int(long long(index[1]) - 1)];
 				vert.normal = normals[int(long long(index[2]) - 1)];
+				vert.color = Vec3(0.5f, 0.0f, 0.0f);
 				vertices.emplace_back(vert);
 			}
 		}
@@ -80,8 +81,8 @@ Mesh OBJLoader::Load(char* filePath)
 
 		}
 	}
-	Mesh mesh;
-	mesh.AddVertices(&vertices[0], vertices.size());
-	mesh.AddIndices(&indices[0], indices.size());
+	Mesh* mesh = new Mesh();
+	mesh->AddVertices(&vertices[0], vertices.size());
+	mesh->AddIndices(&indices[0], indices.size());
 	return mesh;
 }
