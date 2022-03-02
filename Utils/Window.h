@@ -1,29 +1,27 @@
 #pragma once
 #ifndef SR_WINDOW_H
 #define SR_WINDOW_H
-#include "Math/Vector.h"
-#include <stdint.h>
-#include <windows.h>
-#include <iostream>
-#include <vector>
+#include <string>
 
 class Window
 {
 public:
-	Window(const char* name, uint32_t width, uint32_t height);
-	~Window();
+	struct WindProc
+	{
+		std::string title;
+		uint32_t width;
+		uint32_t height;
+	};
 
-	void DrawPixel(int x, int y, Vec4 color);
+	virtual ~Window() = default;
 
-	HWND GetWindowHandle();
-	uint32_t GetWidth();
-	uint32_t GetHeight();
+	virtual void* GetWindowHandle() const = 0;
+	virtual unsigned int GetWidth() const  = 0;
+	virtual unsigned int GetHeight() const = 0;
 
-	HDC ScreenHDC;
-	HDC hdc;
-private:
-	uint32_t m_width;
-	uint32_t m_height;
-	HWND m_window;
+	virtual void OnUpdate() = 0;
+
+	static Window* Create(WindProc* proc);
 };
+
 #endif

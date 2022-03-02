@@ -2,6 +2,9 @@
 #include "Utils/Shader.h"
 #include "Camera/Camera.h"
 #include "Scene/Light.h"
+#include <windows.h>
+
+#define OPENGL
 
 Application* Application::m_instance = nullptr;
 
@@ -71,71 +74,67 @@ void Application::Init()
 	};
 
 
-	const char windowName[] = "SoftRenderer";
-	m_window = new Window(windowName, 640, 480);
+	Window::WindProc proc;
+	proc.title = "SoftRenderer";
+	proc.width = 640;
+	proc.height = 480;
+	m_window = Window::Create(&proc);
 
-	Framebuffer::SetClearColor(Vec4(0.2f, 0.2f, 0.2f, 1.0f));
-	m_framebuffers.emplace_back(m_window->GetWidth(), m_window->GetHeight());
-	Framebuffer::BindFramebuffer(&m_framebuffers[0]);
-	m_framebuffers[0].SetBufferType(COLOR_BUFFER, 1);
-	m_framebuffers[0].SetDepthTest(true);
-	m_framebuffers[0].ClearBuffer(COLOR_BUFFER | DEPTH_BUFFER);
+	//Framebuffer::SetClearColor(Vec4(0.2f, 0.2f, 0.2f, 1.0f));
+	//m_framebuffers.emplace_back(m_window->GetWidth(), m_window->GetHeight());
+	//Framebuffer::BindFramebuffer(&m_framebuffers[0]);
+	//m_framebuffers[0].SetBufferType(COLOR_BUFFER, 1);
+	//m_framebuffers[0].SetDepthTest(true);
+	//m_framebuffers[0].ClearBuffer(COLOR_BUFFER | DEPTH_BUFFER);
 
-	m_world = World::CreateWorld();
-	Entity* sphere = World::CreateEntity(m_world);
-	Entity* cube = World::CreateEntity(m_world);
-	Camera* camera = World::CreateEntity<Camera>(m_world);
-	m_world->m_camera = camera;
-	camera->Move(Camera::direction::BACKWARD, 3.0f);
-	camera->Move(Camera::direction::RIGHT, 1.0f);
-	camera->Move(Camera::direction::UP, 3.0f);
+	//m_world = World::CreateWorld();
+	//Entity* sphere = World::CreateEntity(m_world);
+	//Entity* cube = World::CreateEntity(m_world);
+	//Camera* camera = World::CreateEntity<Camera>(m_world);
+	//m_world->m_camera = camera;
+	//camera->Move(Camera::direction::BACKWARD, 3.0f);
+	//camera->Move(Camera::direction::RIGHT, 1.0f);
+	//camera->Move(Camera::direction::UP, 3.0f);
 
-	Mesh* Cube = MeshLibrary::Allocate();
-	Cube->AddVertices(&vertices[0], vertices.size());
-	Cube->AddIndices(&indices[0], indices.size());
-	sphere->AddComponent<Mesh>(Sphere);
-	cube->AddComponent<Mesh>(Cube);
+	//Mesh* Cube = MeshLibrary::Allocate();
+	//Cube->AddVertices(&vertices[0], vertices.size());
+	//Cube->AddIndices(&indices[0], indices.size());
+	//sphere->AddComponent<Mesh>(Sphere);
+	//cube->AddComponent<Mesh>(Cube);
 
-	Matrix4x4f proj = Matrix4x4f::GetIdentityMatrix();
-	PerspectiveProjection(proj, 45.0f, 640.0f / 480.0f, 1.0f, 100.0f);
-	Matrix4x4f model = Matrix4x4f::GetIdentityMatrix();
-	sphere->AddComponent<Transformer>();
-	sphere->GetTransformer()->SetScale(Vec3(0.2f, 0.2f, 0.2f));
-	cube->AddComponent<Transformer>();
-	cube->GetTransformer()->SetTranslate(Vec3(-1.0f, 0.0f, 1.0f));
-	cube->GetTransformer()->SetScale(Vec3(0.4f, 0.4f, 0.4f));
+	//Matrix4x4f proj = Matrix4x4f::GetIdentityMatrix();
+	//PerspectiveProjection(proj, 45.0f, 640.0f / 480.0f, 1.0f, 100.0f);
+	//Matrix4x4f model = Matrix4x4f::GetIdentityMatrix();
+	//sphere->AddComponent<Transformer>();
+	//sphere->GetTransformer()->SetScale(Vec3(0.2f, 0.2f, 0.2f));
+	//cube->AddComponent<Transformer>();
+	//cube->GetTransformer()->SetTranslate(Vec3(-1.0f, 0.0f, 1.0f));
+	//cube->GetTransformer()->SetScale(Vec3(0.4f, 0.4f, 0.4f));
 
 
-	PointLight* light = World::CreateEntity<PointLight>(m_world);
-	light->SetColor(Vec3(0.5f));
-	light->SetPos(Vec3(1.0f, 1.0f, -1.0f));
-	m_world->AddLight(light);
-	
-	sphere->AddComponent<Material>();
-	cube->AddComponent<Material>();
-	Shader* shader = ShaderLibrary::Allocate(camera->GetViewMatrix(), proj);
-	sphere->GetMaterial()->SetShader(shader);
-	cube->GetMaterial()->SetShader(shader);
+	//PointLight* light = World::CreateEntity<PointLight>(m_world);
+	//light->SetColor(Vec3(0.5f));
+	//light->SetPos(Vec3(1.0f, 1.0f, -1.0f));
+	//m_world->AddLight(light);
+	//
+	//sphere->AddComponent<Material>();
+	//cube->AddComponent<Material>();
+	//Shader* shader = ShaderLibrary::Allocate(camera->GetViewMatrix(), proj);
+	//sphere->GetMaterial()->SetShader(shader);
+	//cube->GetMaterial()->SetShader(shader);
 
-	sphere->SetVisible(true);
-	cube->SetVisible(true);
+	//sphere->SetVisible(true);
+	//cube->SetVisible(true);
 
-	Renderer* renderer = RendererLibrary::Allocate(Renderer::Primitive::TRIANGLE);
-	m_world->SetRenderer(sphere, renderer);
-	m_world->SetRenderer(cube, renderer);
+	//Renderer* renderer = RendererLibrary::Allocate(Renderer::Primitive::TRIANGLE);
+	//m_world->SetRenderer(sphere, renderer);
+	//m_world->SetRenderer(cube, renderer);
 }
 
 void Application::Tick()
 {
-	MSG msg;
 	while (true)
 	{
-		if (GetMessage(&msg, m_window->GetWindowHandle(), 0, 0) > 0)
-		{
-			m_world->Render();
-			m_framebuffers[0].RenderToScreen(m_window);
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
+		m_window->OnUpdate();
 	}
 }

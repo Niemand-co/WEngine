@@ -3,7 +3,6 @@
 #define SR_FRAMEBUFFER_H
 
 #include "Math/Vector.h"
-#include "Utils/Window.h"
 #include <stdint.h>
 #include <vector>
 
@@ -11,6 +10,8 @@ typedef uint8_t BUFFER_TYPE;
 
 extern BUFFER_TYPE COLOR_BUFFER;
 extern BUFFER_TYPE DEPTH_BUFFER;
+
+class Window;
 
 class Framebuffer
 {

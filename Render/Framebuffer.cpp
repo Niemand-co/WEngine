@@ -1,4 +1,5 @@
 #include "Framebuffer.h"
+#include "Platform/Windows/WindowsWindow.h"
 #include <float.h>
 
 Framebuffer* Framebuffer::cur_framebuffer = nullptr;
@@ -90,7 +91,7 @@ void Framebuffer::RenderToScreen(Window* window)
 {
 	for (uint32_t i = 0; i < m_colorbuffers[0].size(); ++i)
 	{
-		window->DrawPixel(i % m_width, i / m_width, m_colorbuffers[0][i]);
+		static_cast<WindowsWindow*>(window)->DrawPixel(i % m_width, i / m_width, m_colorbuffers[0][i]);
 	}
 }
 
