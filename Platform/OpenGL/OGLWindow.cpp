@@ -9,7 +9,7 @@ OGLWindow::OGLWindow(WindProc* proc)
 	glfwInit();
 	
 	m_window = glfwCreateWindow(proc->width, proc->height, proc->title.c_str(), nullptr, nullptr);
-	m_renderContext = new OGLRenderContext(m_window);
+	m_renderContext = new OGLRenderContext(this);
 	m_renderContext->Init();
 }
 

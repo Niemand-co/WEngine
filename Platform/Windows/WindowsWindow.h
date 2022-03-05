@@ -6,6 +6,9 @@
 #include <iostream>
 #include <vector>
 
+class Framebuffer;
+class WindowsRenderContext;
+
 class WindowsWindow : public Window
 {
 public:
@@ -27,4 +30,5 @@ private:
 	uint32_t m_height;
 	HWND m_window;
 	MSG msg;
+	WindowsRenderContext* m_renderContext;
 };

@@ -6,63 +6,65 @@ set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT WEngine)
 
 add_definitions(-DOPENGL)
 
-set(GLAD_INCLUDE ${CMAKE_SOURCE_DIR}/deps/glad/include)
+set(GLAD_INCLUDE ${CMAKE_SOURCE_DIR}/WEngine/deps/glad/include)
 
 set(CORE_SRC
-    "Core/Application.h"
-    "Core/Application.cpp")
+    "WEngine/Core/Application.h"
+    "WEngine/Core/Application.cpp")
 
 set(MATH_SRC
-    "Math/Matrix.h"
-    "Math/Vector.h")
+    "WEngine/Math/Matrix.h"
+    "WEngine/Math/Vector.h")
 
 set(RENDERER_SRC
-    "Render/Rasterizer.h"
-    "Render/Rasterizer.cpp"
-    "Render/Renderer.h"
-    "Render/Renderer.cpp"
-    "Render/RenderAPI.h"
-    "Render/RenderAPI.cpp"
-    "Render/Framebuffer.h"
-    "Render/Framebuffer.cpp"
-    "Render/Vertex.h"
-    "Render/RenderContext.h"
-    "Render/RenderContext.cpp")
+    "WEngine/Render/Rasterizer.h"
+    "WEngine/Render/Rasterizer.cpp"
+    "WEngine/Render/Renderer.h"
+    "WEngine/Render/Renderer.cpp"
+    "WEngine/Render/RenderAPI.h"
+    "WEngine/Render/RenderAPI.cpp"
+    "WEngine/Render/Framebuffer.h"
+    "WEngine/Render/Framebuffer.cpp"
+    "WEngine/Render/Vertex.h"
+    "WEngine/Render/RenderContext.h"
+    "WEngine/Render/RenderContext.cpp"
+    "WEngine/Render/RenderCommand.h"
+    "WEngine/Render/RenderCommand.cpp")
 
 set(COMP_SRC
-    "Components/Component.h"
-    "Components/Material.h"
-    "Components/Material.cpp"
-    "Components/Mesh.h"
-    "Components/Mesh.cpp"
-    "Components/Transformer.h"
-    "Components/Transformer.cpp")
+    "WEngine/Components/Component.h"
+    "WEngine/Components/Material.h"
+    "WEngine/Components/Material.cpp"
+    "WEngine/Components/Mesh.h"
+    "WEngine/Components/Mesh.cpp"
+    "WEngine/Components/Transformer.h"
+    "WEngine/Components/Transformer.cpp")
 
 set(SCENE_SRC
-    "Scene/World.h"
-    "Scene/World.cpp"
-    "Scene/Entity.h"
-    "Scene/Entity.cpp"
-    "Scene/Light.h"
-    "Scene/Light.cpp")
+    "WEngine/Scene/World.h"
+    "WEngine/Scene/World.cpp"
+    "WEngine/Scene/Entity.h"
+    "WEngine/Scene/Entity.cpp"
+    "WEngine/Scene/Light.h"
+    "WEngine/Scene/Light.cpp")
 
 set(CAMERA_SRC
-    "Camera/Camera.h"
-    "Camera/Camera.cpp")
+    "WEngine/Camera/Camera.h"
+    "WEngine/Camera/Camera.cpp")
 
 set(UTILS_SRC
-    "Utils/Shader.h"
-    "Utils/Shader.cpp"
-    "Utils/Window.h"
-    "Utils/Window.cpp"
-    "Utils/OBJLoader.h"
-    "Utils/OBJLoader.cpp"
-    "Utils/Tools.h")
+    "WEngine/Utils/Shader.h"
+    "WEngine/Utils/Shader.cpp"
+    "WEngine/Utils/Window.h"
+    "WEngine/Utils/Window.cpp"
+    "WEngine/Utils/OBJLoader.h"
+    "WEngine/Utils/OBJLoader.cpp"
+    "WEngine/Utils/Tools.h")
 
 set(EVENT_SRC
-    "Event/Event.h"
-    "Event/Event.cpp"
-    "Event/Input.h")
+    "WEngine/Event/Event.h"
+    "WEngine/Event/Event.cpp"
+    "WEngine/Event/Input.h")
 
 set(ROOT_SRC
     "main.cpp")
@@ -74,13 +76,23 @@ set(OGL_SRC
     "Platform/OpenGL/OGLRenderer.h"
     "Platform/OpenGL/OGLRenderer.cpp"
     "Platform/OpenGL/OGLRenderContext.h"
-    "Platform/OpenGL/OGLRenderContext.cpp")
+    "Platform/OpenGL/OGLRenderContext.cpp"
+    "Platform/OpenGL/OGLShader.h"
+    "Platform/OpenGL/OGLShader.cpp"
+    "Platform/OpenGL/OGLRenderAPI.h"
+    "Platform/OpenGL/OGLRenderAPI.cpp")
 
 set(WIN_SRC
     "Platform/Windows/WindowsWindow.h"
     "Platform/Windows/WindowsWindow.cpp"
     "Platform/Windows/WindowsRenderer.h"
-    "Platform/Windows/WindowsRenderer.cpp")
+    "Platform/Windows/WindowsRenderer.cpp"
+    "Platform/Windows/WindowsRenderContext.h"
+    "Platform/Windows/WindowsRenderContext.cpp"
+    "Platform/Windows/WindowsShader.h"
+    "Platform/Windows/WindowsShader.cpp"
+    "Platform/Windows/WindowsRenderAPI.h"
+    "Platform/Windows/WindowsRenderAPI.cpp")
 
 set(PLATFORM_SRC
     ${OGL_SRC}
@@ -104,22 +116,24 @@ list(APPEND WENGINE_INCLUDE ${DEPS_INCLUDE})
 
 
 
-source_group(Core FILES ${CORE_SRC})
-source_group(Math FILES ${MATH_SRC})
-source_group(Render FILES ${RENDERER_SRC})
-source_group(Utils FILES ${UTILS_SRC})
-source_group(Src FILES ${ROOT_SRC})
-source_group(Components FILES ${COMP_SRC})
-source_group(Scene FILES ${SCENE_SRC})
-source_group(Camera FILES ${CAMERA_SRC})
-source_group(Event FILES ${EVENT_SRC})
+source_group(WEngine/Core FILES ${CORE_SRC})
+source_group(WEngine/Math FILES ${MATH_SRC})
+source_group(WEngine/Render FILES ${RENDERER_SRC})
+source_group(WEngine/Utils FILES ${UTILS_SRC})
+source_group(WEngine/Src FILES ${ROOT_SRC})
+source_group(WEngine/Components FILES ${COMP_SRC})
+source_group(WEngine/Scene FILES ${SCENE_SRC})
+source_group(WEngine/Camera FILES ${CAMERA_SRC})
+source_group(WEngine/Event FILES ${EVENT_SRC})
 source_group(Platform/OpenGL FILES ${OGL_SRC})
 source_group(Platform/Windows FILES ${WIN_SRC})
 
 add_executable(WEngine ${SR_SRC})
 
-set(GLFW_DIR ${CMAKE_SOURCE_DIR}/glfw)
+set(GLFW_DIR ${CMAKE_SOURCE_DIR}/WEngine/deps/glfw)
 
+include_directories(${CMAKE_SOURCE_DIR}/Platform)
+include_directories(${CMAKE_SOURCE_DIR}/WEngine)
 include_directories(${CMAKE_SOURCE_DIR})
 add_subdirectory(${CMAKE_SOURCE_DIR}/assets)
 add_subdirectory(${GLFW_DIR})

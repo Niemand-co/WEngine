@@ -1,4 +1,6 @@
 #include "WindowsWindow.h"
+#include "Render/Framebuffer.h"
+#include "Windows/WindowsRenderContext.h"
 #include <iostream>
 
 LRESULT WINAPI WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -48,6 +50,9 @@ WindowsWindow::WindowsWindow(WindProc* proc)
 	hdc = GetDC(m_window);
 	ScreenHDC = CreateCompatibleDC(hdc);
 
+	m_renderContext = new WindowsRenderContext(this);
+	m_renderContext->Init();
+
 	ShowWindow(m_window, SW_SHOW);
 	UpdateWindow(m_window);
 }
@@ -83,5 +88,6 @@ void WindowsWindow::OnUpdate()
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+		m_renderContext->SwapBuffer();
 	}
 }

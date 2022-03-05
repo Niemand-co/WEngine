@@ -1,15 +1,17 @@
 #pragma once
 #include "Render/RenderContext.h"
 
-struct GLFWwindow;
+class OGLWindow;
 
 class OGLRenderContext : RenderContext
 {
 public:
-	OGLRenderContext(GLFWwindow* window);
+	OGLRenderContext(Window* window);
+	virtual ~OGLRenderContext() = default;
 
 	virtual void Init() override;
+	virtual void SetBufferNum(BUFFER_NUM num) override;
 	virtual void SwapBuffer() override;
 private:
-	GLFWwindow* m_window;
+	OGLWindow* m_window;
 };
