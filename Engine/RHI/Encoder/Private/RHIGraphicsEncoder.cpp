@@ -1,0 +1,5 @@
+#include "pch.h"
+#include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
+#include "RHI/Public/RHIRenderPass.h"
+#include "RHI/Public/RHIPipelineStateObject.h"
+#include "Render/Descriptor/Public/RHIRenderPassBeginDescriptor.h"

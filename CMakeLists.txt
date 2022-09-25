@@ -1,140 +1,173 @@
 cmake_minimum_required(VERSION 3.8)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 
-project(SoftRenderer)
+project(WEngine)
 
 set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT WEngine)
 
-add_definitions(-DOPENGL)
+#add_definitions(-DOPENGL)
 
-set(GLAD_INCLUDE ${CMAKE_SOURCE_DIR}/WEngine/deps/glad/include)
+set(GLAD_INCLUDE ${CMAKE_SOURCE_DIR}/Engine/deps/glad/include)
 
-set(CORE_SRC
-    "WEngine/Core/Application.h"
-    "WEngine/Core/Application.cpp")
+file(GLOB MATH_SRC Engine/Math/*.*)
 
-set(MATH_SRC
-    "WEngine/Math/Matrix.h"
-    "WEngine/Math/Vector.h")
+file(GLOB ICON_SRC Icons/*.*)
 
-set(RENDERER_SRC
-    "WEngine/Render/Rasterizer.h"
-    "WEngine/Render/Rasterizer.cpp"
-    "WEngine/Render/Renderer.h"
-    "WEngine/Render/Renderer.cpp"
-    "WEngine/Render/RenderAPI.h"
-    "WEngine/Render/RenderAPI.cpp"
-    "WEngine/Render/Framebuffer.h"
-    "WEngine/Render/Framebuffer.cpp"
-    "WEngine/Render/Vertex.h"
-    "WEngine/Render/RenderContext.h"
-    "WEngine/Render/RenderContext.cpp"
-    "WEngine/Render/RenderCommand.h"
-    "WEngine/Render/RenderCommand.cpp")
+file(GLOB PASS_SRC Engine/Render/Passes/Private/*.*)
+file(GLOB PIPELINE_SRC Engine/Render/RenderPipeline/Private/*.*)
+file(GLOB DESCR_SRC Engine/Render/Descriptor/Private/*.*)
+file(GLOB RENDER_SRC Engine/Render/Private/*.*)
 
-set(COMP_SRC
-    "WEngine/Components/Component.h"
-    "WEngine/Components/Material.h"
-    "WEngine/Components/Material.cpp"
-    "WEngine/Components/Mesh.h"
-    "WEngine/Components/Mesh.cpp"
-    "WEngine/Components/Transformer.h"
-    "WEngine/Components/Transformer.cpp")
+file(GLOB FRAME_SRC Engine/Framework/Private/*.*)
+file(GLOB COMP_SRC Engine/Scene/Components/Private/*.*)
+file(GLOB SCENE_SRC Engine/Scene/Private/*.*)
+file(GLOB UTILS_SRC Engine/Utils/Private/*.*)
+file(GLOB ALLOC_SRC Engine/Utils/Allocator/Private/*.*)
+file(GLOB EVENT_SRC Engine/Event/Private/*.*)
+file(GLOB ROOT_SRC Engine/Sources/*.cpp Engine/Sources/*.h Engine/Sources/*.rc)
+file(GLOB LOG_SRC Engine/Log/Private/*.*)
+file(GLOB RHI_SRC Engine/RHI/Private/*.*)
+file(GLOB RHI_ENCODER_SRC Engine/RHI/Encoder/private/*.*)
+file(GLOB GLFW_SRC Platform/GLFWWindow/Private/*.*)
+file(GLOB WIN_SRC Platform/Windows/Private/*.*)
+file(GLOB VULKAN_SRC Platform/Vulkan/Private/*.*)
+file(GLOB VULKAN_ENCODER_SRC Platform/Vulkan/Encoder/Private/*.*)
 
-set(SCENE_SRC
-    "WEngine/Scene/World.h"
-    "WEngine/Scene/World.cpp"
-    "WEngine/Scene/Entity.h"
-    "WEngine/Scene/Entity.cpp"
-    "WEngine/Scene/Light.h"
-    "WEngine/Scene/Light.cpp")
+file(GLOB PASS_INCLUDE Engine/Render/Passes/Public/*.h)
+file(GLOB PIPELINE_INCLUDE Engine/Render/RenderPipeline/Public/*.h)
+file(GLOB DESCR_INCLUDE Engine/Render/Descriptor/Public/*.h)
+file(GLOB RENDER_INCLUDE Engine/Render/Public/*.h)
 
-set(CAMERA_SRC
-    "WEngine/Camera/Camera.h"
-    "WEngine/Camera/Camera.cpp")
+file(GLOB FRAME_INCLUDE Engine/Framework/Public/*.h)
+file(GLOB COMP_INCLUDE Engine/Scene/Components/Public/*.h)
+file(GLOB SCENE_INCLUDE Engine/Scene/Public/*.h)
+file(GLOB UTILS_INCLUDE Engine/Utils/Public/*.h)
+file(GLOB ALLOC_INCLUDE Engine/Utils/Allocator/Public/*.h)
+file(GLOB EVENT_INCLUDE Engine/Event/Public/*.h)
+file(GLOB LOG_INCLUDE Engine/Log/Public/*.h)
+file(GLOB RHI_INCLUDE Engine/RHI/Public/*.h)
+file(GLOB RHI_ENCODER_INCLUDE Engine/RHI/Encoder/Public/*.h)
+file(GLOB GLFW_INCLUDE Platform/GLFWWindow/Public/*.h)
+file(GLOB WIN_INCLUDE Platform/Windows/Public/*.h)
+file(GLOB VULKAN_INCLUDE Platform/Vulkan/Public/*.h)
+file(GLOB VULKAN_ENCODER_INCLUDE Platform/Vulkan/Encoder/Public/*.h)
 
-set(UTILS_SRC
-    "WEngine/Utils/Shader.h"
-    "WEngine/Utils/Shader.cpp"
-    "WEngine/Utils/Window.h"
-    "WEngine/Utils/Window.cpp"
-    "WEngine/Utils/OBJLoader.h"
-    "WEngine/Utils/OBJLoader.cpp"
-    "WEngine/Utils/Tools.h")
-
-set(EVENT_SRC
-    "WEngine/Event/Event.h"
-    "WEngine/Event/Event.cpp"
-    "WEngine/Event/Input.h")
-
-set(ROOT_SRC
-    "main.cpp")
-
-set(OGL_SRC
-    "Platform/OpenGL/glad.c"
-    "Platform/OpenGL/OGLWindow.h"
-    "Platform/OpenGL/OGLWindow.cpp"
-    "Platform/OpenGL/OGLRenderer.h"
-    "Platform/OpenGL/OGLRenderer.cpp"
-    "Platform/OpenGL/OGLRenderContext.h"
-    "Platform/OpenGL/OGLRenderContext.cpp"
-    "Platform/OpenGL/OGLShader.h"
-    "Platform/OpenGL/OGLShader.cpp"
-    "Platform/OpenGL/OGLRenderAPI.h"
-    "Platform/OpenGL/OGLRenderAPI.cpp")
-
-set(WIN_SRC
-    "Platform/Windows/WindowsWindow.h"
-    "Platform/Windows/WindowsWindow.cpp"
-    "Platform/Windows/WindowsRenderer.h"
-    "Platform/Windows/WindowsRenderer.cpp"
-    "Platform/Windows/WindowsRenderContext.h"
-    "Platform/Windows/WindowsRenderContext.cpp"
-    "Platform/Windows/WindowsShader.h"
-    "Platform/Windows/WindowsShader.cpp"
-    "Platform/Windows/WindowsRenderAPI.h"
-    "Platform/Windows/WindowsRenderAPI.cpp")
+macro(use_precompiled_header TARGET HEADER_FILE SRC_FILE)
+  get_filename_component(HEADER ${HEADER_FILE} NAME)
+  # Use MSVC_IDE to exclude NMake from using PCHs
+  if (MSVC AND NOT NMAKE AND NOT OGRE_UNITY_BUILD)
+    set_target_properties(${TARGET} PROPERTIES COMPILE_FLAGS /Yc"${HEADER}")
+    set_source_files_properties(${SRC_FILE}
+      PPROPERTIES COMPILE_FLAGS /Yu"${HEADER}"
+    )
+  elseif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
+  endif ()
+endmacro(use_precompiled_header)
 
 set(PLATFORM_SRC
-    ${OGL_SRC}
-    ${WIN_SRC})
+    ${GLFW_SRC}
+    ${VULKAN_SRC}
+    ${VULKAN_ENCODER_SRC})
 
-set(SR_SRC
-    ${CORE_SRC}
+set(PLATFORM_INCLUDE
+    ${GLFW_INCLUDE}
+    ${WIN_INCLUDE}
+    ${VULKAN_INCLUDE}
+    ${VULKAN_ENCODER_INCLUDE})
+
+set(WE_SRC
+    ${FRAME_SRC}
     ${MATH_SRC}
-    ${RENDERER_SRC}
+    ${RENDER_SRC}
+    ${DESCR_SRC}
     ${COMP_SRC}
     ${SCENE_SRC}
-    ${CAMERA_SRC}
     ${UTILS_SRC}
+    ${ALLOC_SRC}
     ${EVENT_SRC}
     ${ROOT_SRC}
-    ${PLATFORM_SRC})
+    ${PLATFORM_SRC}
+    ${PASS_SRC}
+    ${PIPELINE_SRC}
+    ${LOG_SRC}
+    ${RHI_SRC}
+    ${RHI_ENCODER_SRC}
+    ${ICON_SRC})
 
+set(WE_INCLUDE
+    ${FRAME_INCLUDE}
+    ${MATH_INCLUDE}
+    ${RENDER_INCLUDE}
+    ${DESCR_INCLUDE}
+    ${COMP_INCLUDE}
+    ${SCENE_INCLUDE}
+    ${UTILS_INCLUDE}
+    ${ALLOC_INCLUDE}
+    ${EVENT_INCLUDE}
+    ${PLATFORM_INCLUDE}
+    ${PASS_INCLUDE}
+    ${PIPELINE_INCLUDE}
+    ${LOG_INCLUDE}
+    ${RHI_INCLUDE}
+    ${RHI_ENCODER_INCLUDE})
 
 list(APPEND WENGINE_INCLUDE ${GLAD_INCLUDE})
 list(APPEND WENGINE_INCLUDE ${DEPS_INCLUDE})
 
+source_group(Engine/Framework/Private FILES ${FRAME_SRC})
+source_group(Engine/Math FILES ${MATH_SRC})
+source_group(Engine/Render/Private FILES ${RENDER_SRC})
+source_group(Engine/Render/Descriptor/Private FILES ${DESCR_SRC})
+source_group(Engine/Render/Passes/Private FILES ${PASS_SRC})
+source_group(Engine/Render/RenderPipeline/Private FILES ${PIPELINE_SRC})
+source_group(Engine/Utils/Private FILES ${UTILS_SRC})
+source_group(Engine/Utils/Allocator/Private FILES ${ALLOC_SRC})
+source_group(Engine/Sources FILES ${ROOT_SRC})
+source_group(Engine/Scene/Components/Private FILES ${COMP_SRC})
+source_group(Engine/Scene/Private FILES ${SCENE_SRC})
+source_group(Engine/Event/Privatet FILES ${EVENT_SRC})
+source_group(Engine/Log/Private FILES ${LOG_SRC})
+source_group(Engine/Render/Pass/Private FILES ${PASS_SRC})
+source_group(Engine/RHI/Private FILES ${RHI_SRC})
+source_group(Engine/RHI/Encoder/Private FILES ${RHI_ENCODER_SRC})
+source_group(Platform/GLFWWindow/Private FILES ${GLFW_SRC})
+source_group(Platform/Vulkan/Private FILES ${VULKAN_SRC})
+source_group(Platform/Vulkan/Encoder/Private FILES ${VULKAN_ENCODER_SRC})
+source_group(Icons FILES ${ICON_SRC})
 
+source_group(Engine/Framework/Public FILES ${FRAME_INCLUDE})
+source_group(Engine/Math/Public FILES ${MATH_INCLUDE})
+source_group(Engine/Render/Public FILES ${RENDER_INCLUDE})
+source_group(Engine/Render/Descriptor/Public FILES ${DESCR_INCLUDE})
+source_group(Engine/Render/Passes/Public FILES ${PASS_INCLUDE})
+source_group(Engine/Render/RenderPipeline/Public FILES ${PIPELINE_INCLUDE})
+source_group(Engine/Utils/Public FILES ${UTILS_INCLUDE})
+source_group(Engine/Utils/Allocator/Public FILES ${ALLOC_INCLUDE})
+source_group(Engine/Scene/Components/Public FILES ${COMP_INCLUDE})
+source_group(Engine/Scene/Public FILES ${SCENE_INCLUDE})
+source_group(Engine/Event/Publict FILES ${EVENT_INCLUDE})
+source_group(Engine/Render/Pass/Public FILES ${PASS_INCLUDE})
+source_group(Engine/Log/Public FILES ${LOG_INCLUDE})
+source_group(Engine/RHI/Public FILES ${RHI_INCLUDE})
+source_group(Engine/RHI/Encoder/Public FILES ${RHI_ENCODER_INCLUDE})
+source_group(Platform/GLFWWindow/Public FILES ${GLFW_INCLUDE})
+source_group(Platform/Vulkan/Public FILES ${VULKAN_INCLUDE})
+source_group(Platform/Vulkan/Encoder/Public FILES ${VULKAN_ENCODER_INCLUDE})
 
-source_group(WEngine/Core FILES ${CORE_SRC})
-source_group(WEngine/Math FILES ${MATH_SRC})
-source_group(WEngine/Render FILES ${RENDERER_SRC})
-source_group(WEngine/Utils FILES ${UTILS_SRC})
-source_group(WEngine/Src FILES ${ROOT_SRC})
-source_group(WEngine/Components FILES ${COMP_SRC})
-source_group(WEngine/Scene FILES ${SCENE_SRC})
-source_group(WEngine/Camera FILES ${CAMERA_SRC})
-source_group(WEngine/Event FILES ${EVENT_SRC})
-source_group(Platform/OpenGL FILES ${OGL_SRC})
-source_group(Platform/Windows FILES ${WIN_SRC})
+link_directories(Engine/deps/Vulkan/Lib)
 
-add_executable(WEngine ${SR_SRC})
+add_executable(WEngine ${WE_SRC} ${WE_INCLUDE})
+use_precompiled_header(${PROJECT_NAME} "${CMAKE_SOURCE_DIR}/Sources/pch.h" "${CMAKE_SOURCE_DIR}/Sources/pch.cpp")
 
-set(GLFW_DIR ${CMAKE_SOURCE_DIR}/WEngine/deps/glfw)
+set(GLFW_DIR ${CMAKE_SOURCE_DIR}/Engine/deps/glfw)
 
 include_directories(${CMAKE_SOURCE_DIR}/Platform)
-include_directories(${CMAKE_SOURCE_DIR}/WEngine)
+include_directories(${CMAKE_SOURCE_DIR}/Engine)
+include_directories(${CMAKE_SOURCE_DIR}/Engine/Sources)
 include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/Engine/deps/Vulkan/include)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/assets)
 add_subdirectory(${CMAKE_SOURCE_DIR}/assets)
 add_subdirectory(${GLFW_DIR})
 
@@ -142,6 +175,7 @@ list(APPEND WENGINE_INCLUDE ${GLFW3_DIR}/include)
 
 target_include_directories(WEngine PUBLIC ${WENGINE_INCLUDE})
 target_link_libraries(WEngine glfw)
+target_link_libraries(WEngine "vulkan-1.lib")
 
 file(GLOB_RECURSE ASSET_LIST_PATH ${CMAKE_SOURCE_DIR}/assets/*.*)
 

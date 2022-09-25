@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\assets",
+    "\\Platform",
+    "\\Platform\\Windows",
+    "\\Platform\\Windows\\Private",
+    "\\Platform\\Windows\\Public",
+    "\\WEngine",
+    "\\WEngine\\Math",
+    "\\WEngine\\Render",
+    "\\WEngine\\Utils"
+  ],
+  "SelectedNode": "\\Platform\\OpenGL\\Private\\OGLWindow.cpp",
+  "PreviewInSolutionExplorer": false
+}
