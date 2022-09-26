@@ -22,11 +22,11 @@ public:
 
 	virtual ~ScriptableRenderPass();
 
-	virtual void Setup();
+	virtual void Setup() = 0;
 
-	virtual void Execute(RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore);
+	virtual void Execute(RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore) = 0;
 
-private:
+protected:
 
 	RHIDevice *m_pDevice;
 

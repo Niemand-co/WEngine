@@ -12,6 +12,7 @@
 #include "Platform/Vulkan/Public/VulkanTextureView.h"
 #include "Platform/Vulkan/Public/VulkanTexture.h"
 #include "Platform/Vulkan/Public/VulkanRenderTarget.h"
+#include "Platform/Vulkan/Public/VulkanBuffer.h"
 #include "Platform/Vulkan/Public/VulkanSemaphore.h"
 #include "Render/Descriptor/Public/RHISwapchainDescriptor.h"
 #include "Render/Descriptor/Public/RHIShaderDescriptor.h"
@@ -21,6 +22,7 @@
 #include "Render/Descriptor/Public/RHIPipelineStateObjectDescriptor.h"
 #include "Render/Descriptor/Public/RHITextureDescriptor.h"
 #include "Render/Descriptor/Public/RHIRenderTargetDescriptor.h"
+#include "Render/Descriptor/Public/RHIBufferDescriptor.h"
 #include "RHI/Public/RHIQueue.h"
 
 namespace Vulkan
@@ -314,6 +316,20 @@ namespace Vulkan
 		RE_ASSERT(vkCreateFramebuffer(*m_device, &framebufferCreateInfo, nullptr, framebuffer) == VK_SUCCESS, "Failed to Create Framebuffer.");
 
 		return new VulkanRenderTarget(framebuffer, descriptor->width, descriptor->height);
+	}
+
+	RHIBuffer* VulkanDevice::CreateBuffer(RHIBufferDescriptor* descriptor)
+	{
+		VkBufferCreateInfo bufferCreateInfo = {};
+		bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		bufferCreateInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+		bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		bufferCreateInfo.size = descriptor->size;
+
+		VkBuffer* buffer = (VkBuffer*)Allocator::Allocate(sizeof(VkBuffer));
+		RE_ASSERT(vkCreateBuffer(*m_device, &bufferCreateInfo, nullptr, buffer) == VK_SUCCESS, "Failed to Create Buffer.");
+
+		return new VulkanBuffer(buffer);
 	}
 
 	std::vector<RHISemaphore*> VulkanDevice::GetSemaphore(unsigned int count)

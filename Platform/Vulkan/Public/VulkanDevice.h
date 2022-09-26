@@ -34,6 +34,8 @@ namespace Vulkan
 
 		virtual RHIRenderTarget* CreateRenderTarget(RHIRenderTargetDescriptor *descriptor) override;
 
+		virtual RHIBuffer* CreateBuffer(RHIBufferDescriptor *descriptor) override;
+
 		virtual std::vector<RHISemaphore*> GetSemaphore(unsigned int count) override;
 
 		virtual int GetNextImage(RHISwapchain *swapchain, RHISemaphore *semaphore) override;

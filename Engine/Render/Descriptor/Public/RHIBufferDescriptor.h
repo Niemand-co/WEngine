@@ -8,4 +8,9 @@ public:
 	RHIBufferDescriptor();
 
 	virtual ~RHIBufferDescriptor();
+
+public:
+
+	uint64_t size;
+
 };

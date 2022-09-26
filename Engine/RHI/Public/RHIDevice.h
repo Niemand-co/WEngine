@@ -9,6 +9,7 @@ class RHIPipelineStateObject;
 class RHITexture;
 class RHIRenderTarget;
 class RHISemaphore;
+class RHIBuffer;
 
 class RHISwapchainDescriptor;
 class RHIShaderDescriptor;
@@ -16,6 +17,7 @@ class RHIRenderPassDescriptor;
 class RHIPipelineStateObjectDescriptor;
 class RHITextureDescriptor;
 class RHIRenderTargetDescriptor;
+class RHIBufferDescriptor;
 
 class RHIDevice
 {
@@ -40,6 +42,8 @@ public:
 	virtual RHITexture* CreateTexture(RHITextureDescriptor *descriptor) = 0;
 
 	virtual RHIRenderTarget* CreateRenderTarget(RHIRenderTargetDescriptor *descriptor) = 0;
+
+	virtual RHIBuffer* CreateBuffer(RHIBufferDescriptor *descriptor) = 0;
 
 	virtual std::vector<RHISemaphore*> GetSemaphore(unsigned int count) = 0;
 

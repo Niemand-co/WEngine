@@ -14,6 +14,7 @@
 #include "RHI/Public/RHIRenderPass.h"
 #include "RHI/Public/RHITexture.h"
 #include "RHI/Public/RHIRenderTarget.h"
+#include "RHI/Public/RHIBuffer.h"
 #include "RHI/Public/RHISemaphore.h"
 #include "Render/Descriptor/Public/RHIQueueDescriptor.h"
 #include "Render/Descriptor/Public/RHISwapchainDescriptor.h"
@@ -21,3 +22,4 @@
 #include "Render/Descriptor/Public/RHIRenderPassDescriptor.h"
 #include "Render/Descriptor/Public/RHITextureDescriptor.h"
 #include "Render/Descriptor/Public/RHIRenderTargetDescriptor.h"
+#include "Render/Descriptor/Public/RHIBufferDescriptor.h"
