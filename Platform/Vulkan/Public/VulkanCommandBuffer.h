@@ -20,6 +20,8 @@ namespace Vulkan
 
 		virtual RHIComputeEncoder* GetComputeEncoder() override;
 
+		virtual void Clear() override;
+
 		virtual VkCommandBuffer* GetHandle();
 
 	private:

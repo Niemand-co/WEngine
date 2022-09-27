@@ -14,6 +14,6 @@ void FinalBlitPass::Setup()
 {
 }
 
-void FinalBlitPass::Execute(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore)
+void FinalBlitPass::Execute(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence)
 {
 }

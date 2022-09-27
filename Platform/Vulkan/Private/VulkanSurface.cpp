@@ -13,7 +13,12 @@ namespace Vulkan
 	{
 	}
 
-	VkSurfaceKHR VulkanSurface::GetSurface()
+	void VulkanSurface::SetHandle(VkSurfaceKHR* surface)
+	{
+		m_surface = surface;
+	}
+
+	VkSurfaceKHR VulkanSurface::GetHandle()
 	{
 		return *m_surface;
 	}

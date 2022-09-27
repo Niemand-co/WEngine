@@ -14,6 +14,7 @@
 #include "Platform/Vulkan/Public/VulkanRenderTarget.h"
 #include "Platform/Vulkan/Public/VulkanBuffer.h"
 #include "Platform/Vulkan/Public/VulkanSemaphore.h"
+#include "Platform/Vulkan/Public/VulkanFence.h"
 #include "Render/Descriptor/Public/RHISwapchainDescriptor.h"
 #include "Render/Descriptor/Public/RHIShaderDescriptor.h"
 #include "Render/Descriptor/Public/RHIRenderPassDescriptor.h"
@@ -23,7 +24,7 @@
 #include "Render/Descriptor/Public/RHITextureDescriptor.h"
 #include "Render/Descriptor/Public/RHIRenderTargetDescriptor.h"
 #include "Render/Descriptor/Public/RHIBufferDescriptor.h"
-#include "RHI/Public/RHIQueue.h"
+#include "Utils/Public/Window.h"
 
 namespace Vulkan
 {
@@ -62,7 +63,7 @@ namespace Vulkan
 	{
 		VkSwapchainCreateInfoKHR swapchainCreateInfo = {};
 		swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-		swapchainCreateInfo.surface = static_cast<VulkanSurface*>(descriptor->surface)->GetSurface();
+		swapchainCreateInfo.surface = static_cast<VulkanSurface*>(descriptor->surface)->GetHandle();
 		swapchainCreateInfo.imageFormat = WEngine::ToVulkan(descriptor->format);
 		swapchainCreateInfo.imageColorSpace = WEngine::ToVulkan(descriptor->colorSpace);
 		swapchainCreateInfo.presentMode = WEngine::ToVulkan(descriptor->presenMode);
@@ -87,19 +88,51 @@ namespace Vulkan
 		VkImage *images = (VkImage*)Allocator::Allocate(imageCount * sizeof(VkImage));
 		vkGetSwapchainImagesKHR(*m_device, *swapchain, &imageCount, images);
 
-		return new VulkanSwapchain(swapchain, images, imageCount, m_device);
+		return new VulkanSwapchain(swapchain, images, imageCount, m_device, 0);
 	}
 
-	RHIFence* VulkanDevice::CreateFence()
+	void VulkanDevice::RecreateSwapchain(RHISwapchain* swapchain, RHISwapchainDescriptor* descriptor)
 	{
+		vkDestroySwapchainKHR(*m_device, *static_cast<VulkanSwapchain*>(swapchain)->GetHandle(), nullptr);
+
+		VkSwapchainCreateInfoKHR swapchainCreateInfo = {};
+		swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+		swapchainCreateInfo.surface = static_cast<VulkanSurface*>(descriptor->surface)->GetHandle();
+		swapchainCreateInfo.imageFormat = WEngine::ToVulkan(descriptor->format);
+		swapchainCreateInfo.imageColorSpace = WEngine::ToVulkan(descriptor->colorSpace);
+		swapchainCreateInfo.presentMode = WEngine::ToVulkan(descriptor->presenMode);
+		swapchainCreateInfo.imageExtent = { descriptor->extent.width, descriptor->extent.height };
+		swapchainCreateInfo.minImageCount = descriptor->count;
+		swapchainCreateInfo.imageArrayLayers = 1;
+		swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+		swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		swapchainCreateInfo.queueFamilyIndexCount = 0;
+		swapchainCreateInfo.pQueueFamilyIndices = nullptr;
+
+		swapchainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+		swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+		swapchainCreateInfo.clipped = VK_TRUE;
+		swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
+
+		RE_ASSERT(vkCreateSwapchainKHR(*m_device, &swapchainCreateInfo, nullptr, static_cast<VulkanSwapchain*>(swapchain)->GetHandle()) == VK_SUCCESS, "Failed to Recreate Swapchain.");
+	}
+
+	std::vector<RHIFence*> VulkanDevice::CreateFence(unsigned int count)
+	{
+		std::vector<RHIFence*> fences(count);
+
 		VkFenceCreateInfo fenceCreateInfo = {};
 		fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-		VkFence *fence = (VkFence*)Allocator::Allocate(sizeof(VkFence));
-		vkCreateFence(*m_device, &fenceCreateInfo, nullptr, fence);
+		VkFence *fence = (VkFence*)Allocator::Allocate(count * sizeof(VkFence));
+		for (unsigned int i = 0; i < count; ++i)
+		{
+			vkCreateFence(*m_device, &fenceCreateInfo, nullptr, fence + i);
+			fences[i] = new VulkanFence(fence + i);
+		}
 
-		return new VulkanFence(fence);
+		return fences;
 	}
 
 	RHIShader* VulkanDevice::CreateShader(RHIShaderDescriptor *descriptor)
@@ -329,7 +362,7 @@ namespace Vulkan
 		VkBuffer* buffer = (VkBuffer*)Allocator::Allocate(sizeof(VkBuffer));
 		RE_ASSERT(vkCreateBuffer(*m_device, &bufferCreateInfo, nullptr, buffer) == VK_SUCCESS, "Failed to Create Buffer.");
 
-		return new VulkanBuffer(buffer);
+		return new VulkanBuffer(buffer, m_device);
 	}
 
 	std::vector<RHISemaphore*> VulkanDevice::GetSemaphore(unsigned int count)
@@ -348,13 +381,45 @@ namespace Vulkan
 		return semaphores;
 	}
 
+	void VulkanDevice::WaitForFences(RHIFence* pFences, unsigned int count, bool waitForAll)
+	{
+		std::vector<VkFence> fences;
+		fences.reserve(count);
+		for (unsigned int i = 0; i < count; ++i)
+		{
+			fences.push_back(*static_cast<VulkanFence*>(pFences + i)->GetHandle());
+		}
+
+		vkWaitForFences(*m_device, count, fences.data(), waitForAll, (std::numeric_limits<uint64_t>::max)());
+	}
+
+	void VulkanDevice::ResetFences(RHIFence* pFences, unsigned int count)
+	{
+		std::vector<VkFence> fences;
+		fences.reserve(count);
+		for (unsigned int i = 0; i < count; ++i)
+		{
+			fences.push_back(*static_cast<VulkanFence*>(pFences + i)->GetHandle());
+		}
+
+		RE_ASSERT(vkResetFences(*m_device, count, fences.data()) == VK_SUCCESS, "Failed to Reset Fences.");
+	}
+
 	int VulkanDevice::GetNextImage(RHISwapchain *swapchain, RHISemaphore *semaphore)
 	{
 		unsigned int index;
 		VkResult result = vkAcquireNextImageKHR(*m_device, *static_cast<VulkanSwapchain*>(swapchain)->GetHandle(), (std::numeric_limits<uint64_t>::max)(), *static_cast<VulkanSemaphore*>(semaphore)->GetHandle(), VK_NULL_HANDLE, &index);
-		if(result == VK_ERROR_OUT_OF_DATE_KHR)
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || Window::cur_window->IsSizeChanged())
+		{
+			vkDeviceWaitIdle(*m_device);
 			return -1;
+		}
 		return index;
+	}
+
+	VkDevice* VulkanDevice::GetHandle()
+	{
+		return m_device;
 	}
 
 }

@@ -5,4 +5,5 @@ class RHIFence
 public:
 
 	virtual ~RHIFence() = default;
+
 };

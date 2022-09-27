@@ -9,6 +9,8 @@ public:
 
 	virtual ~VulkanFence();
 
+	VkFence* GetHandle();
+
 private:
 
 	VkFence *m_fence;

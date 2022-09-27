@@ -8,6 +8,7 @@ class RHIDevice;
 class RHISwapchain;
 class RHIContext;
 class RHISemaphore;
+class RHIFence;
 class RHITexture;
 
 class ScriptableRenderPipeline
@@ -52,8 +53,14 @@ private:
 
 	RHIContext *m_pContext;
 
-	std::vector<RHISemaphore*> m_semaphores;
+	std::vector<RHISemaphore*> m_imageAvailibleSemaphores;
 
-	unsigned int m_semaphoreCount;
+	std::vector<RHISemaphore*> m_presentAVailibleSemaphores;
+
+	std::vector<RHIFence*> m_fences;
+
+	unsigned int m_maxFrame;
+
+	unsigned int m_currentFrame;
 
 };

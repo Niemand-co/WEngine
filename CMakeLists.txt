@@ -25,7 +25,7 @@ file(GLOB SCENE_SRC Engine/Scene/Private/*.*)
 file(GLOB UTILS_SRC Engine/Utils/Private/*.*)
 file(GLOB ALLOC_SRC Engine/Utils/Allocator/Private/*.*)
 file(GLOB EVENT_SRC Engine/Event/Private/*.*)
-file(GLOB ROOT_SRC Engine/Sources/*.cpp Engine/Sources/*.h Engine/Sources/*.rc)
+file(GLOB ROOT_SRC Engine/Sources/*.cpp Engine/Sources/*.h)
 file(GLOB LOG_SRC Engine/Log/Private/*.*)
 file(GLOB RHI_SRC Engine/RHI/Private/*.*)
 file(GLOB RHI_ENCODER_SRC Engine/RHI/Encoder/private/*.*)
@@ -92,8 +92,7 @@ set(WE_SRC
     ${PIPELINE_SRC}
     ${LOG_SRC}
     ${RHI_SRC}
-    ${RHI_ENCODER_SRC}
-    ${ICON_SRC})
+    ${RHI_ENCODER_SRC})
 
 set(WE_INCLUDE
     ${FRAME_INCLUDE}

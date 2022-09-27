@@ -10,7 +10,7 @@ static void WindowKeyCallback(GLFWwindow* window, int key, int scancode, int act
 		RE_LOG("Window Closed.");
 		glfwWindowShouldClose(window);
 		GLFWWindow* win = reinterpret_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
-		win->Destroy();
+		win->SetShouldClose(true);
 	}
 }
 
@@ -18,7 +18,7 @@ static void WindowCloseCallback(GLFWwindow* window)
 {
 	RE_LOG("Window Closed.");
 	GLFWWindow* win = reinterpret_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
-	win->Destroy();
+	win->SetShouldClose(true);
 }
 
 static void FramebufferResizeCallback(GLFWwindow* window, int width, int height)
@@ -36,6 +36,7 @@ GLFWWindow::GLFWWindow(WinProc* pProc)
 	m_width = pProc->width;
 	m_height = pProc->height;
 	m_isClosed = false;
+	m_shouldClose = false;
 	Init();
 }
 

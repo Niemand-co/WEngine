@@ -53,6 +53,23 @@ namespace Vulkan
 				queueProperty->QUEUE_SUPPORT |= QUEUE_PROPERTY_PRESENT;
 			m_feature.queueProperties.push_back(queueProperty);
 		}
+
+		VkPhysicalDeviceMemoryProperties memoryProperties;
+		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
+		m_feature.memorySupports.resize(memoryProperties.memoryHeapCount);
+		for (unsigned int i = 0; i < memoryProperties.memoryHeapCount; ++i)
+		{
+			m_feature.memorySupports[i] = new MemoryTypeSupport();
+			if(memoryProperties.memoryHeaps[i].flags == VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
+				m_feature.memorySupports[i]->type = MemoryType::LocalMemory;
+			else
+				m_feature.memorySupports[i]->type = MemoryType::HostMemory;
+			m_feature.memorySupports[i]->size = memoryProperties.memoryHeaps[i].size;
+		}
+		for (unsigned int i = 0; i < memoryProperties.memoryTypeCount; ++i)
+		{
+			m_feature.memorySupports[memoryProperties.memoryTypes[i].heapIndex]->properties |= memoryProperties.memoryTypes[i].propertyFlags;
+		}
 	}
 
 	VulkanGPU::~VulkanGPU()

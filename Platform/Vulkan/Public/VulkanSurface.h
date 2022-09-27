@@ -12,7 +12,9 @@ namespace Vulkan
 
 		virtual ~VulkanSurface();
 
-		VkSurfaceKHR GetSurface();
+		void SetHandle(VkSurfaceKHR *surface);
+
+		VkSurfaceKHR GetHandle();
 
 	private:
 

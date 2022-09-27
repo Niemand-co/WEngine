@@ -41,6 +41,14 @@ public:
 
 	virtual bool GetIsClosed();
 
+	virtual bool GetShouldClose();
+
+	virtual void SetShouldClose(bool shouldClose);
+
+	bool IsSizeChanged() { return m_isSizeChanged; }
+
+	void SetSizeChanged(bool changed) { m_isSizeChanged = changed; }
+
 	static Window* Get();
 
 	static Window* Get(WinProc* proc);
@@ -49,7 +57,11 @@ public:
 
 protected:
 
+	bool m_shouldClose;
+
 	bool m_isClosed;
+
+	bool m_isSizeChanged;
 
 };
 

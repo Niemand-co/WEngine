@@ -4,7 +4,9 @@
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 #include "Platform/Vulkan/Public/VulkanSwapchain.h"
 #include "Platform/Vulkan/Public/VulkanSemaphore.h"
+#include "Platform/Vulkan/Public/VulkanFence.h"
 #include "Render/Descriptor/Public/RHIQueueDescriptor.h"
+#include "Utils/Public/Window.h"
 
 namespace Vulkan
 {
@@ -38,7 +40,7 @@ namespace Vulkan
 		return new VulkanCommandPool(pool, m_device);
 	}
 
-	void VulkanQueue::Submit(RHICommandBuffer **cmd, unsigned int count, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore)
+	void VulkanQueue::Submit(RHICommandBuffer **cmd, unsigned int count, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence)
 	{
 		std::vector<VkCommandBuffer> commandbuffers(count);
 		for (unsigned int i = 0; i < count; ++i)
@@ -57,10 +59,13 @@ namespace Vulkan
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = static_cast<VulkanSemaphore*>(signalSemaphore)->GetHandle();
 
-		vkQueueSubmit(*m_queue, 1, &submitInfo, VK_NULL_HANDLE);
+		if(fence != nullptr)
+			vkQueueSubmit(*m_queue, 1, &submitInfo, *static_cast<VulkanFence*>(fence)->GetHandle());
+		else
+			vkQueueSubmit(*m_queue, 1, &submitInfo, VK_NULL_HANDLE);
 	}
 
-	void VulkanQueue::Present(RHISwapchain *swapchain, unsigned int index, RHISemaphore *semaphore)
+	bool VulkanQueue::Present(RHISwapchain *swapchain, unsigned int index, RHISemaphore *semaphore)
 	{
 		VkPresentInfoKHR presentInfo = {};
 		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -71,7 +76,16 @@ namespace Vulkan
 		presentInfo.pImageIndices = &index;
 		presentInfo.pResults = nullptr;
 		
-		RE_ASSERT(vkQueuePresentKHR(*m_queue, &presentInfo) == VK_SUCCESS, "Failed to Present Image.");
+		VkResult result = vkQueuePresentKHR(*m_queue, &presentInfo);
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || Window::cur_window->IsSizeChanged())
+		{
+			return false;
+		}
+		else if (result != VK_SUCCESS)
+		{
+			RE_ASSERT(false, "Failed to Present Image.");
+		}
+		return true;
 	}
 
 }

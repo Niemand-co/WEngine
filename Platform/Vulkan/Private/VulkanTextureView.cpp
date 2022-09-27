@@ -6,7 +6,7 @@
 namespace Vulkan
 {
 
-	VulkanTextureView::VulkanTextureView(VkImageView* imageView, RHITextureViewDescriptor* descriptor)
+	VulkanTextureView::VulkanTextureView(VkImageView* imageView, VkDevice *pDevice, RHITextureViewDescriptor* descriptor)
 	{
 		m_format = descriptor->format;
 		m_mipCount = descriptor->mipCount;
@@ -15,11 +15,12 @@ namespace Vulkan
 		m_baseArrayLayer = descriptor->baseArrayLayer;
 		m_dimension = descriptor->dimension;
 		m_imageView = imageView;
+		m_pDevice = pDevice;
 	}
 
 	VulkanTextureView::~VulkanTextureView()
 	{
-
+		vkDestroyImageView(*m_pDevice, *m_imageView, nullptr);
 	}
 
 	VkImageView* VulkanTextureView::GetHandle()

@@ -29,12 +29,13 @@ void RHIContext::ExecuteCommandBuffer(RHICommandBuffer* cmd)
 	m_pCommandBuffers.push_back(cmd);
 }
 
-void RHIContext::Submit(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore)
+void RHIContext::Submit(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence* fence)
 {
-	m_pQueue->Submit(m_pCommandBuffers.data(), m_pCommandBuffers.size(), waitSemaphore, signalSemaphore);
+	m_pQueue->Submit(m_pCommandBuffers.data(), m_pCommandBuffers.size(), waitSemaphore, signalSemaphore, fence);
+	m_pCommandBuffers.clear();
 }
 
-void RHIContext::Present(unsigned int imageIndex, RHISwapchain *swapchain, RHISemaphore *semaphore)
+bool RHIContext::Present(unsigned int imageIndex, RHISwapchain *swapchain, RHISemaphore *semaphore)
 {
-	m_pQueue->Present(swapchain, imageIndex, semaphore);
+	return m_pQueue->Present(swapchain, imageIndex, semaphore);
 }

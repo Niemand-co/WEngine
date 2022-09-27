@@ -8,6 +8,7 @@ class RHISwapchain;
 class RHICommandPool;
 class RHICommandBuffer;
 class RHISemaphore;
+class RHIFence;
 
 class RHIContext : public RenderContext
 {
@@ -23,9 +24,9 @@ public:
 
 	virtual void ExecuteCommandBuffer(RHICommandBuffer *cmd);
 
-	virtual void Submit(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore);
+	virtual void Submit(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence* fence);
 
-	virtual void Present(unsigned int imageIndex, RHISwapchain *swapchain, RHISemaphore *semaphore);
+	virtual bool Present(unsigned int imageIndex, RHISwapchain *swapchain, RHISemaphore *semaphore);
 
 protected:
 

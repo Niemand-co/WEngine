@@ -5,6 +5,7 @@ class RHIContext;
 class RHIPipelineStateObject;
 class RHIRenderPass;
 class RHISemaphore;
+class RHIFence;
 
 struct RenderPassConfigure
 {
@@ -24,7 +25,7 @@ public:
 
 	virtual void Setup() = 0;
 
-	virtual void Execute(RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore) = 0;
+	virtual void Execute(RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence = nullptr) = 0;
 
 protected:
 

@@ -22,7 +22,9 @@ namespace Vulkan
 
 		virtual RHISwapchain* CreateSwapchain(RHISwapchainDescriptor* descriptor) override;
 
-		virtual RHIFence* CreateFence() override;
+		virtual void RecreateSwapchain(RHISwapchain *swapchain, RHISwapchainDescriptor *descriptor) override;
+
+		virtual std::vector<RHIFence*> CreateFence(unsigned int count) override;
 
 		virtual RHIShader* CreateShader(RHIShaderDescriptor *descriptor) override;
 
@@ -38,7 +40,13 @@ namespace Vulkan
 
 		virtual std::vector<RHISemaphore*> GetSemaphore(unsigned int count) override;
 
+		virtual void WaitForFences(RHIFence* pFences, unsigned int count, bool waitForAll = true) override;
+
+		virtual void ResetFences(RHIFence* pFences, unsigned int count) override;
+
 		virtual int GetNextImage(RHISwapchain *swapchain, RHISemaphore *semaphore) override;
+
+		VkDevice* GetHandle();
 
 	private:
 

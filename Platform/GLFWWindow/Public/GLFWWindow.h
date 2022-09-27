@@ -30,15 +30,16 @@ public:
 
 	void SetHeight(unsigned int height) { m_height = height; }
 
-	bool IsSizeChanged() { return m_isSizeChanged; }
 
-	void SetSizeChanged(bool changed) { m_isSizeChanged = changed; }
+
 private:
 	WinProc m_proc;
+
 	GLFWwindow* m_handle;
+
 	unsigned int m_width;
+
 	unsigned int m_height;
-	bool m_isSizeChanged;
 };
 
 #endif

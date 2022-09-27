@@ -22,7 +22,8 @@ namespace Vulkan
 		commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		commandBufferAllocateInfo.commandBufferCount = num;
 
-		VkCommandBuffer* commandBuffer = (VkCommandBuffer*)Allocator::Allocate(num * sizeof(VkCommandBuffer));
+		//VkCommandBuffer* commandBuffer = (VkCommandBuffer*)Allocator::Allocate(num * sizeof(VkCommandBuffer));
+		VkCommandBuffer *commandBuffer = (VkCommandBuffer*)malloc(num * sizeof(VkCommandBuffer));
 		vkAllocateCommandBuffers(*m_device, &commandBufferAllocateInfo, commandBuffer);
 
 		return new VulkanCommandBuffer(commandBuffer);

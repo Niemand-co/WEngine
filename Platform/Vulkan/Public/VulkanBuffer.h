@@ -5,7 +5,7 @@ class VulkanBuffer : public RHIBuffer
 {
 public:
 
-	VulkanBuffer(VkBuffer *buffer);
+	VulkanBuffer(VkBuffer *buffer, VkDevice *device);
 
 	virtual ~VulkanBuffer();
 
@@ -14,5 +14,11 @@ public:
 private:
 
 	VkBuffer *m_pBuffer;
+
+	VkMemoryRequirements *m_pMemoryRequiremtns;
+
+	VkDeviceMemory *m_pDeviceMemory;
+
+	VkDevice *m_pDevice;
 
 };

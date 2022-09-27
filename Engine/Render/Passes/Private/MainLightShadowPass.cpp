@@ -14,6 +14,6 @@ void MainLightShadowPass::Setup()
 {
 }
 
-void MainLightShadowPass::Execute(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore)
+void MainLightShadowPass::Execute(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence)
 {
 }

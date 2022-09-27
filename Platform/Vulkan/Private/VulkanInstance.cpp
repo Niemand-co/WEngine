@@ -97,6 +97,22 @@ namespace Vulkan
 		}
 	}
 
+	void VulkanInstance::UpdateSurface()
+	{
+		vkDestroySurfaceKHR(m_instance, *m_surface, nullptr);
+
+		VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
+		surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+		surfaceCreateInfo.hinstance = GetModuleHandle(0);
+		surfaceCreateInfo.hwnd = glfwGetWin32Window((GLFWwindow*)Window::Get()->GetHandle());
+
+		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(m_instance, "vkCreateWin32SurfaceKHR");
+
+		RE_ASSERT(CreateWin32SurfaceKHR(m_instance, &surfaceCreateInfo, nullptr, m_surface) == VK_SUCCESS, "Failed to Recreate Win32 Surface.");
+
+		static_cast<VulkanSurface*>(RHIInstance::m_surface)->SetHandle(m_surface);
+	}
+
 	void VulkanInstance::SetupDebugCallback()
 	{
 		VkDebugUtilsMessengerCreateInfoEXT debugMessageInfo = {};

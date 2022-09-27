@@ -5,6 +5,7 @@ class ScriptableRenderPass;
 class RHIDevice;
 class RHIContext;
 class RHISemaphore;
+class RHIFence;
 
 struct RendererConfigure
 {
@@ -22,7 +23,7 @@ public:
 
 	virtual void Setup();
 
-	virtual void Execute(RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore);
+	virtual void Execute(RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence);
 
 	virtual void AddRenderPass();
 

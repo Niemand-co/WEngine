@@ -38,6 +38,11 @@ namespace Vulkan
 		return nullptr;
 	}
 
+	void VulkanCommandBuffer::Clear()
+	{
+		vkResetCommandBuffer(*m_commandBuffer, VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
+	}
+
 	VkCommandBuffer* VulkanCommandBuffer::GetHandle()
 	{
 		return m_commandBuffer;

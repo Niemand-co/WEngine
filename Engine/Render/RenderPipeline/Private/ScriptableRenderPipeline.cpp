@@ -9,6 +9,7 @@
 #include "RHI/Public/RHIContext.h"
 #include "RHI/Public/RHITexture.h"
 #include "RHI/Public/RHISemaphore.h"
+#include "RHI/Public/RHIFence.h"
 #include "Render/Descriptor/Public/RHIInstanceDescriptor.h"
 #include "Render/Descriptor/Public/RHIDeviceDescriptor.h"
 #include "Render/Descriptor/Public/RHIQueueDescriptor.h"
@@ -78,27 +79,69 @@ void ScriptableRenderPipeline::Init()
 
 	m_pContext = new RHIContext(queue, m_pDevice);
 
-	m_semaphoreCount = 2;
-	m_semaphores = m_pDevice->GetSemaphore(m_semaphoreCount);
+	m_maxFrame = 3;
+	m_currentFrame = 0;
+	m_imageAvailibleSemaphores = m_pDevice->GetSemaphore(m_maxFrame);
+	m_presentAVailibleSemaphores = m_pDevice->GetSemaphore(m_maxFrame);
+
+	m_fences = m_pDevice->CreateFence(m_maxFrame);
 }
 
 void ScriptableRenderPipeline::Setup()
 {
+	for (ScriptableRenderer* renderer : m_renderers)
+	{
+		renderer->Setup();
+	}
 }
 
 void ScriptableRenderPipeline::Execute()
 {
-	g_currentFrame = m_pDevice->GetNextImage(m_pSwapchain, m_semaphores[0]);
-	g_currentRenderTarget = m_pSwapchain->GetTexture(g_currentFrame);
-	if(g_currentFrame < 0 || Window::cur_window->GetIsClosed())
-		return;
+	//m_pDevice->WaitForFences(m_fences[m_currentFrame], 1);
+	//m_pDevice->ResetFences(m_fences[m_currentFrame], 1);
 
-	for (ScriptableRenderer* renderer : m_renderers)
+	g_currentFrame = m_pDevice->GetNextImage(m_pSwapchain, m_imageAvailibleSemaphores[m_currentFrame]);
+	if (g_currentFrame < 0)
 	{
-		renderer->Execute(m_semaphores[0], m_semaphores[1]);
+		m_pInstance->UpdateSurface();
+		RHISwapchainDescriptor swapchainDescriptor = {};
+		{
+			swapchainDescriptor.count = 3;
+			swapchainDescriptor.format = Format::A16R16G16B16_SFloat;
+			swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
+			swapchainDescriptor.presenMode = PresentMode::Immediate;
+			swapchainDescriptor.surface = m_pInstance->GetSurface();
+			swapchainDescriptor.presentFamilyIndex = 0;
+			swapchainDescriptor.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
+		}
+		m_pDevice->RecreateSwapchain(m_pSwapchain, &swapchainDescriptor);
+		return;
+	}
+	//g_currentRenderTarget = m_pSwapchain->GetTexture(g_currentFrame);
+
+	//for (ScriptableRenderer* renderer : m_renderers)
+	//{
+	//	renderer->Execute(m_imageAvailibleSemaphores[m_currentFrame], m_presentAVailibleSemaphores[m_currentFrame], m_fences[m_currentFrame]);
+	//}
+
+	if (!m_pContext->Present(g_currentFrame, m_pSwapchain, m_imageAvailibleSemaphores[m_currentFrame]))
+	{
+		m_pInstance->UpdateSurface();
+		RHISwapchainDescriptor swapchainDescriptor = {};
+		{
+			swapchainDescriptor.count = 3;
+			swapchainDescriptor.format = Format::A16R16G16B16_SFloat;
+			swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
+			swapchainDescriptor.presenMode = PresentMode::Immediate;
+			swapchainDescriptor.surface = m_pInstance->GetSurface();
+			swapchainDescriptor.presentFamilyIndex = 0;
+			swapchainDescriptor.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
+		}
+		m_pDevice->RecreateSwapchain(m_pSwapchain, &swapchainDescriptor);
+		return;
 	}
 
-	m_pContext->Present(g_currentFrame, m_pSwapchain, m_semaphores[1]);
+	m_currentFrame = (m_currentFrame + 1) % m_maxFrame;
 }
 
 void ScriptableRenderPipeline::AddRenderer()
@@ -108,8 +151,6 @@ void ScriptableRenderPipeline::AddRenderer()
 	ScriptableRenderer *renderer = (ScriptableRenderer*)Allocator::Allocate(sizeof(ScriptableRenderer));
 	::new (renderer) ScriptableRenderer(&configure);
 	m_renderers.push_back(renderer);
-
-	renderer->AddRenderPass();
 }
 
 void ScriptableRenderPipeline::Present()

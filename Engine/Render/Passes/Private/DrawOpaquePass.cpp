@@ -9,6 +9,7 @@
 #include "RHI/Public/RHITexture.h"
 #include "RHI/Public/RHITextureView.h"
 #include "RHI/Public/RHISemaphore.h"
+#include "RHI/Public/RHIBuffer.h"
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
 #include "RHI/Encoder/Public/RHIComputeEncoder.h"
 #include "Render/Descriptor/Public/RHIRenderPassBeginDescriptor.h"
@@ -21,6 +22,7 @@
 #include "Render/Descriptor/Public/RHIBlendDescriptor.h"
 #include "Render/Descriptor/Public/RHIDepthStencilDescriptor.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
+#include "Render/Descriptor/Public/RHIBufferDescriptor.h"
 #include "Utils/Public/Window.h"
 
 DrawOpaquePass::DrawOpaquePass(RenderPassConfigure* configure)
@@ -95,9 +97,15 @@ void DrawOpaquePass::Setup()
 		psoDescriptor.shaderCount = shaders.size();
 	}
 	m_pPSO = m_pDevice->CreatePipelineStateObject(&psoDescriptor);
+
+	//RHIBufferDescriptor bufferDescriptor = {};
+	//{
+	//	bufferDescriptor.size = 3 * sizeof(float);
+	//}
+	//RHIBuffer *buffer = m_pDevice->CreateBuffer(&bufferDescriptor);
 }
 
-void DrawOpaquePass::Execute(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore)
+void DrawOpaquePass::Execute(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence)
 {
 
 	RHICommandBuffer* cmd = m_pContext->GetCommandBuffer();
@@ -133,19 +141,24 @@ void DrawOpaquePass::Execute(RHISemaphore* waitSemaphore, RHISemaphore* signalSe
 	RHIRenderTarget* renderTarget = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
 
 	cmd->BeginScopePass("Test");
-	RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
-	RHIRenderPassBeginDescriptor renderPassBeginDescriptor = {};
 	{
-		renderPassBeginDescriptor.renderPass = m_pRenderPass;
-		renderPassBeginDescriptor.renderTarget = renderTarget;
+		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
+		RHIRenderPassBeginDescriptor renderPassBeginDescriptor = {};
+		{
+			renderPassBeginDescriptor.renderPass = m_pRenderPass;
+			renderPassBeginDescriptor.renderTarget = renderTarget;
+		}
+		encoder->BeginPass(&renderPassBeginDescriptor);
+		encoder->SetPipeline(m_pPSO);
+		encoder->SetViewport(nullptr);
+		encoder->SetScissor(nullptr);
+		encoder->EndPass();
+		cmd->EndScopePass();
+		m_pContext->ExecuteCommandBuffer(cmd);
+		m_pContext->Submit(waitSemaphore, signalSemaphore, fence);
+		delete encoder;
 	}
-	encoder->BeginPass(&renderPassBeginDescriptor);
-	encoder->SetPipeline(m_pPSO);
-	encoder->SetViewport(nullptr);
-	encoder->SetScissor(nullptr);
-	encoder->EndPass();
-	cmd->EndScopePass();
-	m_pContext->ExecuteCommandBuffer(cmd);
-	m_pContext->Submit(waitSemaphore, signalSemaphore);
-	
+	cmd->Clear();
+	delete cmd;
+	delete view;
 }

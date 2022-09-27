@@ -87,14 +87,28 @@ struct QueueProperty
 	unsigned int count = 0u;
 };
 
+enum class MemoryType
+{
+	HostMemory = 0,
+	LocalMemory,
+};
+
+struct MemoryTypeSupport
+{
+	MemoryType type;
+	unsigned short properties;
+	uint64_t size;
+};
+
 struct GPUFeature
 {
 	union
 	{
-		unsigned int sign;
+		unsigned short sign;
 		struct { char PHYSICAL_DEVICE_TYPE, QUEUE_SUPPORT; };
 	};
 	unsigned short SHDAER_SUPPORT;
+	std::vector<MemoryTypeSupport*> memorySupports;
 	std::vector<QueueProperty*> queueProperties;
 };
 

@@ -17,6 +17,8 @@ namespace Vulkan
 
 		virtual void InitializeGPU() override;
 
+		virtual void UpdateSurface() override;
+
 	private:
 
 		void SetupDebugCallback();

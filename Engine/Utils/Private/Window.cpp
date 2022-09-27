@@ -11,6 +11,16 @@ bool Window::GetIsClosed()
 	return m_isClosed;
 }
 
+bool Window::GetShouldClose()
+{
+	return m_shouldClose;
+}
+
+void Window::SetShouldClose(bool shouldClose)
+{
+	m_shouldClose = shouldClose;
+}
+
 Window* Window::Get()
 {
 	if (cur_window != nullptr)

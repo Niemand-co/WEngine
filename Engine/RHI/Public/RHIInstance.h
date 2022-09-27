@@ -24,6 +24,8 @@ public:
 
 	virtual RHISurface* GetSurface();
 
+	virtual void UpdateSurface() = 0;
+
 public:
 
 	static RHIInstance* g_instance;

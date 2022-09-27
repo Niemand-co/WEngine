@@ -17,4 +17,6 @@ public:
 
 	virtual RHIComputeEncoder* GetComputeEncoder() = 0;
 
+	virtual void Clear() = 0;
+
 };

@@ -11,7 +11,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTextureView(VkImageView *imageView, RHITextureViewDescriptor* descriptor);
+		VulkanTextureView(VkImageView *imageView, VkDevice *pDevice, RHITextureViewDescriptor* descriptor);
 
 		virtual ~VulkanTextureView();
 
@@ -22,6 +22,8 @@ namespace Vulkan
 	private:
 
 		VkImageView *m_imageView;
+
+		VkDevice *m_pDevice;
 
 		Format m_format;
 

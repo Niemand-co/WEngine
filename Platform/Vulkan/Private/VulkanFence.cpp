@@ -9,3 +9,8 @@ VulkanFence::VulkanFence(VkFence* fence)
 VulkanFence::~VulkanFence()
 {
 }
+
+VkFence* VulkanFence::GetHandle()
+{
+	return m_fence;
+}

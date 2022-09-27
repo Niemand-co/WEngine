@@ -23,19 +23,22 @@ void ScriptableRenderer::Setup()
 
 	m_mainLightShadowPass = (MainLightShadowPass*)Allocator::Allocate(sizeof(MainLightShadowPass));
 	::new (m_mainLightShadowPass) MainLightShadowPass(&configure);
+	m_mainLightShadowPass->Setup();
 
 	m_drawOpaquePass = (DrawOpaquePass*)Allocator::Allocate(sizeof(DrawOpaquePass));
 	::new (m_drawOpaquePass) DrawOpaquePass(&configure);
+	m_drawOpaquePass->Setup();
 
 	m_finalBlitPass = (FinalBlitPass*)Allocator::Allocate(sizeof(FinalBlitPass));
 	::new (m_finalBlitPass) FinalBlitPass(&configure);
+	m_finalBlitPass->Setup();
 }
 
-void ScriptableRenderer::Execute(RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore)
+void ScriptableRenderer::Execute(RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence)
 {
 	m_mainLightShadowPass->Execute(waitSemaphore, signalSemaphore);
 
-	m_drawOpaquePass->Execute(waitSemaphore, signalSemaphore);
+	m_drawOpaquePass->Execute(waitSemaphore, signalSemaphore, fence);
 
 	m_finalBlitPass->Execute(waitSemaphore, signalSemaphore);
 }

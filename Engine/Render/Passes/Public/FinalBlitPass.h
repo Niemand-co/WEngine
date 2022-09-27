@@ -11,6 +11,6 @@ public:
 
 	virtual void Setup() override;
 
-	virtual void Execute(RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore) override;
+	virtual void Execute(RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence) override;
 
 };

@@ -36,7 +36,7 @@ namespace Vulkan
 		VkImageView* imageView = (VkImageView*)Allocator::Allocate(sizeof(VkImageView));
 		RE_ASSERT(vkCreateImageView(*m_device, &imageViewCreateInfo, nullptr, imageView) == VK_SUCCESS, "Failed to Create Image View.");
 
-		return new VulkanTextureView(imageView, descriptor);
+		return new VulkanTextureView(imageView, m_device, descriptor);
 	}
 
 }
