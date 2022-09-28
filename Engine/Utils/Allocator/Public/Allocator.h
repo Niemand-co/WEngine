@@ -1,45 +1,50 @@
 #pragma once
 
-class Allocator;
+#define MIN_BLOCK_SIZE
 
-struct Block
+namespace WEngine
 {
-	friend class Allocator;
 
-public:
+	struct Block
+	{
+		Block() = default;
+		~Block() = default;
+		Block* prev;
+	};
 
-	Block();
+	class Allocator
+	{
+	public:
 
-	~Block();
+		Allocator();
 
-private:
+		Allocator(const Allocator&) = delete;
 
-	BYTE *data;
+		~Allocator();
 
-	BYTE *cur;
+		static Allocator* Get();
 
-	size_t left;
+		void* Allocate(size_t size);
 
-	Block *next;
+		void Deallocate(void* pBlock);
 
-};
+	private:
 
-class Allocator
-{
-public:
+		void AllocateList(size_t size)
+		{
 
-	Allocator();
+		}
 
-	Allocator(const Allocator&) = delete;
+	private:
 
-	~Allocator();
+		static Allocator* g_pInstance;
 
-	static void* Allocate(size_t size);
+	private:
 
-private:
+		BYTE* head;
 
-	Block* head;
+		Block* lists[5];
 
-	static Block* cur;
+	};
 
-};
+}
