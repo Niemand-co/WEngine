@@ -13,7 +13,7 @@ namespace Vulkan
 
 		VulkanGPU() = delete;
 
-		VulkanGPU(VkPhysicalDevice physicalDevice, VkSurfaceKHR *surface);
+		VulkanGPU(VkPhysicalDevice *pPhysicalDevice, VkSurfaceKHR *surface);
 
 		virtual ~VulkanGPU();
 
@@ -25,7 +25,7 @@ namespace Vulkan
 
 	private:
 
-		VkPhysicalDevice m_device;
+		VkPhysicalDevice *m_pPhysicalDevice;
 
 	};
 

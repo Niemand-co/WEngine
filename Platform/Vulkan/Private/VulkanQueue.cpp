@@ -34,7 +34,7 @@ namespace Vulkan
 		commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		commandPoolCreateInfo.queueFamilyIndex = m_queueFamilyIndex;
 
-		VkCommandPool *pool = (VkCommandPool*)Allocator::Allocate(sizeof(VkCommandPool));
+		VkCommandPool *pool = (VkCommandPool*)WEngine::Allocator::Get()->Allocate(sizeof(VkCommandPool));
 		vkCreateCommandPool(*m_device, &commandPoolCreateInfo, nullptr, pool);
 
 		return new VulkanCommandPool(pool, m_device);

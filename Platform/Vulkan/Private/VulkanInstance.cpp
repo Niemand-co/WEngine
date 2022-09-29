@@ -3,6 +3,7 @@
 #include "Platform/Vulkan/Public/VulkanGPU.h"
 #include "Platform/Vulkan/Public/VulkanSurface.h"
 #include "Platform/GLFWWindow/Public/GLFWWindow.h"
+#include "Platform/Vulkan/Allocator/Public/VulkanAllocator.h"
 
 namespace Vulkan
 {
@@ -66,7 +67,9 @@ namespace Vulkan
 		instanceCreateInfo.enabledExtensionCount = extensions.size();
 		instanceCreateInfo.enabledLayerCount = 0;
 
-		RE_ASSERT(vkCreateInstance(&instanceCreateInfo, nullptr, &m_instance) == VK_SUCCESS, "Failed to Create Vulkan Instance.");
+		Vulkan::VulkanAllocatorData userData = { WEngine::Allocator::Get()->Get(), sizeof(VkInstance) };
+		VkAllocationCallbacks* callbacks = static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(&userData);
+		RE_ASSERT(vkCreateInstance(&instanceCreateInfo, callbacks, &m_instance) == VK_SUCCESS, "Failed to Create Vulkan Instance.");
 
 		if (enableDebugLayer)
 		{
@@ -79,21 +82,23 @@ namespace Vulkan
 	VulkanInstance::~VulkanInstance()
 	{
 		DestroyDebugUtilsMessengerEXT(m_instance, m_debugUtilsMessenger, nullptr);
-		vkDestroyInstance(m_instance, nullptr);
+		Vulkan::VulkanAllocatorData userData = { WEngine::Allocator::Get()->Get(), sizeof(VkInstance) };
+		VkAllocationCallbacks *callbacks = static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(&userData);
+		vkDestroyInstance(m_instance, callbacks);
 	}
 
 	void VulkanInstance::InitializeGPU()
 	{
 		unsigned int physicalDeviceCount = 0;
 		vkEnumeratePhysicalDevices(m_instance, &physicalDeviceCount, nullptr);
-		std::vector<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
-		vkEnumeratePhysicalDevices(m_instance, &physicalDeviceCount, physicalDevices.data());
+		VkPhysicalDevice *pPhysicalDevice = (VkPhysicalDevice*)WEngine::Allocator::Get()->Allocate(physicalDeviceCount * sizeof(VkPhysicalDevice));
+		vkEnumeratePhysicalDevices(m_instance, &physicalDeviceCount, pPhysicalDevice);
 
 		m_gpus.resize(physicalDeviceCount);
 
 		for (unsigned int i = 0; i < physicalDeviceCount; ++i)
 		{
-			m_gpus[i] = new VulkanGPU(physicalDevices[i], m_surface);
+			m_gpus[i] = new VulkanGPU(pPhysicalDevice, m_surface);
 		}
 	}
 
@@ -138,7 +143,7 @@ namespace Vulkan
 
 		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(m_instance, "vkCreateWin32SurfaceKHR");
 
-		m_surface = (VkSurfaceKHR*)Allocator::Allocate(sizeof(VkSurfaceKHR));
+		m_surface = (VkSurfaceKHR*)WEngine::Allocator::Get()->Allocate(sizeof(VkSurfaceKHR));
 		RE_ASSERT(CreateWin32SurfaceKHR(m_instance, &surfaceCreateInfo, nullptr, m_surface) == VK_SUCCESS, "Failed to Create Win32 Surface.");
 
 		RHIInstance::m_surface = new VulkanSurface(m_surface);

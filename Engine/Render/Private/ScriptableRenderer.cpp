@@ -21,15 +21,15 @@ void ScriptableRenderer::Setup()
 	configure.pDevice = m_pDevice;
 	configure.pContext = m_pContext;
 
-	m_mainLightShadowPass = (MainLightShadowPass*)Allocator::Allocate(sizeof(MainLightShadowPass));
+	m_mainLightShadowPass = (MainLightShadowPass*)WEngine::Allocator::Get()->Allocate(sizeof(MainLightShadowPass));
 	::new (m_mainLightShadowPass) MainLightShadowPass(&configure);
 	m_mainLightShadowPass->Setup();
 
-	m_drawOpaquePass = (DrawOpaquePass*)Allocator::Allocate(sizeof(DrawOpaquePass));
+	m_drawOpaquePass = (DrawOpaquePass*)WEngine::Allocator::Get()->Allocate(sizeof(DrawOpaquePass));
 	::new (m_drawOpaquePass) DrawOpaquePass(&configure);
 	m_drawOpaquePass->Setup();
 
-	m_finalBlitPass = (FinalBlitPass*)Allocator::Allocate(sizeof(FinalBlitPass));
+	m_finalBlitPass = (FinalBlitPass*)WEngine::Allocator::Get()->Allocate(sizeof(FinalBlitPass));
 	::new (m_finalBlitPass) FinalBlitPass(&configure);
 	m_finalBlitPass->Setup();
 }

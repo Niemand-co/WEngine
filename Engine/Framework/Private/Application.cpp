@@ -31,16 +31,16 @@ Application* Application::CreateApplication()
 
 void Application::Init()
 {
-	m_allocator = new Allocator();
+	WEngine::Allocator::Init(WEngine::Backend::Vulkan);
 
 	WinProc proc = { "WEngine", 1920u, 1080u };
 	m_window = Window::Get(&proc);
 
 	m_pipeline = ScriptableRenderPipeline::get();
 
-	m_pipeline->AddRenderer();
+	//m_pipeline->AddRenderer();
 
-	m_pipeline->Setup();
+	//m_pipeline->Setup();
 
 }
 
@@ -55,7 +55,7 @@ void Application::Tick()
 			m_window->Destroy();
 			continue;
 		}
-		m_pipeline->Execute();
+		//m_pipeline->Execute();
 	}
 	Finalize();
 }

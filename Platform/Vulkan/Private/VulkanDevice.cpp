@@ -50,7 +50,7 @@ namespace Vulkan
 
 	RHIQueue* VulkanDevice::GetQueue(RHIQueueType type, unsigned int count)
 	{
-		VkQueue *queue = (VkQueue*)Allocator::Allocate(sizeof(VkQueue));
+		VkQueue *queue = (VkQueue*)WEngine::Allocator::Get()->Allocate(sizeof(VkQueue));
 		unsigned int queueFamilyID = 0;
 		for(; queueFamilyID < m_queues.size(); ++queueFamilyID)
 			if(m_queues[queueFamilyID].type == type)
@@ -80,12 +80,12 @@ namespace Vulkan
 		swapchainCreateInfo.clipped = VK_TRUE;
 		swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-		VkSwapchainKHR *swapchain = (VkSwapchainKHR*)Allocator::Allocate(sizeof(VkSwapchainKHR));
+		VkSwapchainKHR *swapchain = (VkSwapchainKHR*)WEngine::Allocator::Get()->Allocate(sizeof(VkSwapchainKHR));
 		RE_ASSERT(vkCreateSwapchainKHR(*m_device, &swapchainCreateInfo, nullptr, swapchain) == VK_SUCCESS, "Failed to Create Swapchain.");
 
 		unsigned int imageCount = 0;
 		vkGetSwapchainImagesKHR(*m_device, *swapchain, &imageCount, nullptr);
-		VkImage *images = (VkImage*)Allocator::Allocate(imageCount * sizeof(VkImage));
+		VkImage *images = (VkImage*)WEngine::Allocator::Get()->Allocate(imageCount * sizeof(VkImage));
 		vkGetSwapchainImagesKHR(*m_device, *swapchain, &imageCount, images);
 
 		return new VulkanSwapchain(swapchain, images, imageCount, m_device, 0);
@@ -125,7 +125,7 @@ namespace Vulkan
 		fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-		VkFence *fence = (VkFence*)Allocator::Allocate(count * sizeof(VkFence));
+		VkFence *fence = (VkFence*)WEngine::Allocator::Get()->Allocate(count * sizeof(VkFence));
 		for (unsigned int i = 0; i < count; ++i)
 		{
 			vkCreateFence(*m_device, &fenceCreateInfo, nullptr, fence + i);
@@ -142,7 +142,7 @@ namespace Vulkan
 		shaderModuleCreateInfo.codeSize = descriptor->codeSize;
 		shaderModuleCreateInfo.pCode = descriptor->pCode;
 
-		VkShaderModule *shaderModule = (VkShaderModule*)Allocator::Allocate(sizeof(VkShaderModule));
+		VkShaderModule *shaderModule = (VkShaderModule*)WEngine::Allocator::Get()->Allocate(sizeof(VkShaderModule));
 		vkCreateShaderModule(*m_device, &shaderModuleCreateInfo, nullptr, shaderModule);
 
 		return new VulkanShader(shaderModule, descriptor->shaderStage, descriptor->entryName);
@@ -186,7 +186,7 @@ namespace Vulkan
 		renderPassCreateInfo.dependencyCount = 1;
 		renderPassCreateInfo.pDependencies = &subpassDependency;
 
-		VkRenderPass *renderPass = (VkRenderPass*)Allocator::Allocate(sizeof(VkRenderPass));
+		VkRenderPass *renderPass = (VkRenderPass*)WEngine::Allocator::Get()->Allocate(sizeof(VkRenderPass));
 		RE_ASSERT(vkCreateRenderPass(*m_device, &renderPassCreateInfo, nullptr, renderPass) == VK_SUCCESS, "Failed to Create Render Pass.");
 
 		return new VulkanRenderPass(renderPass);
@@ -285,7 +285,7 @@ namespace Vulkan
 		layoutCreateInfo.pSetLayouts = nullptr;
 		layoutCreateInfo.pushConstantRangeCount = 0;
 		layoutCreateInfo.pPushConstantRanges = nullptr;
-		VkPipelineLayout *layout = (VkPipelineLayout*)Allocator::Allocate(sizeof(VkPipelineLayout));
+		VkPipelineLayout *layout = (VkPipelineLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VkPipelineLayout));
 		RE_ASSERT(vkCreatePipelineLayout(*m_device, &layoutCreateInfo, nullptr, layout) == VK_SUCCESS, "Failed to Create Pipeline Layout.");
 
 		VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {};
@@ -306,7 +306,7 @@ namespace Vulkan
 		graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
 		//graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
-		VkPipeline *pipeline = (VkPipeline*)Allocator::Allocate(sizeof(VkPipeline));
+		VkPipeline *pipeline = (VkPipeline*)WEngine::Allocator::Get()->Allocate(sizeof(VkPipeline));
 		RE_ASSERT(vkCreateGraphicsPipelines(*m_device, VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, pipeline) == VK_SUCCESS, "Failed to Create Pipeline.");
 
 		return new VulkanPipelineStateObject(pipeline);
@@ -322,7 +322,7 @@ namespace Vulkan
 		imageCreateInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		VkImage *image = (VkImage*)Allocator::Allocate(sizeof(VkImage));
+		VkImage *image = (VkImage*)WEngine::Allocator::Get()->Allocate(sizeof(VkImage));
 		vkCreateImage(*m_device, &imageCreateInfo, nullptr, image);
 
 		return nullptr;
@@ -345,7 +345,7 @@ namespace Vulkan
 		framebufferCreateInfo.height = descriptor->height;
 		framebufferCreateInfo.layers = 1;
 
-		VkFramebuffer *framebuffer = (VkFramebuffer*)Allocator::Allocate(sizeof(VkFramebuffer));
+		VkFramebuffer *framebuffer = (VkFramebuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkFramebuffer));
 		RE_ASSERT(vkCreateFramebuffer(*m_device, &framebufferCreateInfo, nullptr, framebuffer) == VK_SUCCESS, "Failed to Create Framebuffer.");
 
 		return new VulkanRenderTarget(framebuffer, descriptor->width, descriptor->height);
@@ -359,7 +359,7 @@ namespace Vulkan
 		bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		bufferCreateInfo.size = descriptor->size;
 
-		VkBuffer* buffer = (VkBuffer*)Allocator::Allocate(sizeof(VkBuffer));
+		VkBuffer* buffer = (VkBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkBuffer));
 		RE_ASSERT(vkCreateBuffer(*m_device, &bufferCreateInfo, nullptr, buffer) == VK_SUCCESS, "Failed to Create Buffer.");
 
 		return new VulkanBuffer(buffer, m_device);
@@ -367,7 +367,7 @@ namespace Vulkan
 
 	std::vector<RHISemaphore*> VulkanDevice::GetSemaphore(unsigned int count)
 	{
-		VkSemaphore *semaphore = (VkSemaphore*)Allocator::Allocate(count * sizeof(VkSemaphore));
+		VkSemaphore *semaphore = (VkSemaphore*)WEngine::Allocator::Get()->Allocate(count * sizeof(VkSemaphore));
 		std::vector<RHISemaphore*> semaphores(count);
 		
 		VkSemaphoreCreateInfo semaphoreCreateInfo = {};

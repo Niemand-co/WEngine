@@ -4,7 +4,7 @@
 VulkanBuffer::VulkanBuffer(VkBuffer* buffer, VkDevice *device)
 	: m_pBuffer(buffer), m_pDevice(device)
 {
-	m_pMemoryRequiremtns = (VkMemoryRequirements*)Allocator::Allocate(sizeof(VkMemoryRequirements));
+	m_pMemoryRequiremtns = (VkMemoryRequirements*)WEngine::Allocator::Get()->Allocate(sizeof(VkMemoryRequirements));
 	vkGetBufferMemoryRequirements(*m_pDevice, *m_pBuffer, m_pMemoryRequiremtns);
 
 	VkMemoryAllocateInfo memoryAllocateInfo = {};
@@ -12,7 +12,7 @@ VulkanBuffer::VulkanBuffer(VkBuffer* buffer, VkDevice *device)
 	memoryAllocateInfo.allocationSize = m_pMemoryRequiremtns->size;
 	memoryAllocateInfo.memoryTypeIndex = 1;
 
-	m_pDeviceMemory = (VkDeviceMemory*)Allocator::Allocate(sizeof(VkDeviceMemory));
+	m_pDeviceMemory = (VkDeviceMemory*)WEngine::Allocator::Get()->Allocate(sizeof(VkDeviceMemory));
 	RE_ASSERT(vkAllocateMemory(*m_pDevice, &memoryAllocateInfo, nullptr, m_pDeviceMemory) == VK_SUCCESS, "Failed to Allocate Memory.");
 
 	vkBindBufferMemory(*m_pDevice, *m_pBuffer, *m_pDeviceMemory, 0);

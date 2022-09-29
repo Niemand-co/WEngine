@@ -11,12 +11,12 @@
 namespace Vulkan
 {
 
-	VulkanGPU::VulkanGPU(VkPhysicalDevice physicalDevice, VkSurfaceKHR *surface)
+	VulkanGPU::VulkanGPU(VkPhysicalDevice * pPhysicalDevice, VkSurfaceKHR *surface)
 	{
-		m_device = physicalDevice;
+		m_pPhysicalDevice = pPhysicalDevice;
 
 		VkPhysicalDeviceProperties properties;
-		vkGetPhysicalDeviceProperties(m_device, &properties);
+		vkGetPhysicalDeviceProperties(*m_pPhysicalDevice, &properties);
 
 		GPUName = properties.deviceName;
 		RE_LOG(GPUName);
@@ -29,7 +29,7 @@ namespace Vulkan
 			m_feature.PHYSICAL_DEVICE_TYPE |= DEVICE_TYPE_OTHER;
 
 		VkPhysicalDeviceFeatures features;
-		vkGetPhysicalDeviceFeatures(m_device, &features);
+		vkGetPhysicalDeviceFeatures(*m_pPhysicalDevice, &features);
 
 		if(features.geometryShader)
 			m_feature.SHDAER_SUPPORT |= FEATURE_GEOMETRY_SHADER;
@@ -37,15 +37,15 @@ namespace Vulkan
 			m_feature.SHDAER_SUPPORT |= FEATURE_TESSELATION_SHADER;
 
 		unsigned int queueFamilyPropertyCount = 0;
-		vkGetPhysicalDeviceQueueFamilyProperties(m_device, &queueFamilyPropertyCount, nullptr);
+		vkGetPhysicalDeviceQueueFamilyProperties(*m_pPhysicalDevice, &queueFamilyPropertyCount, nullptr);
 		std::vector<VkQueueFamilyProperties> queueFamilyProperties(queueFamilyPropertyCount);
-		vkGetPhysicalDeviceQueueFamilyProperties(m_device, &queueFamilyPropertyCount, queueFamilyProperties.data());
+		vkGetPhysicalDeviceQueueFamilyProperties(*m_pPhysicalDevice, &queueFamilyPropertyCount, queueFamilyProperties.data());
 
 		VkBool32 isPresentSupported;
 		for (unsigned int i = 0; i < queueFamilyPropertyCount; ++i)
 		{
 			VkQueueFamilyProperties properties = queueFamilyProperties[i];
-			vkGetPhysicalDeviceSurfaceSupportKHR(m_device, i, *surface, &isPresentSupported);
+			vkGetPhysicalDeviceSurfaceSupportKHR(*m_pPhysicalDevice, i, *surface, &isPresentSupported);
 			QueueProperty* queueProperty = new QueueProperty();
 			queueProperty->count = properties.queueCount;
 			queueProperty->QUEUE_SUPPORT = properties.queueFlags;
@@ -55,7 +55,7 @@ namespace Vulkan
 		}
 
 		VkPhysicalDeviceMemoryProperties memoryProperties;
-		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
+		vkGetPhysicalDeviceMemoryProperties(*m_pPhysicalDevice, &memoryProperties);
 		m_feature.memorySupports.resize(memoryProperties.memoryHeapCount);
 		for (unsigned int i = 0; i < memoryProperties.memoryHeapCount; ++i)
 		{
@@ -155,8 +155,8 @@ namespace Vulkan
 			deviceCreateInfo.enabledLayerCount = 0u;
 		}
 
-		VkDevice *pDevice = (VkDevice*)Allocator::Allocate(sizeof(VkDevice));
-		RE_ASSERT(vkCreateDevice(m_device, &deviceCreateInfo, nullptr, pDevice) == VK_SUCCESS, "Failed to Create Device.");
+		VkDevice *pDevice = (VkDevice*)WEngine::Allocator::Get()->Allocate(sizeof(VkDevice));
+		RE_ASSERT(vkCreateDevice(*m_pPhysicalDevice, &deviceCreateInfo, nullptr, pDevice) == VK_SUCCESS, "Failed to Create Device.");
 
 		RHIDevice* device = new VulkanDevice(pDevice, queueStack);
 

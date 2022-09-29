@@ -12,6 +12,12 @@ namespace WEngine
 		Block* prev;
 	};
 
+	enum class Backend
+	{
+		None = 0,
+		Vulkan,
+	};
+
 	class Allocator
 	{
 	public:
@@ -20,20 +26,15 @@ namespace WEngine
 
 		Allocator(const Allocator&) = delete;
 
-		~Allocator();
+		virtual ~Allocator();
+
+		static void Init(Backend backend);
 
 		static Allocator* Get();
 
-		void* Allocate(size_t size);
+		virtual void* Allocate(size_t size);
 
-		void Deallocate(void* pBlock);
-
-	private:
-
-		void AllocateList(size_t size)
-		{
-
-		}
+		virtual void Deallocate(void* pBlock, size_t size);
 
 	private:
 

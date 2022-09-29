@@ -33,6 +33,7 @@ file(GLOB GLFW_SRC Platform/GLFWWindow/Private/*.*)
 file(GLOB WIN_SRC Platform/Windows/Private/*.*)
 file(GLOB VULKAN_SRC Platform/Vulkan/Private/*.*)
 file(GLOB VULKAN_ENCODER_SRC Platform/Vulkan/Encoder/Private/*.*)
+file(GLOB VULKAN_ALLOC_SRC Platform/Vulkan/Allocator/Private/*.*)
 
 file(GLOB PASS_INCLUDE Engine/Render/Passes/Public/*.h)
 file(GLOB PIPELINE_INCLUDE Engine/Render/RenderPipeline/Public/*.h)
@@ -52,6 +53,7 @@ file(GLOB GLFW_INCLUDE Platform/GLFWWindow/Public/*.h)
 file(GLOB WIN_INCLUDE Platform/Windows/Public/*.h)
 file(GLOB VULKAN_INCLUDE Platform/Vulkan/Public/*.h)
 file(GLOB VULKAN_ENCODER_INCLUDE Platform/Vulkan/Encoder/Public/*.h)
+file(GLOB VULKAN_ALLOC_INCLUDE Platform/Vulkan/Allocator/Public/*.h)
 
 macro(use_precompiled_header TARGET HEADER_FILE SRC_FILE)
   get_filename_component(HEADER ${HEADER_FILE} NAME)
@@ -68,13 +70,15 @@ endmacro(use_precompiled_header)
 set(PLATFORM_SRC
     ${GLFW_SRC}
     ${VULKAN_SRC}
-    ${VULKAN_ENCODER_SRC})
+    ${VULKAN_ENCODER_SRC}
+    ${VULKAN_ALLOC_SRC})
 
 set(PLATFORM_INCLUDE
     ${GLFW_INCLUDE}
     ${WIN_INCLUDE}
     ${VULKAN_INCLUDE}
-    ${VULKAN_ENCODER_INCLUDE})
+    ${VULKAN_ENCODER_INCLUDE}
+    ${VULKAN_ALLOC_INCLUDE})
 
 set(WE_SRC
     ${FRAME_SRC}
@@ -133,6 +137,7 @@ source_group(Engine/RHI/Encoder/Private FILES ${RHI_ENCODER_SRC})
 source_group(Platform/GLFWWindow/Private FILES ${GLFW_SRC})
 source_group(Platform/Vulkan/Private FILES ${VULKAN_SRC})
 source_group(Platform/Vulkan/Encoder/Private FILES ${VULKAN_ENCODER_SRC})
+source_group(Platform/Vulkan/Allocator/Private FILES ${VULKAN_ALLOC_SRC})
 source_group(Icons FILES ${ICON_SRC})
 
 source_group(Engine/Framework/Public FILES ${FRAME_INCLUDE})
@@ -153,6 +158,7 @@ source_group(Engine/RHI/Encoder/Public FILES ${RHI_ENCODER_INCLUDE})
 source_group(Platform/GLFWWindow/Public FILES ${GLFW_INCLUDE})
 source_group(Platform/Vulkan/Public FILES ${VULKAN_INCLUDE})
 source_group(Platform/Vulkan/Encoder/Public FILES ${VULKAN_ENCODER_INCLUDE})
+source_group(Platform/Vulkan/Allocator/Public FILES ${VULKAN_ALLOC_INCLUDE})
 
 link_directories(Engine/deps/Vulkan/Lib)
 

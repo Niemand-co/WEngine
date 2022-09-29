@@ -25,5 +25,4 @@ private:
 	bool m_isQuit = false;
 	Window* m_window;
 	ScriptableRenderPipeline *m_pipeline;
-	Allocator* m_allocator;
 };

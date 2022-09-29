@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Utils/Allocator/Public/Allocator.h"
+#include "Platform/Vulkan/Allocator/Public/VulkanAllocator.h"
 
 namespace WEngine
 {
@@ -14,6 +15,22 @@ namespace WEngine
 
 	Allocator::~Allocator()
 	{
+	}
+
+	void Allocator::Init(Backend backend)
+	{
+		switch (backend)
+		{
+		case WEngine::Backend::None:
+			g_pInstance = new Allocator();
+			return;
+		case WEngine::Backend::Vulkan:
+			g_pInstance = new Vulkan::VulkanAllocator();
+			return;
+		default:
+			RE_ASSERT(false, "Error Backend Allocator.");
+			return;
+		}
 	}
 
 	Allocator* Allocator::Get()
@@ -113,12 +130,40 @@ namespace WEngine
 		}
 	}
 
-	void Allocator::Deallocate(void* pBlock)
+	void Allocator::Deallocate(void* pBlock, size_t size)
 	{
 		Block *block = (Block*)pBlock;
 		::new (block) Block();
-		block->prev = lists[0];
-		lists[0] = block;
+		if (size <= 32)
+		{
+			block->prev = lists[0];
+			lists[0] = block;
+		}
+		else if (size <= 64)
+		{
+			block->prev = lists[1];
+			lists[1] = block;
+		}
+		else if (size <= 96)
+		{
+			block->prev = lists[2];
+			lists[2] = block;
+		}
+		else if (size <= 128)
+		{
+			block->prev = lists[3];
+			lists[3] = block;
+		}
+		else if (size <= 160)
+		{
+			block->prev = lists[4];
+			lists[4] = block;
+		}
+		else
+		{
+			block->~Block();
+			free(pBlock);
+		}
 	}
 
 }
