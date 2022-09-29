@@ -34,7 +34,9 @@ namespace WEngine
 
 		virtual void* Allocate(size_t size);
 
-		virtual void Deallocate(void* pBlock, size_t size);
+		virtual void Deallocate(void *pBlock, size_t size);
+
+		virtual void* Reallocate(void *pBlock, size_t originSize, size_t newSize);
 
 	private:
 
@@ -42,9 +44,13 @@ namespace WEngine
 
 	private:
 
-		BYTE* head;
+		BYTE* heads[8];
 
-		Block* lists[5];
+		size_t sizes[8];
+
+		Block* freeLists[8];
+
+		Block* closedLists[8];
 
 	};
 

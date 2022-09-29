@@ -53,7 +53,7 @@ void ScriptableRenderPipeline::Init()
 
 	m_pInstance->~RHIInstance();
 
-	WEngine::Allocator::Get()->Deallocate((void*)m_pInstance, sizeof(Vulkan::VulkanInstance));
+	//WEngine::Allocator::Get()->Deallocate((void*)m_pInstance, sizeof(Vulkan::VulkanInstance));
 
 	//std::vector<RHIQueueDescriptor> queueDescriptors(1, RHIQueueDescriptor());
 	//{

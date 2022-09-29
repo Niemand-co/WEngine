@@ -6,11 +6,61 @@ namespace WEngine
 {
 	Allocator *Allocator::g_pInstance = nullptr;
 
+	size_t GetIndex(size_t blockSize)
+	{
+		if(blockSize <= 32)
+			return 0;
+		else if (blockSize <= 64)
+			return 1;
+		else if (blockSize <= 128)
+			return 2;
+		else if (blockSize <= 256)
+			return 3;
+		else if (blockSize <= 512)
+			return 4;
+		else if (blockSize <= 1024)
+			return 5;
+		else if (blockSize <= 2048)
+			return 6;
+		else if (blockSize <= 4096)
+			return 7;
+		RE_ASSERT(false, "Error Size.");
+	}
+
+	size_t GetBlockSize(size_t index)
+	{
+		switch (index)
+		{
+		case 0:
+			return 32;
+		case 1:
+			return 64;
+		case 2:
+			return 128;
+		case 3:
+			return 256;
+		case 4:
+			return 512;
+		case 5:
+			return 1024;
+		case 6:
+			return 2048;
+		case 7:
+			return 4096;
+		default:
+			RE_ASSERT(false, "Out of Range.");
+			return 0;
+		}
+	}
+
 	Allocator::Allocator()
 	{
-		head = (BYTE*)malloc(4086);
-		for(unsigned int i = 0; i < 5; ++i)
-			lists[i] = nullptr;
+		for (unsigned int i = 0; i < 8; ++i)
+		{
+			heads[i] = nullptr;
+			freeLists[i] = nullptr;
+			sizes[i] = 0;
+		}
 	}
 
 	Allocator::~Allocator()
@@ -44,126 +94,60 @@ namespace WEngine
 
 	void* Allocator::Allocate(size_t size)
 	{
-		if (size <= 32)
+		if (size <= 0)
 		{
-			if (lists[0] != nullptr)
-			{
-				Block *block = lists[0];
-				lists[0] = block->prev;
-				block->~Block();
-				return (void*)block;
-			}
-			else
-			{
-				void *result = head;
-				head = head + 32;
-				return result;
-			}
+			return nullptr;
 		}
-		else if (size <= 64)
+		else if (size >= 4096)
 		{
-			if (lists[1] != nullptr)
-			{
-				Block* block = lists[1];
-				lists[1] = block->prev;
-				block->~Block();
-				return (void*)block;
-			}
-			else
-			{
-				void* result = head;
-				head = head + 64;
-				return result;
-			}
-		}
-		else if (size <= 96)
-		{
-			if (lists[2] != nullptr)
-			{
-				Block* block = lists[2];
-				lists[2] = block->prev;
-				block->~Block();
-				return (void*)block;
-			}
-			else
-			{
-				void* result = head;
-				head = head + 96;
-				return result;
-			}
-		}
-		else if (size <= 128)
-		{
-			if (lists[3] != nullptr)
-			{
-				Block* block = lists[3];
-				lists[3] = block->prev;
-				block->~Block();
-				return (void*)block;
-			}
-			else
-			{
-				void* result = head;
-				head = head + 128;
-				return result;
-			}
-		}
-		else if (size <= 160)
-		{
-			if (lists[4] != nullptr)
-			{
-				Block* block = lists[4];
-				lists[4] = block->prev;
-				block->~Block();
-				return (void*)block;
-			}
-			else
-			{
-				void* result = head;
-				head = head + 160;
-				return result;
-			}
+			return (void*)malloc(size);
 		}
 		else
 		{
-			return malloc(size);
+			size_t index = GetIndex(size);
+			size_t blockSize = GetBlockSize(index);
+			if (freeLists[index] != nullptr)
+			{
+				Block* block = freeLists[index];
+				freeLists[index] = block->prev;
+				block->~Block();
+				return block;
+			}
+			if (sizes[index] == 0)
+			{
+				sizes[index] += (4096 / blockSize) * blockSize * 4;
+				heads[index] = (BYTE*)malloc(sizes[index]);
+			}
+			void *block = heads[index];
+			heads[index] += blockSize;
+			sizes[index] -= blockSize;
+			return block;
 		}
 	}
 
 	void Allocator::Deallocate(void* pBlock, size_t size)
 	{
-		Block *block = (Block*)pBlock;
-		::new (block) Block();
-		if (size <= 32)
+		if (size >= 4096)
 		{
-			block->prev = lists[0];
-			lists[0] = block;
-		}
-		else if (size <= 64)
-		{
-			block->prev = lists[1];
-			lists[1] = block;
-		}
-		else if (size <= 96)
-		{
-			block->prev = lists[2];
-			lists[2] = block;
-		}
-		else if (size <= 128)
-		{
-			block->prev = lists[3];
-			lists[3] = block;
-		}
-		else if (size <= 160)
-		{
-			block->prev = lists[4];
-			lists[4] = block;
+			free(pBlock);
 		}
 		else
 		{
-			block->~Block();
-			free(pBlock);
+			size_t index = GetIndex(size);
+			Block *block = (Block*)pBlock;
+			::new (block) Block();
+			block->prev = freeLists[index];
+			freeLists[index] = block;
 		}
+	}
+
+	void* Allocator::Reallocate(void* pBlock, size_t originSize, size_t newSize)
+	{
+		size_t index = GetIndex(originSize);
+		if(index == GetIndex(newSize))
+			return pBlock;
+		void* newBlock = Allocate(newSize);
+		return newBlock;
 	}
 
 }
