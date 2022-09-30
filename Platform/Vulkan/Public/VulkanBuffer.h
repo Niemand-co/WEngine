@@ -1,24 +1,29 @@
 #pragma once
 #include "RHI/Public/RHIBuffer.h"
 
-class VulkanBuffer : public RHIBuffer
+namespace Vulkan
 {
-public:
 
-	VulkanBuffer(VkBuffer *buffer, VkDevice *device);
+	class VulkanBuffer : public RHIBuffer
+	{
+	public:
 
-	virtual ~VulkanBuffer();
+		VulkanBuffer(VkBuffer *buffer, VkDevice *device);
 
-	VkBuffer* GetHandle();
+		virtual ~VulkanBuffer();
 
-private:
+		VkBuffer* GetHandle();
 
-	VkBuffer *m_pBuffer;
+	private:
 
-	VkMemoryRequirements *m_pMemoryRequiremtns;
+		VkBuffer *m_pBuffer;
 
-	VkDeviceMemory *m_pDeviceMemory;
+		VkMemoryRequirements *m_pMemoryRequiremtns;
 
-	VkDevice *m_pDevice;
+		VkDeviceMemory *m_pDeviceMemory;
 
-};
+		VkDevice *m_pDevice;
+
+	};
+
+}

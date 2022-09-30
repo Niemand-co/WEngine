@@ -34,9 +34,12 @@ namespace Vulkan
 		imageViewCreateInfo.subresourceRange.layerCount = descriptor->arrayLayerCount;
 
 		VkImageView* imageView = (VkImageView*)WEngine::Allocator::Get()->Allocate(sizeof(VkImageView));
-		RE_ASSERT(vkCreateImageView(*m_device, &imageViewCreateInfo, nullptr, imageView) == VK_SUCCESS, "Failed to Create Image View.");
+		RE_ASSERT(vkCreateImageView(*m_device, &imageViewCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), imageView) == VK_SUCCESS, "Failed to Create Image View.");
 
-		return new VulkanTextureView(imageView, m_device, descriptor);
+		RHITextureView *textureView = (RHITextureView*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanTextureView));
+		::new (textureView) VulkanTextureView(imageView, m_device, descriptor);
+
+		return textureView;
 	}
 
 }

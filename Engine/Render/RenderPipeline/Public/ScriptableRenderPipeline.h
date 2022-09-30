@@ -53,11 +53,11 @@ private:
 
 	RHIContext *m_pContext;
 
-	std::vector<RHISemaphore*> m_imageAvailibleSemaphores;
+	RHISemaphore* m_pImageAvailibleSemaphores;
 
-	std::vector<RHISemaphore*> m_presentAVailibleSemaphores;
+	RHISemaphore* m_pPresentAVailibleSemaphores;
 
-	std::vector<RHIFence*> m_fences;
+	RHIFence* m_pFences;
 
 	unsigned int m_maxFrame;
 

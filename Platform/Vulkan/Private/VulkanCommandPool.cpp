@@ -16,17 +16,24 @@ namespace Vulkan
 
 	RHICommandBuffer* VulkanCommandPool::GetCommandBuffer(unsigned int num)
 	{
+		RHICommandBuffer *commandBuffers;
+
 		VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
 		commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		commandBufferAllocateInfo.commandPool = *m_commandPool;
 		commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		commandBufferAllocateInfo.commandBufferCount = num;
 
-		//VkCommandBuffer* commandBuffer = (VkCommandBuffer*)WEngine::Allocator::Get()->Allocate(num * sizeof(VkCommandBuffer));
-		VkCommandBuffer *commandBuffer = (VkCommandBuffer*)malloc(num * sizeof(VkCommandBuffer));
-		vkAllocateCommandBuffers(*m_device, &commandBufferAllocateInfo, commandBuffer);
+		VkCommandBuffer* pCommandBuffer = (VkCommandBuffer*)WEngine::Allocator::Get()->Allocate(num * sizeof(VkCommandBuffer));
 
-		return new VulkanCommandBuffer(commandBuffer);
+		commandBuffers = (RHICommandBuffer*)WEngine::Allocator::Get()->Allocate(num * sizeof(VulkanCommandBuffer));
+		for (unsigned int i = 0; i < num; ++i)
+		{
+			vkAllocateCommandBuffers(*m_device, &commandBufferAllocateInfo, pCommandBuffer + i);
+			::new (commandBuffers + i) VulkanCommandBuffer(pCommandBuffer + i);
+		}
+
+		return commandBuffers;
 	}
 
 }

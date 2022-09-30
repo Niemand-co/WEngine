@@ -114,7 +114,7 @@ namespace Vulkan
 
 		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(*m_pInstance, "vkCreateWin32SurfaceKHR");
 
-		RE_ASSERT(CreateWin32SurfaceKHR(*m_pInstance, &surfaceCreateInfo, nullptr, m_pSurface) == VK_SUCCESS, "Failed to Recreate Win32 Surface.");
+		RE_ASSERT(CreateWin32SurfaceKHR(*m_pInstance, &surfaceCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), m_pSurface) == VK_SUCCESS, "Failed to Recreate Win32 Surface.");
 
 		static_cast<VulkanSurface*>(RHIInstance::m_surface)->SetHandle(m_pSurface);
 	}

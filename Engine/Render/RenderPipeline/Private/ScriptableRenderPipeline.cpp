@@ -36,7 +36,8 @@ ScriptableRenderPipeline* ScriptableRenderPipeline::get()
 {
 	if (g_instance == nullptr)
 	{
-		g_instance = new ScriptableRenderPipeline();
+		g_instance = (ScriptableRenderPipeline*)WEngine::Allocator::Get()->Allocate(sizeof(ScriptableRenderPipeline));
+		::new (g_instance) ScriptableRenderPipeline();
 	}
 	return g_instance;
 }
@@ -66,28 +67,27 @@ void ScriptableRenderPipeline::Init()
 
 	RHIQueue* queue = m_pDevice->GetQueue(RHIQueueType::Graphics, 1);
 
-	//RHIContext* context = new RHIContext(queue, m_pDevice);
+	RHIContext* context = (RHIContext*)WEngine::Allocator::Get()->Allocate(sizeof(RHIContext));
+	::new (context) RHIContext(queue, m_pDevice);
 
-	//RHISwapchainDescriptor swapchainDescriptor = {};
-	//{
-	//	swapchainDescriptor.count = 3;
-	//	swapchainDescriptor.format = Format::A16R16G16B16_SFloat;
-	//	swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
-	//	swapchainDescriptor.presenMode = PresentMode::Immediate;
-	//	swapchainDescriptor.surface = m_pInstance->GetSurface();
-	//	swapchainDescriptor.presentFamilyIndex = queue->GetIndex();
-	//	swapchainDescriptor.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
-	//}
-	//m_pSwapchain = m_pDevice->CreateSwapchain(&swapchainDescriptor);
+	RHISwapchainDescriptor swapchainDescriptor = {};
+	{
+		swapchainDescriptor.count = 3;
+		swapchainDescriptor.format = Format::A16R16G16B16_SFloat;
+		swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
+		swapchainDescriptor.presenMode = PresentMode::Immediate;
+		swapchainDescriptor.surface = m_pInstance->GetSurface();
+		swapchainDescriptor.presentFamilyIndex = queue->GetIndex();
+		swapchainDescriptor.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
+	}
+	m_pSwapchain = m_pDevice->CreateSwapchain(&swapchainDescriptor);
 
-	//m_pContext = new RHIContext(queue, m_pDevice);
+	m_maxFrame = 3;
+	m_currentFrame = 0;
+	m_pImageAvailibleSemaphores = m_pDevice->GetSemaphore(m_maxFrame);
+	m_pPresentAVailibleSemaphores = m_pDevice->GetSemaphore(m_maxFrame);
 
-	//m_maxFrame = 3;
-	//m_currentFrame = 0;
-	//m_imageAvailibleSemaphores = m_pDevice->GetSemaphore(m_maxFrame);
-	//m_presentAVailibleSemaphores = m_pDevice->GetSemaphore(m_maxFrame);
-
-	//m_fences = m_pDevice->CreateFence(m_maxFrame);
+	m_pFences = m_pDevice->CreateFence(m_maxFrame);
 }
 
 void ScriptableRenderPipeline::Setup()
@@ -103,7 +103,7 @@ void ScriptableRenderPipeline::Execute()
 	//m_pDevice->WaitForFences(m_fences[m_currentFrame], 1);
 	//m_pDevice->ResetFences(m_fences[m_currentFrame], 1);
 
-	g_currentFrame = m_pDevice->GetNextImage(m_pSwapchain, m_imageAvailibleSemaphores[m_currentFrame]);
+	g_currentFrame = m_pDevice->GetNextImage(m_pSwapchain, m_pImageAvailibleSemaphores + m_currentFrame);
 	if (g_currentFrame < 0)
 	{
 		m_pInstance->UpdateSurface();
@@ -127,7 +127,7 @@ void ScriptableRenderPipeline::Execute()
 	//	renderer->Execute(m_imageAvailibleSemaphores[m_currentFrame], m_presentAVailibleSemaphores[m_currentFrame], m_fences[m_currentFrame]);
 	//}
 
-	if (!m_pContext->Present(g_currentFrame, m_pSwapchain, m_imageAvailibleSemaphores[m_currentFrame]))
+	if (!m_pContext->Present(g_currentFrame, m_pSwapchain, m_pImageAvailibleSemaphores + m_currentFrame))
 	{
 		m_pInstance->UpdateSurface();
 		RHISwapchainDescriptor swapchainDescriptor = {};

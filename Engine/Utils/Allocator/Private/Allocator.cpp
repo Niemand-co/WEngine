@@ -6,7 +6,7 @@ namespace WEngine
 {
 	Allocator *Allocator::g_pInstance = nullptr;
 
-	size_t GetIndex(size_t blockSize)
+	BYTE GetIndex(size_t blockSize)
 	{
 		if(blockSize <= 32)
 			return 0;
@@ -27,7 +27,7 @@ namespace WEngine
 		RE_ASSERT(false, "Error Size.");
 	}
 
-	size_t GetBlockSize(size_t index)
+	size_t GetBlockSize(BYTE index)
 	{
 		switch (index)
 		{
@@ -92,16 +92,18 @@ namespace WEngine
 		return g_pInstance;
 	}
 
+	static void* record;
+
 	void* Allocator::Allocate(size_t size)
 	{
 		if (size <= 0)
 		{
 			return nullptr;
 		}
-		else if (size > 4096)
+		else if (size > 1024)
 		{
-			BYTE *block = (BYTE*)malloc(size + 1);
-			*block = 0;
+			BYTE *block = (BYTE*)malloc(size + sizeof(BYTE));
+			::new (block) BYTE(0);
 			return block + 1;
 		}
 		else
@@ -113,18 +115,19 @@ namespace WEngine
 				Block* block = freeLists[index];
 				freeLists[index] = block->prev;
 				block->~Block();
+
 				return block;
 			}
 			if (sizes[index] == 0)
 			{
-				size_t blockCount = 4 * 4096 / blockSize;
+				size_t blockCount = 16 * 4096 / blockSize;
 				sizes[index] += blockCount * blockSize;
-				heads[index] = (BYTE*)malloc(sizes[index] + blockCount);
+				heads[index] = (BYTE*)malloc(sizes[index] + blockCount * sizeof(BYTE));
 			}
-			BYTE *block = heads[index];
-			heads[index] += (blockSize + 1);
+			BYTE *block = (BYTE*)heads[index];
+			heads[index] += (blockSize + sizeof(BYTE));
 			sizes[index] -= blockSize;
-			*block = (index + 1) & 0xFF;
+			::new (block) BYTE(index + 1);
 			return block + 1;
 		}
 	}
@@ -133,7 +136,7 @@ namespace WEngine
 	{
 		if(pBlock == nullptr)
 			return;
-		size_t index = *((BYTE*)pBlock - 1);
+		BYTE index = *((BYTE*)pBlock - 1);
 		if (index == 0)
 		{ 
 			free ((void*)((BYTE*)pBlock - 1));
@@ -150,12 +153,15 @@ namespace WEngine
 
 	void* Allocator::Reallocate(void* pBlock, size_t newSize)
 	{
-		size_t index = *((BYTE*)pBlock - 1);
-		if(index == 0)
-			realloc(pBlock, newSize);
-		if(index - 1 == GetIndex(newSize))
+		BYTE index = *((BYTE*)pBlock - 1);
+		if (index == 0)
+		{
+			BYTE* newBlock = (BYTE*)realloc((BYTE*)pBlock - 1, newSize + sizeof(BYTE));
+			return newBlock + 1;
+		}
+		if(newSize <= 4096 && index - 1 == GetIndex(newSize))
 			return pBlock;
-		void* newBlock = Allocate(newSize);
+		BYTE *newBlock = (BYTE*)Allocate(newSize);
 		std::memcpy(newBlock, pBlock, GetBlockSize(index - 1));
 		Deallocate(pBlock);
 		return newBlock;

@@ -30,13 +30,6 @@ Application* Application::CreateApplication()
 	}
 }
 
-struct test
-{
-	test() { a = 10; }
-	~test() {}
-	int a;
-};
-
 void Application::Init()
 {
 	WEngine::Allocator::Init(WEngine::Backend::Vulkan);
@@ -44,34 +37,16 @@ void Application::Init()
 	WinProc proc = { "WEngine", 1920u, 1080u };
 	m_window = Window::Get(&proc);
 
+	time_t start, end;
+	start = clock();
 	m_pipeline = ScriptableRenderPipeline::get();
+	end = clock();
+
+	RE_LOG(double(end - start) / CLOCKS_PER_SEC);
 
 	//m_pipeline->AddRenderer();
 
 	//m_pipeline->Setup();
-
-	//float start, end;
-	//start = std::clock();
-	//for (int i = 0; i < 100000; ++i)
-	//{
-	//	test *t = (test*)WEngine::Allocator::Get()->Allocate(sizeof(test));
-	//	::new (t) test();
-	//	t->~test();
-	//	WEngine::Allocator::Get()->Deallocate(t, sizeof(test));
-	//}
-	//end = std::clock();
-
-	//std::cout<<end - start<<std::endl;
-
-	//start = std::clock();
-	//for (int i = 0; i < 100000; ++i)
-	//{
-	//	test* t = new test();
-	//	delete t;
-	//}
-	//end = std::clock();
-
-	//std::cout << end - start << std::endl;
 
 }
 
