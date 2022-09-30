@@ -6,18 +6,18 @@ namespace Vulkan
 
 	void* __stdcall AllocationCallbacks(void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope allocationScope)
 	{
-		void *result = ((VulkanAllocatorData*)pUserData)->allocator->Allocate(size);
+		void *result = WEngine::Allocator::Get()->Allocate(size);
 		return result;
 	}
 
 	void __stdcall FreeCallbacks(void* pUserData, void* pMemory)
 	{
-		((VulkanAllocatorData*)pUserData)->allocator->Deallocate(pMemory, ((VulkanAllocatorData*)pUserData)->size);
+		WEngine::Allocator::Get()->Deallocate(pMemory);
 	}
 
 	void* __stdcall ReallocationCallbacks(void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope allocationScope)
 	{
-		void* result = ((VulkanAllocatorData*)pUserData)->allocator->Reallocate(pOriginal, 0, size);
+		void* result = WEngine::Allocator::Get()->Reallocate(pOriginal, size);
 		return result;
 	}
 
@@ -35,7 +35,8 @@ namespace Vulkan
 
 	VkAllocationCallbacks* VulkanAllocator::GetCallbacks(void* pUserData)
 	{
-		m_pAllocationCallbacks->pUserData = pUserData;
+		if(pUserData != nullptr)
+			m_pAllocationCallbacks->pUserData = pUserData;
 		
 		return m_pAllocationCallbacks;
 	}

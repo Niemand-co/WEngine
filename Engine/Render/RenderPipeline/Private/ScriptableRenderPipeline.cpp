@@ -51,22 +51,20 @@ void ScriptableRenderPipeline::Init()
 	}
 	m_pInstance = RHIInstance::CreateInstance(&descriptor);
 
-	m_pInstance->~RHIInstance();
+	std::vector<RHIQueueDescriptor> queueDescriptors(1, RHIQueueDescriptor());
+	{
+		queueDescriptors[0].count = 1;
+		queueDescriptors[0].type = RHIQueueType::Graphics;
+	}
+	RHIDeviceDescriptor deviceDescriptor;
+	{
+		deviceDescriptor.queueInfos = queueDescriptors.data();
+		deviceDescriptor.queueInfoCount = queueDescriptors.size();
+	}
 
-	//WEngine::Allocator::Get()->Deallocate((void*)m_pInstance, sizeof(Vulkan::VulkanInstance));
+	m_pDevice = m_pInstance->GetGPU(0)->CreateDevice(&deviceDescriptor);
 
-	//std::vector<RHIQueueDescriptor> queueDescriptors(1, RHIQueueDescriptor());
-	//{
-	//	queueDescriptors[0].count = 1;
-	//	queueDescriptors[0].type = RHIQueueType::Graphics;
-	//}
-	//RHIDeviceDescriptor deviceDescriptor;
-	//deviceDescriptor.queueInfos = queueDescriptors.data();
-	//deviceDescriptor.queueInfoCount = queueDescriptors.size();
-
-	//m_pDevice = m_pInstance->GetGPU(0)->CreateDevice(&deviceDescriptor);
-
-	//RHIQueue* queue = m_pDevice->GetQueue(RHIQueueType::Graphics, 1);
+	RHIQueue* queue = m_pDevice->GetQueue(RHIQueueType::Graphics, 1);
 
 	//RHIContext* context = new RHIContext(queue, m_pDevice);
 

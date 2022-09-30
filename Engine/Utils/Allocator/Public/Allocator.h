@@ -7,8 +7,8 @@ namespace WEngine
 
 	struct Block
 	{
-		Block() = default;
-		~Block() = default;
+		Block() { prev = nullptr; }
+		~Block() { prev = nullptr; }
 		Block* prev;
 	};
 
@@ -34,9 +34,9 @@ namespace WEngine
 
 		virtual void* Allocate(size_t size);
 
-		virtual void Deallocate(void *pBlock, size_t size);
+		virtual void Deallocate(void *pBlock);
 
-		virtual void* Reallocate(void *pBlock, size_t originSize, size_t newSize);
+		virtual void* Reallocate(void *pBlock, size_t newSize);
 
 	private:
 

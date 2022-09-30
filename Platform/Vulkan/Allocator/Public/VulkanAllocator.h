@@ -12,7 +12,7 @@ namespace Vulkan
 
 		virtual ~VulkanAllocator();
 
-		VkAllocationCallbacks* GetCallbacks(void *pUserData);
+		VkAllocationCallbacks* GetCallbacks(void *pUserData = nullptr);
 
 	private:
 
@@ -23,7 +23,6 @@ namespace Vulkan
 	struct VulkanAllocatorData
 	{
 		WEngine::Allocator *allocator;
-		size_t size;
 	};
 
 }

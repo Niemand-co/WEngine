@@ -98,9 +98,11 @@ namespace WEngine
 		{
 			return nullptr;
 		}
-		else if (size >= 4096)
+		else if (size > 4096)
 		{
-			return (void*)malloc(size);
+			BYTE *block = (BYTE*)malloc(size + 1);
+			*block = 0;
+			return block + 1;
 		}
 		else
 		{
@@ -115,25 +117,30 @@ namespace WEngine
 			}
 			if (sizes[index] == 0)
 			{
-				sizes[index] += (4096 / blockSize) * blockSize * 4;
-				heads[index] = (BYTE*)malloc(sizes[index]);
+				size_t blockCount = 4 * 4096 / blockSize;
+				sizes[index] += blockCount * blockSize;
+				heads[index] = (BYTE*)malloc(sizes[index] + blockCount);
 			}
-			void *block = heads[index];
-			heads[index] += blockSize;
+			BYTE *block = heads[index];
+			heads[index] += (blockSize + 1);
 			sizes[index] -= blockSize;
-			return block;
+			*block = (index + 1) & 0xFF;
+			return block + 1;
 		}
 	}
 
-	void Allocator::Deallocate(void* pBlock, size_t size)
+	void Allocator::Deallocate(void* pBlock)
 	{
-		if (size >= 4096)
-		{
-			free(pBlock);
+		if(pBlock == nullptr)
+			return;
+		size_t index = *((BYTE*)pBlock - 1);
+		if (index == 0)
+		{ 
+			free ((void*)((BYTE*)pBlock - 1));
 		}
 		else
 		{
-			size_t index = GetIndex(size);
+			index -= 1;
 			Block *block = (Block*)pBlock;
 			::new (block) Block();
 			block->prev = freeLists[index];
@@ -141,12 +148,16 @@ namespace WEngine
 		}
 	}
 
-	void* Allocator::Reallocate(void* pBlock, size_t originSize, size_t newSize)
+	void* Allocator::Reallocate(void* pBlock, size_t newSize)
 	{
-		size_t index = GetIndex(originSize);
-		if(index == GetIndex(newSize))
+		size_t index = *((BYTE*)pBlock - 1);
+		if(index == 0)
+			realloc(pBlock, newSize);
+		if(index - 1 == GetIndex(newSize))
 			return pBlock;
 		void* newBlock = Allocate(newSize);
+		std::memcpy(newBlock, pBlock, GetBlockSize(index - 1));
+		Deallocate(pBlock);
 		return newBlock;
 	}
 

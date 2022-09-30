@@ -35,7 +35,7 @@
 #include "Math/Vector.h"
 #include "Math/Matrix.h"
 #include "Log/Public/Logger.h"
-#include "Utils/Allocator/Public/Allocator.h"
+#include "Platform/Vulkan/Allocator/Public/VulkanAllocator.h"
 #include "Render/Public/RenderCore.h"
 #include "RHI/Public/RHICore.h"
 #include "Utils/Public/ShaderCodeBlob.h"

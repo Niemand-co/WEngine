@@ -34,7 +34,7 @@ public:
 
 	virtual void RecreateSwapchain(RHISwapchain* swapchain, RHISwapchainDescriptor* descriptor) = 0;
 
-	virtual std::vector<RHIFence*> CreateFence(unsigned int count) = 0;
+	virtual RHIFence* CreateFence(unsigned int count) = 0;
 
 	virtual RHIShader* CreateShader(RHIShaderDescriptor *descriptor) = 0;
 
@@ -48,7 +48,7 @@ public:
 
 	virtual RHIBuffer* CreateBuffer(RHIBufferDescriptor *descriptor) = 0;
 
-	virtual std::vector<RHISemaphore*> GetSemaphore(unsigned int count) = 0;
+	virtual RHISemaphore* GetSemaphore(unsigned int count) = 0;
 
 	virtual void WaitForFences(RHIFence *pFences, unsigned int count, bool waitForAll = true) = 0;
 

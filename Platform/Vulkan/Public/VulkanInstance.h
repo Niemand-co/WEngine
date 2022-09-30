@@ -39,9 +39,9 @@ namespace Vulkan
 
 	private:
 
-		VkInstance m_instance;
+		VkInstance *m_pInstance;
 
-		VkSurfaceKHR *m_surface;
+		VkSurfaceKHR *m_pSurface;
 
 		VkDebugUtilsMessengerEXT m_debugUtilsMessenger;
 	};

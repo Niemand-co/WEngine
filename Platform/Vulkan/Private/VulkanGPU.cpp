@@ -156,9 +156,10 @@ namespace Vulkan
 		}
 
 		VkDevice *pDevice = (VkDevice*)WEngine::Allocator::Get()->Allocate(sizeof(VkDevice));
-		RE_ASSERT(vkCreateDevice(*m_pPhysicalDevice, &deviceCreateInfo, nullptr, pDevice) == VK_SUCCESS, "Failed to Create Device.");
+		RE_ASSERT(vkCreateDevice(*m_pPhysicalDevice, &deviceCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pDevice) == VK_SUCCESS, "Failed to Create Device.");
 
-		RHIDevice* device = new VulkanDevice(pDevice, queueStack);
+		RHIDevice* device = (RHIDevice*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanDevice));
+		::new (device) VulkanDevice(pDevice, queueStack);
 
 		return device;
 	}
