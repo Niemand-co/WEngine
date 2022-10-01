@@ -20,7 +20,7 @@ namespace Vulkan
 
 	VulkanTextureView::~VulkanTextureView()
 	{
-		vkDestroyImageView(*m_pDevice, *m_imageView, nullptr);
+		vkDestroyImageView(*m_pDevice, *m_imageView, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
 	}
 
 	VkImageView* VulkanTextureView::GetHandle()

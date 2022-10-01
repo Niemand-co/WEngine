@@ -10,10 +10,10 @@ FinalBlitPass::~FinalBlitPass()
 {
 }
 
-void FinalBlitPass::Setup()
+void FinalBlitPass::Setup(RHIContext *context)
 {
 }
 
-void FinalBlitPass::Execute(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence)
+void FinalBlitPass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence)
 {
 }

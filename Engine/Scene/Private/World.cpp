@@ -3,7 +3,7 @@
 #include "Scene/Public/GameObject.h"
 #include "Render/Public/RenderCommand.h"
 
-World* World::m_instance = nullptr;
+World* World::g_pInstance = nullptr;
 
 World::World()
 {
@@ -15,16 +15,34 @@ World::~World()
 
 }
 
+GameObject* World::CreateGameObject(std::string name)
+{
+	GameObject* gameObject = new GameObject();
+	g_pInstance->m_pEntities.push_back(std::move(gameObject));
+	return gameObject;
+}
+
+void World::AddCamera(Camera* pCamera)
+{
+	m_pCameras.push_back(std::move(pCamera));
+}
+
 World* World::CreateWorld()
 {
-	if (m_instance == nullptr)
+	if (g_pInstance == nullptr)
 	{
-		m_instance = new World();
-		return m_instance;
+		g_pInstance = (World*)WEngine::Allocator::Get()->Allocate(sizeof(World));
+		::new (g_pInstance) World();
+		return g_pInstance;
 	}
 	else
 	{
 		std::cout<<"Over Created World"<<std::endl;
 		exit(0);
 	}
+}
+
+World* World::GetWorld()
+{
+	return g_pInstance;
 }

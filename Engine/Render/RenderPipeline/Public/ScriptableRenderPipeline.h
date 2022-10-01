@@ -29,13 +29,11 @@ public:
 
 	virtual void AddRenderer();
 
-	virtual void Present();
+private:
 
 public:
 
 	static int g_currentFrame;
-
-	static RHITexture* g_currentRenderTarget;
 
 private:
 
@@ -53,11 +51,11 @@ private:
 
 	RHIContext *m_pContext;
 
-	RHISemaphore* m_pImageAvailibleSemaphores;
+	std::vector<RHISemaphore*> m_pImageAvailibleSemaphores;
 
-	RHISemaphore* m_pPresentAVailibleSemaphores;
+	std::vector<RHISemaphore*> m_pPresentAVailibleSemaphores;
 
-	RHIFence* m_pFences;
+	std::vector<RHIFence*> m_pFences;
 
 	unsigned int m_maxFrame;
 

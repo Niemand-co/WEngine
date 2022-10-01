@@ -124,9 +124,10 @@ namespace Vulkan
 		RE_ASSERT(vkCreateSwapchainKHR(*m_device, &swapchainCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), static_cast<VulkanSwapchain*>(swapchain)->GetHandle()) == VK_SUCCESS, "Failed to Recreate Swapchain.");
 	}
 
-	RHIFence* VulkanDevice::CreateFence(unsigned int count)
+	std::vector<RHIFence*> VulkanDevice::CreateFence(unsigned int count)
 	{
-		RHIFence *pFences = (RHIFence*)WEngine::Allocator::Get()->Allocate(count * sizeof(VulkanFence));
+		VulkanFence *pFences = (VulkanFence*)WEngine::Allocator::Get()->Allocate(count * sizeof(VulkanFence));
+		std::vector<RHIFence*> fences(count);
 
 		VkFenceCreateInfo fenceCreateInfo = {};
 		fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -136,10 +137,12 @@ namespace Vulkan
 		for (unsigned int i = 0; i < count; ++i)
 		{
 			vkCreateFence(*m_device, &fenceCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), fence + i);
-			::new (pFences) VulkanFence(fence + i);
+			::new (pFences + i) VulkanFence(fence + i);
+			fences[i] = pFences + i;
 		}
 
-		return pFences;
+
+		return fences;
 	}
 
 	RHIShader* VulkanDevice::CreateShader(RHIShaderDescriptor *descriptor)
@@ -365,7 +368,7 @@ namespace Vulkan
 		RE_ASSERT(vkCreateFramebuffer(*m_device, &framebufferCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), framebuffer) == VK_SUCCESS, "Failed to Create Framebuffer.");
 
 		RHIRenderTarget *renderTarget = (RHIRenderTarget*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanRenderTarget));
-		::new (renderTarget) VulkanRenderTarget(framebuffer, descriptor->width, descriptor->height);
+		::new (renderTarget) VulkanRenderTarget(framebuffer, descriptor->width, descriptor->height, m_device);
 
 		return renderTarget;
 	}
@@ -384,17 +387,19 @@ namespace Vulkan
 		return new VulkanBuffer(buffer, m_device);
 	}
 
-	RHISemaphore* VulkanDevice::GetSemaphore(unsigned int count)
+	std::vector<RHISemaphore*> VulkanDevice::GetSemaphore(unsigned int count)
 	{
 		VkSemaphore *pSemaphore = (VkSemaphore*)WEngine::Allocator::Get()->Allocate(count * sizeof(VkSemaphore));
-		RHISemaphore *semaphores = (RHISemaphore*)WEngine::Allocator::Get()->Allocate(count * sizeof(VulkanSemaphore));
+		VulkanSemaphore *semaphore = (VulkanSemaphore*)WEngine::Allocator::Get()->Allocate(count * sizeof(VulkanSemaphore));
+		std::vector<RHISemaphore*> semaphores(count);
 		
 		VkSemaphoreCreateInfo semaphoreCreateInfo = {};
 		semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 		for (int i = 0; i < count; ++i)
 		{
 			RE_ASSERT(vkCreateSemaphore(*m_device, &semaphoreCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pSemaphore + i) == VK_SUCCESS, "Failed to Create Semaphore.");
-			::new (semaphores + i) VulkanSemaphore(pSemaphore + i);
+			::new (semaphore + i) VulkanSemaphore(pSemaphore + i);
+			semaphores[i] = semaphore + i;
 		}
 
 		return semaphores;

@@ -10,10 +10,10 @@ MainLightShadowPass::~MainLightShadowPass()
 {
 }
 
-void MainLightShadowPass::Setup()
+void MainLightShadowPass::Setup(RHIContext *context)
 {
 }
 
-void MainLightShadowPass::Execute(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence)
+void MainLightShadowPass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence)
 {
 }

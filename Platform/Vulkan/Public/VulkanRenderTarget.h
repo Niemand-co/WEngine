@@ -1,18 +1,25 @@
 #pragma once
 #include "RHI/Public/RHIRenderTarget.h"
 
-class VulkanRenderTarget : public RHIRenderTarget
+namespace Vulkan
 {
-public:
 
-	VulkanRenderTarget(VkFramebuffer *framebuffer, unsigned int width, unsigned int height);
+	class VulkanRenderTarget : public RHIRenderTarget
+	{
+	public:
 
-	virtual ~VulkanRenderTarget();
+		VulkanRenderTarget(VkFramebuffer *framebuffer, unsigned int width, unsigned int height, VkDevice *device);
 
-	VkFramebuffer* GetHandle();
+		virtual ~VulkanRenderTarget();
 
-private:
+		VkFramebuffer* GetHandle();
 
-	VkFramebuffer *m_framebuffer;
+	private:
 
-};
+		VkFramebuffer *m_framebuffer;
+
+		VkDevice *m_pDevice;
+
+	};
+
+}

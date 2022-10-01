@@ -6,13 +6,14 @@
 namespace Vulkan
 {
 
-	VulkanCommandBuffer::VulkanCommandBuffer(VkCommandBuffer *commandBuffer)
-		: m_commandBuffer(commandBuffer)
+	VulkanCommandBuffer::VulkanCommandBuffer(VkCommandBuffer *commandBuffer, VkCommandPool *pCommandPool, VkDevice *pDevice)
+		: m_commandBuffer(commandBuffer), m_pCommandPool(pCommandPool), m_pDevice(pDevice)
 	{
 	}
 
 	VulkanCommandBuffer::~VulkanCommandBuffer()
 	{
+		vkFreeCommandBuffers(*m_pDevice, *m_pCommandPool, 1, m_commandBuffer);
 	}
 
 	void VulkanCommandBuffer::BeginScopePass(std::string passName)
@@ -30,7 +31,9 @@ namespace Vulkan
 
 	RHIGraphicsEncoder* VulkanCommandBuffer::GetGraphicsEncoder()
 	{
-		return new VulkanGraphicsEncoder(m_commandBuffer);
+		VulkanGraphicsEncoder *pEncoder = (VulkanGraphicsEncoder*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanGraphicsEncoder));
+		::new (pEncoder) VulkanGraphicsEncoder(m_commandBuffer);
+		return pEncoder;
 	}
 
 	RHIComputeEncoder* VulkanCommandBuffer::GetComputeEncoder()

@@ -19,28 +19,27 @@ void ScriptableRenderer::Setup()
 {
 	RenderPassConfigure configure = {};
 	configure.pDevice = m_pDevice;
-	configure.pContext = m_pContext;
 
 	m_mainLightShadowPass = (MainLightShadowPass*)WEngine::Allocator::Get()->Allocate(sizeof(MainLightShadowPass));
 	::new (m_mainLightShadowPass) MainLightShadowPass(&configure);
-	m_mainLightShadowPass->Setup();
+	m_mainLightShadowPass->Setup(m_pContext);
 
 	m_drawOpaquePass = (DrawOpaquePass*)WEngine::Allocator::Get()->Allocate(sizeof(DrawOpaquePass));
 	::new (m_drawOpaquePass) DrawOpaquePass(&configure);
-	m_drawOpaquePass->Setup();
+	m_drawOpaquePass->Setup(m_pContext);
 
 	m_finalBlitPass = (FinalBlitPass*)WEngine::Allocator::Get()->Allocate(sizeof(FinalBlitPass));
 	::new (m_finalBlitPass) FinalBlitPass(&configure);
-	m_finalBlitPass->Setup();
+	m_finalBlitPass->Setup(m_pContext);
 }
 
-void ScriptableRenderer::Execute(RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence)
+void ScriptableRenderer::Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence)
 {
-	m_mainLightShadowPass->Execute(waitSemaphore, signalSemaphore);
+	m_mainLightShadowPass->Execute(context, waitSemaphore, signalSemaphore);
 
-	m_drawOpaquePass->Execute(waitSemaphore, signalSemaphore, fence);
+	m_drawOpaquePass->Execute(context, waitSemaphore, signalSemaphore, fence);
 
-	m_finalBlitPass->Execute(waitSemaphore, signalSemaphore);
+	m_finalBlitPass->Execute(context, waitSemaphore, signalSemaphore);
 }
 
 void ScriptableRenderer::AddRenderPass()

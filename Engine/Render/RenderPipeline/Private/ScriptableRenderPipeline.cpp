@@ -5,7 +5,6 @@
 #include "RHI/Public/RHIGPU.h"
 #include "RHI/Public/RHIDevice.h"
 #include "RHI/Public/RHIQueue.h"
-#include "RHI/Public/RHISwapchain.h"
 #include "RHI/Public/RHIContext.h"
 #include "RHI/Public/RHITexture.h"
 #include "RHI/Public/RHISemaphore.h"
@@ -13,15 +12,12 @@
 #include "Render/Descriptor/Public/RHIInstanceDescriptor.h"
 #include "Render/Descriptor/Public/RHIDeviceDescriptor.h"
 #include "Render/Descriptor/Public/RHIQueueDescriptor.h"
-#include "Render/Descriptor/Public/RHISwapchainDescriptor.h"
 #include "Platform/Vulkan/Public/VulkanInstance.h"
 #include "Utils/Public/Window.h"
 
 ScriptableRenderPipeline *ScriptableRenderPipeline::g_instance = nullptr;
 
 int ScriptableRenderPipeline::g_currentFrame = 0;
-
-RHITexture *ScriptableRenderPipeline::g_currentRenderTarget = nullptr;
 
 ScriptableRenderPipeline::ScriptableRenderPipeline()
 {
@@ -67,20 +63,10 @@ void ScriptableRenderPipeline::Init()
 
 	RHIQueue* queue = m_pDevice->GetQueue(RHIQueueType::Graphics, 1);
 
-	RHIContext* context = (RHIContext*)WEngine::Allocator::Get()->Allocate(sizeof(RHIContext));
-	::new (context) RHIContext(queue, m_pDevice);
+	m_pContext = (RHIContext*)WEngine::Allocator::Get()->Allocate(sizeof(RHIContext));
+	::new (m_pContext) RHIContext(queue, m_pInstance->GetSurface(), m_pDevice);
 
-	RHISwapchainDescriptor swapchainDescriptor = {};
-	{
-		swapchainDescriptor.count = 3;
-		swapchainDescriptor.format = Format::A16R16G16B16_SFloat;
-		swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
-		swapchainDescriptor.presenMode = PresentMode::Immediate;
-		swapchainDescriptor.surface = m_pInstance->GetSurface();
-		swapchainDescriptor.presentFamilyIndex = queue->GetIndex();
-		swapchainDescriptor.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
-	}
-	m_pSwapchain = m_pDevice->CreateSwapchain(&swapchainDescriptor);
+	m_pContext->Init();
 
 	m_maxFrame = 3;
 	m_currentFrame = 0;
@@ -100,47 +86,26 @@ void ScriptableRenderPipeline::Setup()
 
 void ScriptableRenderPipeline::Execute()
 {
-	//m_pDevice->WaitForFences(m_fences[m_currentFrame], 1);
-	//m_pDevice->ResetFences(m_fences[m_currentFrame], 1);
+	m_pDevice->WaitForFences(m_pFences[m_currentFrame], 1);
+	m_pDevice->ResetFences(m_pFences[m_currentFrame], 1);
 
-	g_currentFrame = m_pDevice->GetNextImage(m_pSwapchain, m_pImageAvailibleSemaphores + m_currentFrame);
+	g_currentFrame = m_pContext->GetNextImage(m_pImageAvailibleSemaphores[m_currentFrame]);
 	if (g_currentFrame < 0)
 	{
 		m_pInstance->UpdateSurface();
-		RHISwapchainDescriptor swapchainDescriptor = {};
-		{
-			swapchainDescriptor.count = 3;
-			swapchainDescriptor.format = Format::A16R16G16B16_SFloat;
-			swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
-			swapchainDescriptor.presenMode = PresentMode::Immediate;
-			swapchainDescriptor.surface = m_pInstance->GetSurface();
-			swapchainDescriptor.presentFamilyIndex = 0;
-			swapchainDescriptor.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
-		}
-		m_pDevice->RecreateSwapchain(m_pSwapchain, &swapchainDescriptor);
+		m_pContext->RecreateSwapchain();
 		return;
 	}
-	//g_currentRenderTarget = m_pSwapchain->GetTexture(g_currentFrame);
 
-	//for (ScriptableRenderer* renderer : m_renderers)
-	//{
-	//	renderer->Execute(m_imageAvailibleSemaphores[m_currentFrame], m_presentAVailibleSemaphores[m_currentFrame], m_fences[m_currentFrame]);
-	//}
+	for (ScriptableRenderer* renderer : m_renderers)
+	{
+		renderer->Execute(m_pContext, m_pImageAvailibleSemaphores[m_currentFrame], m_pPresentAVailibleSemaphores[m_currentFrame], m_pFences[m_currentFrame]);
+	}
 
-	if (!m_pContext->Present(g_currentFrame, m_pSwapchain, m_pImageAvailibleSemaphores + m_currentFrame))
+	if (!m_pContext->Present(g_currentFrame, m_pPresentAVailibleSemaphores[m_currentFrame]))
 	{
 		m_pInstance->UpdateSurface();
-		RHISwapchainDescriptor swapchainDescriptor = {};
-		{
-			swapchainDescriptor.count = 3;
-			swapchainDescriptor.format = Format::A16R16G16B16_SFloat;
-			swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
-			swapchainDescriptor.presenMode = PresentMode::Immediate;
-			swapchainDescriptor.surface = m_pInstance->GetSurface();
-			swapchainDescriptor.presentFamilyIndex = 0;
-			swapchainDescriptor.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
-		}
-		m_pDevice->RecreateSwapchain(m_pSwapchain, &swapchainDescriptor);
+		m_pContext->RecreateSwapchain();
 		return;
 	}
 
@@ -154,8 +119,4 @@ void ScriptableRenderPipeline::AddRenderer()
 	ScriptableRenderer *renderer = (ScriptableRenderer*)WEngine::Allocator::Get()->Allocate(sizeof(ScriptableRenderer));
 	::new (renderer) ScriptableRenderer(&configure);
 	m_renderers.push_back(renderer);
-}
-
-void ScriptableRenderPipeline::Present()
-{
 }

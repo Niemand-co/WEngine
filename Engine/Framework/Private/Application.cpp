@@ -2,6 +2,8 @@
 #include "Framework/Public/Application.h"
 #include "Utils/Public/Window.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
+#include "Scene/Public/GameObject.h"
+#include "Scene/Public/World.h"
 #include <time.h>
 
 Application* Application::m_instance = nullptr;
@@ -37,6 +39,12 @@ void Application::Init()
 	WinProc proc = { "WEngine", 1920u, 1080u };
 	m_window = Window::Get(&proc);
 
+	World::CreateWorld();
+
+	GameObject *go = World::GetWorld()->CreateGameObject();
+
+	go->AddComponent<Component::ComponentType::Camera>();
+
 	time_t start, end;
 	start = clock();
 	m_pipeline = ScriptableRenderPipeline::get();
@@ -44,9 +52,9 @@ void Application::Init()
 
 	RE_LOG(double(end - start) / CLOCKS_PER_SEC);
 
-	//m_pipeline->AddRenderer();
+	m_pipeline->AddRenderer();
 
-	//m_pipeline->Setup();
+	m_pipeline->Setup();
 
 }
 
@@ -61,7 +69,7 @@ void Application::Tick()
 			m_window->Destroy();
 			continue;
 		}
-		//m_pipeline->Execute();
+		m_pipeline->Execute();
 	}
 	Finalize();
 }

@@ -8,7 +8,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanCommandBuffer(VkCommandBuffer *commandBuffer);
+		VulkanCommandBuffer(VkCommandBuffer *commandBuffer,VkCommandPool *pCommandPool, VkDevice *pDevice);
 
 		virtual ~VulkanCommandBuffer();
 
@@ -27,6 +27,10 @@ namespace Vulkan
 	private:
 
 		VkCommandBuffer *m_commandBuffer;
+
+		VkCommandPool *m_pCommandPool;
+
+		VkDevice *m_pDevice;
 
 	};
 

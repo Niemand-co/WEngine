@@ -30,7 +30,7 @@ namespace Vulkan
 		for (unsigned int i = 0; i < num; ++i)
 		{
 			vkAllocateCommandBuffers(*m_device, &commandBufferAllocateInfo, pCommandBuffer + i);
-			::new (commandBuffers + i) VulkanCommandBuffer(pCommandBuffer + i);
+			::new (commandBuffers + i) VulkanCommandBuffer(pCommandBuffer + i, m_commandPool, m_device);
 		}
 
 		return commandBuffers;

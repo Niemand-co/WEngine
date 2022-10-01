@@ -26,8 +26,8 @@ namespace Vulkan
 
 	VulkanBuffer::~VulkanBuffer()
 	{
-		vkDestroyBuffer(*m_pDevice, *m_pBuffer, nullptr);
-		vkFreeMemory(*m_pDevice, *m_pDeviceMemory, nullptr);
+		vkDestroyBuffer(*m_pDevice, *m_pBuffer, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
+		vkFreeMemory(*m_pDevice, *m_pDeviceMemory, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
 	}
 
 	VkBuffer* VulkanBuffer::GetHandle()

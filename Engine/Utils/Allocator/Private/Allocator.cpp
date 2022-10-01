@@ -92,8 +92,6 @@ namespace WEngine
 		return g_pInstance;
 	}
 
-	static void* record;
-
 	void* Allocator::Allocate(size_t size)
 	{
 		if (size <= 0)

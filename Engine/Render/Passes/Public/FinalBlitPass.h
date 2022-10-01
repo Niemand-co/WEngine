@@ -9,8 +9,8 @@ public:
 
 	virtual ~FinalBlitPass();
 
-	virtual void Setup() override;
+	virtual void Setup(RHIContext *context) override;
 
-	virtual void Execute(RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence) override;
+	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence) override;
 
 };

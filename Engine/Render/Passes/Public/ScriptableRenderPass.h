@@ -10,7 +10,6 @@ class RHIFence;
 struct RenderPassConfigure
 {
 	RHIDevice *pDevice;
-	RHIContext *pContext;
 	RHIRenderPass *pRenderPass;
 	RHIPipelineStateObject *pPSO;
 };
@@ -23,15 +22,13 @@ public:
 
 	virtual ~ScriptableRenderPass();
 
-	virtual void Setup() = 0;
+	virtual void Setup(RHIContext *context) = 0;
 
-	virtual void Execute(RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence = nullptr) = 0;
+	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence = nullptr) = 0;
 
 protected:
 
 	RHIDevice *m_pDevice;
-
-	RHIContext *m_pContext;
 
 	RHIRenderPass *m_pRenderPass;
 

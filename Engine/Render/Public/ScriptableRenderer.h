@@ -23,7 +23,7 @@ public:
 
 	virtual void Setup();
 
-	virtual void Execute(RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence);
+	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence);
 
 	virtual void AddRenderPass();
 

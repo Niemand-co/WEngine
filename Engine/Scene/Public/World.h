@@ -3,29 +3,31 @@
 #define SR_WORLD_H
 
 class GameObject;
+class Camera;
 
 class World
 {
 public:
 	World();
+
 	~World();
+
+	GameObject* CreateGameObject(std::string name = "GameObject");
+
+	void AddCamera(Camera *pCamera);
 
 	static World* CreateWorld();
 
-	template<typename T = GameObject>
-	static T* CreateGameObject(World* world);
+	static World* GetWorld();
 
 private:
-	std::vector<GameObject*> m_entities;
-	static World* m_instance;
-};
 
-template<typename T>
-T* World::CreateGameObject(World* world)
-{
-	T* entity = new T();
-	world->m_entities.push_back(entity); 
-	return entity;
-}
+	std::vector<GameObject*> m_pEntities;
+
+	std::vector<Camera*> m_pCameras;
+
+	static World* g_pInstance;
+
+};
 
 #endif

@@ -6,8 +6,8 @@
 #include "RHI/Public/RHIShader.h"
 #include "RHI/Public/RHIContext.h"
 #include "RHI/Public/RHICommandBuffer.h"
-#include "RHI/Public/RHITexture.h"
 #include "RHI/Public/RHITextureView.h"
+#include "RHI/Public/RHIRenderTarget.h"
 #include "RHI/Public/RHISemaphore.h"
 #include "RHI/Public/RHIBuffer.h"
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
@@ -34,7 +34,7 @@ DrawOpaquePass::~DrawOpaquePass()
 {
 }
 
-void DrawOpaquePass::Setup()
+void DrawOpaquePass::Setup(RHIContext *context)
 {
 	ShaderCodeBlob* vertBlob = new ShaderCodeBlob("../assets/vert.spv");
 	RHIShaderDescriptor vertShaderDescriptor = {};
@@ -103,42 +103,27 @@ void DrawOpaquePass::Setup()
 	//	bufferDescriptor.size = 3 * sizeof(float);
 	//}
 	//RHIBuffer *buffer = m_pDevice->CreateBuffer(&bufferDescriptor);
+
+	m_pRenderTargets.resize(3);
+	for (int i = 0; i < 3; ++i)
+	{
+		std::vector<RHITextureView*> textureViews = { context->GetTextureView(i) };
+		RHIRenderTargetDescriptor renderTargetDescriptor = {};
+		{
+			renderTargetDescriptor.bufferCount = 1;
+			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.renderPass = m_pRenderPass;
+			renderTargetDescriptor.width = Window::cur_window->GetWidth();
+			renderTargetDescriptor.height = Window::cur_window->GetHeight();
+		}
+		m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
+	}
 }
 
-void DrawOpaquePass::Execute(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence)
+void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence)
 {
 
-	RHICommandBuffer* cmd = m_pContext->GetCommandBuffer();
-
-	//RHITextureDescriptor textureDescriptor = {};
-	//{
-	//	textureDescriptor.format = Format::A16R16G16B16_SFloat;
-	//	textureDescriptor.width = Window::cur_window->GetWidth();
-	//	textureDescriptor.height = Window::cur_window->GetHeight();
-	//	textureDescriptor.mipCount = 0;
-	//}
-	//RHITexture* renderTexture = m_pDevice->CreateTexture(&textureDescriptor);
-
-	RHITextureViewDescriptor textureViewDescriptor = {};
-	{
-		textureViewDescriptor.format = Format::A16R16G16B16_SFloat;
-		textureViewDescriptor.mipCount = 1;
-		textureViewDescriptor.baseMipLevel = 0;
-		textureViewDescriptor.arrayLayerCount = 1;
-		textureViewDescriptor.baseArrayLayer = 0;
-		textureViewDescriptor.dimension = Dimension::Texture2D;
-	}
-	RHITextureView* view = ScriptableRenderPipeline::g_currentRenderTarget->CreateTextureView(&textureViewDescriptor);
-
-	RHIRenderTargetDescriptor renderTargetDescriptor = {};
-	{
-		renderTargetDescriptor.bufferCount = 1;
-		renderTargetDescriptor.pBufferView = &view;
-		renderTargetDescriptor.renderPass = m_pRenderPass;
-		renderTargetDescriptor.width = Window::cur_window->GetWidth();
-		renderTargetDescriptor.height = Window::cur_window->GetHeight();
-	}
-	RHIRenderTarget* renderTarget = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
+	RHICommandBuffer* cmd = context->GetCommandBuffer();
 
 	cmd->BeginScopePass("Test");
 	{
@@ -146,7 +131,7 @@ void DrawOpaquePass::Execute(RHISemaphore* waitSemaphore, RHISemaphore* signalSe
 		RHIRenderPassBeginDescriptor renderPassBeginDescriptor = {};
 		{
 			renderPassBeginDescriptor.renderPass = m_pRenderPass;
-			renderPassBeginDescriptor.renderTarget = renderTarget;
+			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[ScriptableRenderPipeline::g_currentFrame];
 		}
 		encoder->BeginPass(&renderPassBeginDescriptor);
 		encoder->SetPipeline(m_pPSO);
@@ -154,11 +139,13 @@ void DrawOpaquePass::Execute(RHISemaphore* waitSemaphore, RHISemaphore* signalSe
 		encoder->SetScissor(nullptr);
 		encoder->EndPass();
 		cmd->EndScopePass();
-		m_pContext->ExecuteCommandBuffer(cmd);
-		m_pContext->Submit(waitSemaphore, signalSemaphore, fence);
-		delete encoder;
+		context->ExecuteCommandBuffer(cmd);
+		context->Submit(waitSemaphore, signalSemaphore, fence);
+		encoder->~RHIGraphicsEncoder();
+		WEngine::Allocator::Get()->Deallocate(encoder);
 	}
 	cmd->Clear();
-	delete cmd;
-	delete view;
+
+	cmd->~RHICommandBuffer();
+	WEngine::Allocator::Get()->Deallocate(cmd);
 }
