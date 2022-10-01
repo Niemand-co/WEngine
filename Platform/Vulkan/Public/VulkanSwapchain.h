@@ -8,11 +8,13 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanSwapchain(VkSwapchainKHR *swapchain, VkImage* images, const unsigned int& imageCount, VkDevice *device, unsigned int familyIndex);
+		VulkanSwapchain(VkSwapchainKHR *swapchain, VkDevice *device, unsigned int familyIndex);
 
 		virtual ~VulkanSwapchain();
 
 		void SetHandle(VkSwapchainKHR *swapchain);
+
+		void UpdateTexture();
 
 		VkSwapchainKHR* GetHandle();
 
@@ -20,11 +22,13 @@ namespace Vulkan
 
 	private:
 
-		VkSwapchainKHR *m_swapchain;
+		VkSwapchainKHR *m_pSwapchain;
 
-		VkDevice *m_device;
+		VkDevice *m_pDevice;
 
 		unsigned int m_familyIndex;
+
+		std::vector<VkImage> m_images;
 
 	};
 

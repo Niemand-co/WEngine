@@ -1,18 +1,25 @@
 #pragma once
 #include "RHI/Public/RHIFramebuffer.h"
 
-class VulkanFramebuffer : public RHIFramebuffer
+namespace Vulkan
 {
-public:
 
-	VulkanFramebuffer(VkFramebuffer *framebuffer);
+	class VulkanFramebuffer : public RHIFramebuffer
+	{
+	public:
 
-	virtual ~VulkanFramebuffer();
+		VulkanFramebuffer(VkFramebuffer *pFramebuffer, VkDevice *pDevice);
 
-	VkFramebuffer* GetHandle();
+		virtual ~VulkanFramebuffer();
 
-private:
+		VkFramebuffer* GetHandle();
 
-	VkFramebuffer *m_framebuffer;
+	private:
 
-};
+		VkFramebuffer *m_pFramebuffer;
+
+		VkDevice *m_pDevice;
+
+	};
+
+}

@@ -1,16 +1,22 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanFramebuffer.h"
 
-VulkanFramebuffer::VulkanFramebuffer(VkFramebuffer *framebuffer)
-	: m_framebuffer(framebuffer)
+namespace Vulkan
 {
-}
 
-VulkanFramebuffer::~VulkanFramebuffer()
-{
-}
+	VulkanFramebuffer::VulkanFramebuffer(VkFramebuffer *framebuffer, VkDevice *pDevice)
+		: m_pFramebuffer(framebuffer), m_pDevice(pDevice)
+	{
+	}
 
-VkFramebuffer* VulkanFramebuffer::GetHandle()
-{
-	return m_framebuffer;
+	VulkanFramebuffer::~VulkanFramebuffer()
+	{
+		  vkDestroyFramebuffer(*m_pDevice, *m_pFramebuffer, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
+	}
+
+	VkFramebuffer* VulkanFramebuffer::GetHandle()
+	{
+		return m_pFramebuffer;
+	}
+
 }

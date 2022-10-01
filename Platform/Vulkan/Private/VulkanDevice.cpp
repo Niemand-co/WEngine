@@ -87,20 +87,15 @@ namespace Vulkan
 		VkSwapchainKHR *pSwapchain = (VkSwapchainKHR*)WEngine::Allocator::Get()->Allocate(sizeof(VkSwapchainKHR));
 		RE_ASSERT(vkCreateSwapchainKHR(*m_device, &swapchainCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pSwapchain) == VK_SUCCESS, "Failed to Create Swapchain.");
 
-		unsigned int imageCount = 0;
-		vkGetSwapchainImagesKHR(*m_device, *pSwapchain, &imageCount, nullptr);
-		VkImage *images = (VkImage*)WEngine::Allocator::Get()->Allocate(imageCount * sizeof(VkImage));
-		vkGetSwapchainImagesKHR(*m_device, *pSwapchain, &imageCount, images);
-
 		RHISwapchain *swapchain = (RHISwapchain*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanSwapchain));
-		::new (swapchain) VulkanSwapchain(pSwapchain, images, imageCount, m_device, 0);
+		::new (swapchain) VulkanSwapchain(pSwapchain, m_device, 0);
 
 		return swapchain;
 	}
 
-	void VulkanDevice::RecreateSwapchain(RHISwapchain* swapchain, RHISwapchainDescriptor* descriptor)
+	RHISwapchain* VulkanDevice::RecreateSwapchain(RHISwapchain*& pSwapchain, RHISwapchainDescriptor* descriptor)
 	{
-		vkDestroySwapchainKHR(*m_device, *static_cast<VulkanSwapchain*>(swapchain)->GetHandle(), nullptr);
+		vkDestroySwapchainKHR(*m_device, *static_cast<VulkanSwapchain*>(pSwapchain)->GetHandle(), nullptr);
 
 		VkSwapchainCreateInfoKHR swapchainCreateInfo = {};
 		swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -121,7 +116,11 @@ namespace Vulkan
 		swapchainCreateInfo.clipped = VK_TRUE;
 		swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-		RE_ASSERT(vkCreateSwapchainKHR(*m_device, &swapchainCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), static_cast<VulkanSwapchain*>(swapchain)->GetHandle()) == VK_SUCCESS, "Failed to Recreate Swapchain.");
+		RE_ASSERT(vkCreateSwapchainKHR(*m_device, &swapchainCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), static_cast<VulkanSwapchain*>(pSwapchain)->GetHandle()) == VK_SUCCESS, "Failed to Recreate Swapchain.");
+		
+		static_cast<VulkanSwapchain*>(pSwapchain)->UpdateTexture();
+
+		return pSwapchain;
 	}
 
 	std::vector<RHIFence*> VulkanDevice::CreateFence(unsigned int count)

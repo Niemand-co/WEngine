@@ -48,10 +48,15 @@ void RHIContext::Init()
 	m_pTextureViews.push_back(m_pSwapchain->GetTexture(0)->CreateTextureView(&textureViewDescriptor));
 	m_pTextureViews.push_back(m_pSwapchain->GetTexture(1)->CreateTextureView(&textureViewDescriptor));
 	m_pTextureViews.push_back(m_pSwapchain->GetTexture(2)->CreateTextureView(&textureViewDescriptor));
+
+	m_isDisplayChagned = false;
 }
 
 void RHIContext::RecreateSwapchain()
 {
+	m_pSwapchain->~RHISwapchain();
+	WEngine::Allocator::Get()->Deallocate(m_pSwapchain);
+
 	RHISwapchainDescriptor swapchainDescriptor = {};
 	{
 		swapchainDescriptor.count = 3;
@@ -62,7 +67,25 @@ void RHIContext::RecreateSwapchain()
 		swapchainDescriptor.presentFamilyIndex = 0;
 		swapchainDescriptor.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
 	}
-	m_pDevice->RecreateSwapchain(m_pSwapchain, &swapchainDescriptor);
+	m_pSwapchain = m_pDevice->CreateSwapchain(&swapchainDescriptor);
+
+	RHITextureViewDescriptor textureViewDescriptor = {};
+	{
+		textureViewDescriptor.format = Format::A16R16G16B16_SFloat;
+		textureViewDescriptor.mipCount = 1;
+		textureViewDescriptor.baseMipLevel = 0;
+		textureViewDescriptor.arrayLayerCount = 1;
+		textureViewDescriptor.baseArrayLayer = 0;
+		textureViewDescriptor.dimension = Dimension::Texture2D;
+	}
+	for (int i = 0; i < 3; ++i)
+	{
+		m_pTextureViews[i]->~RHITextureView();
+		WEngine::Allocator::Get()->Deallocate(m_pTextureViews[i]);
+		m_pTextureViews[i] = m_pSwapchain->GetTexture(i)->CreateTextureView(&textureViewDescriptor);
+	}
+
+	m_isDisplayChagned = true;
 }
 
 RHITextureView* RHIContext::GetTextureView(unsigned int index)
@@ -94,4 +117,14 @@ void RHIContext::Submit(RHISemaphore* waitSemaphore, RHISemaphore* signalSemapho
 bool RHIContext::Present(unsigned int imageIndex, RHISemaphore *semaphore)
 {
 	return m_pQueue->Present(m_pSwapchain, imageIndex, semaphore);
+}
+
+bool RHIContext::IsDisplayChanged()
+{
+	return m_isDisplayChagned;
+}
+
+void RHIContext::ResetDisplayState()
+{
+	m_isDisplayChagned = false;
 }

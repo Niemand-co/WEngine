@@ -22,7 +22,7 @@ namespace Vulkan
 
 		virtual RHISwapchain* CreateSwapchain(RHISwapchainDescriptor* descriptor) override;
 
-		virtual void RecreateSwapchain(RHISwapchain *swapchain, RHISwapchainDescriptor *descriptor) override;
+		virtual RHISwapchain* RecreateSwapchain(RHISwapchain *&swapchain, RHISwapchainDescriptor *descriptor) override;
 
 		virtual std::vector<RHIFence*> CreateFence(unsigned int count) override;
 

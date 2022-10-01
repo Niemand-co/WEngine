@@ -122,6 +122,25 @@ void DrawOpaquePass::Setup(RHIContext *context)
 
 void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence)
 {
+	if (context->IsDisplayChanged())
+	{
+		for (int i = 0; i < 3; ++i)
+		{
+			std::vector<RHITextureView*> textureViews = { context->GetTextureView(i) };
+			RHIRenderTargetDescriptor renderTargetDescriptor = {};
+			{
+				renderTargetDescriptor.bufferCount = 1;
+				renderTargetDescriptor.pBufferView = textureViews.data();
+				renderTargetDescriptor.renderPass = m_pRenderPass;
+				renderTargetDescriptor.width = Window::cur_window->GetWidth();
+				renderTargetDescriptor.height = Window::cur_window->GetHeight();
+			}
+			m_pRenderTargets[i]->~RHIRenderTarget();
+			WEngine::Allocator::Get()->Deallocate(m_pRenderTargets[i]);
+			m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
+		}
+		context->ResetDisplayState();
+	}
 
 	RHICommandBuffer* cmd = context->GetCommandBuffer();
 

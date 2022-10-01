@@ -87,7 +87,6 @@ void ScriptableRenderPipeline::Setup()
 void ScriptableRenderPipeline::Execute()
 {
 	m_pDevice->WaitForFences(m_pFences[m_currentFrame], 1);
-	m_pDevice->ResetFences(m_pFences[m_currentFrame], 1);
 
 	g_currentFrame = m_pContext->GetNextImage(m_pImageAvailibleSemaphores[m_currentFrame]);
 	if (g_currentFrame < 0)
@@ -96,6 +95,7 @@ void ScriptableRenderPipeline::Execute()
 		m_pContext->RecreateSwapchain();
 		return;
 	}
+	m_pDevice->ResetFences(m_pFences[m_currentFrame], 1);
 
 	for (ScriptableRenderer* renderer : m_renderers)
 	{
@@ -106,7 +106,6 @@ void ScriptableRenderPipeline::Execute()
 	{
 		m_pInstance->UpdateSurface();
 		m_pContext->RecreateSwapchain();
-		return;
 	}
 
 	m_currentFrame = (m_currentFrame + 1) % m_maxFrame;

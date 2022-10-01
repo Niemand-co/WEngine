@@ -35,6 +35,10 @@ public:
 
 	virtual bool Present(unsigned int imageIndex, RHISemaphore *semaphore);
 
+	virtual bool IsDisplayChanged();
+
+	virtual void ResetDisplayState();
+
 protected:
 
 	RHIDevice *m_pDevice;
@@ -50,5 +54,7 @@ protected:
 	std::vector<RHICommandBuffer*> m_pCommandBuffers;
 
 	std::vector<RHITextureView*> m_pTextureViews;
+
+	bool m_isDisplayChagned;
 
 };

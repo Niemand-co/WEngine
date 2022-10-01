@@ -10,17 +10,23 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTexture(VkImage *image, VkDevice *device);
+		VulkanTexture(VkImage *image, VkDevice *device, bool isDisplay = false);
 
 		virtual ~VulkanTexture();
 
 		virtual RHITextureView* CreateTextureView(RHITextureViewDescriptor *descriptor) override;
 
+		VkImage* GetHandle();
+
+		void SetHandle(VkImage *image);
+
 	private:
 
-		VkImage *m_image;
+		VkImage *m_pImage;
 
-		VkDevice *m_device;
+		VkDevice *m_pDevice;
+
+		bool m_isDisplayTexture;
 
 	};
 
