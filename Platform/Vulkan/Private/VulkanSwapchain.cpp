@@ -10,14 +10,14 @@ namespace Vulkan
 	{
 		unsigned int imageCount = 0;
 		vkGetSwapchainImagesKHR(*m_pDevice, *m_pSwapchain, &imageCount, nullptr);
-		m_images.resize(imageCount);
-		vkGetSwapchainImagesKHR(*m_pDevice, *m_pSwapchain, &imageCount, m_images.data());
+		VkImage *pImages = (VkImage*)WEngine::Allocator::Get()->Allocate(imageCount * sizeof(VkImage));
+		vkGetSwapchainImagesKHR(*m_pDevice, *m_pSwapchain, &imageCount, pImages);
 
 		m_textures.resize(imageCount);
 		for (unsigned int i = 0; i < imageCount; ++i)
 		{
 			m_textures[i] = (RHITexture*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanAllocator));
-			::new (m_textures[i]) VulkanTexture(&m_images[i], m_pDevice, true);
+			::new (m_textures[i]) VulkanTexture(pImages + i, m_pDevice, true);
 		}
 	}
 
@@ -29,26 +29,11 @@ namespace Vulkan
 			m_textures[i]->~RHITexture();
 			WEngine::Allocator::Get()->Deallocate(m_textures[i]);
 		}
-		m_images.clear();
 	}
 
 	void VulkanSwapchain::SetHandle(VkSwapchainKHR* pSwapchain)
 	{
 		m_pSwapchain = pSwapchain;
-	}
-
-	void VulkanSwapchain::UpdateTexture()
-	{
-		unsigned int imageCount = 0;
-		vkGetSwapchainImagesKHR(*m_pDevice, *m_pSwapchain, &imageCount, nullptr);
-		m_images.clear();
-		m_images.resize(imageCount);
-		vkGetSwapchainImagesKHR(*m_pDevice, *m_pSwapchain, &imageCount, m_images.data());
-
-		for (int i = 0; i < m_textures.size(); ++i)
-		{
-			static_cast<VulkanTexture*>(m_textures[i])->SetHandle(&m_images[i]);
-		}
 	}
 
 	VkSwapchainKHR* VulkanSwapchain::GetHandle()

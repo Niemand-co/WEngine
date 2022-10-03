@@ -14,8 +14,6 @@ namespace Vulkan
 
 		void SetHandle(VkSwapchainKHR *swapchain);
 
-		void UpdateTexture();
-
 		VkSwapchainKHR* GetHandle();
 
 		unsigned int GetQueueFamilyIndex();
@@ -27,8 +25,6 @@ namespace Vulkan
 		VkDevice *m_pDevice;
 
 		unsigned int m_familyIndex;
-
-		std::vector<VkImage> m_images;
 
 	};
 

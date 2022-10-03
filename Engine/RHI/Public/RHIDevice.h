@@ -32,8 +32,6 @@ public:
 
 	virtual RHISwapchain* CreateSwapchain(RHISwapchainDescriptor *descriptor) = 0;
 
-	virtual RHISwapchain* RecreateSwapchain(RHISwapchain* &swapchain, RHISwapchainDescriptor* descriptor) = 0;
-
 	virtual std::vector<RHIFence*> CreateFence(unsigned int count) = 0;
 
 	virtual RHIShader* CreateShader(RHIShaderDescriptor *descriptor) = 0;

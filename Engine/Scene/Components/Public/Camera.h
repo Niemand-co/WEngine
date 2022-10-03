@@ -1,7 +1,4 @@
 #pragma once
-#ifndef SR_CAMERA_H
-#define SR_CAMERA_H
-
 #include "Scene/Components/Public/Component.h"
 
 class Camera : public Component
@@ -41,5 +38,3 @@ private:
 
 	Matrix4x4f m_viewMatrix;
 };
-
-#endif

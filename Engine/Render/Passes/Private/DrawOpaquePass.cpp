@@ -21,9 +21,12 @@
 #include "Render/Descriptor/Public/RHIShaderDescriptor.h"
 #include "Render/Descriptor/Public/RHIBlendDescriptor.h"
 #include "Render/Descriptor/Public/RHIDepthStencilDescriptor.h"
+#include "Render/Descriptor/Public/RHIVertexInputDescriptor.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Render/Descriptor/Public/RHIBufferDescriptor.h"
 #include "Utils/Public/Window.h"
+#include "Render/Mesh/Public/Mesh.h"
+#include "Render/Mesh/Public/Vertex.h"
 
 DrawOpaquePass::DrawOpaquePass(RenderPassConfigure* configure)
 	: ScriptableRenderPass(configure)
@@ -88,6 +91,23 @@ void DrawOpaquePass::Setup(RHIContext *context)
 		depthStencilDescriptor.maxDepth = 1.0f;
 		depthStencilDescriptor.minDepth = 0.0f;
 	}
+
+	m_pMesh = (Mesh*)WEngine::Allocator::Get()->Allocate(sizeof(Mesh));
+	::new (m_pMesh) Mesh();
+	m_pMesh->m_pVertices = (Vertex*)WEngine::Allocator::Get()->Allocate(3 * sizeof(Vertex));
+	m_pMesh->m_pVertices[0].Position = { -0.5f, -0.5f, 0.0f };
+	m_pMesh->m_pVertices[1].Position = { 0.5f, -0.5f, 0.0f };
+	m_pMesh->m_pVertices[2].Position = { 0.0f, 0.5f, 0.0f };
+	m_pMesh->m_pVertices[0].Color = { 1.0f, 0.0f, 0.0f };
+	m_pMesh->m_pVertices[1].Color = { 0.0f, 1.0f, 0.0f };
+	m_pMesh->m_pVertices[2].Color = { 0.0f, 0.0f, 1.0f };
+	m_pMesh->m_pVertices[0].UV = { 0.0f, 0.0f };
+	m_pMesh->m_pVertices[1].UV = { 0.0f, 0.0f };
+	m_pMesh->m_pVertices[2].UV = { 0.0f, 0.0f };
+	m_pMesh->m_vertexCount = 3;
+
+	m_pMesh->GenerateVertexInputDescription();
+	RHIVertexInputDescriptor vertexInputDescriptor = m_pMesh->GetVertexInputDescriptor();
 	RHIPipelineStateObjectDescriptor psoDescriptor = {};
 	{
 		psoDescriptor.renderPass = m_pRenderPass;
@@ -95,14 +115,17 @@ void DrawOpaquePass::Setup(RHIContext *context)
 		psoDescriptor.depthStencilDescriptor = &depthStencilDescriptor;
 		psoDescriptor.pShader = shaders.data();
 		psoDescriptor.shaderCount = shaders.size();
-	}
+		psoDescriptor.vertexDescriptor = &vertexInputDescriptor;
+	};
 	m_pPSO = m_pDevice->CreatePipelineStateObject(&psoDescriptor);
 
-	//RHIBufferDescriptor bufferDescriptor = {};
-	//{
-	//	bufferDescriptor.size = 3 * sizeof(float);
-	//}
-	//RHIBuffer *buffer = m_pDevice->CreateBuffer(&bufferDescriptor);
+
+	RHIBufferDescriptor bufferDescriptor = {};
+	{
+		bufferDescriptor.size = m_pMesh->m_vertexCount * sizeof(Vertex);
+		bufferDescriptor.pData = m_pMesh->m_pVertices;
+	}
+	m_pBuffer = m_pDevice->CreateBuffer(&bufferDescriptor);
 
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
@@ -156,6 +179,8 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 		encoder->SetPipeline(m_pPSO);
 		encoder->SetViewport(nullptr);
 		encoder->SetScissor(nullptr);
+		encoder->BindVertexBuffer(m_pBuffer);
+		encoder->DrawVertexArray();
 		encoder->EndPass();
 		cmd->EndScopePass();
 		context->ExecuteCommandBuffer(cmd);

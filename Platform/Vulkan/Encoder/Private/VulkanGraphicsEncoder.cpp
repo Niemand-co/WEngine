@@ -3,6 +3,7 @@
 #include "Platform/Vulkan/Public/VulkanPipelineStateObject.h"
 #include "Platform/Vulkan/Public/VulkanRenderPass.h"
 #include "Platform/Vulkan/Public/VulkanRenderTarget.h"
+#include "Platform/Vulkan/Public/VulkanBuffer.h"
 #include "Render/Descriptor/Public/RHIRenderPassBeginDescriptor.h"
 #include "Utils/Public/Window.h"
 
@@ -27,7 +28,7 @@ namespace Vulkan
 		renderPassBeginInfo.renderArea.offset = { 0, 0 };
 		renderPassBeginInfo.renderArea.extent = { descriptor->renderTarget->GetWidth(), descriptor->renderTarget->GetHeight() };
 		renderPassBeginInfo.clearValueCount = 1;
-		VkClearValue clearColor = { {{1.0f, 0.0f, 0.0f, 1.0f}} };
+		VkClearValue clearColor = { {{1.0f, 1.0f, 1.0f, 1.0f}} };
 		renderPassBeginInfo.pClearValues = &clearColor;
 
 		vkCmdBeginRenderPass(*m_cmd, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
@@ -60,6 +61,17 @@ namespace Vulkan
 
 	void VulkanGraphicsEncoder::ClearRenderTarget(bool isClearColor, bool isClearDepth, Vector4 clearColor, float clearDepth)
 	{
+	}
+
+	void VulkanGraphicsEncoder::BindVertexBuffer(RHIBuffer* pBuffer)
+	{
+		VkDeviceSize offets[] = {0};
+		vkCmdBindVertexBuffers(*m_cmd, 0, 1, static_cast<VulkanBuffer*>(pBuffer)->GetHandle(), offets);
+	}
+
+	void VulkanGraphicsEncoder::DrawVertexArray()
+	{
+		vkCmdDraw(*m_cmd, 3, 1, 0, 0);
 	}
 
 	void VulkanGraphicsEncoder::EndPass()

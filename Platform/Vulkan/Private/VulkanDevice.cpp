@@ -24,14 +24,16 @@
 #include "Render/Descriptor/Public/RHITextureDescriptor.h"
 #include "Render/Descriptor/Public/RHIRenderTargetDescriptor.h"
 #include "Render/Descriptor/Public/RHIBufferDescriptor.h"
+#include "Render/Descriptor/Public/RHIVertexInputDescriptor.h"
 #include "Utils/Public/Window.h"
+#include "Render/Mesh/Public/Vertex.h"
 
 namespace Vulkan
 {
 
 	VulkanDevice::VulkanDevice(VkDevice *device, std::vector<QueueStack> stacks)
 	{
-		m_device = device;
+		m_pDevice = device;
 		m_queues = stacks;
 	}
 
@@ -55,10 +57,10 @@ namespace Vulkan
 		for(; queueFamilyID < m_queues.size(); ++queueFamilyID)
 			if(m_queues[queueFamilyID].type == type)
 				break;
-		vkGetDeviceQueue(*m_device, m_queues[queueFamilyID].index, 0, pQueue);
+		vkGetDeviceQueue(*m_pDevice, m_queues[queueFamilyID].index, 0, pQueue);
 
 		RHIQueue *queue = (RHIQueue*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanQueue));
-		:: new (queue) VulkanQueue(pQueue, queueFamilyID, m_device);
+		:: new (queue) VulkanQueue(pQueue, queueFamilyID, m_pDevice);
 
 		return queue;
 	}
@@ -85,42 +87,12 @@ namespace Vulkan
 		swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
 		VkSwapchainKHR *pSwapchain = (VkSwapchainKHR*)WEngine::Allocator::Get()->Allocate(sizeof(VkSwapchainKHR));
-		RE_ASSERT(vkCreateSwapchainKHR(*m_device, &swapchainCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pSwapchain) == VK_SUCCESS, "Failed to Create Swapchain.");
+		RE_ASSERT(vkCreateSwapchainKHR(*m_pDevice, &swapchainCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pSwapchain) == VK_SUCCESS, "Failed to Create Swapchain.");
 
 		RHISwapchain *swapchain = (RHISwapchain*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanSwapchain));
-		::new (swapchain) VulkanSwapchain(pSwapchain, m_device, 0);
+		::new (swapchain) VulkanSwapchain(pSwapchain, m_pDevice, 0);
 
 		return swapchain;
-	}
-
-	RHISwapchain* VulkanDevice::RecreateSwapchain(RHISwapchain*& pSwapchain, RHISwapchainDescriptor* descriptor)
-	{
-		vkDestroySwapchainKHR(*m_device, *static_cast<VulkanSwapchain*>(pSwapchain)->GetHandle(), nullptr);
-
-		VkSwapchainCreateInfoKHR swapchainCreateInfo = {};
-		swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-		swapchainCreateInfo.surface = static_cast<VulkanSurface*>(descriptor->surface)->GetHandle();
-		swapchainCreateInfo.imageFormat = WEngine::ToVulkan(descriptor->format);
-		swapchainCreateInfo.imageColorSpace = WEngine::ToVulkan(descriptor->colorSpace);
-		swapchainCreateInfo.presentMode = WEngine::ToVulkan(descriptor->presenMode);
-		swapchainCreateInfo.imageExtent = { descriptor->extent.width, descriptor->extent.height };
-		swapchainCreateInfo.minImageCount = descriptor->count;
-		swapchainCreateInfo.imageArrayLayers = 1;
-		swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-		swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		swapchainCreateInfo.queueFamilyIndexCount = 0;
-		swapchainCreateInfo.pQueueFamilyIndices = nullptr;
-
-		swapchainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
-		swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-		swapchainCreateInfo.clipped = VK_TRUE;
-		swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
-
-		RE_ASSERT(vkCreateSwapchainKHR(*m_device, &swapchainCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), static_cast<VulkanSwapchain*>(pSwapchain)->GetHandle()) == VK_SUCCESS, "Failed to Recreate Swapchain.");
-		
-		static_cast<VulkanSwapchain*>(pSwapchain)->UpdateTexture();
-
-		return pSwapchain;
 	}
 
 	std::vector<RHIFence*> VulkanDevice::CreateFence(unsigned int count)
@@ -135,7 +107,7 @@ namespace Vulkan
 		VkFence *fence = (VkFence*)WEngine::Allocator::Get()->Allocate(count * sizeof(VkFence));
 		for (unsigned int i = 0; i < count; ++i)
 		{
-			vkCreateFence(*m_device, &fenceCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), fence + i);
+			vkCreateFence(*m_pDevice, &fenceCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), fence + i);
 			::new (pFences + i) VulkanFence(fence + i);
 			fences[i] = pFences + i;
 		}
@@ -152,7 +124,7 @@ namespace Vulkan
 		shaderModuleCreateInfo.pCode = descriptor->pCode;
 
 		VkShaderModule *pShaderModule = (VkShaderModule*)WEngine::Allocator::Get()->Allocate(sizeof(VkShaderModule));
-		vkCreateShaderModule(*m_device, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pShaderModule);
+		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pShaderModule);
 
 		RHIShader *shader = (RHIShader*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanShader));
 		:: new (shader) VulkanShader(pShaderModule, descriptor->shaderStage, descriptor->entryName);
@@ -199,7 +171,7 @@ namespace Vulkan
 		renderPassCreateInfo.pDependencies = &subpassDependency;
 
 		VkRenderPass *pRenderPass = (VkRenderPass*)WEngine::Allocator::Get()->Allocate(sizeof(VkRenderPass));
-		RE_ASSERT(vkCreateRenderPass(*m_device, &renderPassCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pRenderPass) == VK_SUCCESS, "Failed to Create Render Pass.");
+		RE_ASSERT(vkCreateRenderPass(*m_pDevice, &renderPassCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pRenderPass) == VK_SUCCESS, "Failed to Create Render Pass.");
 
 		RHIRenderPass *renderPass = (RHIRenderPass*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanRenderPass));
 		::new (renderPass) VulkanRenderPass(pRenderPass);
@@ -220,12 +192,26 @@ namespace Vulkan
 			shaderStageCreateInfos[i].pName = shader->GetEntry();
 		}
 
+		VkVertexInputBindingDescription vertexInputBindgDescription = {};
+		{
+			vertexInputBindgDescription.binding = descriptor->vertexDescriptor->bindingDescription->slot;
+			vertexInputBindgDescription.stride = descriptor->vertexDescriptor->bindingDescription->stride;
+			vertexInputBindgDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+		}
+		VkVertexInputAttributeDescription *pVertexInputAttributeDescriptions = (VkVertexInputAttributeDescription*)WEngine::Allocator::Get()->Allocate(descriptor->vertexDescriptor->attributeDescriptionCount * sizeof(VkVertexInputAttributeDescription));
+		for(unsigned int i = 0; i < descriptor->vertexDescriptor->attributeDescriptionCount; ++i)
+		{
+			pVertexInputAttributeDescriptions[i].binding = descriptor->vertexDescriptor->pAttributeDescription[i]->slot;
+			pVertexInputAttributeDescriptions[i].location = descriptor->vertexDescriptor->pAttributeDescription[i]->location;
+			pVertexInputAttributeDescriptions[i].offset = descriptor->vertexDescriptor->pAttributeDescription[i]->offset;
+			pVertexInputAttributeDescriptions[i].format = WEngine::ToVulkan(descriptor->vertexDescriptor->pAttributeDescription[i]->format);
+		}
 		VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {};
 		vertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputStateCreateInfo.vertexBindingDescriptionCount = 0;
-		vertexInputStateCreateInfo.pVertexBindingDescriptions = nullptr;
-		vertexInputStateCreateInfo.vertexAttributeDescriptionCount = 0;
-		vertexInputStateCreateInfo.pVertexAttributeDescriptions = nullptr;
+		vertexInputStateCreateInfo.vertexBindingDescriptionCount = 1;
+		vertexInputStateCreateInfo.pVertexBindingDescriptions = &vertexInputBindgDescription;
+		vertexInputStateCreateInfo.vertexAttributeDescriptionCount = descriptor->vertexDescriptor->attributeDescriptionCount;
+		vertexInputStateCreateInfo.pVertexAttributeDescriptions = pVertexInputAttributeDescriptions;
 
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo = {};
 		inputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -301,7 +287,7 @@ namespace Vulkan
 		layoutCreateInfo.pushConstantRangeCount = 0;
 		layoutCreateInfo.pPushConstantRanges = nullptr;
 		VkPipelineLayout *layout = (VkPipelineLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VkPipelineLayout));
-		RE_ASSERT(vkCreatePipelineLayout(*m_device, &layoutCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), layout) == VK_SUCCESS, "Failed to Create Pipeline Layout.");
+		RE_ASSERT(vkCreatePipelineLayout(*m_pDevice, &layoutCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), layout) == VK_SUCCESS, "Failed to Create Pipeline Layout.");
 
 		VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {};
 		graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -322,7 +308,13 @@ namespace Vulkan
 		//graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
 		VkPipeline *pPipeline = (VkPipeline*)WEngine::Allocator::Get()->Allocate(sizeof(VkPipeline));
-		RE_ASSERT(vkCreateGraphicsPipelines(*m_device, VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pPipeline) == VK_SUCCESS, "Failed to Create Pipeline.");
+		RE_ASSERT(vkCreateGraphicsPipelines(*m_pDevice, VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pPipeline) == VK_SUCCESS, "Failed to Create Pipeline.");
+
+		for (unsigned int i = 0; i < descriptor->vertexDescriptor->attributeDescriptionCount; ++i)
+		{
+			pVertexInputAttributeDescriptions[i].~VkVertexInputAttributeDescription();
+		}
+		WEngine::Allocator::Get()->Deallocate(pVertexInputAttributeDescriptions);
 
 		RHIPipelineStateObject *pipeline = (RHIPipelineStateObject*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanAllocator));
 		::new (pipeline) VulkanPipelineStateObject(pPipeline);
@@ -341,7 +333,7 @@ namespace Vulkan
 		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 		VkImage *image = (VkImage*)WEngine::Allocator::Get()->Allocate(sizeof(VkImage));
-		vkCreateImage(*m_device, &imageCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), image);
+		vkCreateImage(*m_pDevice, &imageCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), image);
 
 		return nullptr;
 	}
@@ -364,10 +356,10 @@ namespace Vulkan
 		framebufferCreateInfo.layers = 1;
 
 		VkFramebuffer *framebuffer = (VkFramebuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkFramebuffer));
-		RE_ASSERT(vkCreateFramebuffer(*m_device, &framebufferCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), framebuffer) == VK_SUCCESS, "Failed to Create Framebuffer.");
+		RE_ASSERT(vkCreateFramebuffer(*m_pDevice, &framebufferCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), framebuffer) == VK_SUCCESS, "Failed to Create Framebuffer.");
 
 		RHIRenderTarget *renderTarget = (RHIRenderTarget*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanRenderTarget));
-		::new (renderTarget) VulkanRenderTarget(framebuffer, descriptor->width, descriptor->height, m_device);
+		::new (renderTarget) VulkanRenderTarget(framebuffer, descriptor->width, descriptor->height, m_pDevice);
 
 		return renderTarget;
 	}
@@ -380,10 +372,13 @@ namespace Vulkan
 		bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		bufferCreateInfo.size = descriptor->size;
 
-		VkBuffer* buffer = (VkBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkBuffer));
-		RE_ASSERT(vkCreateBuffer(*m_device, &bufferCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), buffer) == VK_SUCCESS, "Failed to Create Buffer.");
+		VkBuffer* pBuffer = (VkBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkBuffer));
+		RE_ASSERT(vkCreateBuffer(*m_pDevice, &bufferCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pBuffer) == VK_SUCCESS, "Failed to Create Buffer.");
 
-		return new VulkanBuffer(buffer, m_device);
+		RHIBuffer *buffer = (RHIBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanBuffer));
+		::new (buffer) VulkanBuffer(pBuffer, m_pDevice, descriptor->size, descriptor->pData);
+
+		return buffer;
 	}
 
 	std::vector<RHISemaphore*> VulkanDevice::GetSemaphore(unsigned int count)
@@ -396,7 +391,7 @@ namespace Vulkan
 		semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 		for (int i = 0; i < count; ++i)
 		{
-			RE_ASSERT(vkCreateSemaphore(*m_device, &semaphoreCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pSemaphore + i) == VK_SUCCESS, "Failed to Create Semaphore.");
+			RE_ASSERT(vkCreateSemaphore(*m_pDevice, &semaphoreCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pSemaphore + i) == VK_SUCCESS, "Failed to Create Semaphore.");
 			::new (semaphore + i) VulkanSemaphore(pSemaphore + i);
 			semaphores[i] = semaphore + i;
 		}
@@ -413,7 +408,7 @@ namespace Vulkan
 			fences.push_back(*static_cast<VulkanFence*>(pFences + i)->GetHandle());
 		}
 
-		vkWaitForFences(*m_device, count, fences.data(), waitForAll, (std::numeric_limits<uint64_t>::max)());
+		vkWaitForFences(*m_pDevice, count, fences.data(), waitForAll, (std::numeric_limits<uint64_t>::max)());
 	}
 
 	void VulkanDevice::ResetFences(RHIFence* pFences, unsigned int count)
@@ -425,16 +420,16 @@ namespace Vulkan
 			fences.push_back(*static_cast<VulkanFence*>(pFences + i)->GetHandle());
 		}
 
-		RE_ASSERT(vkResetFences(*m_device, count, fences.data()) == VK_SUCCESS, "Failed to Reset Fences.");
+		RE_ASSERT(vkResetFences(*m_pDevice, count, fences.data()) == VK_SUCCESS, "Failed to Reset Fences.");
 	}
 
 	int VulkanDevice::GetNextImage(RHISwapchain *swapchain, RHISemaphore *semaphore)
 	{
 		unsigned int index;
-		VkResult result = vkAcquireNextImageKHR(*m_device, *static_cast<VulkanSwapchain*>(swapchain)->GetHandle(), (std::numeric_limits<uint64_t>::max)(), *static_cast<VulkanSemaphore*>(semaphore)->GetHandle(), VK_NULL_HANDLE, &index);
+		VkResult result = vkAcquireNextImageKHR(*m_pDevice, *static_cast<VulkanSwapchain*>(swapchain)->GetHandle(), (std::numeric_limits<uint64_t>::max)(), *static_cast<VulkanSemaphore*>(semaphore)->GetHandle(), VK_NULL_HANDLE, &index);
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || Window::cur_window->IsSizeChanged())
 		{
-			vkDeviceWaitIdle(*m_device);
+			vkDeviceWaitIdle(*m_pDevice);
 			return -1;
 		}
 		return index;
@@ -442,7 +437,7 @@ namespace Vulkan
 
 	VkDevice* VulkanDevice::GetHandle()
 	{
-		return m_device;
+		return m_pDevice;
 	}
 
 }

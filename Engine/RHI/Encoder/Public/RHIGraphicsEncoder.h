@@ -6,6 +6,7 @@ class RHIRenderPass;
 class RHIPipelineStateObject;
 class RHIViewport;
 class RHIScissor;
+class RHIBuffer;
 
 class RHIRenderPassBeginDescriptor;
 
@@ -24,6 +25,10 @@ public:
 	virtual void SetScissor(RHIScissor* scissor) = 0;
 
 	virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, Vector4 clearColor, float clearDepth = 0.0f) = 0;
+
+	virtual void BindVertexBuffer(RHIBuffer *pBuffer) = 0;
+
+	virtual void DrawVertexArray() = 0;
 
 	virtual void EndPass() = 0;
 

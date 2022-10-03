@@ -13,4 +13,6 @@ public:
 
 	uint64_t size;
 
+	void *pData;
+
 };

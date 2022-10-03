@@ -22,8 +22,6 @@ namespace Vulkan
 
 		virtual RHISwapchain* CreateSwapchain(RHISwapchainDescriptor* descriptor) override;
 
-		virtual RHISwapchain* RecreateSwapchain(RHISwapchain *&swapchain, RHISwapchainDescriptor *descriptor) override;
-
 		virtual std::vector<RHIFence*> CreateFence(unsigned int count) override;
 
 		virtual RHIShader* CreateShader(RHIShaderDescriptor *descriptor) override;
@@ -50,7 +48,7 @@ namespace Vulkan
 
 	private:
 
-		VkDevice *m_device;
+		VkDevice *m_pDevice;
 
 		std::vector<QueueStack> m_queues;
 

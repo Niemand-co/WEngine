@@ -22,6 +22,10 @@ namespace Vulkan
 
 		virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, Vector4 clearColor, float clearDepth /* = 0.0f */) override;
 
+		virtual void BindVertexBuffer(RHIBuffer *pBuffer) override;
+
+		virtual void DrawVertexArray() override;
+
 		virtual void EndPass() override;
 
 	private:

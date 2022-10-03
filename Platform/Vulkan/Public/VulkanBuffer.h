@@ -8,9 +8,11 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanBuffer(VkBuffer *buffer, VkDevice *device);
+		VulkanBuffer(VkBuffer *buffer, VkDevice *device, size_t size, void *pData);
 
 		virtual ~VulkanBuffer();
+
+		virtual void LoadData(void *pData, size_t size) override;
 
 		VkBuffer* GetHandle();
 
@@ -18,11 +20,13 @@ namespace Vulkan
 
 		VkBuffer *m_pBuffer;
 
-		VkMemoryRequirements *m_pMemoryRequiremtns;
+		VkMemoryRequirements *m_pMemoryRequirements;
 
 		VkDeviceMemory *m_pDeviceMemory;
 
 		VkDevice *m_pDevice;
+
+		void *m_pData;
 
 	};
 

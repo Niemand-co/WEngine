@@ -2,6 +2,8 @@
 #include "Render/Passes/Public/ScriptableRenderPass.h"
 
 class RHIRenderTarget;
+class Mesh;
+class RHIBuffer;
 
 class DrawOpaquePass : public ScriptableRenderPass
 {
@@ -18,5 +20,9 @@ public:
 private:
 
 	std::vector<RHIRenderTarget*> m_pRenderTargets;
+
+	Mesh *m_pMesh;
+
+	RHIBuffer *m_pBuffer;
 
 };

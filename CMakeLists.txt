@@ -17,6 +17,7 @@ file(GLOB ICON_SRC Icons/*.*)
 file(GLOB PASS_SRC Engine/Render/Passes/Private/*.*)
 file(GLOB PIPELINE_SRC Engine/Render/RenderPipeline/Private/*.*)
 file(GLOB DESCR_SRC Engine/Render/Descriptor/Private/*.*)
+file(GLOB MESH_SRC Engine/Render/Mesh/Private/*.*)
 file(GLOB RENDER_SRC Engine/Render/Private/*.*)
 
 file(GLOB FRAME_SRC Engine/Framework/Private/*.*)
@@ -38,6 +39,7 @@ file(GLOB VULKAN_ALLOC_SRC Platform/Vulkan/Allocator/Private/*.*)
 file(GLOB PASS_INCLUDE Engine/Render/Passes/Public/*.h)
 file(GLOB PIPELINE_INCLUDE Engine/Render/RenderPipeline/Public/*.h)
 file(GLOB DESCR_INCLUDE Engine/Render/Descriptor/Public/*.h)
+file(GLOB MESH_INCLUDE Engine/Render/Mesh/Public/*.h)
 file(GLOB RENDER_INCLUDE Engine/Render/Public/*.h)
 
 file(GLOB FRAME_INCLUDE Engine/Framework/Public/*.h)
@@ -94,6 +96,7 @@ set(WE_SRC
     ${PLATFORM_SRC}
     ${PASS_SRC}
     ${PIPELINE_SRC}
+    ${MESH_SRC}
     ${LOG_SRC}
     ${RHI_SRC}
     ${RHI_ENCODER_SRC})
@@ -111,6 +114,7 @@ set(WE_INCLUDE
     ${PLATFORM_INCLUDE}
     ${PASS_INCLUDE}
     ${PIPELINE_INCLUDE}
+    ${MESH_INCLUDE}
     ${LOG_INCLUDE}
     ${RHI_INCLUDE}
     ${RHI_ENCODER_INCLUDE})
@@ -132,6 +136,7 @@ source_group(Engine/Scene/Private FILES ${SCENE_SRC})
 source_group(Engine/Event/Privatet FILES ${EVENT_SRC})
 source_group(Engine/Log/Private FILES ${LOG_SRC})
 source_group(Engine/Render/Pass/Private FILES ${PASS_SRC})
+source_group(Engine/Render/Mesh/Private FILES ${MESH_SRC})
 source_group(Engine/RHI/Private FILES ${RHI_SRC})
 source_group(Engine/RHI/Encoder/Private FILES ${RHI_ENCODER_SRC})
 source_group(Platform/GLFWWindow/Private FILES ${GLFW_SRC})
@@ -152,6 +157,7 @@ source_group(Engine/Scene/Components/Public FILES ${COMP_INCLUDE})
 source_group(Engine/Scene/Public FILES ${SCENE_INCLUDE})
 source_group(Engine/Event/Publict FILES ${EVENT_INCLUDE})
 source_group(Engine/Render/Pass/Public FILES ${PASS_INCLUDE})
+source_group(Engine/Render/Mesh/Public FILES ${MESH_INCLUDE})
 source_group(Engine/Log/Public FILES ${LOG_INCLUDE})
 source_group(Engine/RHI/Public FILES ${RHI_INCLUDE})
 source_group(Engine/RHI/Encoder/Public FILES ${RHI_ENCODER_INCLUDE})

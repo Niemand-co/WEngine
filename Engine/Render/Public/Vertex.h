@@ -1,4 +1,5 @@
 #pragma once
+#ifdef SOFTRENDERER
 
 template<typename T>
 struct Vector4Type;
@@ -47,3 +48,5 @@ struct V2F
 		return result;
 	}
 };
+
+#endif
