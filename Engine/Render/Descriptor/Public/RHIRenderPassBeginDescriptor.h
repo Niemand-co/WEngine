@@ -1,10 +1,9 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
 class RHIRenderPass;
 class RHIRenderTarget;
 
-class RHIRenderPassBeginDescriptor : public RHIDescriptor
+class RHIRenderPassBeginDescriptor
 {
 public:
 

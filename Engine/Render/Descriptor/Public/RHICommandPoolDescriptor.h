@@ -1,7 +1,6 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
-class RHICommandPoolDescriptor : public RHIDescriptor
+class RHICommandPoolDescriptor
 {
 public:
 

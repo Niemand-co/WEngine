@@ -1,5 +1,4 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
 enum class RHIBackend
 {
@@ -9,7 +8,7 @@ enum class RHIBackend
 	OpenGL
 };
 
-class RHIInstanceDescriptor : public RHIDescriptor
+class RHIInstanceDescriptor
 {
 public:
 

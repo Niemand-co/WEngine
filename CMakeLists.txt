@@ -11,6 +11,7 @@ set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT WEngine)
 set(GLAD_INCLUDE ${CMAKE_SOURCE_DIR}/Engine/deps/glad/include)
 
 file(GLOB MATH_SRC Engine/Math/*.*)
+file(GLOB_RECURSE GLM_SRC deps/GLM *.h *.hpp *.inl)
 
 file(GLOB ICON_SRC Icons/*.*)
 
@@ -99,7 +100,8 @@ set(WE_SRC
     ${MESH_SRC}
     ${LOG_SRC}
     ${RHI_SRC}
-    ${RHI_ENCODER_SRC})
+    ${RHI_ENCODER_SRC}
+    ${GLM_SRC})
 
 set(WE_INCLUDE
     ${FRAME_INCLUDE}
@@ -177,6 +179,7 @@ include_directories(${CMAKE_SOURCE_DIR}/Platform)
 include_directories(${CMAKE_SOURCE_DIR}/Engine)
 include_directories(${CMAKE_SOURCE_DIR}/Engine/Sources)
 include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/Engine/deps)
 include_directories(${CMAKE_SOURCE_DIR}/Engine/deps/Vulkan/include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/assets)
 add_subdirectory(${CMAKE_SOURCE_DIR}/assets)

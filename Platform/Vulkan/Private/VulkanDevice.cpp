@@ -1,40 +1,17 @@
 #include "pch.h"
-#include "Platform/Vulkan/Public/VulkanDevice.h"
-#include "Platform/Vulkan/Public/VulkanInstance.h"
-#include "Platform/Vulkan/Public/VulkanQueue.h"
-#include "Platform/Vulkan/Public/VulkanSurface.h"
-#include "Platform/Vulkan/Public/VulkanSwapchain.h"
-#include "Platform/Vulkan/Public/VulkanFence.h"
-#include "Platform/Vulkan/Public/VulkanShader.h"
-#include "Platform/Vulkan/Public/VulkanRenderPass.h"
-#include "Platform/Vulkan/Public/VulkanPipelineStateObject.h"
-#include "Platform/Vulkan/Public/VulkanRenderTarget.h"
-#include "Platform/Vulkan/Public/VulkanTextureView.h"
-#include "Platform/Vulkan/Public/VulkanTexture.h"
-#include "Platform/Vulkan/Public/VulkanRenderTarget.h"
-#include "Platform/Vulkan/Public/VulkanBuffer.h"
-#include "Platform/Vulkan/Public/VulkanSemaphore.h"
-#include "Platform/Vulkan/Public/VulkanFence.h"
-#include "Render/Descriptor/Public/RHISwapchainDescriptor.h"
-#include "Render/Descriptor/Public/RHIShaderDescriptor.h"
-#include "Render/Descriptor/Public/RHIRenderPassDescriptor.h"
-#include "Render/Descriptor/Public/RHIDepthStencilDescriptor.h"
-#include "Render/Descriptor/Public/RHIBlendDescriptor.h"
-#include "Render/Descriptor/Public/RHIPipelineStateObjectDescriptor.h"
-#include "Render/Descriptor/Public/RHITextureDescriptor.h"
-#include "Render/Descriptor/Public/RHIRenderTargetDescriptor.h"
-#include "Render/Descriptor/Public/RHIBufferDescriptor.h"
-#include "Render/Descriptor/Public/RHIVertexInputDescriptor.h"
+#include "Platform/Vulkan/Public/VulkanHeads.h"
+#include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Utils/Public/Window.h"
 #include "Render/Mesh/Public/Vertex.h"
 
 namespace Vulkan
 {
 
-	VulkanDevice::VulkanDevice(VkDevice *device, std::vector<QueueStack> stacks)
+	VulkanDevice::VulkanDevice(VkDevice *device, VulkanGPU *pGPU, std::vector<QueueStack> stacks)
 	{
 		m_pDevice = device;
 		m_queues = stacks;
+		m_pGPU = pGPU;
 	}
 
 	VulkanDevice::~VulkanDevice()
@@ -207,105 +184,116 @@ namespace Vulkan
 			pVertexInputAttributeDescriptions[i].format = WEngine::ToVulkan(descriptor->vertexDescriptor->pAttributeDescription[i]->format);
 		}
 		VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {};
-		vertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputStateCreateInfo.vertexBindingDescriptionCount = 1;
-		vertexInputStateCreateInfo.pVertexBindingDescriptions = &vertexInputBindgDescription;
-		vertexInputStateCreateInfo.vertexAttributeDescriptionCount = descriptor->vertexDescriptor->attributeDescriptionCount;
-		vertexInputStateCreateInfo.pVertexAttributeDescriptions = pVertexInputAttributeDescriptions;
+		{
+			vertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+			vertexInputStateCreateInfo.vertexBindingDescriptionCount = 1;
+			vertexInputStateCreateInfo.pVertexBindingDescriptions = &vertexInputBindgDescription;
+			vertexInputStateCreateInfo.vertexAttributeDescriptionCount = descriptor->vertexDescriptor->attributeDescriptionCount;
+			vertexInputStateCreateInfo.pVertexAttributeDescriptions = pVertexInputAttributeDescriptions;
+		}
 
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo = {};
-		inputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-		inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-		inputAssemblyStateCreateInfo.primitiveRestartEnable = VK_FALSE;
+		{
+			inputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+			inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+			inputAssemblyStateCreateInfo.primitiveRestartEnable = VK_FALSE;
+		}
 
 		VkPipelineViewportStateCreateInfo viewportStateCreateInfo = {};
-		viewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+		{
+			viewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+		}
 
 		VkPipelineRasterizationStateCreateInfo rasterizationStateCreateInfo = {};
-		rasterizationStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-		rasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
-		rasterizationStateCreateInfo.rasterizerDiscardEnable = VK_FALSE;
-		rasterizationStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
-		rasterizationStateCreateInfo.lineWidth = 1.0f;
-		rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
-		rasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
-		rasterizationStateCreateInfo.depthBiasEnable = VK_FALSE;
-		rasterizationStateCreateInfo.depthBiasConstantFactor = 0.0f;
-		rasterizationStateCreateInfo.depthBiasClamp = 0.0f;
-		rasterizationStateCreateInfo.depthBiasSlopeFactor = 0.0f;
+		{
+			rasterizationStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+			rasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
+			rasterizationStateCreateInfo.rasterizerDiscardEnable = VK_FALSE;
+			rasterizationStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
+			rasterizationStateCreateInfo.lineWidth = 1.0f;
+			rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
+			rasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+			rasterizationStateCreateInfo.depthBiasEnable = VK_FALSE;
+			rasterizationStateCreateInfo.depthBiasConstantFactor = 0.0f;
+			rasterizationStateCreateInfo.depthBiasClamp = 0.0f;
+			rasterizationStateCreateInfo.depthBiasSlopeFactor = 0.0f;
+		}
 
 		VkPipelineMultisampleStateCreateInfo multisampleStateCreateInfo = {};
-		multisampleStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-		multisampleStateCreateInfo.sampleShadingEnable = VK_FALSE;
-		multisampleStateCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-		multisampleStateCreateInfo.minSampleShading = 1.0f;
-		multisampleStateCreateInfo.pSampleMask = nullptr;
-		multisampleStateCreateInfo.alphaToCoverageEnable = VK_FALSE;
-		multisampleStateCreateInfo.alphaToOneEnable = VK_FALSE;
+		{
+			multisampleStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+			multisampleStateCreateInfo.sampleShadingEnable = VK_FALSE;
+			multisampleStateCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+			multisampleStateCreateInfo.minSampleShading = 1.0f;
+			multisampleStateCreateInfo.pSampleMask = nullptr;
+			multisampleStateCreateInfo.alphaToCoverageEnable = VK_FALSE;
+			multisampleStateCreateInfo.alphaToOneEnable = VK_FALSE;
+		}
 
 		VkPipelineColorBlendAttachmentState colorBlendAttachmentState = {};
-		colorBlendAttachmentState.blendEnable = descriptor->blendDescriptor->blendEnabled;
-		colorBlendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-		colorBlendAttachmentState.srcColorBlendFactor = WEngine::ToVulkan(descriptor->blendDescriptor->colorSrcFactor);
-		colorBlendAttachmentState.dstColorBlendFactor = WEngine::ToVulkan(descriptor->blendDescriptor->colorDstFactor);
-		colorBlendAttachmentState.colorBlendOp = WEngine::ToVulkan(descriptor->blendDescriptor->colorBlendOP);
-		colorBlendAttachmentState.srcAlphaBlendFactor = WEngine::ToVulkan(descriptor->blendDescriptor->alphaSrcFactor);
-		colorBlendAttachmentState.dstAlphaBlendFactor = WEngine::ToVulkan(descriptor->blendDescriptor->alphaDstFactor);
-		colorBlendAttachmentState.alphaBlendOp = WEngine::ToVulkan(descriptor->blendDescriptor->alphaBlendOP);
+		{
+			colorBlendAttachmentState.blendEnable = descriptor->blendDescriptor->blendEnabled;
+			colorBlendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+			colorBlendAttachmentState.srcColorBlendFactor = WEngine::ToVulkan(descriptor->blendDescriptor->colorSrcFactor);
+			colorBlendAttachmentState.dstColorBlendFactor = WEngine::ToVulkan(descriptor->blendDescriptor->colorDstFactor);
+			colorBlendAttachmentState.colorBlendOp = WEngine::ToVulkan(descriptor->blendDescriptor->colorBlendOP);
+			colorBlendAttachmentState.srcAlphaBlendFactor = WEngine::ToVulkan(descriptor->blendDescriptor->alphaSrcFactor);
+			colorBlendAttachmentState.dstAlphaBlendFactor = WEngine::ToVulkan(descriptor->blendDescriptor->alphaDstFactor);
+			colorBlendAttachmentState.alphaBlendOp = WEngine::ToVulkan(descriptor->blendDescriptor->alphaBlendOP);
+		}
 
 		VkPipelineDepthStencilStateCreateInfo depthStencilStateCreateInfo = {};
-		depthStencilStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-		depthStencilStateCreateInfo.stencilTestEnable = false;
-		depthStencilStateCreateInfo.depthTestEnable = descriptor->depthStencilDescriptor->depthTestEnabled;
-		depthStencilStateCreateInfo.depthCompareOp = WEngine::ToVulkan(descriptor->depthStencilDescriptor->depthCompareOP);
-		depthStencilStateCreateInfo.depthWriteEnable = descriptor->depthStencilDescriptor->depthWriteEnabled;
-		depthStencilStateCreateInfo.depthBoundsTestEnable = descriptor->depthStencilDescriptor->depthBoundsTest;
-		depthStencilStateCreateInfo.maxDepthBounds = descriptor->depthStencilDescriptor->maxDepth;
-		depthStencilStateCreateInfo.minDepthBounds = descriptor->depthStencilDescriptor->minDepth;
+		{
+			depthStencilStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+			depthStencilStateCreateInfo.stencilTestEnable = false;
+			depthStencilStateCreateInfo.depthTestEnable = descriptor->depthStencilDescriptor->depthTestEnabled;
+			depthStencilStateCreateInfo.depthCompareOp = WEngine::ToVulkan(descriptor->depthStencilDescriptor->depthCompareOP);
+			depthStencilStateCreateInfo.depthWriteEnable = descriptor->depthStencilDescriptor->depthWriteEnabled;
+			depthStencilStateCreateInfo.depthBoundsTestEnable = descriptor->depthStencilDescriptor->depthBoundsTest;
+			depthStencilStateCreateInfo.maxDepthBounds = descriptor->depthStencilDescriptor->maxDepth;
+			depthStencilStateCreateInfo.minDepthBounds = descriptor->depthStencilDescriptor->minDepth;
+		}
 
 		VkPipelineColorBlendStateCreateInfo colorBlendStateCreateInfo = {};
-		colorBlendStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-		colorBlendStateCreateInfo.attachmentCount = 1;
-		colorBlendStateCreateInfo.pAttachments = &colorBlendAttachmentState;
-		colorBlendStateCreateInfo.logicOpEnable = VK_FALSE;
-		colorBlendStateCreateInfo.logicOp = VK_LOGIC_OP_COPY;
-		colorBlendStateCreateInfo.blendConstants[0] = 0.0f;
-		colorBlendStateCreateInfo.blendConstants[1] = 0.0f;
-		colorBlendStateCreateInfo.blendConstants[2] = 0.0f;
-		colorBlendStateCreateInfo.blendConstants[3] = 0.0f;
+		{
+			colorBlendStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+			colorBlendStateCreateInfo.attachmentCount = 1;
+			colorBlendStateCreateInfo.pAttachments = &colorBlendAttachmentState;
+			colorBlendStateCreateInfo.logicOpEnable = VK_FALSE;
+			colorBlendStateCreateInfo.logicOp = VK_LOGIC_OP_COPY;
+			colorBlendStateCreateInfo.blendConstants[0] = 0.0f;
+			colorBlendStateCreateInfo.blendConstants[1] = 0.0f;
+			colorBlendStateCreateInfo.blendConstants[2] = 0.0f;
+			colorBlendStateCreateInfo.blendConstants[3] = 0.0f;
+		}
 
 		VkDynamicState dynamicStates[2] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_LINE_WIDTH };
 		VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo = {};
-		dynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-		dynamicStateCreateInfo.dynamicStateCount = 2;
-		dynamicStateCreateInfo.pDynamicStates = dynamicStates;
-
-		VkPipelineLayoutCreateInfo layoutCreateInfo = {};
-		layoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		layoutCreateInfo.setLayoutCount = 0;
-		layoutCreateInfo.pSetLayouts = nullptr;
-		layoutCreateInfo.pushConstantRangeCount = 0;
-		layoutCreateInfo.pPushConstantRanges = nullptr;
-		VkPipelineLayout *layout = (VkPipelineLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VkPipelineLayout));
-		RE_ASSERT(vkCreatePipelineLayout(*m_pDevice, &layoutCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), layout) == VK_SUCCESS, "Failed to Create Pipeline Layout.");
+		{
+			dynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+			dynamicStateCreateInfo.dynamicStateCount = 2;
+			dynamicStateCreateInfo.pDynamicStates = dynamicStates;
+		}
 
 		VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {};
-		graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-		graphicsPipelineCreateInfo.stageCount = shaderStageCreateInfos.size();
-		graphicsPipelineCreateInfo.pStages = shaderStageCreateInfos.data();
-		graphicsPipelineCreateInfo.pVertexInputState = &vertexInputStateCreateInfo;
-		graphicsPipelineCreateInfo.pInputAssemblyState = &inputAssemblyStateCreateInfo;
-		graphicsPipelineCreateInfo.pViewportState = &viewportStateCreateInfo;
-		graphicsPipelineCreateInfo.pRasterizationState = &rasterizationStateCreateInfo;
-		graphicsPipelineCreateInfo.pMultisampleState = &multisampleStateCreateInfo;
-		graphicsPipelineCreateInfo.pDepthStencilState = nullptr;
-		graphicsPipelineCreateInfo.pColorBlendState = &colorBlendStateCreateInfo;
-		graphicsPipelineCreateInfo.pDynamicState = &dynamicStateCreateInfo;
-		graphicsPipelineCreateInfo.layout = *layout;
-		graphicsPipelineCreateInfo.renderPass = *static_cast<VulkanRenderPass*>(descriptor->renderPass)->GetHandle();
-		graphicsPipelineCreateInfo.subpass = 0;
-		graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
-		//graphicsPipelineCreateInfo.basePipelineIndex = -1;
+		{
+			graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+			graphicsPipelineCreateInfo.stageCount = shaderStageCreateInfos.size();
+			graphicsPipelineCreateInfo.pStages = shaderStageCreateInfos.data();
+			graphicsPipelineCreateInfo.pVertexInputState = &vertexInputStateCreateInfo;
+			graphicsPipelineCreateInfo.pInputAssemblyState = &inputAssemblyStateCreateInfo;
+			graphicsPipelineCreateInfo.pViewportState = &viewportStateCreateInfo;
+			graphicsPipelineCreateInfo.pRasterizationState = &rasterizationStateCreateInfo;
+			graphicsPipelineCreateInfo.pMultisampleState = &multisampleStateCreateInfo;
+			graphicsPipelineCreateInfo.pDepthStencilState = &depthStencilStateCreateInfo;
+			graphicsPipelineCreateInfo.pColorBlendState = &colorBlendStateCreateInfo;
+			graphicsPipelineCreateInfo.pDynamicState = &dynamicStateCreateInfo;
+			graphicsPipelineCreateInfo.layout = *static_cast<VulkanPipelineResourceLayout*>(descriptor->pipelineResourceLayout)->GetHandle();
+			graphicsPipelineCreateInfo.renderPass = *static_cast<VulkanRenderPass*>(descriptor->renderPass)->GetHandle();
+			graphicsPipelineCreateInfo.subpass = 0;
+			graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
+			//graphicsPipelineCreateInfo.basePipelineIndex = -1;
+		}
 
 		VkPipeline *pPipeline = (VkPipeline*)WEngine::Allocator::Get()->Allocate(sizeof(VkPipeline));
 		RE_ASSERT(vkCreateGraphicsPipelines(*m_pDevice, VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pPipeline) == VK_SUCCESS, "Failed to Create Pipeline.");
@@ -368,17 +356,140 @@ namespace Vulkan
 	{
 		VkBufferCreateInfo bufferCreateInfo = {};
 		bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		bufferCreateInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+		bufferCreateInfo.usage = descriptor->bufferType;
 		bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		bufferCreateInfo.size = descriptor->size;
 
 		VkBuffer* pBuffer = (VkBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkBuffer));
 		RE_ASSERT(vkCreateBuffer(*m_pDevice, &bufferCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pBuffer) == VK_SUCCESS, "Failed to Create Buffer.");
 
+		unsigned int index = 0;
+		GPUFeature feature = m_pGPU->GetFeature();
+		for (; index < feature.memorySupports.size(); ++index)
+		{
+			if (feature.memorySupports[index]->type == MemoryType::LocalMemory && (feature.memorySupports[index]->properties & descriptor->memoryType) != 0)
+			{
+				break;
+			}
+		}
+		RE_ASSERT(feature.memorySupports.size() > index, "No Suitable Memory Heap Exists.");
+
 		RHIBuffer *buffer = (RHIBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanBuffer));
-		::new (buffer) VulkanBuffer(pBuffer, m_pDevice, descriptor->size, descriptor->pData);
+		::new (buffer) VulkanBuffer(pBuffer, m_pDevice, index, descriptor->size, descriptor->pData);
 
 		return buffer;
+	}
+
+	RHIGroup* VulkanDevice::CreateResourceGroup(RHIGroupDescriptor* descriptor)
+	{
+
+		return nullptr;
+	}
+
+	RHIGroupLayout* VulkanDevice::CreateGroupLayout(RHIGroupLayoutDescriptor *descriptor)
+	{
+		VkDescriptorSetLayoutBinding *pDescriptorSetLayoutBindings = (VkDescriptorSetLayoutBinding*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkDescriptorSetLayoutBinding));
+		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
+		{
+			::new (pDescriptorSetLayoutBindings + i) VkDescriptorSetLayoutBinding();
+			BindingResource *resource = (descriptor->pBindingResources) + i;
+			pDescriptorSetLayoutBindings[i].binding = resource->bindingSlot;
+			pDescriptorSetLayoutBindings[i].descriptorCount = resource->count;
+			pDescriptorSetLayoutBindings[i].descriptorType = WEngine::ToVulkan(resource->type);
+			pDescriptorSetLayoutBindings[i].stageFlags = WEngine::ToVulkan(resource->shaderStage);
+			pDescriptorSetLayoutBindings[i].pImmutableSamplers = nullptr;
+		}
+		
+		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
+		{
+			descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+			descriptorSetLayoutCreateInfo.bindingCount = descriptor->bindingCount;
+			descriptorSetLayoutCreateInfo.pBindings = pDescriptorSetLayoutBindings;
+		}
+
+		VkDescriptorSetLayout *pDescriptorSetLayout = (VkDescriptorSetLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VkDescriptorSetLayout));
+		RE_ASSERT(vkCreateDescriptorSetLayout(*m_pDevice, &descriptorSetLayoutCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pDescriptorSetLayout) == VK_SUCCESS, "Failed to Create Descriptor Set Layout.");
+
+		RHIGroupLayout *groupLayout = (RHIGroupLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanGroupLayout));
+		::new (groupLayout) VulkanGroupLayout(pDescriptorSetLayout, descriptor->bindingCount);
+
+		groupLayout->bindingCount = descriptor->bindingCount;
+		groupLayout->pBindingResources = descriptor->pBindingResources;
+		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
+		{
+			BindingResource* resource = (descriptor->pBindingResources) + i;
+			pDescriptorSetLayoutBindings[i].~VkDescriptorSetLayoutBinding();
+		}
+		WEngine::Allocator::Get()->Deallocate(pDescriptorSetLayoutBindings);
+
+		return groupLayout;
+	}
+
+	RHIPipelineResourceLayout* VulkanDevice::CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor* descriptor)
+	{
+		VkPipelineLayoutCreateInfo layoutCreateInfo = {};
+		{
+			layoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+			layoutCreateInfo.setLayoutCount = descriptor->groupLayoutCount;
+			layoutCreateInfo.pSetLayouts = static_cast<VulkanGroupLayout*>(descriptor->pGroupLayout)->GetHandle();
+			layoutCreateInfo.pushConstantRangeCount = 0;
+			layoutCreateInfo.pPushConstantRanges = nullptr;
+		}
+		VkPipelineLayout* pLayout = (VkPipelineLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VkPipelineLayout));
+		RE_ASSERT(vkCreatePipelineLayout(*m_pDevice, &layoutCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pLayout) == VK_SUCCESS, "Failed to Create Pipeline Layout.");
+
+		RHIPipelineResourceLayout *pPipelineResourceLayout = (RHIPipelineResourceLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanPipelineResourceLayout));
+		::new (pPipelineResourceLayout) VulkanPipelineResourceLayout(pLayout);
+
+		return pPipelineResourceLayout;
+	}
+
+	RHIGroupPool* VulkanDevice::CreateGroupPool(RHIGroupPoolDescriptor* descriptor)
+	{
+		VkDescriptorPoolSize *pDescriptorPoolSizes = (VkDescriptorPoolSize*)WEngine::Allocator::Get()->Allocate(descriptor->pGroupLayout->bindingCount * sizeof(VkDescriptorPoolSize));
+		for (unsigned int i = 0; i < descriptor->pGroupLayout->bindingCount; ++i)
+		{
+			pDescriptorPoolSizes[i].descriptorCount = descriptor->pGroupLayout->pBindingResources[i].count;
+			pDescriptorPoolSizes[i].type = WEngine::ToVulkan(descriptor->pGroupLayout->pBindingResources[i].type);
+		}
+
+		VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
+		{
+			descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+			descriptorPoolCreateInfo.maxSets = descriptor->maxSetCount;
+			descriptorPoolCreateInfo.poolSizeCount = descriptor->pGroupLayout->bindingCount;
+			descriptorPoolCreateInfo.pPoolSizes = pDescriptorPoolSizes;
+		}
+
+		VkDescriptorPool *pDescriptorPool = (VkDescriptorPool*)WEngine::Allocator::Get()->Allocate(sizeof(VkDescriptorPool));
+		RE_ASSERT(vkCreateDescriptorPool(*m_pDevice, &descriptorPoolCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pDescriptorPool) == VK_SUCCESS, "Failed to Create Descriptor Pool.");
+
+		RHIGroupPool *groupPool = (RHIGroupPool*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanGroupPool));
+		::new (groupPool) VulkanGroupPool(pDescriptorPool, descriptor->pGroupLayout, m_pDevice);
+
+		return groupPool;
+	}
+
+	void VulkanDevice::UpdateResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
+	{
+		VkWriteDescriptorSet* pWriteDescriptorSets = (VkWriteDescriptorSet*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkWriteDescriptorSet));
+		VkDescriptorBufferInfo *pDescriptorBufferInfo = (VkDescriptorBufferInfo*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkDescriptorBufferInfo));
+		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
+		{
+			::new (pDescriptorBufferInfo + i) VkDescriptorBufferInfo();
+			pDescriptorBufferInfo[i].buffer = *static_cast<VulkanBuffer*>(descriptor->pBuffer + i)->GetHandle();
+			pDescriptorBufferInfo[i].offset = 0;
+			pDescriptorBufferInfo[i].range = descriptor->pSize[i];
+
+			::new (pWriteDescriptorSets + i) VkWriteDescriptorSet();
+			pWriteDescriptorSets[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			pWriteDescriptorSets[i].descriptorCount = descriptor->pBindingResources[i].count;
+			pWriteDescriptorSets[i].descriptorType = WEngine::ToVulkan(descriptor->pBindingResources[i].type);
+			pWriteDescriptorSets[i].dstSet = *static_cast<VulkanGroup*>(descriptor->pGroup)->GetHandle();
+			pWriteDescriptorSets[i].dstBinding = descriptor->pBindingResources[i].bindingSlot;
+			pWriteDescriptorSets[i].pBufferInfo = pDescriptorBufferInfo + i;
+		}
+		vkUpdateDescriptorSets(*m_pDevice, descriptor->bindingCount, pWriteDescriptorSets, 0, nullptr);
 	}
 
 	std::vector<RHISemaphore*> VulkanDevice::GetSemaphore(unsigned int count)

@@ -8,7 +8,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanBuffer(VkBuffer *buffer, VkDevice *device, size_t size, void *pData);
+		VulkanBuffer(VkBuffer *buffer, VkDevice *device, unsigned int memoryHeapIndex, size_t size, void *pData);
 
 		virtual ~VulkanBuffer();
 

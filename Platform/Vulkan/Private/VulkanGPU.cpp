@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanGPU.h"
-#include "Platform/Vulkan/Public/VulkanMacro.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
 #include "Platform/Vulkan/Public/VulkanInstance.h"
 #include "Platform/Vulkan/Public/VulkanQueue.h"
@@ -159,7 +158,7 @@ namespace Vulkan
 		RE_ASSERT(vkCreateDevice(*m_pPhysicalDevice, &deviceCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pDevice) == VK_SUCCESS, "Failed to Create Device.");
 
 		RHIDevice* device = (RHIDevice*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanDevice));
-		::new (device) VulkanDevice(pDevice, queueStack);
+		::new (device) VulkanDevice(pDevice, this, queueStack);
 
 		return device;
 	}

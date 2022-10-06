@@ -1,7 +1,6 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
-class RHIRenderPassDescriptor : public RHIDescriptor
+class RHIRenderPassDescriptor
 {
 public:
 
@@ -24,9 +23,5 @@ public:
 	AttachmentLoadOP stencilLoadOP;
 
 	AttachmentStoreOP stencilStoreOP;
-
-	ImageLayout initialLayout;
-
-	ImageLayout finalLayout;
 
 };

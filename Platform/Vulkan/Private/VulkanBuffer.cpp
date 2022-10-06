@@ -4,7 +4,7 @@
 namespace Vulkan
 {
 
-	VulkanBuffer::VulkanBuffer(VkBuffer* buffer, VkDevice *device, size_t size, void* pData)
+	VulkanBuffer::VulkanBuffer(VkBuffer* buffer, VkDevice *device, unsigned int memoryHeapIndex, size_t size, void* pData)
 		: m_pBuffer(buffer), m_pDevice(device)
 	{
 		m_pMemoryRequirements = (VkMemoryRequirements*)WEngine::Allocator::Get()->Allocate(sizeof(VkMemoryRequirements));
@@ -13,7 +13,7 @@ namespace Vulkan
 		VkMemoryAllocateInfo memoryAllocateInfo = {};
 		memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		memoryAllocateInfo.allocationSize = m_pMemoryRequirements->size;
-		memoryAllocateInfo.memoryTypeIndex = 2;
+		memoryAllocateInfo.memoryTypeIndex = memoryHeapIndex;
 
 		m_pDeviceMemory = (VkDeviceMemory*)WEngine::Allocator::Get()->Allocate(sizeof(VkDeviceMemory));
 		RE_ASSERT(vkAllocateMemory(*m_pDevice, &memoryAllocateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), m_pDeviceMemory) == VK_SUCCESS, "Failed to Allocate Memory.");

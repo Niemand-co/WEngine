@@ -1,9 +1,6 @@
 #include "pch.h"
 #include "Platform/Vulkan/Encoder/Public/VulkanGraphicsEncoder.h"
-#include "Platform/Vulkan/Public/VulkanPipelineStateObject.h"
-#include "Platform/Vulkan/Public/VulkanRenderPass.h"
-#include "Platform/Vulkan/Public/VulkanRenderTarget.h"
-#include "Platform/Vulkan/Public/VulkanBuffer.h"
+#include "Platform/Vulkan/Public/VulkanHeads.h"
 #include "Render/Descriptor/Public/RHIRenderPassBeginDescriptor.h"
 #include "Utils/Public/Window.h"
 
@@ -28,7 +25,7 @@ namespace Vulkan
 		renderPassBeginInfo.renderArea.offset = { 0, 0 };
 		renderPassBeginInfo.renderArea.extent = { descriptor->renderTarget->GetWidth(), descriptor->renderTarget->GetHeight() };
 		renderPassBeginInfo.clearValueCount = 1;
-		VkClearValue clearColor = { {{1.0f, 1.0f, 1.0f, 1.0f}} };
+		VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 0.0f}} };
 		renderPassBeginInfo.pClearValues = &clearColor;
 
 		vkCmdBeginRenderPass(*m_cmd, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
@@ -69,9 +66,24 @@ namespace Vulkan
 		vkCmdBindVertexBuffers(*m_cmd, 0, 1, static_cast<VulkanBuffer*>(pBuffer)->GetHandle(), offets);
 	}
 
+	void VulkanGraphicsEncoder::BindIndexBuffer(RHIBuffer* pBuffer)
+	{
+		vkCmdBindIndexBuffer(*m_cmd, *static_cast<VulkanBuffer*>(pBuffer)->GetHandle(), 0, VK_INDEX_TYPE_UINT32);
+	}
+
+	void VulkanGraphicsEncoder::BindGroups(unsigned int groupCount, RHIGroup* pGroup, RHIPipelineResourceLayout* pPipelineResourceLayout)
+	{
+		vkCmdBindDescriptorSets(*m_cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, *static_cast<VulkanPipelineResourceLayout*>(pPipelineResourceLayout)->GetHandle(), 0, groupCount, static_cast<VulkanGroup*>(pGroup)->GetHandle(), 0, nullptr);
+	}
+
 	void VulkanGraphicsEncoder::DrawVertexArray()
 	{
 		vkCmdDraw(*m_cmd, 3, 1, 0, 0);
+	}
+
+	void VulkanGraphicsEncoder::DrawIndexed(unsigned int indexeCount, unsigned int firstIndex, unsigned int instanceCount, unsigned int firstInstance)
+	{
+		vkCmdDrawIndexed(*m_cmd, indexeCount, instanceCount, firstIndex, 0, firstInstance);
 	}
 
 	void VulkanGraphicsEncoder::EndPass()

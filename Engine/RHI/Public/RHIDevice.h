@@ -11,6 +11,10 @@ class RHIRenderTarget;
 class RHISemaphore;
 class RHIFence;
 class RHIBuffer;
+class RHIGroup;
+class RHIGroupLayout;
+class RHIGroupPool;
+class RHIPipelineResourceLayout;
 
 class RHISwapchainDescriptor;
 class RHIShaderDescriptor;
@@ -19,6 +23,11 @@ class RHIPipelineStateObjectDescriptor;
 class RHITextureDescriptor;
 class RHIRenderTargetDescriptor;
 class RHIBufferDescriptor;
+class RHIGroupPoolDescriptor;
+class RHIGroupDescriptor;
+class RHIGroupLayoutDescriptor;
+class RHIPipelineResourceLayoutDescriptor;
+class RHIUpdateResourceDescriptor;
 
 class RHIDevice
 {
@@ -45,6 +54,16 @@ public:
 	virtual RHIRenderTarget* CreateRenderTarget(RHIRenderTargetDescriptor *descriptor) = 0;
 
 	virtual RHIBuffer* CreateBuffer(RHIBufferDescriptor *descriptor) = 0;
+
+	virtual RHIGroup* CreateResourceGroup(RHIGroupDescriptor *descriptor) = 0;
+
+	virtual RHIGroupLayout* CreateGroupLayout(RHIGroupLayoutDescriptor *descriptor) = 0;
+
+	virtual RHIPipelineResourceLayout* CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor *descriptor) = 0;
+
+	virtual RHIGroupPool* CreateGroupPool(RHIGroupPoolDescriptor *descriptor) = 0;
+
+	virtual void UpdateResourceToGroup(RHIUpdateResourceDescriptor *descriptor) = 0;
 
 	virtual std::vector<RHISemaphore*> GetSemaphore(unsigned int count) = 0;
 

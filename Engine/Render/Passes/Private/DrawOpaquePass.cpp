@@ -1,32 +1,14 @@
 #include "pch.h"
 #include "Render/Passes/Public/DrawOpaquePass.h"
-#include "RHI/Public/RHIDevice.h"
-#include "RHI/Public/RHIRenderPass.h"
-#include "RHI/Public/RHIPipelineStateObject.h"
-#include "RHI/Public/RHIShader.h"
-#include "RHI/Public/RHIContext.h"
-#include "RHI/Public/RHICommandBuffer.h"
-#include "RHI/Public/RHITextureView.h"
-#include "RHI/Public/RHIRenderTarget.h"
-#include "RHI/Public/RHISemaphore.h"
-#include "RHI/Public/RHIBuffer.h"
+#include "RHI/Public/RHIHeads.h"
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
 #include "RHI/Encoder/Public/RHIComputeEncoder.h"
-#include "Render/Descriptor/Public/RHIRenderPassBeginDescriptor.h"
-#include "Render/Descriptor/Public/RHIRenderTargetDescriptor.h"
-#include "Render/Descriptor/Public/RHITextureDescriptor.h"
-#include "Render/Descriptor/Public/RHITextureViewDescriptor.h"
-#include "Render/Descriptor/Public/RHIRenderPassDescriptor.h"
-#include "Render/Descriptor/Public/RHIPipelineStateObjectDescriptor.h"
-#include "Render/Descriptor/Public/RHIShaderDescriptor.h"
-#include "Render/Descriptor/Public/RHIBlendDescriptor.h"
-#include "Render/Descriptor/Public/RHIDepthStencilDescriptor.h"
-#include "Render/Descriptor/Public/RHIVertexInputDescriptor.h"
+#include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
-#include "Render/Descriptor/Public/RHIBufferDescriptor.h"
 #include "Utils/Public/Window.h"
 #include "Render/Mesh/Public/Mesh.h"
 #include "Render/Mesh/Public/Vertex.h"
+#include "Scene/Components/Public/Camera.h"
 
 DrawOpaquePass::DrawOpaquePass(RenderPassConfigure* configure)
 	: ScriptableRenderPass(configure)
@@ -37,7 +19,7 @@ DrawOpaquePass::~DrawOpaquePass()
 {
 }
 
-void DrawOpaquePass::Setup(RHIContext *context)
+void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 {
 	ShaderCodeBlob* vertBlob = new ShaderCodeBlob("../assets/vert.spv");
 	RHIShaderDescriptor vertShaderDescriptor = {};
@@ -92,19 +74,31 @@ void DrawOpaquePass::Setup(RHIContext *context)
 		depthStencilDescriptor.minDepth = 0.0f;
 	}
 
-	m_pMesh = (Mesh*)WEngine::Allocator::Get()->Allocate(sizeof(Mesh));
-	::new (m_pMesh) Mesh();
-	m_pMesh->m_pVertices = (Vertex*)WEngine::Allocator::Get()->Allocate(3 * sizeof(Vertex));
-	m_pMesh->m_pVertices[0].Position = { -0.5f, -0.5f, 0.0f };
-	m_pMesh->m_pVertices[1].Position = { 0.5f, -0.5f, 0.0f };
-	m_pMesh->m_pVertices[2].Position = { 0.0f, 0.5f, 0.0f };
-	m_pMesh->m_pVertices[0].Color = { 1.0f, 0.0f, 0.0f };
-	m_pMesh->m_pVertices[1].Color = { 0.0f, 1.0f, 0.0f };
-	m_pMesh->m_pVertices[2].Color = { 0.0f, 0.0f, 1.0f };
-	m_pMesh->m_pVertices[0].UV = { 0.0f, 0.0f };
-	m_pMesh->m_pVertices[1].UV = { 0.0f, 0.0f };
-	m_pMesh->m_pVertices[2].UV = { 0.0f, 0.0f };
-	m_pMesh->m_vertexCount = 3;
+	m_pMesh = Mesh::GetCube();
+
+	BindingResource resource[1] = 
+	{
+		{0, ResourceType::UniformBuffer, 1, ShaderStage::vertex}
+	};
+	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
+	{
+		groupLayoutDescriptor.bindingCount = 1;
+		groupLayoutDescriptor.pBindingResources = resource;
+	}
+	RHIGroupLayout *groupLayout = context->CreateGroupLayout(&groupLayoutDescriptor);
+
+	RHIPipelineResourceLayoutDescriptor pipelineResourceLayoutDescriptor = {};
+	{
+		pipelineResourceLayoutDescriptor.groupLayoutCount = 1;
+		pipelineResourceLayoutDescriptor.pGroupLayout = groupLayout;
+	}
+	m_pPipelineResourceLayout = context->CreatePipelineResourceLayout(&pipelineResourceLayoutDescriptor);
+
+	RHIGroupDescriptor groupDescriptor = {};
+	{
+		groupDescriptor.pGroupLayout = groupLayout;
+	}
+	m_pGroup = context->CreateResourceGroup(&groupDescriptor);
 
 	m_pMesh->GenerateVertexInputDescription();
 	RHIVertexInputDescriptor vertexInputDescriptor = m_pMesh->GetVertexInputDescriptor();
@@ -116,16 +110,46 @@ void DrawOpaquePass::Setup(RHIContext *context)
 		psoDescriptor.pShader = shaders.data();
 		psoDescriptor.shaderCount = shaders.size();
 		psoDescriptor.vertexDescriptor = &vertexInputDescriptor;
+		psoDescriptor.pipelineResourceLayout = m_pPipelineResourceLayout;
 	};
-	m_pPSO = m_pDevice->CreatePipelineStateObject(&psoDescriptor);
+	m_pPSO = context->CreatePSO(&psoDescriptor);
 
 
 	RHIBufferDescriptor bufferDescriptor = {};
 	{
 		bufferDescriptor.size = m_pMesh->m_vertexCount * sizeof(Vertex);
 		bufferDescriptor.pData = m_pMesh->m_pVertices;
+		bufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
-	m_pBuffer = m_pDevice->CreateBuffer(&bufferDescriptor);
+	m_pVertexBuffer = context->CreateVertexBuffer(&bufferDescriptor);
+
+	RHIBufferDescriptor indexBufferDescriptor = {};
+	{
+		indexBufferDescriptor.size = m_pMesh->m_indexCount * sizeof(unsigned int);
+		indexBufferDescriptor.pData = m_pMesh->m_pIndices;
+		indexBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
+	}
+	m_pIndexBuffer = context->CreateIndexBuffer(&indexBufferDescriptor);
+
+	glm::mat4x4 uniformData[] = { cameraData->MatrixVP };
+	RHIBufferDescriptor uniformBufferDescriptor = {};
+	{
+		uniformBufferDescriptor.size = sizeof(uniformData);
+		uniformBufferDescriptor.pData = uniformData;
+		uniformBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
+	}
+	m_pUniformBuffer = context->CreateUniformBuffer(&uniformBufferDescriptor);
+
+	size_t pSizes[1] = {sizeof(uniformData)};
+	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
+	{
+		updateResourceDescriptor.bindingCount = 1;
+		updateResourceDescriptor.pBindingResources = resource;
+		updateResourceDescriptor.pBuffer = m_pUniformBuffer;
+		updateResourceDescriptor.pSize = pSizes;
+		updateResourceDescriptor.pGroup = m_pGroup;
+	}
+	context->UpdateResourceToGroup(&updateResourceDescriptor);
 
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
@@ -179,8 +203,10 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 		encoder->SetPipeline(m_pPSO);
 		encoder->SetViewport(nullptr);
 		encoder->SetScissor(nullptr);
-		encoder->BindVertexBuffer(m_pBuffer);
-		encoder->DrawVertexArray();
+		encoder->BindVertexBuffer(m_pVertexBuffer);
+		encoder->BindIndexBuffer(m_pIndexBuffer);
+		encoder->BindGroups(1, m_pGroup, m_pPipelineResourceLayout);
+		encoder->DrawIndexed(m_pMesh->m_indexCount, 0);
 		encoder->EndPass();
 		cmd->EndScopePass();
 		context->ExecuteCommandBuffer(cmd);

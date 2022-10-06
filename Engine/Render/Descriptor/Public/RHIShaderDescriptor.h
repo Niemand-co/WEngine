@@ -1,7 +1,6 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
-class RHIShaderDescriptor : public RHIDescriptor
+class RHIShaderDescriptor
 {
 public:
 

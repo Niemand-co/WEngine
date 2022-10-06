@@ -1,6 +1,4 @@
 #pragma once
-#ifndef WENGINE_GAMEOBJECT_H
-#define WENGINE_GAMEOBJECT_H
 
 #include "Scene/Public/Object.h"
 #include "Scene/Components/Public/Transformer.h"
@@ -39,14 +37,16 @@ inline Component* GameObject::AddComponent()
 	{
 		case Component::ComponentType::Transformer:
 		{
-			Component* pComponent = new Transformer();
+			Component* pComponent = (Component*)WEngine::Allocator::Get()->Allocate(sizeof(Transformer));
+			::new (pComponent) Transformer();
 			m_components.push_back(pComponent);
 			return pComponent;
 		}
 
 		case Component::ComponentType::Camera:
 		{
-			Component* pComponent = new Camera();
+			Component* pComponent = (Component*)WEngine::Allocator::Get()->Allocate(sizeof(Camera));;
+			::new (pComponent) Camera();
 			m_components.push_back(pComponent);
 			World::GetWorld()->AddCamera(static_cast<Camera*>(pComponent));
 			return pComponent;
@@ -54,7 +54,8 @@ inline Component* GameObject::AddComponent()
 
 		case Component::ComponentType::MeshFilter:
 		{
-			Component* pComponent = new MeshFilter();
+			Component* pComponent = (Component*)WEngine::Allocator::Get()->Allocate(sizeof(MeshFilter));
+			::new (pComponent) MeshFilter();
 			m_components.push_back(pComponent);
 			return pComponent;
 		}
@@ -76,5 +77,3 @@ inline Component* GameObject::GetComponent()
 	}
 	return nullptr;
 }
-
-#endif

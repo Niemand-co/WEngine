@@ -1,8 +1,16 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
-class RHIBufferDescriptor : public RHIDescriptor
+namespace Vulkan
 {
+	class VulkanDevice;
+}
+
+class RHIBufferDescriptor
+{
+
+	friend class RHIContext;
+	friend class Vulkan::VulkanDevice;
+
 public:
 
 	RHIBufferDescriptor();
@@ -14,5 +22,11 @@ public:
 	uint64_t size;
 
 	void *pData;
+
+	unsigned short memoryType;
+
+private:
+
+	unsigned int bufferType;
 
 };

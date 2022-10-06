@@ -6,6 +6,7 @@ class RHIDevice;
 class RHIContext;
 class RHISemaphore;
 class RHIFence;
+struct CameraData;
 
 struct RendererConfigure
 {
@@ -21,7 +22,7 @@ public:
 
 	virtual ~ScriptableRenderer();
 
-	virtual void Setup();
+	virtual void Setup(CameraData *cameraData);
 
 	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence);
 

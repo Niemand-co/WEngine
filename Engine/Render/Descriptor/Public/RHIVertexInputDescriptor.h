@@ -1,10 +1,9 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
 struct VertexBindingDescription;
 struct VertexAttributeDescription;
 
-class RHIVertexInputDescriptor : RHIDescriptor
+class RHIVertexInputDescriptor
 {
 public:
 

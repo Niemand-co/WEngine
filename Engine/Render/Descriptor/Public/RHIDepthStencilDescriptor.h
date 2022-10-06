@@ -1,7 +1,6 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
-class RHIDepthStencilDescriptor : public RHIDescriptor
+class RHIDepthStencilDescriptor
 {
 public:
 

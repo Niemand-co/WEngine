@@ -1,7 +1,6 @@
-#pragma 
-#include "Render/Descriptor/Public/RHIDescriptor.h"
+#pragma once
 
-class RHIBlendDescriptor : RHIDescriptor
+class RHIBlendDescriptor
 {
 public:
 

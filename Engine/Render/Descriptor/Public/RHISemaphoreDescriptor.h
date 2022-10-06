@@ -1,7 +1,6 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
-class RHISemaphoreDescriptor : public RHIDescriptor
+class RHISemaphoreDescriptor
 {
 public:
 

@@ -493,11 +493,21 @@ inline void LookAt(Matrix4x4f& matrix, const Vector3& pos, const Vector3& goal, 
 	Vector3 right = Unit(CrossProduct(front, WorldUp));
 	Vector3 up = Unit(CrossProduct(right, front));
 	matrix = {
-		right.x,  right.y, right.z, DotProduct(right, -pos),
-		   up.x,     up.y,    up.z,    DotProduct(up, -pos),
-		front.x,  front.y, front.z, DotProduct(front, -pos),
+		right.x,  right.y, right.z, 0.0f,
+		   up.x,     up.y,    up.z, 0.0f,
+		front.x,  front.y, front.z, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f
 	};
+
+	Matrix4x4f transformMatrix = 
+	{
+		1.0f, 0.0f, 0.0f, -pos.x,
+		0.0f, 1.0f, 0.0f, -pos.y,
+		0.0f, 0.0f, 1.0f, -pos.z,
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
+
+	matrix = matrix * transformMatrix;
 
 }
 
@@ -520,10 +530,10 @@ inline void PerspectiveProjection(Matrix4x4f& matrix, const float fov, const flo
 	auto xscale = yscale / aspect;
 
 	Matrix4x4f projection = {
-		xscale,	0.0f,                  0.0f,                         0.0f,
+	  xscale,	0.0f,                  0.0f,                         0.0f,
 		0.0f, yscale,                  0.0f,                         0.0f,
-		0.0f,   0.0f, (zn + zf) / (zn - zf), (2.0f * zf * zn) / (zf - zn),
-		0.0f,	0.0f,                  1.0f,                         0.0f
+		0.0f,   0.0f, (zn + zf) / (zn - zf), (2.0f * zf * zn) / (zn - zf),
+		0.0f,	0.0f,                 -1.0f,                         0.0f
 	};
 	matrix = projection * matrix;
 

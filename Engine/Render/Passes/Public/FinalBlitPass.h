@@ -9,7 +9,7 @@ public:
 
 	virtual ~FinalBlitPass();
 
-	virtual void Setup(RHIContext *context) override;
+	virtual void Setup(RHIContext *context, CameraData *cameraData) override;
 
 	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence) override;
 

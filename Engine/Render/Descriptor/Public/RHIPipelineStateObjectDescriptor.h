@@ -1,13 +1,13 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
 class RHIVertexInputDescriptor;
 class RHIBlendDescriptor;
 class RHIDepthStencilDescriptor;
 class RHIShader;
 class RHIRenderPass;
+class RHIPipelineResourceLayout;
 
-class RHIPipelineStateObjectDescriptor : public RHIDescriptor
+class RHIPipelineStateObjectDescriptor
 {
 public:
 
@@ -28,5 +28,7 @@ public:
 	unsigned int shaderCount;
 
 	RHIRenderPass *renderPass;
+
+	RHIPipelineResourceLayout *pipelineResourceLayout;
 
 };

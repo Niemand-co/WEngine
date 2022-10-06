@@ -7,6 +7,8 @@ class RHIPipelineStateObject;
 class RHIViewport;
 class RHIScissor;
 class RHIBuffer;
+class RHIGroup;
+class RHIPipelineResourceLayout;
 
 class RHIRenderPassBeginDescriptor;
 
@@ -28,7 +30,13 @@ public:
 
 	virtual void BindVertexBuffer(RHIBuffer *pBuffer) = 0;
 
+	virtual void BindIndexBuffer(RHIBuffer *pBuffer) = 0;
+
+	virtual void BindGroups(unsigned int groupCount, RHIGroup *pGroup, RHIPipelineResourceLayout* pPipelineResourceLayout) = 0;
+
 	virtual void DrawVertexArray() = 0;
+
+	virtual void DrawIndexed(unsigned int indexeCount, unsigned int firstIndex, unsigned int instanceCount = 1, unsigned int firstInstance = 0) = 0;
 
 	virtual void EndPass() = 0;
 

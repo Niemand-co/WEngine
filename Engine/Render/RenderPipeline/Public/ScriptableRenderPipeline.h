@@ -10,6 +10,8 @@ class RHIContext;
 class RHISemaphore;
 class RHIFence;
 class RHITexture;
+class Camera;
+struct CameraData;
 
 class ScriptableRenderPipeline
 {
@@ -27,9 +29,9 @@ public:
 
 	virtual void Execute();
 
-	virtual void AddRenderer();
+	virtual ScriptableRenderer* CreateRenderer();
 
-private:
+	virtual void RenderSingleCamera(Camera *camera, RHIContext* context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence* fence);
 
 public:
 
@@ -40,8 +42,6 @@ private:
 	static ScriptableRenderPipeline *g_instance;
 
 private:
-
-	std::vector<ScriptableRenderer*> m_renderers;
 
 	RHIInstance *m_pInstance;
 
@@ -60,5 +60,9 @@ private:
 	unsigned int m_maxFrame;
 
 	unsigned int m_currentFrame;
+
+	std::vector<Camera*> m_pCameras;
+
+	std::vector<CameraData*> m_pCameraDatas;
 
 };

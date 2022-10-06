@@ -17,6 +17,20 @@ public:
 
 	RHIVertexInputDescriptor GetVertexInputDescriptor();
 
+	void* operator new(size_t size)
+	{
+		return WEngine::Allocator::Get()->Allocate(size);
+	}
+
+	void operator delete(void* pData)
+	{
+		WEngine::Allocator::Get()->Deallocate(pData);
+	}
+
+public:
+
+	static Mesh* GetCube();
+
 public:
 
 	Vertex *m_pVertices;
@@ -26,6 +40,8 @@ public:
 	unsigned int *m_pIndices;
 
 	unsigned int m_indexCount;
+
+private:
 
 	VertexBindingDescription *m_bindingDescription;
 

@@ -1,18 +1,6 @@
 #include "pch.h"
-#include "RHI/Public/RHIContext.h"
-#include "RHI/Public/RHIDevice.h"
-#include "RHI/Public/RHICommandPool.h"
-#include "RHI/Public/RHICommandBuffer.h"
-#include "RHI/Public/RHIQueue.h"
-#include "RHI/Public/RHISwapchain.h"
-#include "RHI/Public/RHISurface.h"
-#include "RHI/Public/RHITexture.h"
-#include "RHI/Public/RHITextureView.h"
-#include "RHI/Public/RHISemaphore.h"
-#include "Render/Descriptor/Public/RHISwapchainDescriptor.h"
-#include "Render/Descriptor/Public/RHIInstanceDescriptor.h"
-#include "Render/Descriptor/Public/RHISwapchainDescriptor.h"
-#include "Render/Descriptor/Public/RHITextureViewDescriptor.h"
+#include "RHI/Public/RHIHeads.h"
+#include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Utils/Public/Window.h"
 
 RHIContext::RHIContext(RHIQueue *queue, RHISurface *surface, RHIDevice *device)
@@ -127,4 +115,56 @@ bool RHIContext::IsDisplayChanged()
 void RHIContext::ResetDisplayState()
 {
 	m_isDisplayChagned = false;
+}
+
+RHIBuffer* RHIContext::CreateVertexBuffer(RHIBufferDescriptor* descriptor)
+{
+	descriptor->bufferType = BUFFER_USAGE_VERTEX_BUFFER;
+	return m_pDevice->CreateBuffer(descriptor);
+}
+
+RHIBuffer* RHIContext::CreateIndexBuffer(RHIBufferDescriptor* descriptor)
+{
+	descriptor->bufferType = BUFFER_USAGE_INDEX_BUFFER;
+	return m_pDevice->CreateBuffer(descriptor);
+}
+
+RHIBuffer* RHIContext::CreateUniformBuffer(RHIBufferDescriptor* descriptor)
+{
+	descriptor->bufferType = BUFFER_USAGE_UNIFORM_BUFFER;
+	return m_pDevice->CreateBuffer(descriptor);
+}
+
+RHIGroupLayout* RHIContext::CreateGroupLayout(RHIGroupLayoutDescriptor* descriptor)
+{
+	return m_pDevice->CreateGroupLayout(descriptor);
+}
+
+RHIGroup* RHIContext::CreateResourceGroup(RHIGroupDescriptor* descriptor)
+{
+	RHIGroupPoolDescriptor poolDescriptor = {};
+	{
+		poolDescriptor.pGroupLayout = descriptor->pGroupLayout;
+		poolDescriptor.maxSetCount = 1;
+	}
+	RHIGroupPool *pool = m_pDevice->CreateGroupPool(&poolDescriptor);
+
+	RHIGroup *group = pool->GetGroup();
+
+	return group;
+}
+
+void RHIContext::UpdateResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
+{
+	m_pDevice->UpdateResourceToGroup(descriptor);
+}
+
+RHIPipelineResourceLayout* RHIContext::CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor* descriptor)
+{
+	return m_pDevice->CreatePipelineResourceLayout(descriptor);
+}
+
+RHIPipelineStateObject* RHIContext::CreatePSO(RHIPipelineStateObjectDescriptor* descriptor)
+{
+	return m_pDevice->CreatePipelineStateObject(descriptor);
 }

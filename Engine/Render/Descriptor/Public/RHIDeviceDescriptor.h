@@ -1,9 +1,8 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
 class RHIQueueDescriptor;
 
-class RHIDeviceDescriptor : public RHIDescriptor
+class RHIDeviceDescriptor
 {
 public:
 	

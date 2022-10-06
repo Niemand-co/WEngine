@@ -46,3 +46,8 @@ World* World::GetWorld()
 {
 	return g_pInstance;
 }
+
+std::vector<Camera*>& World::GetCameras()
+{
+	return m_pCameras;
+}

@@ -8,8 +8,20 @@ class RHISurface;
 class RHITextureView;
 class RHICommandPool;
 class RHICommandBuffer;
+class RHIBuffer;
+class RHIGroup;
+class RHIGroupLayout;
+class RHIPipelineResourceLayout;
+class RHIPipelineStateObject;
 class RHISemaphore;
 class RHIFence;
+
+class RHIBufferDescriptor;
+class RHIGroupLayoutDescriptor;
+class RHIGroupDescriptor;
+class RHIUpdateResourceDescriptor;
+class RHIPipelineResourceLayoutDescriptor;
+class RHIPipelineStateObjectDescriptor;
 
 class RHIContext : public RenderContext
 {
@@ -38,6 +50,22 @@ public:
 	virtual bool IsDisplayChanged();
 
 	virtual void ResetDisplayState();
+
+	virtual RHIBuffer* CreateVertexBuffer(RHIBufferDescriptor *descriptor);
+
+	virtual RHIBuffer* CreateIndexBuffer(RHIBufferDescriptor *descriptor);
+
+	virtual RHIBuffer* CreateUniformBuffer(RHIBufferDescriptor *descriptor);
+
+	virtual RHIGroupLayout* CreateGroupLayout(RHIGroupLayoutDescriptor *descriptor);
+
+	virtual RHIGroup* CreateResourceGroup(RHIGroupDescriptor *descriptor);
+
+	virtual void UpdateResourceToGroup(RHIUpdateResourceDescriptor *descriptor);
+
+	virtual RHIPipelineResourceLayout* CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor *descriptor);
+
+	virtual RHIPipelineStateObject* CreatePSO(RHIPipelineStateObjectDescriptor *descriptor);
 
 protected:
 

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef SR_WORLD_H
-#define SR_WORLD_H
 
 class GameObject;
 class Camera;
@@ -16,6 +14,8 @@ public:
 
 	void AddCamera(Camera *pCamera);
 
+	std::vector<Camera*>& GetCameras();
+
 	static World* CreateWorld();
 
 	static World* GetWorld();
@@ -29,5 +29,3 @@ private:
 	static World* g_pInstance;
 
 };
-
-#endif

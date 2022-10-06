@@ -34,10 +34,13 @@ namespace Vulkan
 		commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		commandPoolCreateInfo.queueFamilyIndex = m_queueFamilyIndex;
 
-		VkCommandPool *pool = (VkCommandPool*)WEngine::Allocator::Get()->Allocate(sizeof(VkCommandPool));
-		vkCreateCommandPool(*m_device, &commandPoolCreateInfo, nullptr, pool);
+		VkCommandPool *pPool = (VkCommandPool*)WEngine::Allocator::Get()->Allocate(sizeof(VkCommandPool));
+		RE_ASSERT(vkCreateCommandPool(*m_device, &commandPoolCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pPool) == VK_SUCCESS, "Failed to Get Command Pool.");
 
-		return new VulkanCommandPool(pool, m_device);
+		RHICommandPool *pool = (RHICommandPool*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanCommandPool));
+		::new (pool) VulkanCommandPool(pPool, m_device);
+
+		return pool;
 	}
 
 	void VulkanQueue::Submit(RHICommandBuffer **cmd, unsigned int count, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence)

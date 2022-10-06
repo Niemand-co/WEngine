@@ -10,7 +10,7 @@ MainLightShadowPass::~MainLightShadowPass()
 {
 }
 
-void MainLightShadowPass::Setup(RHIContext *context)
+void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 {
 }
 

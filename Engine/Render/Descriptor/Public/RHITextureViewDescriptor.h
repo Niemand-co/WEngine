@@ -1,7 +1,6 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
-class RHITextureViewDescriptor : public RHIDescriptor
+class RHITextureViewDescriptor
 {
 public:
 

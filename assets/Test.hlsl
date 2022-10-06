@@ -10,12 +10,14 @@ struct VSOutput
 	float3 Color : COLOR;
 };
 
+uniform float4x4 MVP : register(b0);
+
 VSOutput vert(VSInput vin)
 {
 	VSOutput vout = (VSOutput)0;
 
-	vout.Position = float4(vin.Position, 1.0);
-	vout.Position.y *= -1.0;
+	vout.Position = mul(MVP, float4(vin.Position, 1.0));
+	vout.Position.y *= -1.0f;
 	vout.Color = vin.Color;
 
 	return vout;

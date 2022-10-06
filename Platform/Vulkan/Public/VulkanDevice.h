@@ -8,11 +8,13 @@ struct QueueStack;
 namespace Vulkan
 {
 
+	class VulkanGPU;
+
 	class VulkanDevice : public RHIDevice
 	{
 	public:
 	
-		VulkanDevice(VkDevice *device, std::vector<QueueStack> stacks);
+		VulkanDevice(VkDevice *device, VulkanGPU *pGPU, std::vector<QueueStack> stacks);
 
 		virtual ~VulkanDevice();
 
@@ -36,6 +38,16 @@ namespace Vulkan
 
 		virtual RHIBuffer* CreateBuffer(RHIBufferDescriptor *descriptor) override;
 
+		virtual RHIGroup* CreateResourceGroup(RHIGroupDescriptor *descriptor) override;
+
+		virtual RHIGroupLayout* CreateGroupLayout(RHIGroupLayoutDescriptor *descriptor) override;
+
+		virtual RHIPipelineResourceLayout* CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor *descriptor) override;
+
+		virtual RHIGroupPool* CreateGroupPool(RHIGroupPoolDescriptor *descriptor) override;
+
+		virtual void UpdateResourceToGroup(RHIUpdateResourceDescriptor *descriptor) override;
+
 		virtual std::vector<RHISemaphore*> GetSemaphore(unsigned int count) override;
 
 		virtual void WaitForFences(RHIFence* pFences, unsigned int count, bool waitForAll = true) override;
@@ -51,6 +63,8 @@ namespace Vulkan
 		VkDevice *m_pDevice;
 
 		std::vector<QueueStack> m_queues;
+
+		VulkanGPU *m_pGPU;
 
 	};
 

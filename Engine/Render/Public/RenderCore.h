@@ -189,7 +189,10 @@ enum class AttachmentStoreOP
 	DontCare,
 };
 
-enum class ImageLayout
+enum class ResourceType
 {
-
+	UniformBuffer = 0,
+	DynamicUniformBuffer,
+	Texture,
+	Sampler,
 };

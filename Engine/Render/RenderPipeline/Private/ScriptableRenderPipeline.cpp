@@ -14,6 +14,8 @@
 #include "Render/Descriptor/Public/RHIQueueDescriptor.h"
 #include "Platform/Vulkan/Public/VulkanInstance.h"
 #include "Utils/Public/Window.h"
+#include "Scene/Public/World.h"
+#include "Scene/Components/Public/Camera.h"
 
 ScriptableRenderPipeline *ScriptableRenderPipeline::g_instance = nullptr;
 
@@ -78,9 +80,14 @@ void ScriptableRenderPipeline::Init()
 
 void ScriptableRenderPipeline::Setup()
 {
-	for (ScriptableRenderer* renderer : m_renderers)
+	m_pCameras = World::GetWorld()->GetCameras();
+	m_pCameraDatas.reserve(m_pCameras.size());
+
+	for (Camera *camera : m_pCameras)
 	{
-		renderer->Setup();
+		CameraData *data = camera->GetData();
+		camera->GetRenderer()->Setup(data);
+		m_pCameraDatas.push_back(data);
 	}
 }
 
@@ -97,9 +104,9 @@ void ScriptableRenderPipeline::Execute()
 	}
 	m_pDevice->ResetFences(m_pFences[m_currentFrame], 1);
 
-	for (ScriptableRenderer* renderer : m_renderers)
+	for (Camera *camera : m_pCameras)
 	{
-		renderer->Execute(m_pContext, m_pImageAvailibleSemaphores[m_currentFrame], m_pPresentAVailibleSemaphores[m_currentFrame], m_pFences[m_currentFrame]);
+		RenderSingleCamera(camera, m_pContext, m_pImageAvailibleSemaphores[m_currentFrame], m_pPresentAVailibleSemaphores[m_currentFrame], m_pFences[m_currentFrame]);
 	}
 
 	if (!m_pContext->Present(g_currentFrame, m_pPresentAVailibleSemaphores[m_currentFrame]))
@@ -111,11 +118,17 @@ void ScriptableRenderPipeline::Execute()
 	m_currentFrame = (m_currentFrame + 1) % m_maxFrame;
 }
 
-void ScriptableRenderPipeline::AddRenderer()
+ScriptableRenderer* ScriptableRenderPipeline::CreateRenderer()
 {
 	RendererConfigure configure = { m_pDevice, m_pContext };
 
 	ScriptableRenderer *renderer = (ScriptableRenderer*)WEngine::Allocator::Get()->Allocate(sizeof(ScriptableRenderer));
 	::new (renderer) ScriptableRenderer(&configure);
-	m_renderers.push_back(renderer);
+	
+	return renderer;
+}
+
+void ScriptableRenderPipeline::RenderSingleCamera(Camera* camera, RHIContext* context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence* fence)
+{
+	camera->GetRenderer()->Execute(context, waitSemaphore, signalSemaphore, fence);
 }

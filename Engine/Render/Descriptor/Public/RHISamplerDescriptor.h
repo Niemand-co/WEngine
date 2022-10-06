@@ -1,7 +1,6 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
-class RHISamplerDescriptor : public RHIDescriptor
+class RHISamplerDescriptor
 {
 public:
 

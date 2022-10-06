@@ -1,10 +1,9 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
 class RHITextureView;
 class RHIRenderPass;
 
-class RHIRenderTargetDescriptor : public RHIDescriptor
+class RHIRenderTargetDescriptor
 {
 public:
 

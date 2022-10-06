@@ -1,9 +1,8 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptor.h"
 
 class RHISurface;
 
-class RHISwapchainDescriptor : public RHIDescriptor
+class RHISwapchainDescriptor
 {
 public:
 	

@@ -43,7 +43,9 @@ void Application::Init()
 
 	GameObject *go = World::GetWorld()->CreateGameObject();
 
-	go->AddComponent<Component::ComponentType::Camera>();
+	Camera *camera = (Camera*)go->AddComponent<Component::ComponentType::Camera>();
+	camera->m_aspect = (float)Window::cur_window->GetWidth() / (float)Window::cur_window->GetHeight();
+	camera->m_pos = glm::vec3(2.0f, 2.0f, 2.0f);
 
 	time_t start, end;
 	start = clock();
@@ -52,7 +54,9 @@ void Application::Init()
 
 	RE_LOG(double(end - start) / CLOCKS_PER_SEC);
 
-	m_pipeline->AddRenderer();
+	ScriptableRenderer *renderer = m_pipeline->CreateRenderer();
+
+	camera->SetRenderer(renderer);
 
 	m_pipeline->Setup();
 

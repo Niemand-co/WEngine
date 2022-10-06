@@ -273,4 +273,21 @@ namespace WEngine
 		}
 	}
 
+	static VkDescriptorType ToVulkan(ResourceType type)
+	{
+		switch (type)
+		{
+		case ResourceType::UniformBuffer:
+			return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		case ResourceType::DynamicUniformBuffer:
+			return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+		case ResourceType::Texture:
+			return VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+		case ResourceType::Sampler:
+			return VK_DESCRIPTOR_TYPE_SAMPLER;
+		default:
+			break;
+		}
+	}
+
 }
