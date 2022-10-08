@@ -42,10 +42,9 @@ void Application::Init()
 	World::CreateWorld();
 
 	GameObject *go = World::GetWorld()->CreateGameObject();
-
+	
 	Camera *camera = (Camera*)go->AddComponent<Component::ComponentType::Camera>();
 	camera->m_aspect = (float)Window::cur_window->GetWidth() / (float)Window::cur_window->GetHeight();
-	camera->m_pos = glm::vec3(2.0f, 2.0f, 2.0f);
 
 	time_t start, end;
 	start = clock();

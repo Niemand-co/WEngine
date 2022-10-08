@@ -2,42 +2,38 @@
 #include "Scene/Components/Public/Transformer.h"
 
 Transformer::Transformer()
-	: Model(Matrix4x4f::GetIdentityMatrix()), ScaleMatrix(Matrix4x4f::GetIdentityMatrix()),
-	RotateMatrix(Matrix4x4f::GetIdentityMatrix()), TranslateMatrix(Matrix4x4f::GetIdentityMatrix())
 {
+	m_localToWorldMatrix = glm::mat4(1.0f);
 }
 
-void Transformer::SetScale(Vector3 scale)
+void Transformer::SetScale(glm::vec3 scale)
 {
 	m_scale = scale;
-	Matrix4x4f model = Matrix4x4f::GetIdentityMatrix();
-	Scale(model, scale);
-	ScaleMatrix = model;
-	Model = TranslateMatrix * RotateMatrix * ScaleMatrix;
 }
 
-void Transformer::SetRotate(Vector3 rotate)
+void Transformer::SetRotate(glm::vec3 rotate)
 {
 	m_rotate = rotate;
-	Matrix4x4f model = Matrix4x4f::GetIdentityMatrix();
-	Rotate(model, rotate[0], Vector3(1.0f, 0.0f, 0.0f));
-	Rotate(model, rotate[1], Vector3(0.0f, 1.0f, 0.0f));
-	Rotate(model, rotate[2], Vector3(0.0f, 0.0f, 1.0f));
-	RotateMatrix = model;
-	Model = TranslateMatrix * RotateMatrix * ScaleMatrix;
 }
 
-void Transformer::SetTranslate(Vector3 translate)
+void Transformer::SetPosition(glm::vec3 translate)
 {
-	m_translate = translate;
-	Matrix4x4f model = Matrix4x4f::GetIdentityMatrix();
-	Translate(model, translate);
-	TranslateMatrix = model;
-	Model = TranslateMatrix * RotateMatrix * ScaleMatrix;
+	m_position = translate;
 }
 
-Matrix4x4f Transformer::GetModelMatrix()
+glm::mat4 Transformer::GetLocalToWorldMatrix()
 {
-	return Model;
+	m_localToWorldMatrix = glm::mat4(1.0f);
+	glm::scale(m_localToWorldMatrix, m_scale);
+	glm::rotate(m_localToWorldMatrix, m_rotate.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::rotate(m_localToWorldMatrix, m_rotate.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::rotate(m_localToWorldMatrix, m_rotate.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::translate(m_localToWorldMatrix, m_position);
+	return m_localToWorldMatrix;
+}
+
+glm::mat4 Transformer::GetWorldToLocalMatrix()
+{
+	return glm::inverse(GetWorldToLocalMatrix());
 }
 

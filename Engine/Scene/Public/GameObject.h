@@ -37,16 +37,14 @@ inline Component* GameObject::AddComponent()
 	{
 		case Component::ComponentType::Transformer:
 		{
-			Component* pComponent = (Component*)WEngine::Allocator::Get()->Allocate(sizeof(Transformer));
-			::new (pComponent) Transformer();
+			Component* pComponent = new Transformer();
 			m_components.push_back(pComponent);
 			return pComponent;
 		}
 
 		case Component::ComponentType::Camera:
 		{
-			Component* pComponent = (Component*)WEngine::Allocator::Get()->Allocate(sizeof(Camera));;
-			::new (pComponent) Camera();
+			Component* pComponent = new Camera();
 			m_components.push_back(pComponent);
 			World::GetWorld()->AddCamera(static_cast<Camera*>(pComponent));
 			return pComponent;
@@ -54,8 +52,14 @@ inline Component* GameObject::AddComponent()
 
 		case Component::ComponentType::MeshFilter:
 		{
-			Component* pComponent = (Component*)WEngine::Allocator::Get()->Allocate(sizeof(MeshFilter));
-			::new (pComponent) MeshFilter();
+			Component* pComponent = new MeshFilter();
+			m_components.push_back(pComponent);
+			return pComponent;
+		}
+
+		case Component::ComponentType::Material
+		{
+			Component* pComponent = new Material();
 			m_components.push_back(pComponent);
 			return pComponent;
 		}

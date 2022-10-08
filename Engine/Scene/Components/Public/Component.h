@@ -1,6 +1,4 @@
 #pragma once
-#ifndef SR_COMPONENT_H
-#define SR_COMPONENT_H
 #include "Scene/Public/Object.h"
 
 class Component : public Object
@@ -11,16 +9,17 @@ public:
 		Transformer = 0,
 		Camera,
 		MeshFilter,
+		Material,
 	};
 
 public:
+
 	virtual ~Component() = default;
 
 	virtual ComponentType GetType() { return m_type; }
+
 	virtual bool IsType(ComponentType type) { return type == m_type; }
 
 protected:
 	ComponentType m_type;
 };
-
-#endif

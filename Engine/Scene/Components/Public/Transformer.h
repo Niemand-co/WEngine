@@ -1,13 +1,6 @@
 #pragma once
 #include "Scene/Components/Public/Component.h"
 
-template<typename T>
-struct Vector3Type;
-typedef Vector3Type<float> Vector3;
-template<typename T, int RowSize, int ColSize>
-struct Matrix;
-typedef Matrix<float, 4, 4> Matrix4x4f;
-
 class Transformer : public Component
 {
 public:
@@ -16,27 +9,23 @@ public:
 
 	~Transformer() = default;
 
-	void SetScale(Vector3 scale);
+	void SetScale(glm::vec3 scale);
 
-	void SetRotate(Vector3 rotate);
+	void SetRotate(glm::vec3 rotate);
 
-	void SetTranslate(Vector3 translate);
+	void SetPosition(glm::vec3 position);
 
-	Matrix4x4f GetModelMatrix();
+	glm::mat4 GetLocalToWorldMatrix();
+
+	glm::mat4 GetWorldToLocalMatrix();
 
 private:
 
-	Vector3 m_scale;
+	glm::vec3 m_scale;
 
-	Vector3 m_rotate;
+	glm::vec3 m_rotate;
 
-	Vector3 m_translate;
+	glm::vec3 m_position;
 
-	Matrix4x4f ScaleMatrix;
-
-	Matrix4x4f RotateMatrix;
-
-	Matrix4x4f TranslateMatrix;
-
-	Matrix4x4f Model;
+	glm::mat4 m_localToWorldMatrix;
 };

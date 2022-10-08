@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene/Components/Public/Component.h"
 
+class GameObject;
 class ScriptableRenderer;
 struct CameraData;
 
@@ -17,15 +18,11 @@ public:
 		DOWN
 	};
 
-	Camera();
+	Camera(GameObject *pGameObject);
 
-	Camera(const glm::vec3& position, const glm::vec3& front, const float& fov = 90.f, const float& aspect = 1.0f, const float& nearPlane = 0.1f, const float& farPlane = 1000.0f);
+	Camera(GameObject* pGameObject, const float& fov = 90.f, const float& aspect = 1.0f, const float& nearPlane = 0.1f, const float& farPlane = 1000.0f);
 
 	~Camera() = default;
-
-	void Move(direction dir, float dis);
-
-	glm::vec3 GetPos(){return m_pos;}
 
 	glm::mat4x4 GetViewMatrix();
 
@@ -38,8 +35,6 @@ public:
 	CameraData* GetData();
 
 private:
-
-	void UpdateViewMatrix();
 
 	void UpdateProjectionMatrix();
 
@@ -55,13 +50,9 @@ public:
 
 	float m_aspect;
 
-	glm::vec3 m_pos;
-
-	glm::vec3 m_front;
-
 private:
 
-	glm::mat4x4 m_viewMatrix;
+	GameObject *m_pGameObject;
 
 	glm::mat4x4 m_projectionMatrix;
 
