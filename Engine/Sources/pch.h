@@ -32,6 +32,9 @@
 #include "glm/gtc/type_ptr.hpp"
 #define GLFW_VULKAN_INCLUDE
 #include "Vulkan/vulkan.h"
+#include "imgui/imgui.h"
+#include "imgui/backends/imgui_impl_glfw.h"
+#include "imgui/backends/imgui_impl_vulkan.h"
 //-------------------------------------------------------------
 
 #include "Math/Common.h"

@@ -76,6 +76,11 @@ void ScriptableRenderPipeline::Init()
 	m_pPresentAVailibleSemaphores = m_pDevice->GetSemaphore(m_maxFrame);
 
 	m_pFences = m_pDevice->CreateFence(m_maxFrame);
+
+	ImGui::CreateContext();
+	ImGuiIO m_io = ImGui::GetIO();
+	ImGui_ImplGlfw_InitForVulkan(static_cast<GLFWwindow*>(Window::cur_window->GetHandle()), true);
+
 }
 
 void ScriptableRenderPipeline::Setup()

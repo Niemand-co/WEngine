@@ -32,12 +32,14 @@ file(GLOB EVENT_SRC Engine/Event/Private/*.*)
 file(GLOB ROOT_SRC Engine/Sources/*.cpp Engine/Sources/*.h)
 file(GLOB LOG_SRC Engine/Log/Private/*.*)
 file(GLOB RHI_SRC Engine/RHI/Private/*.*)
-file(GLOB RHI_ENCODER_SRC Engine/RHI/Encoder/private/*.*)
+file(GLOB RHI_ENCODER_SRC Engine/RHI/Encoder/Private/*.*)
+file(GLOB GUI_SRC Engine/Utils/ImGui/Private/*.*)
 file(GLOB GLFW_SRC Platform/GLFWWindow/Private/*.*)
 file(GLOB WIN_SRC Platform/Windows/Private/*.*)
 file(GLOB VULKAN_SRC Platform/Vulkan/Private/*.*)
 file(GLOB VULKAN_ENCODER_SRC Platform/Vulkan/Encoder/Private/*.*)
 file(GLOB VULKAN_ALLOC_SRC Platform/Vulkan/Allocator/Private/*.*)
+file(GLOB VULKAN_GUI_SRC Platform/Vulkan/ImGui/Private/*.*)
 
 file(GLOB IMGUI_INCLUDE deps/imgui *.h)
 
@@ -56,11 +58,13 @@ file(GLOB EVENT_INCLUDE Engine/Event/Public/*.h)
 file(GLOB LOG_INCLUDE Engine/Log/Public/*.h)
 file(GLOB RHI_INCLUDE Engine/RHI/Public/*.h)
 file(GLOB RHI_ENCODER_INCLUDE Engine/RHI/Encoder/Public/*.h)
+file(GLOB GUI_INCLUDE Engine/Utils/ImGui/Public/*.h)
 file(GLOB GLFW_INCLUDE Platform/GLFWWindow/Public/*.h)
 file(GLOB WIN_INCLUDE Platform/Windows/Public/*.h)
 file(GLOB VULKAN_INCLUDE Platform/Vulkan/Public/*.h)
 file(GLOB VULKAN_ENCODER_INCLUDE Platform/Vulkan/Encoder/Public/*.h)
 file(GLOB VULKAN_ALLOC_INCLUDE Platform/Vulkan/Allocator/Public/*.h)
+file(GLOB VULKAN_GUI_INCLUDE Platform/Vulkan/ImGui/Public/*.h)
 
 macro(use_precompiled_header TARGET HEADER_FILE SRC_FILE)
   get_filename_component(HEADER ${HEADER_FILE} NAME)
@@ -78,14 +82,16 @@ set(PLATFORM_SRC
     ${GLFW_SRC}
     ${VULKAN_SRC}
     ${VULKAN_ENCODER_SRC}
-    ${VULKAN_ALLOC_SRC})
+    ${VULKAN_ALLOC_SRC}
+    ${VULKAN_GUI_SRC})
 
 set(PLATFORM_INCLUDE
     ${GLFW_INCLUDE}
     ${WIN_INCLUDE}
     ${VULKAN_INCLUDE}
     ${VULKAN_ENCODER_INCLUDE}
-    ${VULKAN_ALLOC_INCLUDE})
+    ${VULKAN_ALLOC_INCLUDE}
+    ${VULKAN_GUI_INCLUDE})
 
 set(WE_SRC
     ${FRAME_SRC}
@@ -105,6 +111,7 @@ set(WE_SRC
     ${LOG_SRC}
     ${RHI_SRC}
     ${RHI_ENCODER_SRC}
+    ${GUI_SRC}
     ${GLM_SRC}
     ${IMGUI_SRC})
 
@@ -125,6 +132,7 @@ set(WE_INCLUDE
     ${LOG_INCLUDE}
     ${RHI_INCLUDE}
     ${RHI_ENCODER_INCLUDE}
+    ${GUI_INCLUDE}
     ${IMGUI_INCLUDE})
 
 list(APPEND WENGINE_INCLUDE ${GLAD_INCLUDE})
@@ -147,10 +155,12 @@ source_group(Engine/Render/Pass/Private FILES ${PASS_SRC})
 source_group(Engine/Render/Mesh/Private FILES ${MESH_SRC})
 source_group(Engine/RHI/Private FILES ${RHI_SRC})
 source_group(Engine/RHI/Encoder/Private FILES ${RHI_ENCODER_SRC})
+source_group(Engine/Utils/ImGui/Private FILES ${GUI_SRC})
 source_group(Platform/GLFWWindow/Private FILES ${GLFW_SRC})
 source_group(Platform/Vulkan/Private FILES ${VULKAN_SRC})
 source_group(Platform/Vulkan/Encoder/Private FILES ${VULKAN_ENCODER_SRC})
 source_group(Platform/Vulkan/Allocator/Private FILES ${VULKAN_ALLOC_SRC})
+source_group(Platform/Vulkan/ImGui/Private FILES ${VULKAN_GUI_SRC})
 source_group(Icons FILES ${ICON_SRC})
 
 source_group(Engine/Framework/Public FILES ${FRAME_INCLUDE})
@@ -169,10 +179,12 @@ source_group(Engine/Render/Mesh/Public FILES ${MESH_INCLUDE})
 source_group(Engine/Log/Public FILES ${LOG_INCLUDE})
 source_group(Engine/RHI/Public FILES ${RHI_INCLUDE})
 source_group(Engine/RHI/Encoder/Public FILES ${RHI_ENCODER_INCLUDE})
+source_group(Engine/Utils/ImGui/Public FILES ${GUI_INCLUDE})
 source_group(Platform/GLFWWindow/Public FILES ${GLFW_INCLUDE})
 source_group(Platform/Vulkan/Public FILES ${VULKAN_INCLUDE})
 source_group(Platform/Vulkan/Encoder/Public FILES ${VULKAN_ENCODER_INCLUDE})
 source_group(Platform/Vulkan/Allocator/Public FILES ${VULKAN_ALLOC_INCLUDE})
+source_group(Platform/Vulkan/ImGui/Public FILES ${VULKAN_GUI_INCLUDE})
 
 link_directories(Engine/deps/Vulkan/Lib)
 
