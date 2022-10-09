@@ -13,6 +13,8 @@ set(GLAD_INCLUDE ${CMAKE_SOURCE_DIR}/Engine/deps/glad/include)
 file(GLOB MATH_SRC Engine/Math/*.*)
 file(GLOB_RECURSE GLM_SRC deps/GLM *.h *.hpp *.inl)
 
+file(GLOB IMGUI_SRC deps/imgui *.cpp)
+
 file(GLOB ICON_SRC Icons/*.*)
 
 file(GLOB PASS_SRC Engine/Render/Passes/Private/*.*)
@@ -36,6 +38,8 @@ file(GLOB WIN_SRC Platform/Windows/Private/*.*)
 file(GLOB VULKAN_SRC Platform/Vulkan/Private/*.*)
 file(GLOB VULKAN_ENCODER_SRC Platform/Vulkan/Encoder/Private/*.*)
 file(GLOB VULKAN_ALLOC_SRC Platform/Vulkan/Allocator/Private/*.*)
+
+file(GLOB IMGUI_INCLUDE deps/imgui *.h)
 
 file(GLOB PASS_INCLUDE Engine/Render/Passes/Public/*.h)
 file(GLOB PIPELINE_INCLUDE Engine/Render/RenderPipeline/Public/*.h)
@@ -101,7 +105,8 @@ set(WE_SRC
     ${LOG_SRC}
     ${RHI_SRC}
     ${RHI_ENCODER_SRC}
-    ${GLM_SRC})
+    ${GLM_SRC}
+    ${IMGUI_SRC})
 
 set(WE_INCLUDE
     ${FRAME_INCLUDE}
@@ -119,7 +124,8 @@ set(WE_INCLUDE
     ${MESH_INCLUDE}
     ${LOG_INCLUDE}
     ${RHI_INCLUDE}
-    ${RHI_ENCODER_INCLUDE})
+    ${RHI_ENCODER_INCLUDE}
+    ${IMGUI_INCLUDE})
 
 list(APPEND WENGINE_INCLUDE ${GLAD_INCLUDE})
 list(APPEND WENGINE_INCLUDE ${DEPS_INCLUDE})
