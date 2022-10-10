@@ -42,4 +42,6 @@ private:
 
 	ScriptableRenderPass *m_finalBlitPass;
 
+	ScriptableRenderPass *m_drawGuiPass;
+
 };

@@ -13,8 +13,4 @@ public:
 
 	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence = nullptr);
 
-private:
-
-	ImGuiIO m_io;
-
 };

@@ -22,6 +22,8 @@ namespace Vulkan
 
 		virtual bool Present(RHISwapchain *swapchain, unsigned int index, RHISemaphore *semaphore) override;
 
+		VkQueue* GetHandle();
+
 	private:
 
 		VkQueue *m_queue;

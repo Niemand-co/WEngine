@@ -1,6 +1,5 @@
 #pragma once
-#ifndef WENGINE_PRECOMPILE_H
-#define WENGINE_PRECOMPILE_H
+#ifndef NOT_INCLUDE
 
 #include <algorithm>
 #include <vector>
@@ -32,9 +31,17 @@
 #include "glm/gtc/type_ptr.hpp"
 #define GLFW_VULKAN_INCLUDE
 #include "Vulkan/vulkan.h"
-#include "imgui/imgui.h"
-#include "imgui/backends/imgui_impl_glfw.h"
+//-------------------------------------------------------------
+
+//-------------------------ImGui-------------------------------
+#include "imgui.h"
+#include "imgui_internal.h"
+#include "imconfig.h"
+#include "imstb_rectpack.h"
+#include "imstb_textedit.h"
+#include "imstb_truetype.h"
 #include "imgui/backends/imgui_impl_vulkan.h"
+#include "imgui/backends/imgui_impl_glfw.h"
 //-------------------------------------------------------------
 
 #include "Math/Common.h"

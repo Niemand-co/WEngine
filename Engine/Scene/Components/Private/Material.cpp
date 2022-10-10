@@ -5,7 +5,7 @@
 Material::Material()
 	: color(Vector3(1.0f, 1.0f, 1.0f)), roughness(1.0f), m_shader(nullptr)
 {
-
+	m_type = Component::ComponentType::Material;
 }
 
 void Material::SetShader(RHIShader* shader)

@@ -119,6 +119,11 @@ namespace Vulkan
 		static_cast<VulkanSurface*>(RHIInstance::m_surface)->SetHandle(m_pSurface);
 	}
 
+	VkInstance* VulkanInstance::GetHandle()
+	{
+		return m_pInstance;
+	}
+
 	void VulkanInstance::SetupDebugCallback()
 	{
 		VkDebugUtilsMessengerCreateInfoEXT debugMessageInfo = {};

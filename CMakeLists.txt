@@ -10,10 +10,11 @@ set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT WEngine)
 
 set(GLAD_INCLUDE ${CMAKE_SOURCE_DIR}/Engine/deps/glad/include)
 
-file(GLOB MATH_SRC Engine/Math/*.*)
-file(GLOB_RECURSE GLM_SRC deps/GLM *.h *.hpp *.inl)
+file(GLOB MATH_SRC Engine/Math/*.cpp)
+file(GLOB_RECURSE GLM_SRC Engine/deps/GLM *.h *.hpp *.inl)
 
-file(GLOB IMGUI_SRC deps/imgui *.cpp)
+file(GLOB IMGUI_SRC Engine/deps/imgui/*.cpp)
+set(IMGUI_BACKEND_SRC Engine/deps/imgui/backends/imgui_impl_vulkan.cpp Engine/deps/imgui/backends/imgui_impl_glfw.cpp)
 
 file(GLOB ICON_SRC Icons/*.*)
 
@@ -41,7 +42,8 @@ file(GLOB VULKAN_ENCODER_SRC Platform/Vulkan/Encoder/Private/*.*)
 file(GLOB VULKAN_ALLOC_SRC Platform/Vulkan/Allocator/Private/*.*)
 file(GLOB VULKAN_GUI_SRC Platform/Vulkan/ImGui/Private/*.*)
 
-file(GLOB IMGUI_INCLUDE deps/imgui *.h)
+file(GLOB IMGUI_INCLUDE Engine/deps/imgui/*.h)
+set(IMGUI_BACKEND_INCLUDE Engine/deps/imgui/backends/imgui_impl_vulkan.h Engine/deps/imgui/backends/imgui_impl_glfw.h)
 
 file(GLOB PASS_INCLUDE Engine/Render/Passes/Public/*.h)
 file(GLOB PIPELINE_INCLUDE Engine/Render/RenderPipeline/Public/*.h)
@@ -113,7 +115,8 @@ set(WE_SRC
     ${RHI_ENCODER_SRC}
     ${GUI_SRC}
     ${GLM_SRC}
-    ${IMGUI_SRC})
+    ${IMGUI_SRC}
+    ${IMGUI_BACKEND_SRC})
 
 set(WE_INCLUDE
     ${FRAME_INCLUDE}
@@ -133,7 +136,8 @@ set(WE_INCLUDE
     ${RHI_INCLUDE}
     ${RHI_ENCODER_INCLUDE}
     ${GUI_INCLUDE}
-    ${IMGUI_INCLUDE})
+    ${IMGUI_INCLUDE}
+    ${IMGUI_BACKEND_INCLUDE})
 
 list(APPEND WENGINE_INCLUDE ${GLAD_INCLUDE})
 list(APPEND WENGINE_INCLUDE ${DEPS_INCLUDE})
@@ -161,7 +165,6 @@ source_group(Platform/Vulkan/Private FILES ${VULKAN_SRC})
 source_group(Platform/Vulkan/Encoder/Private FILES ${VULKAN_ENCODER_SRC})
 source_group(Platform/Vulkan/Allocator/Private FILES ${VULKAN_ALLOC_SRC})
 source_group(Platform/Vulkan/ImGui/Private FILES ${VULKAN_GUI_SRC})
-source_group(Icons FILES ${ICON_SRC})
 
 source_group(Engine/Framework/Public FILES ${FRAME_INCLUDE})
 source_group(Engine/Math/Public FILES ${MATH_INCLUDE})
@@ -198,6 +201,7 @@ include_directories(${CMAKE_SOURCE_DIR}/Engine)
 include_directories(${CMAKE_SOURCE_DIR}/Engine/Sources)
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/Engine/deps)
+include_directories(${CMAKE_SOURCE_DIR}/Engine/deps/imgui)
 include_directories(${CMAKE_SOURCE_DIR}/Engine/deps/Vulkan/include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/assets)
 add_subdirectory(${CMAKE_SOURCE_DIR}/assets)

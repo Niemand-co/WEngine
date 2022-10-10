@@ -3,6 +3,7 @@
 
 Transformer::Transformer()
 {
+	m_type = Component::ComponentType::Transformer;
 	m_localToWorldMatrix = glm::mat4(1.0f);
 }
 

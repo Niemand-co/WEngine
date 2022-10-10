@@ -3,6 +3,7 @@
 #include "Render/Passes/Public/DrawOpaquePass.h"
 #include "Render/Passes/Public/MainLightShadowPass.h"
 #include "Render/Passes/Public/FinalBlitPass.h"
+#include "Render/Passes/Public/DrawGUIPass.h"
 #include "RHI/Public/RHISemaphore.h"
 #include "Scene/Components/Public/Camera.h"
 
@@ -31,6 +32,10 @@ void ScriptableRenderer::Setup(CameraData* cameraData)
 	m_finalBlitPass = (FinalBlitPass*)WEngine::Allocator::Get()->Allocate(sizeof(FinalBlitPass));
 	::new (m_finalBlitPass) FinalBlitPass(&configure);
 	m_finalBlitPass->Setup(m_pContext, cameraData);
+
+	m_drawGuiPass = (DrawGUIPass*)WEngine::Allocator::Get()->Allocate(sizeof(DrawGUIPass));
+	::new (m_drawGuiPass) DrawGUIPass(&configure);
+	m_drawGuiPass->Setup(m_pContext, cameraData);
 }
 
 void ScriptableRenderer::Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence)
@@ -40,6 +45,8 @@ void ScriptableRenderer::Execute(RHIContext *context, RHISemaphore *waitSemaphor
 	m_drawOpaquePass->Execute(context, waitSemaphore, signalSemaphore, fence);
 
 	m_finalBlitPass->Execute(context, waitSemaphore, signalSemaphore);
+
+	m_drawGuiPass->Execute(context, waitSemaphore, signalSemaphore);
 }
 
 void ScriptableRenderer::AddRenderPass()

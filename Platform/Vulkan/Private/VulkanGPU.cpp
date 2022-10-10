@@ -163,4 +163,9 @@ namespace Vulkan
 		return device;
 	}
 
+	VkPhysicalDevice* VulkanGPU::GetHandle()
+	{
+		return m_pPhysicalDevice;
+	}
+
 }

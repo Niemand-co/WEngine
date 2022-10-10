@@ -23,6 +23,8 @@ namespace Vulkan
 
 		virtual RHIDevice* CreateDevice(RHIDeviceDescriptor *descriptor) override;
 
+		VkPhysicalDevice* GetHandle();
+
 	private:
 
 		VkPhysicalDevice *m_pPhysicalDevice;

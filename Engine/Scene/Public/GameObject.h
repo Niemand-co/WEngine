@@ -44,7 +44,7 @@ inline Component* GameObject::AddComponent()
 
 		case Component::ComponentType::Camera:
 		{
-			Component* pComponent = new Camera();
+			Component* pComponent = new Camera(this);
 			m_components.push_back(pComponent);
 			World::GetWorld()->AddCamera(static_cast<Camera*>(pComponent));
 			return pComponent;
@@ -57,7 +57,7 @@ inline Component* GameObject::AddComponent()
 			return pComponent;
 		}
 
-		case Component::ComponentType::Material
+		case Component::ComponentType::Material:
 		{
 			Component* pComponent = new Material();
 			m_components.push_back(pComponent);

@@ -3,5 +3,5 @@
 
 MeshFilter::MeshFilter()
 {
-
+	m_type = Component::ComponentType::MeshFilter;
 }

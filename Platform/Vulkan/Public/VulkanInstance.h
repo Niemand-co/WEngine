@@ -19,6 +19,8 @@ namespace Vulkan
 
 		virtual void UpdateSurface() override;
 
+		VkInstance* GetHandle();
+
 	private:
 
 		void SetupDebugCallback();

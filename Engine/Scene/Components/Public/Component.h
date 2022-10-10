@@ -18,8 +18,13 @@ public:
 
 	virtual ComponentType GetType() { return m_type; }
 
-	virtual bool IsType(ComponentType type) { return type == m_type; }
+	virtual bool IsType(ComponentType type) 
+	{
+		return type == m_type; 
+	}
 
 protected:
+
 	ComponentType m_type;
+
 };

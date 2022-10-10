@@ -20,7 +20,6 @@ namespace Vulkan
 
 	VulkanQueue::~VulkanQueue()
 	{
-
 	}
 
 	int VulkanQueue::GetIndex()
@@ -89,6 +88,11 @@ namespace Vulkan
 			RE_ASSERT(false, "Failed to Present Image.");
 		}
 		return true;
+	}
+
+	VkQueue* VulkanQueue::GetHandle()
+	{
+		return m_queue;
 	}
 
 }

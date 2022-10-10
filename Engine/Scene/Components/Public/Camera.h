@@ -18,9 +18,7 @@ public:
 		DOWN
 	};
 
-	Camera(GameObject *pGameObject);
-
-	Camera(GameObject* pGameObject, const float& fov = 90.f, const float& aspect = 1.0f, const float& nearPlane = 0.1f, const float& farPlane = 1000.0f);
+	Camera(GameObject* pGameObject, const float& fov = 3.1415926535f / 2.0f, const float& aspect = 1.0f, const float& nearPlane = 0.1f, const float& farPlane = 1000.0f);
 
 	~Camera() = default;
 

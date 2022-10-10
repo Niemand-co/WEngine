@@ -3,15 +3,10 @@
 #include "Scene/Public/GameObject.h"
 #include "Render/Public/ScriptableRenderer.h"
 
-Camera::Camera(GameObject* pGameObject)
-	: m_fov(3.1415926535f / 2.0f), m_aspect(1.0f), m_nearPlane(0.1f), m_farPlane(1000.0f), m_pGameObject(pGameObject)
-{
-	UpdateProjectionMatrix();
-}
-
 Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, const float& nearPlane, const float& farPlane)
 	: m_fov(fov), m_aspect(aspect), m_nearPlane(nearPlane), m_farPlane(farPlane), m_pGameObject(pGameObject)
 {
+	m_type = Component::ComponentType::Camera; 
 	UpdateProjectionMatrix();
 }
 

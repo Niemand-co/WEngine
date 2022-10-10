@@ -16,6 +16,7 @@
 #include "Utils/Public/Window.h"
 #include "Scene/Public/World.h"
 #include "Scene/Components/Public/Camera.h"
+#include "Utils/ImGui/Public/Gui.h"
 
 ScriptableRenderPipeline *ScriptableRenderPipeline::g_instance = nullptr;
 
@@ -77,10 +78,17 @@ void ScriptableRenderPipeline::Init()
 
 	m_pFences = m_pDevice->CreateFence(m_maxFrame);
 
-	ImGui::CreateContext();
-	ImGuiIO m_io = ImGui::GetIO();
-	ImGui_ImplGlfw_InitForVulkan(static_cast<GLFWwindow*>(Window::cur_window->GetHandle()), true);
+	GuiConfigure guiConfigure = {};
+	{
+		guiConfigure.pInstance = m_pInstance;
+		guiConfigure.pGPU = m_pInstance->GetGPU(0);
+		guiConfigure.pDevice = m_pDevice;
+		guiConfigure.pQueue = queue;
+		guiConfigure.imageCount = 3;
+	}
 
+	Gui* pGui = Gui::CreateGui(WEngine::Backend::Vulkan);
+	pGui->Init(&guiConfigure);
 }
 
 void ScriptableRenderPipeline::Setup()
