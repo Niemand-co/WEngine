@@ -50,6 +50,8 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		renderPassDescriptor.stencilLoadOP = AttachmentLoadOP::Clear;
 		renderPassDescriptor.stencilStoreOP = AttachmentStoreOP::Store;
 		renderPassDescriptor.sampleCount = 1;
+		renderPassDescriptor.initialLayout = AttachmentLayout::Undefined;
+		renderPassDescriptor.finalLayout = AttachmentLayout::General;
 	}
 	m_pRenderPass = m_pDevice->CreateRenderPass(&renderPassDescriptor);
 
@@ -197,7 +199,7 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 		RHIRenderPassBeginDescriptor renderPassBeginDescriptor = {};
 		{
 			renderPassBeginDescriptor.renderPass = m_pRenderPass;
-			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[ScriptableRenderPipeline::g_currentFrame];
+			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[ScriptableRenderPipeline::g_currentImage];
 		}
 		encoder->BeginPass(&renderPassBeginDescriptor);
 		encoder->SetPipeline(m_pPSO);

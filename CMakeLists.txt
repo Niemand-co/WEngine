@@ -13,9 +13,6 @@ set(GLAD_INCLUDE ${CMAKE_SOURCE_DIR}/Engine/deps/glad/include)
 file(GLOB MATH_SRC Engine/Math/*.cpp)
 file(GLOB_RECURSE GLM_SRC Engine/deps/GLM *.h *.hpp *.inl)
 
-file(GLOB IMGUI_SRC Engine/deps/imgui/*.cpp)
-set(IMGUI_BACKEND_SRC Engine/deps/imgui/backends/imgui_impl_vulkan.cpp Engine/deps/imgui/backends/imgui_impl_glfw.cpp)
-
 file(GLOB ICON_SRC Icons/*.*)
 
 file(GLOB PASS_SRC Engine/Render/Passes/Private/*.*)
@@ -41,9 +38,6 @@ file(GLOB VULKAN_SRC Platform/Vulkan/Private/*.*)
 file(GLOB VULKAN_ENCODER_SRC Platform/Vulkan/Encoder/Private/*.*)
 file(GLOB VULKAN_ALLOC_SRC Platform/Vulkan/Allocator/Private/*.*)
 file(GLOB VULKAN_GUI_SRC Platform/Vulkan/ImGui/Private/*.*)
-
-file(GLOB IMGUI_INCLUDE Engine/deps/imgui/*.h)
-set(IMGUI_BACKEND_INCLUDE Engine/deps/imgui/backends/imgui_impl_vulkan.h Engine/deps/imgui/backends/imgui_impl_glfw.h)
 
 file(GLOB PASS_INCLUDE Engine/Render/Passes/Public/*.h)
 file(GLOB PIPELINE_INCLUDE Engine/Render/RenderPipeline/Public/*.h)
@@ -114,9 +108,7 @@ set(WE_SRC
     ${RHI_SRC}
     ${RHI_ENCODER_SRC}
     ${GUI_SRC}
-    ${GLM_SRC}
-    ${IMGUI_SRC}
-    ${IMGUI_BACKEND_SRC})
+    ${GLM_SRC})
 
 set(WE_INCLUDE
     ${FRAME_INCLUDE}
@@ -135,9 +127,7 @@ set(WE_INCLUDE
     ${LOG_INCLUDE}
     ${RHI_INCLUDE}
     ${RHI_ENCODER_INCLUDE}
-    ${GUI_INCLUDE}
-    ${IMGUI_INCLUDE}
-    ${IMGUI_BACKEND_INCLUDE})
+    ${GUI_INCLUDE})
 
 list(APPEND WENGINE_INCLUDE ${GLAD_INCLUDE})
 list(APPEND WENGINE_INCLUDE ${DEPS_INCLUDE})
@@ -190,6 +180,9 @@ source_group(Platform/Vulkan/Allocator/Public FILES ${VULKAN_ALLOC_INCLUDE})
 source_group(Platform/Vulkan/ImGui/Public FILES ${VULKAN_GUI_INCLUDE})
 
 link_directories(Engine/deps/Vulkan/Lib)
+link_directories(${CMAKE_BINARY_DIR}/Engine/deps/imgui/Debug)
+
+add_subdirectory(Engine/deps/imgui)
 
 add_executable(WEngine ${WE_SRC} ${WE_INCLUDE})
 use_precompiled_header(${PROJECT_NAME} "${CMAKE_SOURCE_DIR}/Sources/pch.h" "${CMAKE_SOURCE_DIR}/Sources/pch.cpp")
@@ -212,6 +205,7 @@ list(APPEND WENGINE_INCLUDE ${GLFW3_DIR}/include)
 target_include_directories(WEngine PUBLIC ${WENGINE_INCLUDE})
 target_link_libraries(WEngine glfw)
 target_link_libraries(WEngine "vulkan-1.lib")
+target_link_libraries(WEngine "ImGui.lib")
 
 file(GLOB_RECURSE ASSET_LIST_PATH ${CMAKE_SOURCE_DIR}/assets/*.*)
 

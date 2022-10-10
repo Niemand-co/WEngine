@@ -15,6 +15,8 @@ public:
 
 	void SetPosition(glm::vec3 position);
 
+	glm::vec3 GetPosition();
+
 	glm::mat4 GetLocalToWorldMatrix();
 
 	glm::mat4 GetWorldToLocalMatrix();

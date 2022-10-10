@@ -4,6 +4,8 @@
 #include "Render/Passes/Public/MainLightShadowPass.h"
 #include "Render/Passes/Public/FinalBlitPass.h"
 #include "Render/Passes/Public/DrawGUIPass.h"
+#include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
+#include "RHI/Public/RHIDevice.h"
 #include "RHI/Public/RHISemaphore.h"
 #include "Scene/Components/Public/Camera.h"
 
@@ -36,17 +38,19 @@ void ScriptableRenderer::Setup(CameraData* cameraData)
 	m_drawGuiPass = (DrawGUIPass*)WEngine::Allocator::Get()->Allocate(sizeof(DrawGUIPass));
 	::new (m_drawGuiPass) DrawGUIPass(&configure);
 	m_drawGuiPass->Setup(m_pContext, cameraData);
+
+	m_semaphores = m_pDevice->GetSemaphore(3);
 }
 
 void ScriptableRenderer::Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence)
 {
 	m_mainLightShadowPass->Execute(context, waitSemaphore, signalSemaphore);
 
-	m_drawOpaquePass->Execute(context, waitSemaphore, signalSemaphore, fence);
+	m_drawOpaquePass->Execute(context, waitSemaphore, m_semaphores[ScriptableRenderPipeline::g_currentFrame], fence);
+
+	m_drawGuiPass->Execute(context, m_semaphores[ScriptableRenderPipeline::g_currentFrame], signalSemaphore);
 
 	m_finalBlitPass->Execute(context, waitSemaphore, signalSemaphore);
-
-	m_drawGuiPass->Execute(context, waitSemaphore, signalSemaphore);
 }
 
 void ScriptableRenderer::AddRenderPass()

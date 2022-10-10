@@ -34,6 +34,8 @@ public:
 
 private:
 
+	void UpdateViewMatrix();
+
 	void UpdateProjectionMatrix();
 
 public:
@@ -52,12 +54,13 @@ private:
 
 	GameObject *m_pGameObject;
 
+	glm::mat4x4 m_viewMatrix;
+
 	glm::mat4x4 m_projectionMatrix;
 
 	ScriptableRenderer *m_renderer;
 
 };
-
 struct CameraData
 {
 	Camera *camera;

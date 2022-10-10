@@ -43,6 +43,8 @@ void Application::Init()
 
 	GameObject *go = World::GetWorld()->CreateGameObject();
 	
+	static_cast<Transformer*>(go->GetComponent<Component::ComponentType::Transformer>())->SetPosition(glm::vec3(2.0f, 2.0f, 2.0f));
+
 	Camera *camera = (Camera*)go->AddComponent<Component::ComponentType::Camera>();
 	camera->m_aspect = (float)Window::cur_window->GetWidth() / (float)Window::cur_window->GetHeight();
 

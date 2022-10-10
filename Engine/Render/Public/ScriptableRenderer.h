@@ -44,4 +44,6 @@ private:
 
 	ScriptableRenderPass *m_drawGuiPass;
 
+	std::vector<RHISemaphore*> m_semaphores;
+
 };

@@ -35,7 +35,9 @@ public:
 
 public:
 
-	static int g_currentFrame;
+	static int g_currentImage;
+
+	static unsigned int g_currentFrame;
 
 private:
 
@@ -58,8 +60,6 @@ private:
 	std::vector<RHIFence*> m_pFences;
 
 	unsigned int m_maxFrame;
-
-	unsigned int m_currentFrame;
 
 	std::vector<Camera*> m_pCameras;
 

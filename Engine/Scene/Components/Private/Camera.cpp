@@ -12,7 +12,8 @@ Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, c
 
 glm::mat4x4 Camera::GetViewMatrix()
 {
-	return static_cast<Transformer*>(m_pGameObject->GetComponent<ComponentType::Transformer>())->GetLocalToWorldMatrix();
+	UpdateViewMatrix();
+	return m_viewMatrix;
 }
 
 glm::mat4x4 Camera::GetProjectionMatrix()
@@ -42,6 +43,11 @@ CameraData* Camera::GetData()
 	data->MatrixVP = data->MatrixP * data->MatrixV;
 
 	return data;
+}
+
+void Camera::UpdateViewMatrix()
+{
+	m_viewMatrix = glm::lookAt(static_cast<Transformer*>(m_pGameObject->GetComponent<ComponentType::Transformer>())->GetPosition(), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void Camera::UpdateProjectionMatrix()

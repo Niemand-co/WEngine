@@ -26,7 +26,7 @@ public:
 
 	virtual void Setup(RHIContext *context, CameraData *cameraData) = 0;
 
-	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence = nullptr) = 0;
+	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore = nullptr, RHISemaphore *signalSemaphore = nullptr, RHIFence *fence = nullptr) = 0;
 
 	virtual RHIGroup* GetResourceGroup();
 

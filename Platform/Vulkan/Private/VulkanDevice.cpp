@@ -118,8 +118,8 @@ namespace Vulkan
 		attachmentDescription.storeOp = WEngine::ToVulkan(descriptor->attachmentStoreOP);
 		attachmentDescription.stencilLoadOp = WEngine::ToVulkan(descriptor->stencilLoadOP);
 		attachmentDescription.stencilStoreOp = WEngine::ToVulkan(descriptor->stencilStoreOP);
-		attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		attachmentDescription.initialLayout = WEngine::ToVulkan(descriptor->initialLayout);
+		attachmentDescription.finalLayout = WEngine::ToVulkan(descriptor->finalLayout);
 
 		VkAttachmentReference attachmentReference = {};
 		attachmentReference.attachment = 0;

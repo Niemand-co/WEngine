@@ -22,6 +22,11 @@ void Transformer::SetPosition(glm::vec3 translate)
 	m_position = translate;
 }
 
+glm::vec3 Transformer::GetPosition()
+{
+	return m_position;
+}
+
 glm::mat4 Transformer::GetLocalToWorldMatrix()
 {
 	m_localToWorldMatrix = glm::mat4(1.0f);

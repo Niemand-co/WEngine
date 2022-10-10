@@ -290,4 +290,31 @@ namespace WEngine
 		}
 	}
 
+	static VkImageLayout ToVulkan(AttachmentLayout layout)
+	{
+		switch (layout)
+		{
+		case AttachmentLayout::Undefined:
+			return VK_IMAGE_LAYOUT_UNDEFINED;
+		case AttachmentLayout::Present:
+			return VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		case AttachmentLayout::BlitSrc:
+			return VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+		case AttachmentLayout::BlitDst:
+			return VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+		case AttachmentLayout::ColorBuffer:
+			return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		case AttachmentLayout::DepthBuffer:
+			return VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
+		case AttachmentLayout::General:
+			return VK_IMAGE_LAYOUT_GENERAL;
+		case AttachmentLayout::ReadOnlyColor:
+			return VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
+		case AttachmentLayout::ReadOnlyDepth:
+			return VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_OPTIMAL;
+		default:
+			RE_ASSERT(false, "Error Type Image Layout.");
+		}
+	}
+
 }

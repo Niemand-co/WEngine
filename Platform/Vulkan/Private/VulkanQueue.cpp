@@ -55,11 +55,11 @@ namespace Vulkan
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 		submitInfo.commandBufferCount = commandbuffers.size();
 		submitInfo.pCommandBuffers = commandbuffers.data();
-		submitInfo.waitSemaphoreCount = 1;
-		submitInfo.pWaitSemaphores = static_cast<VulkanSemaphore*>(waitSemaphore)->GetHandle();
+		submitInfo.waitSemaphoreCount = waitSemaphore == nullptr ? 0 : 1;
+		submitInfo.pWaitSemaphores = waitSemaphore == nullptr ? VK_NULL_HANDLE : static_cast<VulkanSemaphore*>(waitSemaphore)->GetHandle();
 		submitInfo.pWaitDstStageMask = pipelineStateFlags;
-		submitInfo.signalSemaphoreCount = 1;
-		submitInfo.pSignalSemaphores = static_cast<VulkanSemaphore*>(signalSemaphore)->GetHandle();
+		submitInfo.signalSemaphoreCount = signalSemaphore == nullptr ? 0 :1;
+		submitInfo.pSignalSemaphores = signalSemaphore == nullptr ? VK_NULL_HANDLE : static_cast<VulkanSemaphore*>(signalSemaphore)->GetHandle();
 
 		if(fence != nullptr)
 			vkQueueSubmit(*m_queue, 1, &submitInfo, *static_cast<VulkanFence*>(fence)->GetHandle());

@@ -189,6 +189,19 @@ enum class AttachmentStoreOP
 	DontCare,
 };
 
+enum class AttachmentLayout
+{
+	Undefined = 0,
+	Present,
+	BlitSrc,
+	BlitDst,
+	ColorBuffer,
+	DepthBuffer,
+	General,
+	ReadOnlyDepth,
+	ReadOnlyColor,
+};
+
 enum class ResourceType
 {
 	UniformBuffer = 0,

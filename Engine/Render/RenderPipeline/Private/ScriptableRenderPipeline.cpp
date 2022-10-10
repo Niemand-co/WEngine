@@ -1,17 +1,9 @@
 #include "pch.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Render/Public/ScriptableRenderer.h"
-#include "RHI/Public/RHIInstance.h"
+#include "RHI/Public/RHIHeads.h"
 #include "RHI/Public/RHIGPU.h"
-#include "RHI/Public/RHIDevice.h"
-#include "RHI/Public/RHIQueue.h"
-#include "RHI/Public/RHIContext.h"
-#include "RHI/Public/RHITexture.h"
-#include "RHI/Public/RHISemaphore.h"
-#include "RHI/Public/RHIFence.h"
-#include "Render/Descriptor/Public/RHIInstanceDescriptor.h"
-#include "Render/Descriptor/Public/RHIDeviceDescriptor.h"
-#include "Render/Descriptor/Public/RHIQueueDescriptor.h"
+#include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Platform/Vulkan/Public/VulkanInstance.h"
 #include "Utils/Public/Window.h"
 #include "Scene/Public/World.h"
@@ -20,7 +12,8 @@
 
 ScriptableRenderPipeline *ScriptableRenderPipeline::g_instance = nullptr;
 
-int ScriptableRenderPipeline::g_currentFrame = 0;
+int ScriptableRenderPipeline::g_currentImage = 0;
+unsigned int ScriptableRenderPipeline::g_currentFrame = 0;
 
 ScriptableRenderPipeline::ScriptableRenderPipeline()
 {
@@ -72,7 +65,6 @@ void ScriptableRenderPipeline::Init()
 	m_pContext->Init();
 
 	m_maxFrame = 3;
-	m_currentFrame = 0;
 	m_pImageAvailibleSemaphores = m_pDevice->GetSemaphore(m_maxFrame);
 	m_pPresentAVailibleSemaphores = m_pDevice->GetSemaphore(m_maxFrame);
 
@@ -106,29 +98,29 @@ void ScriptableRenderPipeline::Setup()
 
 void ScriptableRenderPipeline::Execute()
 {
-	m_pDevice->WaitForFences(m_pFences[m_currentFrame], 1);
+	m_pDevice->WaitForFences(m_pFences[g_currentFrame], 1);
 
-	g_currentFrame = m_pContext->GetNextImage(m_pImageAvailibleSemaphores[m_currentFrame]);
-	if (g_currentFrame < 0)
+	g_currentImage = m_pContext->GetNextImage(m_pImageAvailibleSemaphores[g_currentFrame]);
+	if (g_currentImage < 0)
 	{
 		m_pInstance->UpdateSurface();
 		m_pContext->RecreateSwapchain();
 		return;
 	}
-	m_pDevice->ResetFences(m_pFences[m_currentFrame], 1);
+	m_pDevice->ResetFences(m_pFences[g_currentFrame], 1);
 
 	for (Camera *camera : m_pCameras)
 	{
-		RenderSingleCamera(camera, m_pContext, m_pImageAvailibleSemaphores[m_currentFrame], m_pPresentAVailibleSemaphores[m_currentFrame], m_pFences[m_currentFrame]);
+		RenderSingleCamera(camera, m_pContext, m_pImageAvailibleSemaphores[g_currentFrame], m_pPresentAVailibleSemaphores[g_currentFrame], m_pFences[g_currentFrame]);
 	}
 
-	if (!m_pContext->Present(g_currentFrame, m_pPresentAVailibleSemaphores[m_currentFrame]))
+	if (!m_pContext->Present(g_currentFrame, m_pPresentAVailibleSemaphores[g_currentFrame]))
 	{
 		m_pInstance->UpdateSurface();
 		m_pContext->RecreateSwapchain();
 	}
 
-	m_currentFrame = (m_currentFrame + 1) % m_maxFrame;
+	g_currentFrame = (g_currentFrame + 1) % m_maxFrame;
 }
 
 ScriptableRenderer* ScriptableRenderPipeline::CreateRenderer()
