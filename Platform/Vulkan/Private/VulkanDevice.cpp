@@ -111,41 +111,48 @@ namespace Vulkan
 
 	RHIRenderPass* VulkanDevice::CreateRenderPass(RHIRenderPassDescriptor* descriptor)
 	{
-		VkAttachmentDescription attachmentDescription = {};
-		attachmentDescription.format = WEngine::ToVulkan(descriptor->attachmentFormat);
-		attachmentDescription.samples = WEngine::ToVulkan(descriptor->sampleCount);
-		attachmentDescription.loadOp = WEngine::ToVulkan(descriptor->attachmentLoadOP);
-		attachmentDescription.storeOp = WEngine::ToVulkan(descriptor->attachmentStoreOP);
-		attachmentDescription.stencilLoadOp = WEngine::ToVulkan(descriptor->stencilLoadOP);
-		attachmentDescription.stencilStoreOp = WEngine::ToVulkan(descriptor->stencilStoreOP);
-		attachmentDescription.initialLayout = WEngine::ToVulkan(descriptor->initialLayout);
-		attachmentDescription.finalLayout = WEngine::ToVulkan(descriptor->finalLayout);
+		VkAttachmentDescription *pAttachmentDescriptions = (VkAttachmentDescription*)WEngine::Allocator::Get()->Allocate(descriptor->attachmentCount * sizeof(VkAttachmentDescription));
+		for (unsigned int i = 0; i < descriptor->attachmentCount; ++i)
+		{
+			RHIAttachmentDescriptor *pAttachmentDescriptor = descriptor->pAttachmentDescriptors + i;
+			pAttachmentDescriptions[i].format = WEngine::ToVulkan(pAttachmentDescriptor->attachmentFormat);
+			pAttachmentDescriptions[i].samples = WEngine::ToVulkan(pAttachmentDescriptor->sampleCount);
+			pAttachmentDescriptions[i].loadOp = WEngine::ToVulkan(pAttachmentDescriptor->attachmentLoadOP);
+			pAttachmentDescriptions[i].storeOp = WEngine::ToVulkan(pAttachmentDescriptor->attachmentStoreOP);
+			pAttachmentDescriptions[i].stencilLoadOp = WEngine::ToVulkan(pAttachmentDescriptor->stencilLoadOP);
+			pAttachmentDescriptions[i].stencilStoreOp = WEngine::ToVulkan(pAttachmentDescriptor->stencilStoreOP);
+			pAttachmentDescriptions[i].initialLayout = WEngine::ToVulkan(pAttachmentDescriptor->initialLayout);
+			pAttachmentDescriptions[i].finalLayout = WEngine::ToVulkan(pAttachmentDescriptor->finalLayout);
+		}
 
-		VkAttachmentReference attachmentReference = {};
-		attachmentReference.attachment = 0;
-		attachmentReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		VkSubpassDescription *pSubpassDescriptions = (VkSubpassDescription*)WEngine::Allocator::Get()->Allocate(descriptor->subpassCount * sizeof(VkSubpassDescription));
+		VkAttachmentReference *pAttachmentReferences = (VkAttachmentReference*)WEngine::Allocator::Get()->Allocate(descriptor->subpassCount * sizeof(VkAttachmentReference));
+		VkSubpassDependency *pSubpassDependencies = (VkSubpassDependency*)WEngine::Allocator::Get()->Allocate(descriptor->subpassCount * sizeof(VkSubpassDependency));
+		for (unsigned int i = 0; i < descriptor->subpassCount; ++i)
+		{
+			RHISubPassDescriptor *pSubpassDescriptor = descriptor->pSubPassDescriptors + i;
+			pAttachmentReferences[i].attachment = pSubpassDescriptor->attachmentIndex;
+			pAttachmentReferences[i].layout = WEngine::ToVulkan(pSubpassDescriptor->attachmentLayout);
+			pSubpassDescriptions[i].pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+			pSubpassDescriptions[i].colorAttachmentCount = 1;
+			pSubpassDescriptions[i].pColorAttachments = &pAttachmentReferences[i];
+			pSubpassDependencies[i].srcSubpass = pSubpassDescriptor->dependedPass > 0 ? pSubpassDescriptor->dependedPass : VK_SUBPASS_EXTERNAL;
+			pSubpassDependencies[i].dstSubpass = i;
+			pSubpassDependencies[i].srcStageMask = pSubpassDescriptor->dependedStage;
+			pSubpassDependencies[i].srcAccessMask = pSubpassDescriptor->dependedAccess;
+			pSubpassDependencies[i].dstStageMask = pSubpassDescriptor->waitingStage;
+			pSubpassDependencies[i].dstAccessMask = pSubpassDescriptor->waitingAccess;
+		}
 
-		VkSubpassDescription subpassDescription = {};
-		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpassDescription.colorAttachmentCount = 1;
-		subpassDescription.pColorAttachments = &attachmentReference;
-
-		VkSubpassDependency subpassDependency = {};
-		subpassDependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-		subpassDependency.dstSubpass = 0;
-		subpassDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		subpassDependency.srcAccessMask = 0;
-		subpassDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		subpassDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
 		VkRenderPassCreateInfo renderPassCreateInfo = {};
 		renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 		renderPassCreateInfo.attachmentCount = descriptor->attachmentCount;
-		renderPassCreateInfo.pAttachments = &attachmentDescription;
-		renderPassCreateInfo.subpassCount = 1;
-		renderPassCreateInfo.pSubpasses = &subpassDescription;
-		renderPassCreateInfo.dependencyCount = 1;
-		renderPassCreateInfo.pDependencies = &subpassDependency;
+		renderPassCreateInfo.pAttachments = pAttachmentDescriptions;
+		renderPassCreateInfo.subpassCount = descriptor->subpassCount;
+		renderPassCreateInfo.pSubpasses = pSubpassDescriptions;
+		renderPassCreateInfo.dependencyCount = descriptor->subpassCount;
+		renderPassCreateInfo.pDependencies = pSubpassDependencies;
 
 		VkRenderPass *pRenderPass = (VkRenderPass*)WEngine::Allocator::Get()->Allocate(sizeof(VkRenderPass));
 		RE_ASSERT(vkCreateRenderPass(*m_pDevice, &renderPassCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pRenderPass) == VK_SUCCESS, "Failed to Create Render Pass.");

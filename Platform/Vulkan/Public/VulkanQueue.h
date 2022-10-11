@@ -18,7 +18,7 @@ namespace Vulkan
 
 		virtual RHICommandPool* GetCommandPool() override;
 
-		virtual void Submit(RHICommandBuffer **cmd, unsigned int count, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence) override;
+		virtual void Submit(RHISubmitDescriptor* descriptor) override;
 
 		virtual bool Present(RHISwapchain *swapchain, unsigned int index, RHISemaphore *semaphore) override;
 

@@ -2,6 +2,7 @@
 #include "Render/Passes/Public/ScriptableRenderPass.h"
 
 class RHIRenderTarget;
+class RHIPipelineStateObject;
 
 class DrawGUIPass : public ScriptableRenderPass
 {
@@ -18,5 +19,7 @@ public:
 private:
 
 	std::vector<RHIRenderTarget*> m_pRenderTargets;
+
+	RHIPipelineStateObject *m_pPSO;
 
 };

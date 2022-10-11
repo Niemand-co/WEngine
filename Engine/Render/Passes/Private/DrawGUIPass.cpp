@@ -3,7 +3,6 @@
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
-#include "RHI/Public/RHIRenderTarget.h"
 #include "RHI/Public/RHIHeads.h"
 #include "Utils/Public/Window.h"
 #include "Utils/ImGui/Public/Gui.h"
@@ -21,19 +20,11 @@ DrawGUIPass::~DrawGUIPass()
 
 void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 {
-	RHIRenderPassDescriptor renderPassDescriptor = {};
+	RHIPipelineStateObjectDescriptor psoDescriptor = {};
 	{
-		renderPassDescriptor.attachmentCount = 1;
-		renderPassDescriptor.attachmentFormat = Format::A16R16G16B16_SFloat;
-		renderPassDescriptor.attachmentLoadOP = AttachmentLoadOP::Load;
-		renderPassDescriptor.attachmentStoreOP = AttachmentStoreOP::Store;
-		renderPassDescriptor.sampleCount = 1;
-		renderPassDescriptor.stencilLoadOP = AttachmentLoadOP::Load;
-		renderPassDescriptor.stencilStoreOP = AttachmentStoreOP::Store;
-		renderPassDescriptor.initialLayout = AttachmentLayout::General;
-		renderPassDescriptor.finalLayout = AttachmentLayout::Present;
+		psoDescriptor.renderPass = m_pRenderPass;
 	}
-	m_pRenderPass = m_pDevice->CreateRenderPass(&renderPassDescriptor);
+	m_pPSO = context->CreatePSO(&psoDescriptor);
 
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
@@ -59,7 +50,16 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	cmd->EndScopePass();
 	context->ExecuteCommandBuffer(cmd);
-	context->Submit(nullptr, nullptr, nullptr);
+	RHISubmitDescriptor submitDescriptor = {};
+	{
+		submitDescriptor.pFence = nullptr;
+		submitDescriptor.waitSemaphoreCount = 0;
+		submitDescriptor.pWaitSemaphores = nullptr;
+		submitDescriptor.signalSemaphoreCount = 0;
+		submitDescriptor.pSignalSemaphores = nullptr;
+		submitDescriptor.waitStage = PIPELINE_STAGE_ALL_COMMANDS;
+	}
+	context->Submit(&submitDescriptor);
 	cmd->~RHICommandBuffer();
 	WEngine::Allocator::Get()->Deallocate(cmd);
 }
@@ -89,7 +89,16 @@ void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHIS
 	}
 	cmd->EndScopePass();
 	context->ExecuteCommandBuffer(cmd);
-	context->Submit(waitSemaphore, signalSemaphore, fence);
+	RHISubmitDescriptor submitDescriptor = {};
+	{
+		submitDescriptor.waitSemaphoreCount = 1;
+		submitDescriptor.pWaitSemaphores = &waitSemaphore;
+		submitDescriptor.signalSemaphoreCount = 1;
+		submitDescriptor.pSignalSemaphores = &signalSemaphore;
+		submitDescriptor.pFence = nullptr;
+		submitDescriptor.waitStage = PIPELINE_STAGE_VERTEX_INPUT;
+	}
+	context->Submit(&submitDescriptor);
 
 	cmd->Clear();
 	cmd->~RHICommandBuffer();

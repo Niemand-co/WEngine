@@ -6,6 +6,7 @@
 #include "Platform/Vulkan/Public/VulkanSemaphore.h"
 #include "Platform/Vulkan/Public/VulkanFence.h"
 #include "Render/Descriptor/Public/RHIQueueDescriptor.h"
+#include "Render/Descriptor/Public/RHISubmitDescriptor.h"
 #include "Utils/Public/Window.h"
 
 namespace Vulkan
@@ -42,27 +43,39 @@ namespace Vulkan
 		return pool;
 	}
 
-	void VulkanQueue::Submit(RHICommandBuffer **cmd, unsigned int count, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence)
+	void VulkanQueue::Submit(RHISubmitDescriptor* descriptor)
 	{
-		std::vector<VkCommandBuffer> commandbuffers(count);
-		for (unsigned int i = 0; i < count; ++i)
+		std::vector<VkCommandBuffer> commandbuffers(descriptor->commandBufferCount);
+		for (unsigned int i = 0; i < descriptor->commandBufferCount; ++i)
 		{
-			commandbuffers[i] = *static_cast<VulkanCommandBuffer*>(cmd[i])->GetHandle();
+			commandbuffers[i] = *static_cast<VulkanCommandBuffer*>(descriptor->pCommandBuffers[i])->GetHandle();
 		}
 
-		VkPipelineStageFlags pipelineStateFlags[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+		std::vector<VkSemaphore> waitSemaphores(descriptor->waitSemaphoreCount);
+		for (unsigned int i = 0; i < descriptor->waitSemaphoreCount; ++i)
+		{
+			waitSemaphores[i] = *static_cast<VulkanSemaphore*>(descriptor->pWaitSemaphores[i])->GetHandle();
+		}
+
+		std::vector<VkSemaphore> signalSemaphores(descriptor->waitSemaphoreCount);
+		for (unsigned int i = 0; i < descriptor->waitSemaphoreCount; ++i)
+		{
+			signalSemaphores[i] = *static_cast<VulkanSemaphore*>(descriptor->pSignalSemaphores[i])->GetHandle();
+		}
+
+		VkPipelineStageFlags pipelineStateFlags[] = { descriptor->waitStage };
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 		submitInfo.commandBufferCount = commandbuffers.size();
 		submitInfo.pCommandBuffers = commandbuffers.data();
-		submitInfo.waitSemaphoreCount = waitSemaphore == nullptr ? 0 : 1;
-		submitInfo.pWaitSemaphores = waitSemaphore == nullptr ? VK_NULL_HANDLE : static_cast<VulkanSemaphore*>(waitSemaphore)->GetHandle();
+		submitInfo.waitSemaphoreCount = waitSemaphores.size();
+		submitInfo.pWaitSemaphores = waitSemaphores.data();
 		submitInfo.pWaitDstStageMask = pipelineStateFlags;
-		submitInfo.signalSemaphoreCount = signalSemaphore == nullptr ? 0 :1;
-		submitInfo.pSignalSemaphores = signalSemaphore == nullptr ? VK_NULL_HANDLE : static_cast<VulkanSemaphore*>(signalSemaphore)->GetHandle();
+		submitInfo.signalSemaphoreCount = signalSemaphores.size();
+		submitInfo.pSignalSemaphores = signalSemaphores.data();
 
-		if(fence != nullptr)
-			vkQueueSubmit(*m_queue, 1, &submitInfo, *static_cast<VulkanFence*>(fence)->GetHandle());
+		if(descriptor->pFence != nullptr)
+			vkQueueSubmit(*m_queue, 1, &submitInfo, *static_cast<VulkanFence*>(descriptor->pFence)->GetHandle());
 		else
 			vkQueueSubmit(*m_queue, 1, &submitInfo, VK_NULL_HANDLE);
 	}

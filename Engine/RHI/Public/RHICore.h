@@ -91,6 +91,7 @@ namespace WEngine
 		default:
 			RE_ASSERT(false, "Error Type Format.");
 		}
+		return VK_FORMAT_MAX_ENUM;
 	}
 
 	static VkColorSpaceKHR ToVulkan(ColorSpace colorSpace)
@@ -102,6 +103,7 @@ namespace WEngine
 		default:
 			RE_ASSERT(false, "Error Type Colorspace.");
 		}
+		return VK_COLOR_SPACE_MAX_ENUM_KHR;
 	}
 
 	static VkPresentModeKHR ToVulkan(PresentMode presentMode)
@@ -119,6 +121,7 @@ namespace WEngine
 		default:
 			RE_ASSERT(false, "Error Type PresentMode.");
 		}
+		return VK_PRESENT_MODE_MAX_ENUM_KHR;
 	}
 
 	static VkImageViewType ToVulkan(Dimension dimension)
@@ -142,6 +145,7 @@ namespace WEngine
 		default:
 			RE_ASSERT(false, "Error Type View Type.");
 		}
+		return VK_IMAGE_VIEW_TYPE_MAX_ENUM;
 	}
 
 	static VkShaderStageFlagBits ToVulkan(ShaderStage stage)
@@ -159,6 +163,7 @@ namespace WEngine
 		default:
 			RE_ASSERT(false, "Error Type Shader Stage.");
 		}
+		return VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM;
 	}
 
 	static VkCompareOp ToVulkan(DepthCompareOP op)
@@ -176,6 +181,7 @@ namespace WEngine
 		default:
 			break;
 		}
+		return VK_COMPARE_OP_MAX_ENUM;
 	}
 
 	static VkBlendFactor ToVulkan(BlendFactor factor)
@@ -201,6 +207,7 @@ namespace WEngine
 		default:
 			RE_ASSERT(false, "Error Type Blend Factor.");
 		}
+		return VK_BLEND_FACTOR_MAX_ENUM;
 	}
 
 	static VkBlendOp ToVulkan(BlendOP op)
@@ -220,6 +227,7 @@ namespace WEngine
 		default:
 			RE_ASSERT(false, "Error Type Blend Operation.");
 		}
+		return VK_BLEND_OP_MAX_ENUM;
 	}
 
 	static VkAttachmentLoadOp ToVulkan(AttachmentLoadOP op)
@@ -235,6 +243,7 @@ namespace WEngine
 		default:
 			RE_ASSERT(false, "Error Type Attachment Load Operation.");
 		}
+		return VK_ATTACHMENT_LOAD_OP_MAX_ENUM;
 	}
 
 	static VkAttachmentStoreOp ToVulkan(AttachmentStoreOP op)
@@ -248,6 +257,7 @@ namespace WEngine
 		default:
 			RE_ASSERT(false, "Error Type Attachment Store Operation.");
 		}
+		return VK_ATTACHMENT_STORE_OP_MAX_ENUM;
 	}
 
 	static VkSampleCountFlagBits ToVulkan(unsigned int sampleCount)
@@ -271,6 +281,7 @@ namespace WEngine
 		default:
 			RE_ASSERT(false, "Error Sample Count.");
 		}
+		return VK_SAMPLE_COUNT_FLAG_BITS_MAX_ENUM;
 	}
 
 	static VkDescriptorType ToVulkan(ResourceType type)
@@ -288,6 +299,7 @@ namespace WEngine
 		default:
 			break;
 		}
+		return VK_DESCRIPTOR_TYPE_MAX_ENUM;
 	}
 
 	static VkImageLayout ToVulkan(AttachmentLayout layout)
@@ -315,6 +327,7 @@ namespace WEngine
 		default:
 			RE_ASSERT(false, "Error Type Image Layout.");
 		}
+		return VK_IMAGE_LAYOUT_MAX_ENUM;
 	}
 
 }

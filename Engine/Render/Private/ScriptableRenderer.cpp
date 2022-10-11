@@ -5,6 +5,7 @@
 #include "Render/Passes/Public/FinalBlitPass.h"
 #include "Render/Passes/Public/DrawGUIPass.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
+#include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "RHI/Public/RHIDevice.h"
 #include "RHI/Public/RHISemaphore.h"
 #include "Scene/Components/Public/Camera.h"
@@ -22,6 +23,25 @@ void ScriptableRenderer::Setup(CameraData* cameraData)
 {
 	RenderPassConfigure configure = {};
 	configure.pDevice = m_pDevice;
+
+	RHIAttachmentDescriptor attachmentDescriptors[] = 
+	{
+		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::General },
+		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::General, AttachmentLayout::Present }
+	};
+	RHISubPassDescriptor subpassDescriptors[] = 
+	{
+		{ 0, AttachmentLayout::ColorBuffer, -1, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_READ, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
+		{ 1, AttachmentLayout::ColorBuffer, 0, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, 0, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE }
+	};
+	RHIRenderPassDescriptor renderPassDescriptor = {};
+	{
+		renderPassDescriptor.attachmentCount = 2;
+		renderPassDescriptor.pAttachmentDescriptors = attachmentDescriptors;
+		renderPassDescriptor.subpassCount = 2;
+		renderPassDescriptor.pSubPassDescriptors = subpassDescriptors;
+	}
+	configure.pRenderPass = m_pDevice->CreateRenderPass(&renderPassDescriptor);
 
 	m_mainLightShadowPass = (MainLightShadowPass*)WEngine::Allocator::Get()->Allocate(sizeof(MainLightShadowPass));
 	::new (m_mainLightShadowPass) MainLightShadowPass(&configure);

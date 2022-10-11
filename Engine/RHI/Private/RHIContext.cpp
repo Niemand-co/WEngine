@@ -96,9 +96,11 @@ void RHIContext::ExecuteCommandBuffer(RHICommandBuffer* cmd)
 	m_pCommandBuffers.push_back(cmd);
 }
 
-void RHIContext::Submit(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence* fence)
+void RHIContext::Submit(RHISubmitDescriptor* descriptor)
 {
-	m_pQueue->Submit(m_pCommandBuffers.data(), m_pCommandBuffers.size(), waitSemaphore, signalSemaphore, fence);
+	descriptor->commandBufferCount = m_pCommandBuffers.size();
+	descriptor->pCommandBuffers = m_pCommandBuffers.data();
+	m_pQueue->Submit(descriptor);
 	m_pCommandBuffers.clear();
 }
 

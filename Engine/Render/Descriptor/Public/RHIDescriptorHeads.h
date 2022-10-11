@@ -23,3 +23,6 @@
 #include "Render/Descriptor/Public/RHIVertexInputDescriptor.h"
 #include "Render/Descriptor/Public/RHIPipelineResourceLayoutDescriptor.h"
 #include "Render/Descriptor/Public/RHIUpdateResourceDescriptor.h"
+#include "Render/Descriptor/Public/RHISubmitDescriptor.h"
+#include "Render/Descriptor/Public/RHIAttachmentDescriptor.h"
+#include "Render/Descriptor/Public/RHISubPassDescriptor.h"

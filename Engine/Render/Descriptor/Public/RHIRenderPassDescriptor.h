@@ -1,5 +1,8 @@
 #pragma once
 
+class RHIAttachmentDescriptor;
+class RHISubPassDescriptor;
+
 class RHIRenderPassDescriptor
 {
 public:
@@ -12,20 +15,10 @@ public:
 
 	unsigned int attachmentCount;
 
-	Format attachmentFormat;
+	RHIAttachmentDescriptor *pAttachmentDescriptors;
 
-	unsigned int sampleCount;
+	unsigned int subpassCount;
 
-	AttachmentLoadOP attachmentLoadOP;
-
-	AttachmentStoreOP attachmentStoreOP;
-
-	AttachmentLoadOP stencilLoadOP;
-
-	AttachmentStoreOP stencilStoreOP;
-
-	AttachmentLayout initialLayout;
-
-	AttachmentLayout finalLayout;
+	RHISubPassDescriptor *pSubPassDescriptors;
 
 };

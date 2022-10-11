@@ -41,20 +41,6 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 	RHIShader* fragShader = m_pDevice->CreateShader(&fragShaderDescriptor);
 
-	RHIRenderPassDescriptor renderPassDescriptor = {};
-	{
-		renderPassDescriptor.attachmentCount = 1;
-		renderPassDescriptor.attachmentFormat = Format::A16R16G16B16_SFloat;
-		renderPassDescriptor.attachmentLoadOP = AttachmentLoadOP::Clear;
-		renderPassDescriptor.attachmentStoreOP = AttachmentStoreOP::Store;
-		renderPassDescriptor.stencilLoadOP = AttachmentLoadOP::Clear;
-		renderPassDescriptor.stencilStoreOP = AttachmentStoreOP::Store;
-		renderPassDescriptor.sampleCount = 1;
-		renderPassDescriptor.initialLayout = AttachmentLayout::Undefined;
-		renderPassDescriptor.finalLayout = AttachmentLayout::General;
-	}
-	m_pRenderPass = m_pDevice->CreateRenderPass(&renderPassDescriptor);
-
 	std::vector<RHIShader*> shaders = { vertShader, fragShader };
 	RHIBlendDescriptor blendDescriptor = {};
 	{
@@ -212,7 +198,16 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 		encoder->EndPass();
 		cmd->EndScopePass();
 		context->ExecuteCommandBuffer(cmd);
-		context->Submit(waitSemaphore, signalSemaphore, fence);
+		RHISubmitDescriptor submitDescriptor = {};
+		{
+			submitDescriptor.waitSemaphoreCount = 1;
+			submitDescriptor.pWaitSemaphores = &waitSemaphore;
+			submitDescriptor.signalSemaphoreCount = 1;
+			submitDescriptor.pSignalSemaphores = &signalSemaphore;
+			submitDescriptor.waitStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
+			submitDescriptor.pFence = fence;
+		}
+		context->Submit(&submitDescriptor);
 		encoder->~RHIGraphicsEncoder();
 		WEngine::Allocator::Get()->Deallocate(encoder);
 	}

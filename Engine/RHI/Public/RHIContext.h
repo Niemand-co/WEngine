@@ -22,6 +22,7 @@ class RHIGroupDescriptor;
 class RHIUpdateResourceDescriptor;
 class RHIPipelineResourceLayoutDescriptor;
 class RHIPipelineStateObjectDescriptor;
+class RHISubmitDescriptor;
 
 class RHIContext : public RenderContext
 {
@@ -43,7 +44,7 @@ public:
 
 	virtual void ExecuteCommandBuffer(RHICommandBuffer *cmd);
 
-	virtual void Submit(RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence* fence);
+	virtual void Submit(RHISubmitDescriptor *descriptor);
 
 	virtual bool Present(unsigned int imageIndex, RHISemaphore *semaphore);
 
