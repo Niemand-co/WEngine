@@ -20,12 +20,6 @@ DrawGUIPass::~DrawGUIPass()
 
 void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 {
-	RHIPipelineStateObjectDescriptor psoDescriptor = {};
-	{
-		psoDescriptor.renderPass = m_pRenderPass;
-	}
-	m_pPSO = context->CreatePSO(&psoDescriptor);
-
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
@@ -68,6 +62,7 @@ void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHIS
 {
 
 	RHICommandBuffer* cmd = context->GetCommandBuffer();
+	cmd->Clear();
 
 	cmd->BeginScopePass("GUI");
 	{
@@ -86,6 +81,8 @@ void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHIS
 		ImDrawData* data = ImGui::GetDrawData();
 		ImGui_ImplVulkan_RenderDrawData(data, *static_cast<Vulkan::VulkanCommandBuffer*>(cmd)->GetHandle(), nullptr);
 		encoder->EndPass();
+		encoder->~RHIGraphicsEncoder();
+		WEngine::Allocator::Get()->Deallocate(encoder);
 	}
 	cmd->EndScopePass();
 	context->ExecuteCommandBuffer(cmd);
@@ -95,8 +92,8 @@ void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHIS
 		submitDescriptor.pWaitSemaphores = &waitSemaphore;
 		submitDescriptor.signalSemaphoreCount = 1;
 		submitDescriptor.pSignalSemaphores = &signalSemaphore;
-		submitDescriptor.pFence = nullptr;
-		submitDescriptor.waitStage = PIPELINE_STAGE_VERTEX_INPUT;
+		submitDescriptor.pFence = fence;
+		submitDescriptor.waitStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
 	}
 	context->Submit(&submitDescriptor);
 

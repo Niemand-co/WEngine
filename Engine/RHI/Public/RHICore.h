@@ -88,6 +88,8 @@ namespace WEngine
 			return VK_FORMAT_R32G32B32A32_SINT;
 		case Format::A32R32G32B32_UInt:
 			return VK_FORMAT_R32G32B32A32_UINT;
+		case Format::D32_SFloat:
+			return VK_FORMAT_D32_SFLOAT;
 		default:
 			RE_ASSERT(false, "Error Type Format.");
 		}
@@ -314,6 +316,8 @@ namespace WEngine
 			return VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
 		case AttachmentLayout::BlitDst:
 			return VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+		case AttachmentLayout::Attachment:
+			return VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
 		case AttachmentLayout::ColorBuffer:
 			return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		case AttachmentLayout::DepthBuffer:

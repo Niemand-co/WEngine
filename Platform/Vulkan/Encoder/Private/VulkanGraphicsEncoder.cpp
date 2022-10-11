@@ -87,7 +87,7 @@ namespace Vulkan
 	}
 
 	void VulkanGraphicsEncoder::EndPass()
-	{
+	{	
 		vkCmdEndRenderPass(*m_cmd);
 	}
 

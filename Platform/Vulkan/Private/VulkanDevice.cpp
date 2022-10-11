@@ -115,6 +115,7 @@ namespace Vulkan
 		for (unsigned int i = 0; i < descriptor->attachmentCount; ++i)
 		{
 			RHIAttachmentDescriptor *pAttachmentDescriptor = descriptor->pAttachmentDescriptors + i;
+			::new (pAttachmentDescriptions + i) VkAttachmentDescription();
 			pAttachmentDescriptions[i].format = WEngine::ToVulkan(pAttachmentDescriptor->attachmentFormat);
 			pAttachmentDescriptions[i].samples = WEngine::ToVulkan(pAttachmentDescriptor->sampleCount);
 			pAttachmentDescriptions[i].loadOp = WEngine::ToVulkan(pAttachmentDescriptor->attachmentLoadOP);
@@ -131,12 +132,15 @@ namespace Vulkan
 		for (unsigned int i = 0; i < descriptor->subpassCount; ++i)
 		{
 			RHISubPassDescriptor *pSubpassDescriptor = descriptor->pSubPassDescriptors + i;
+			::new (pAttachmentReferences + i) VkAttachmentReference();
 			pAttachmentReferences[i].attachment = pSubpassDescriptor->attachmentIndex;
 			pAttachmentReferences[i].layout = WEngine::ToVulkan(pSubpassDescriptor->attachmentLayout);
+			::new (pSubpassDescriptions + i) VkSubpassDescription();
 			pSubpassDescriptions[i].pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 			pSubpassDescriptions[i].colorAttachmentCount = 1;
 			pSubpassDescriptions[i].pColorAttachments = &pAttachmentReferences[i];
-			pSubpassDependencies[i].srcSubpass = pSubpassDescriptor->dependedPass > 0 ? pSubpassDescriptor->dependedPass : VK_SUBPASS_EXTERNAL;
+			::new (pSubpassDependencies + i) VkSubpassDependency();
+			pSubpassDependencies[i].srcSubpass = pSubpassDescriptor->dependedPass >= 0 ? pSubpassDescriptor->dependedPass : VK_SUBPASS_EXTERNAL;
 			pSubpassDependencies[i].dstSubpass = i;
 			pSubpassDependencies[i].srcStageMask = pSubpassDescriptor->dependedStage;
 			pSubpassDependencies[i].srcAccessMask = pSubpassDescriptor->dependedAccess;
@@ -155,7 +159,7 @@ namespace Vulkan
 		renderPassCreateInfo.pDependencies = pSubpassDependencies;
 
 		VkRenderPass *pRenderPass = (VkRenderPass*)WEngine::Allocator::Get()->Allocate(sizeof(VkRenderPass));
-		RE_ASSERT(vkCreateRenderPass(*m_pDevice, &renderPassCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pRenderPass) == VK_SUCCESS, "Failed to Create Render Pass.");
+   		RE_ASSERT(vkCreateRenderPass(*m_pDevice, &renderPassCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pRenderPass) == VK_SUCCESS, "Failed to Create Render Pass.");
 
 		RHIRenderPass *renderPass = (RHIRenderPass*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanRenderPass));
 		::new (renderPass) VulkanRenderPass(pRenderPass);

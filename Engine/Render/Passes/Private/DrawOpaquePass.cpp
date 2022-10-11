@@ -178,6 +178,7 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 	}
 
 	RHICommandBuffer* cmd = context->GetCommandBuffer();
+	cmd->Clear();
 
 	cmd->BeginScopePass("Test");
 	{
@@ -196,21 +197,21 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 		encoder->BindGroups(1, m_pGroup, m_pPipelineResourceLayout);
 		encoder->DrawIndexed(m_pMesh->m_indexCount, 0);
 		encoder->EndPass();
-		cmd->EndScopePass();
-		context->ExecuteCommandBuffer(cmd);
-		RHISubmitDescriptor submitDescriptor = {};
-		{
-			submitDescriptor.waitSemaphoreCount = 1;
-			submitDescriptor.pWaitSemaphores = &waitSemaphore;
-			submitDescriptor.signalSemaphoreCount = 1;
-			submitDescriptor.pSignalSemaphores = &signalSemaphore;
-			submitDescriptor.waitStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-			submitDescriptor.pFence = fence;
-		}
-		context->Submit(&submitDescriptor);
 		encoder->~RHIGraphicsEncoder();
 		WEngine::Allocator::Get()->Deallocate(encoder);
 	}
+	cmd->EndScopePass();
+	context->ExecuteCommandBuffer(cmd);
+	RHISubmitDescriptor submitDescriptor = {};
+	{
+		submitDescriptor.waitSemaphoreCount = 1;
+		submitDescriptor.pWaitSemaphores = &waitSemaphore;
+		submitDescriptor.signalSemaphoreCount = 1;
+		submitDescriptor.pSignalSemaphores = &signalSemaphore;
+		submitDescriptor.waitStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
+		submitDescriptor.pFence = fence;
+	}
+	context->Submit(&submitDescriptor);
 	cmd->Clear();
 
 	cmd->~RHICommandBuffer();

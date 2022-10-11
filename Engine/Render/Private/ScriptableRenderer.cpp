@@ -26,12 +26,13 @@ void ScriptableRenderer::Setup(CameraData* cameraData)
 
 	RHIAttachmentDescriptor attachmentDescriptors[] = 
 	{
-		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::General },
-		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::General, AttachmentLayout::Present }
+		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::DontCare, AttachmentLayout::Undefined, AttachmentLayout::ColorBuffer },
+		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::ColorBuffer },
+		//{ Format::D32_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer }
 	};
 	RHISubPassDescriptor subpassDescriptors[] = 
 	{
-		{ 0, AttachmentLayout::ColorBuffer, -1, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_READ, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
+		{ 0, AttachmentLayout::ColorBuffer, -1, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, 0, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
 		{ 1, AttachmentLayout::ColorBuffer, 0, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, 0, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE }
 	};
 	RHIRenderPassDescriptor renderPassDescriptor = {};
