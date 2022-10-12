@@ -14,6 +14,6 @@ void FinalBlitPass::Setup(RHIContext *context, CameraData *cameraData)
 {
 }
 
-void FinalBlitPass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence)
+void FinalBlitPass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence, RHIEvent* pEvent)
 {
 }

@@ -5,6 +5,7 @@ class RHIDevice;
 class RHIQueue;
 class RHISwapchain;
 class RHISurface;
+class RHITexture;
 class RHITextureView;
 class RHICommandPool;
 class RHICommandBuffer;
@@ -35,6 +36,8 @@ public:
 	void Init();
 
 	virtual void RecreateSwapchain();
+
+	virtual RHITexture* GetTexture(unsigned int index);
 
 	virtual RHITextureView* GetTextureView(unsigned int index);
 

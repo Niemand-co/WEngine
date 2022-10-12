@@ -12,9 +12,9 @@ public:
 
 	virtual ~DrawGUIPass();
 
-	virtual void Setup(RHIContext *context, CameraData *cameraData);
+	virtual void Setup(RHIContext *context, CameraData *cameraData) override;
 
-	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence = nullptr);
+	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence = nullptr, RHIEvent* pEvent = nullptr) override;
 
 private:
 

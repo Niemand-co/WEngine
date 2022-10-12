@@ -9,6 +9,8 @@ class RHIScissor;
 class RHIBuffer;
 class RHIGroup;
 class RHIPipelineResourceLayout;
+class RHITexture;
+class RHIEvent;
 
 class RHIRenderPassBeginDescriptor;
 
@@ -37,6 +39,10 @@ public:
 	virtual void DrawVertexArray() = 0;
 
 	virtual void DrawIndexed(unsigned int indexeCount, unsigned int firstIndex, unsigned int instanceCount = 1, unsigned int firstInstance = 0) = 0;
+
+	virtual void ResourceBarrier(RHITexture *pTexture) = 0;
+
+	virtual void SetEvent(RHIEvent *pEvent) = 0;
 
 	virtual void NextSubpass() = 0;
 

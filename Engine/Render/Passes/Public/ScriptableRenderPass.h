@@ -7,6 +7,7 @@ class RHIRenderPass;
 class RHIGroup;
 class RHISemaphore;
 class RHIFence;
+class RHIEvent;
 struct CameraData;
 
 struct RenderPassConfigure
@@ -26,7 +27,7 @@ public:
 
 	virtual void Setup(RHIContext *context, CameraData *cameraData) = 0;
 
-	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore = nullptr, RHISemaphore *signalSemaphore = nullptr, RHIFence *fence = nullptr) = 0;
+	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore = nullptr, RHISemaphore *signalSemaphore = nullptr, RHIFence *fence = nullptr, RHIEvent *pEvent = nullptr) = 0;
 
 	virtual RHIGroup* GetResourceGroup();
 

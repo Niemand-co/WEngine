@@ -93,6 +93,22 @@ namespace Vulkan
 		return fences;
 	}
 
+	RHIEvent* VulkanDevice::GetEvent()
+	{
+		VkEventCreateInfo eventCreateInfo = {};
+		{
+			eventCreateInfo.sType = VK_STRUCTURE_TYPE_EVENT_CREATE_INFO;
+		}
+
+		VkEvent* pEvent = (VkEvent*)WEngine::Allocator::Get()->Allocate(sizeof(VkEvent));
+		vkCreateEvent(*m_pDevice, &eventCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pEvent);
+		
+		RHIEvent *event = (RHIEvent*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanEvent));
+		::new (event) VulkanEvent(pEvent);
+
+		return event;
+	}
+
 	RHIShader* VulkanDevice::CreateShader(RHIShaderDescriptor *descriptor)
 	{
 		VkShaderModuleCreateInfo shaderModuleCreateInfo = {};

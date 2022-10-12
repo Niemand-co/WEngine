@@ -9,6 +9,7 @@
 #include "Render/Mesh/Public/Mesh.h"
 #include "Render/Mesh/Public/Vertex.h"
 #include "Scene/Components/Public/Camera.h"
+#include "Platform/Vulkan/Public/VulkanDevice.h"
 
 DrawOpaquePass::DrawOpaquePass(RenderPassConfigure* configure)
 	: ScriptableRenderPass(configure)
@@ -172,7 +173,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 }
 
-void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence)
+void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence, RHIEvent* pEvent)
 {
 	if (context->IsDisplayChanged())
 	{
@@ -212,6 +213,7 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 		encoder->BindIndexBuffer(m_pIndexBuffer);
 		encoder->BindGroups(1, m_pGroup, m_pPipelineResourceLayout);
 		encoder->DrawIndexed(m_pMesh->m_indexCount, 0);
+		encoder->SetEvent(pEvent);
 		encoder->EndPass();
 		encoder->~RHIGraphicsEncoder();
 		WEngine::Allocator::Get()->Deallocate(encoder);
@@ -220,9 +222,9 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 	context->ExecuteCommandBuffer(cmd);
 	RHISubmitDescriptor submitDescriptor = {};
 	{
-		submitDescriptor.waitSemaphoreCount = 1;
+		submitDescriptor.waitSemaphoreCount = 0;
 		submitDescriptor.pWaitSemaphores = &waitSemaphore;
-		submitDescriptor.signalSemaphoreCount = 1;
+		submitDescriptor.signalSemaphoreCount = 0;
 		submitDescriptor.pSignalSemaphores = &signalSemaphore;
 		submitDescriptor.waitStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
 		submitDescriptor.pFence = fence;

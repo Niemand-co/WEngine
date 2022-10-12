@@ -26,6 +26,8 @@ namespace Vulkan
 
 		virtual std::vector<RHIFence*> CreateFence(unsigned int count) override;
 
+		virtual RHIEvent* GetEvent() override;
+
 		virtual RHIShader* CreateShader(RHIShaderDescriptor *descriptor) override;
 
 		virtual RHIRenderPass* CreateRenderPass(RHIRenderPassDescriptor *descriptor) override;

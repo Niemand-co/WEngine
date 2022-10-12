@@ -85,6 +85,11 @@ void RHIContext::RecreateSwapchain()
 	m_isDisplayChagned = true;
 }
 
+RHITexture* RHIContext::GetTexture(unsigned int index)
+{
+	return m_pSwapchain->GetTexture(index);
+}
+
 RHITextureView* RHIContext::GetTextureView(unsigned int index)
 {
 	return m_pTextureViews[index];

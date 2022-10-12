@@ -20,3 +20,4 @@
 #include "Platform/Vulkan/Public/VulkanSwapchain.h"
 #include "Platform/Vulkan/Public/VulkanTexture.h"
 #include "Platform/Vulkan/Public/VulkanTextureView.h"
+#include "Platform/Vulkan/Public/VulkanEvent.h"

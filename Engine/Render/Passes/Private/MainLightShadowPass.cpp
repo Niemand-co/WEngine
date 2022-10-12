@@ -14,6 +14,6 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 {
 }
 
-void MainLightShadowPass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence)
+void MainLightShadowPass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence, RHIEvent* pEvent)
 {
 }

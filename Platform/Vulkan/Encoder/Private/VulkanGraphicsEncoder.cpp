@@ -100,6 +100,25 @@ namespace Vulkan
 		vkCmdDrawIndexed(*m_cmd, indexeCount, instanceCount, firstIndex, 0, firstInstance);
 	}
 
+	void VulkanGraphicsEncoder::ResourceBarrier(RHITexture *pTexture)
+	{
+		VkImageMemoryBarrier imageMemoryBarrier = {};
+		{
+			imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			imageMemoryBarrier.image = *static_cast<VulkanTexture*>(pTexture)->GetHandle();
+			imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		}
+		vkCmdPipelineBarrier(*m_cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VkDependencyFlagBits(), 0, nullptr, 0, nullptr, 0, &imageMemoryBarrier);
+	}
+
+	void VulkanGraphicsEncoder::SetEvent(RHIEvent* pEvent)
+	{
+		vkCmdSetEvent(*m_cmd, *static_cast<VulkanEvent*>(pEvent)->GetHandle(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
+	}
+
 	void VulkanGraphicsEncoder::NextSubpass()
 	{
 		vkCmdNextSubpass(*m_cmd, VK_SUBPASS_CONTENTS_INLINE);

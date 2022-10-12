@@ -10,6 +10,7 @@ class RHITexture;
 class RHIRenderTarget;
 class RHISemaphore;
 class RHIFence;
+class RHIEvent;
 class RHIBuffer;
 class RHIGroup;
 class RHIGroupLayout;
@@ -42,6 +43,8 @@ public:
 	virtual RHISwapchain* CreateSwapchain(RHISwapchainDescriptor *descriptor) = 0;
 
 	virtual std::vector<RHIFence*> CreateFence(unsigned int count) = 0;
+
+	virtual RHIEvent* GetEvent() = 0;
 
 	virtual RHIShader* CreateShader(RHIShaderDescriptor *descriptor) = 0;
 

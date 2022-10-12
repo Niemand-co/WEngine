@@ -8,6 +8,7 @@
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "RHI/Public/RHIDevice.h"
 #include "RHI/Public/RHISemaphore.h"
+#include "RHI/Public/RHIEvent.h"
 #include "Scene/Components/Public/Camera.h"
 
 ScriptableRenderer::ScriptableRenderer(RendererConfigure *pConfigure)
@@ -41,15 +42,17 @@ void ScriptableRenderer::Setup(CameraData* cameraData)
 	m_drawGuiPass->Setup(m_pContext, cameraData);
 
 	m_semaphores = m_pDevice->GetSemaphore(3);
+
+	m_pEvent = m_pDevice->GetEvent();
 }
 
 void ScriptableRenderer::Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence)
 {
 	m_mainLightShadowPass->Execute(context, waitSemaphore, signalSemaphore);
 
-	//m_drawOpaquePass->Execute(context, waitSemaphore, signalSemaphore, fence);
+	m_drawOpaquePass->Execute(context, waitSemaphore, m_semaphores[ScriptableRenderPipeline::g_currentFrame], fence, m_pEvent);
 
-	m_drawGuiPass->Execute(context, waitSemaphore, signalSemaphore, fence);
+	m_drawGuiPass->Execute(context, m_semaphores[ScriptableRenderPipeline::g_currentFrame], signalSemaphore, nullptr, m_pEvent);
 
 	m_finalBlitPass->Execute(context, waitSemaphore, signalSemaphore);
 }

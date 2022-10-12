@@ -7,6 +7,7 @@
 #include "Utils/Public/Window.h"
 #include "Utils/ImGui/Public/Gui.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
+#include "Platform/Vulkan/Public/VulkanEvent.h"
 
 DrawGUIPass::DrawGUIPass(RenderPassConfigure *pConfigure)
 	: ScriptableRenderPass(pConfigure)
@@ -22,7 +23,7 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 {
 	RHIAttachmentDescriptor attachmentDescriptors[] =
 	{
-		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::Present },
+		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::ColorBuffer, AttachmentLayout::Present },
 	};
 	RHISubPassDescriptor subpassDescriptors[] =
 	{
@@ -75,7 +76,7 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 	WEngine::Allocator::Get()->Deallocate(cmd);
 }
 
-void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence* fence)
+void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence* fence, RHIEvent* pEvent)
 {
 	RHICommandBuffer* cmd = context->GetCommandBuffer();
 
@@ -88,13 +89,14 @@ void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHIS
 			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[ScriptableRenderPipeline::g_currentImage];
 		}
 		encoder->BeginPass(&renderPassBeginDescriptor);
-		//ImGui_ImplVulkan_NewFrame();
-		//ImGui_ImplGlfw_NewFrame();
-		//ImGui::NewFrame();
-		//ImGui::ShowDemoWindow();
-		//ImGui::Render();
-		//ImDrawData* data = ImGui::GetDrawData();
-		//ImGui_ImplVulkan_RenderDrawData(data, *static_cast<Vulkan::VulkanCommandBuffer*>(cmd)->GetHandle(), nullptr);
+		ImGui_ImplVulkan_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		ImGui::ShowDemoWindow();
+		ImGui::Render();
+		ImDrawData* data = ImGui::GetDrawData();
+		vkCmdWaitEvents(*static_cast<Vulkan::VulkanCommandBuffer*>(cmd)->GetHandle(), 1, static_cast<VulkanEvent*>(pEvent)->GetHandle(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, nullptr, 0, nullptr, 0, nullptr);
+		ImGui_ImplVulkan_RenderDrawData(data, *static_cast<Vulkan::VulkanCommandBuffer*>(cmd)->GetHandle(), nullptr);
 		encoder->EndPass();
 		encoder->~RHIGraphicsEncoder();
 		WEngine::Allocator::Get()->Deallocate(encoder);

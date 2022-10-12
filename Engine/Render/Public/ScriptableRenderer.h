@@ -6,6 +6,7 @@ class RHIDevice;
 class RHIContext;
 class RHISemaphore;
 class RHIFence;
+class RHIEvent;
 struct CameraData;
 
 struct RendererConfigure
@@ -45,5 +46,7 @@ private:
 	ScriptableRenderPass *m_drawGuiPass;
 
 	std::vector<RHISemaphore*> m_semaphores;
+
+	RHIEvent * m_pEvent;
 
 };
