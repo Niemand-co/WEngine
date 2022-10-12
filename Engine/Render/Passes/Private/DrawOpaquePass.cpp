@@ -21,6 +21,23 @@ DrawOpaquePass::~DrawOpaquePass()
 
 void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 {
+	RHIAttachmentDescriptor attachmentDescriptors[] =
+	{
+		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::ColorBuffer },
+	};
+	RHISubPassDescriptor subpassDescriptors[] =
+	{
+		{ 0, AttachmentLayout::ColorBuffer, -1, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, 0, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
+	};
+	RHIRenderPassDescriptor renderPassDescriptor = {};
+	{
+		renderPassDescriptor.attachmentCount = 1;
+		renderPassDescriptor.pAttachmentDescriptors = attachmentDescriptors;
+		renderPassDescriptor.subpassCount = 1;
+		renderPassDescriptor.pSubPassDescriptors = subpassDescriptors;
+	}
+	m_pRenderPass = m_pDevice->CreateRenderPass(&renderPassDescriptor);
+
 	ShaderCodeBlob* vertBlob = new ShaderCodeBlob("../assets/vert.spv");
 	RHIShaderDescriptor vertShaderDescriptor = {};
 	{
@@ -178,7 +195,6 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 	}
 
 	RHICommandBuffer* cmd = context->GetCommandBuffer();
-	cmd->Clear();
 
 	cmd->BeginScopePass("Test");
 	{

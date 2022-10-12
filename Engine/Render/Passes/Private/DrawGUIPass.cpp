@@ -20,6 +20,23 @@ DrawGUIPass::~DrawGUIPass()
 
 void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 {
+	RHIAttachmentDescriptor attachmentDescriptors[] =
+	{
+		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::Present },
+	};
+	RHISubPassDescriptor subpassDescriptors[] =
+	{
+		{ 0, AttachmentLayout::ColorBuffer, -1, PIPELINE_STAGE_BOTTOM_OF_PIPE, 0, PIPELINE_STAGE_TOP_OF_PIPE, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
+	};
+	RHIRenderPassDescriptor renderPassDescriptor = {};
+	{
+		renderPassDescriptor.attachmentCount = 1;
+		renderPassDescriptor.pAttachmentDescriptors = attachmentDescriptors;
+		renderPassDescriptor.subpassCount = 1;
+		renderPassDescriptor.pSubPassDescriptors = subpassDescriptors;
+	}
+	m_pRenderPass = m_pDevice->CreateRenderPass(&renderPassDescriptor);
+
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
@@ -60,9 +77,7 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 
 void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence* fence)
 {
-
 	RHICommandBuffer* cmd = context->GetCommandBuffer();
-	cmd->Clear();
 
 	cmd->BeginScopePass("GUI");
 	{
@@ -73,13 +88,13 @@ void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHIS
 			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[ScriptableRenderPipeline::g_currentImage];
 		}
 		encoder->BeginPass(&renderPassBeginDescriptor);
-		ImGui_ImplVulkan_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-		ImGui::ShowDemoWindow();
-		ImGui::Render();
-		ImDrawData* data = ImGui::GetDrawData();
-		ImGui_ImplVulkan_RenderDrawData(data, *static_cast<Vulkan::VulkanCommandBuffer*>(cmd)->GetHandle(), nullptr);
+		//ImGui_ImplVulkan_NewFrame();
+		//ImGui_ImplGlfw_NewFrame();
+		//ImGui::NewFrame();
+		//ImGui::ShowDemoWindow();
+		//ImGui::Render();
+		//ImDrawData* data = ImGui::GetDrawData();
+		//ImGui_ImplVulkan_RenderDrawData(data, *static_cast<Vulkan::VulkanCommandBuffer*>(cmd)->GetHandle(), nullptr);
 		encoder->EndPass();
 		encoder->~RHIGraphicsEncoder();
 		WEngine::Allocator::Get()->Deallocate(encoder);

@@ -14,7 +14,7 @@ namespace Vulkan
 
 		virtual void Init(GuiConfigure* pConfigure) override;
 
-		virtual void BindRenderPass(RHIRenderPass *pRenderPass) override;
+		virtual void BindRenderPass(RHIRenderPass *pRenderPass, unsigned int subpass) override;
 
 	private:
 

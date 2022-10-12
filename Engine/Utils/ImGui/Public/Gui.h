@@ -24,7 +24,7 @@ public:
 
 	virtual void Init(GuiConfigure *pConfigure) = 0;
 
-	virtual void BindRenderPass(RHIRenderPass *pRenderPass) = 0;
+	virtual void BindRenderPass(RHIRenderPass *pRenderPass, unsigned int subpass = 0) = 0;
 
 	static Gui* CreateGui(WEngine::Backend backend);
 

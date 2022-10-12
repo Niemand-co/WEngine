@@ -26,7 +26,7 @@ public:
 
 	virtual void SetScissor(RHIScissor* scissor) = 0;
 
-	virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, Vector4 clearColor, float clearDepth = 0.0f) = 0;
+	virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth = 0.0f) = 0;
 
 	virtual void BindVertexBuffer(RHIBuffer *pBuffer) = 0;
 
@@ -37,6 +37,8 @@ public:
 	virtual void DrawVertexArray() = 0;
 
 	virtual void DrawIndexed(unsigned int indexeCount, unsigned int firstIndex, unsigned int instanceCount = 1, unsigned int firstInstance = 0) = 0;
+
+	virtual void NextSubpass() = 0;
 
 	virtual void EndPass() = 0;
 

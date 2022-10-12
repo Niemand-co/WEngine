@@ -56,8 +56,22 @@ namespace Vulkan
 		vkCmdSetScissor(*m_cmd, 0, 1, &rect);
 	}
 
-	void VulkanGraphicsEncoder::ClearRenderTarget(bool isClearColor, bool isClearDepth, Vector4 clearColor, float clearDepth)
+	void VulkanGraphicsEncoder::ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth)
 	{
+		VkClearAttachment clearAttachment = {};
+		{
+			clearAttachment.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT | VK_IMAGE_ASPECT_DEPTH_BIT;
+			clearAttachment.colorAttachment = 0;
+			clearAttachment.clearValue.color = { clearColor.x, clearColor.y, clearColor.z, clearColor.w };
+			clearAttachment.clearValue.depthStencil.depth = clearDepth;
+		}
+		VkClearRect clearRect = {};
+		{
+			clearRect.rect = { 1920, 1080 };
+			clearRect.baseArrayLayer = 0;
+			clearRect.layerCount = 1;
+		}
+		vkCmdClearAttachments(*m_cmd, 1, &clearAttachment, 1, &clearRect);
 	}
 
 	void VulkanGraphicsEncoder::BindVertexBuffer(RHIBuffer* pBuffer)
@@ -84,6 +98,11 @@ namespace Vulkan
 	void VulkanGraphicsEncoder::DrawIndexed(unsigned int indexeCount, unsigned int firstIndex, unsigned int instanceCount, unsigned int firstInstance)
 	{
 		vkCmdDrawIndexed(*m_cmd, indexeCount, instanceCount, firstIndex, 0, firstInstance);
+	}
+
+	void VulkanGraphicsEncoder::NextSubpass()
+	{
+		vkCmdNextSubpass(*m_cmd, VK_SUBPASS_CONTENTS_INLINE);
 	}
 
 	void VulkanGraphicsEncoder::EndPass()

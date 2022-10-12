@@ -148,7 +148,6 @@ namespace Vulkan
 			pSubpassDependencies[i].dstAccessMask = pSubpassDescriptor->waitingAccess;
 		}
 
-
 		VkRenderPassCreateInfo renderPassCreateInfo = {};
 		renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 		renderPassCreateInfo.attachmentCount = descriptor->attachmentCount;
@@ -328,13 +327,20 @@ namespace Vulkan
 		imageCreateInfo.extent = { descriptor->width, descriptor->height };
 		imageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
 		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-		imageCreateInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+		imageCreateInfo.usage = descriptor->usage;
+		imageCreateInfo.arrayLayers = 1;
+		imageCreateInfo.initialLayout = WEngine::ToVulkan(descriptor->layout);
+		imageCreateInfo.mipLevels = descriptor->mipCount;
+		imageCreateInfo.samples = WEngine::ToVulkan(1);
 		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 		VkImage *image = (VkImage*)WEngine::Allocator::Get()->Allocate(sizeof(VkImage));
 		vkCreateImage(*m_pDevice, &imageCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), image);
 
-		return nullptr;
+		RHITexture *pTexture = (RHITexture*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanTexture));
+		::new (pTexture) VulkanTexture(image, m_pDevice);
+
+		return pTexture;
 	}
 
 	RHIRenderTarget* VulkanDevice::CreateRenderTarget(RHIRenderTargetDescriptor* descriptor)

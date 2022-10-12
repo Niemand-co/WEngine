@@ -20,7 +20,7 @@ namespace Vulkan
 
 		virtual void SetScissor(RHIScissor* scissor) override;
 
-		virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, Vector4 clearColor, float clearDepth /* = 0.0f */) override;
+		virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth /* = 0.0f */) override;
 
 		virtual void BindVertexBuffer(RHIBuffer *pBuffer) override;
 
@@ -31,6 +31,8 @@ namespace Vulkan
 		virtual void DrawVertexArray() override;
 
 		virtual void DrawIndexed(unsigned int indexeCount, unsigned int firstIndex, unsigned int instanceCount = 1, unsigned int firstInstance = 0) override;
+
+		virtual void NextSubpass() override;
 
 		virtual void EndPass() override;
 

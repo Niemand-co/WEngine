@@ -58,7 +58,7 @@ namespace Vulkan
 			m_vulkanInitInfo.QueueFamily = static_cast<VulkanQueue*>(pConfigure->pQueue)->GetIndex();
 			m_vulkanInitInfo.PipelineCache = VK_NULL_HANDLE;
 			m_vulkanInitInfo.DescriptorPool = *pool;
-			m_vulkanInitInfo.Subpass = 1;
+			m_vulkanInitInfo.Subpass = 0;
 			m_vulkanInitInfo.MinImageCount = 2;
 			m_vulkanInitInfo.ImageCount = pConfigure->imageCount;
 			m_vulkanInitInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
@@ -67,8 +67,9 @@ namespace Vulkan
 		}
 	}
 
-	void VulkanGui::BindRenderPass(RHIRenderPass* pRenderPass)
+	void VulkanGui::BindRenderPass(RHIRenderPass* pRenderPass, unsigned int subpass)
 	{
+		m_vulkanInitInfo.Subpass = subpass;
 		ImGui_ImplVulkan_Init(&m_vulkanInitInfo, *static_cast<VulkanRenderPass*>(pRenderPass)->GetHandle());
 	}
 

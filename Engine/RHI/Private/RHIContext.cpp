@@ -33,6 +33,15 @@ void RHIContext::Init()
 		textureViewDescriptor.baseArrayLayer = 0;
 		textureViewDescriptor.dimension = Dimension::Texture2D;
 	}
+	RHITextureDescriptor textureDescriptor = {};
+	{
+		textureDescriptor.format = Format::A16R16G16B16_SFloat;
+		textureDescriptor.width = 1920;
+		textureDescriptor.height = 1080;
+		textureDescriptor.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+		textureDescriptor.mipCount = 1;
+		textureDescriptor.layout = AttachmentLayout::ColorBuffer;
+	}
 	m_pTextureViews.push_back(m_pSwapchain->GetTexture(0)->CreateTextureView(&textureViewDescriptor));
 	m_pTextureViews.push_back(m_pSwapchain->GetTexture(1)->CreateTextureView(&textureViewDescriptor));
 	m_pTextureViews.push_back(m_pSwapchain->GetTexture(2)->CreateTextureView(&textureViewDescriptor));

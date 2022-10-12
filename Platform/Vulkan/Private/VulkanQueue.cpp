@@ -57,8 +57,8 @@ namespace Vulkan
 			waitSemaphores[i] = *static_cast<VulkanSemaphore*>(descriptor->pWaitSemaphores[i])->GetHandle();
 		}
 
-		std::vector<VkSemaphore> signalSemaphores(descriptor->waitSemaphoreCount);
-		for (unsigned int i = 0; i < descriptor->waitSemaphoreCount; ++i)
+		std::vector<VkSemaphore> signalSemaphores(descriptor->signalSemaphoreCount);
+		for (unsigned int i = 0; i < descriptor->signalSemaphoreCount; ++i)
 		{
 			signalSemaphores[i] = *static_cast<VulkanSemaphore*>(descriptor->pSignalSemaphores[i])->GetHandle();
 		}
