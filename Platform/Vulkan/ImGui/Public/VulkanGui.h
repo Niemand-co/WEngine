@@ -16,6 +16,8 @@ namespace Vulkan
 
 		virtual void BindRenderPass(RHIRenderPass *pRenderPass, unsigned int subpass) override;
 
+		virtual void RenderGUI(RHICommandBuffer* pCommandBuffer) override;
+
 	private:
 
 		VkInstance *m_pInstance;

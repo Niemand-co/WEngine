@@ -2,6 +2,7 @@
 #include "RHI/Public/RHIHeads.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Utils/Public/Window.h"
+#include "Platform/Vulkan/Public/VulkanDevice.h"
 
 RHIContext::RHIContext(RHIQueue *queue, RHISurface *surface, RHIDevice *device)
 	: m_pQueue(queue), m_pDevice(device), m_pSurface(surface)
@@ -115,6 +116,12 @@ void RHIContext::Submit(RHISubmitDescriptor* descriptor)
 	descriptor->commandBufferCount = m_pCommandBuffers.size();
 	descriptor->pCommandBuffers = m_pCommandBuffers.data();
 	m_pQueue->Submit(descriptor);
+	//vkDeviceWaitIdle(*static_cast<Vulkan::VulkanDevice*>(m_pDevice)->GetHandle());
+	//for (unsigned int i = 0; i < m_pCommandBuffers.size(); ++i)
+	//{
+	//	m_pCommandBuffers[i]->~RHICommandBuffer();
+	//	WEngine::Allocator::Get()->Deallocate(m_pCommandBuffers[i]);
+	//}
 	m_pCommandBuffers.clear();
 }
 

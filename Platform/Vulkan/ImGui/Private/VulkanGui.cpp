@@ -73,4 +73,11 @@ namespace Vulkan
 		ImGui_ImplVulkan_Init(&m_vulkanInitInfo, *static_cast<VulkanRenderPass*>(pRenderPass)->GetHandle());
 	}
 
+	void VulkanGui::RenderGUI(RHICommandBuffer *pCommandBuffer)
+	{
+		ImGui::Render();
+		ImDrawData* data = ImGui::GetDrawData();
+		ImGui_ImplVulkan_RenderDrawData(data, *static_cast<VulkanCommandBuffer*>(pCommandBuffer)->GetHandle(), nullptr);
+	}
+
 }

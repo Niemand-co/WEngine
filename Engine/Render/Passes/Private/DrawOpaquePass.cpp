@@ -9,7 +9,15 @@
 #include "Render/Mesh/Public/Mesh.h"
 #include "Render/Mesh/Public/Vertex.h"
 #include "Scene/Components/Public/Camera.h"
+#include "Scene/Components/Public/Material.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
+
+struct UniformData
+{
+	glm::mat4 VP;
+	glm::vec3 lightPos;
+	SurfaceData surfaceData;
+};
 
 DrawOpaquePass::DrawOpaquePass(RenderPassConfigure* configure)
 	: ScriptableRenderPass(configure)
@@ -82,13 +90,15 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 
 	m_pMesh = Mesh::GetCube();
 
-	BindingResource resource[1] = 
+	BindingResource resource[3] = 
 	{
-		{0, ResourceType::UniformBuffer, 1, ShaderStage::vertex}
+		{0, ResourceType::UniformBuffer, 1, ShaderStage::vertex},
+		{1, ResourceType::UniformBuffer, 1, ShaderStage::fragment},
+		{2, ResourceType::UniformBuffer, 3, ShaderStage::fragment}
 	};
 	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
 	{
-		groupLayoutDescriptor.bindingCount = 1;
+		groupLayoutDescriptor.bindingCount = 3;
 		groupLayoutDescriptor.pBindingResources = resource;
 	}
 	RHIGroupLayout *groupLayout = context->CreateGroupLayout(&groupLayoutDescriptor);
@@ -137,22 +147,29 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 	m_pIndexBuffer = context->CreateIndexBuffer(&indexBufferDescriptor);
 
-	glm::mat4x4 uniformData[] = { cameraData->MatrixVP };
+	UniformData data = 
+	{
+		cameraData->MatrixVP,
+		glm::vec3(-2.0f, 2.0f, 2.0f),
+		SurfaceData()
+	};
 	RHIBufferDescriptor uniformBufferDescriptor = {};
 	{
-		uniformBufferDescriptor.size = sizeof(uniformData);
-		uniformBufferDescriptor.pData = uniformData;
+		uniformBufferDescriptor.size = sizeof(data);
+		uniformBufferDescriptor.pData = &data;
 		uniformBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	m_pUniformBuffer = context->CreateUniformBuffer(&uniformBufferDescriptor);
 
-	size_t pSizes[1] = {sizeof(uniformData)};
+	size_t pSizes[3] = { sizeof(glm::mat4), sizeof(glm::vec3), sizeof(SurfaceData) };
+	size_t pOffsets[3] = { 0, sizeof(glm::mat4), 80 };
 	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
 	{
-		updateResourceDescriptor.bindingCount = 1;
+		updateResourceDescriptor.bindingCount = 3;
 		updateResourceDescriptor.pBindingResources = resource;
 		updateResourceDescriptor.pBuffer = m_pUniformBuffer;
 		updateResourceDescriptor.pSize = pSizes;
+		updateResourceDescriptor.pOffsets = pOffsets;
 		updateResourceDescriptor.pGroup = m_pGroup;
 	}
 	context->UpdateResourceToGroup(&updateResourceDescriptor);
@@ -213,7 +230,6 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 		encoder->BindIndexBuffer(m_pIndexBuffer);
 		encoder->BindGroups(1, m_pGroup, m_pPipelineResourceLayout);
 		encoder->DrawIndexed(m_pMesh->m_indexCount, 0);
-		encoder->SetEvent(pEvent);
 		encoder->EndPass();
 		encoder->~RHIGraphicsEncoder();
 		WEngine::Allocator::Get()->Deallocate(encoder);
@@ -222,16 +238,16 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 	context->ExecuteCommandBuffer(cmd);
 	RHISubmitDescriptor submitDescriptor = {};
 	{
-		submitDescriptor.waitSemaphoreCount = 0;
+		submitDescriptor.waitSemaphoreCount = 1;
 		submitDescriptor.pWaitSemaphores = &waitSemaphore;
-		submitDescriptor.signalSemaphoreCount = 0;
+		submitDescriptor.signalSemaphoreCount = 1;
 		submitDescriptor.pSignalSemaphores = &signalSemaphore;
 		submitDescriptor.waitStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
 		submitDescriptor.pFence = fence;
 	}
 	context->Submit(&submitDescriptor);
-	cmd->Clear();
+	//cmd->Clear();
 
-	cmd->~RHICommandBuffer();
-	WEngine::Allocator::Get()->Deallocate(cmd);
+	//cmd->~RHICommandBuffer();
+	//WEngine::Allocator::Get()->Deallocate(cmd);
 }

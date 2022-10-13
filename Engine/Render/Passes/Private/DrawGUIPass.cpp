@@ -8,6 +8,7 @@
 #include "Utils/ImGui/Public/Gui.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 #include "Platform/Vulkan/Public/VulkanEvent.h"
+#include "Platform/Vulkan/Public/VulkanDevice.h"
 
 DrawGUIPass::DrawGUIPass(RenderPassConfigure *pConfigure)
 	: ScriptableRenderPass(pConfigure)
@@ -72,8 +73,6 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 		submitDescriptor.waitStage = PIPELINE_STAGE_ALL_COMMANDS;
 	}
 	context->Submit(&submitDescriptor);
-	cmd->~RHICommandBuffer();
-	WEngine::Allocator::Get()->Deallocate(cmd);
 }
 
 void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence* fence, RHIEvent* pEvent)
@@ -92,11 +91,12 @@ void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHIS
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		ImGui::ShowDemoWindow();
-		ImGui::Render();
-		ImDrawData* data = ImGui::GetDrawData();
-		vkCmdWaitEvents(*static_cast<Vulkan::VulkanCommandBuffer*>(cmd)->GetHandle(), 1, static_cast<VulkanEvent*>(pEvent)->GetHandle(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, nullptr, 0, nullptr, 0, nullptr);
-		ImGui_ImplVulkan_RenderDrawData(data, *static_cast<Vulkan::VulkanCommandBuffer*>(cmd)->GetHandle(), nullptr);
+		{
+			ImGui::Begin("Inspector");
+			//ImGui::SliderFloat("Roughness")
+			ImGui::End();
+		}
+		Gui::g_pGui->RenderGUI(cmd);
 		encoder->EndPass();
 		encoder->~RHIGraphicsEncoder();
 		WEngine::Allocator::Get()->Deallocate(encoder);
@@ -114,7 +114,7 @@ void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHIS
 	}
 	context->Submit(&submitDescriptor);
 
-	cmd->Clear();
-	cmd->~RHICommandBuffer();
-	WEngine::Allocator::Get()->Deallocate(cmd);
+	//cmd->Clear();
+	//cmd->~RHICommandBuffer();
+	//WEngine::Allocator::Get()->Deallocate(cmd);
 }

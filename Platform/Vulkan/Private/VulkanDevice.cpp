@@ -510,8 +510,8 @@ namespace Vulkan
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
 			::new (pDescriptorBufferInfo + i) VkDescriptorBufferInfo();
-			pDescriptorBufferInfo[i].buffer = *static_cast<VulkanBuffer*>(descriptor->pBuffer + i)->GetHandle();
-			pDescriptorBufferInfo[i].offset = 0;
+			pDescriptorBufferInfo[i].buffer = *static_cast<VulkanBuffer*>(descriptor->pBuffer)->GetHandle();
+			pDescriptorBufferInfo[i].offset = descriptor->pOffsets[i];
 			pDescriptorBufferInfo[i].range = descriptor->pSize[i];
 
 			::new (pWriteDescriptorSets + i) VkWriteDescriptorSet();

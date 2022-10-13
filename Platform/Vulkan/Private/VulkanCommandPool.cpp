@@ -19,7 +19,7 @@ namespace Vulkan
 		VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
 		commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		commandBufferAllocateInfo.commandPool = *m_commandPool;
-		commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		commandBufferAllocateInfo.level = true ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		commandBufferAllocateInfo.commandBufferCount = num;
 
 		VkCommandBuffer* pCommandBuffer = (VkCommandBuffer*)WEngine::Allocator::Get()->Allocate(num * sizeof(VkCommandBuffer));

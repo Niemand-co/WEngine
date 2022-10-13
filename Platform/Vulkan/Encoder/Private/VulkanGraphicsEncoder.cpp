@@ -114,6 +114,20 @@ namespace Vulkan
 		vkCmdPipelineBarrier(*m_cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VkDependencyFlagBits(), 0, nullptr, 0, nullptr, 0, &imageMemoryBarrier);
 	}
 
+	void VulkanGraphicsEncoder::ResourceBarrier(RHIBuffer* pBuffer, size_t size)
+	{
+		VkBufferMemoryBarrier bufferMemoryBarrier = {};
+		{
+			bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+			bufferMemoryBarrier.buffer = *static_cast<VulkanBuffer*>(pBuffer)->GetHandle();
+			bufferMemoryBarrier.size = size;
+			bufferMemoryBarrier.offset = 0;
+			bufferMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_READ_BIT;
+			bufferMemoryBarrier.dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
+		}
+		vkCmdPipelineBarrier(*m_cmd, VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VkDependencyFlagBits(), 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
+	}
+
 	void VulkanGraphicsEncoder::SetEvent(RHIEvent* pEvent)
 	{
 		vkCmdSetEvent(*m_cmd, *static_cast<VulkanEvent*>(pEvent)->GetHandle(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);

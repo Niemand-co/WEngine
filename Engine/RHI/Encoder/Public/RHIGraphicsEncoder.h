@@ -42,6 +42,8 @@ public:
 
 	virtual void ResourceBarrier(RHITexture *pTexture) = 0;
 
+	virtual void ResourceBarrier(RHIBuffer *pBuffer, size_t size) = 0;
+
 	virtual void SetEvent(RHIEvent *pEvent) = 0;
 
 	virtual void NextSubpass() = 0;

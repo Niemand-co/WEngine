@@ -6,9 +6,7 @@
 #include "Render/Passes/Public/DrawGUIPass.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
-#include "RHI/Public/RHIDevice.h"
-#include "RHI/Public/RHISemaphore.h"
-#include "RHI/Public/RHIEvent.h"
+#include "RHI/Public/RHIHeads.h"
 #include "Scene/Components/Public/Camera.h"
 
 ScriptableRenderer::ScriptableRenderer(RendererConfigure *pConfigure)

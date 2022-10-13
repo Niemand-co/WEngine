@@ -34,6 +34,8 @@ namespace Vulkan
 
 		virtual void ResourceBarrier(RHITexture *ptexture) override;
 
+		virtual void ResourceBarrier(RHIBuffer *pBuffer, size_t size) override;
+
 		virtual void SetEvent(RHIEvent* pEvent) override;
 
 		virtual void NextSubpass() override;

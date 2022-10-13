@@ -21,6 +21,8 @@ public:
 
 	size_t *pSize;
 
+	size_t *pOffsets;
+
 	BindingResource *pBindingResources;
 
 	RHIGroup *pGroup;

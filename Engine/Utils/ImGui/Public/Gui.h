@@ -6,6 +6,7 @@ class RHIGPU;
 class RHIDevice;
 class RHIQueue;
 class RHIRenderPass;
+class RHICommandBuffer;
 
 struct GuiConfigure
 {
@@ -14,6 +15,16 @@ struct GuiConfigure
 	RHIDevice *pDevice;
 	RHIQueue *pQueue;
 	unsigned int imageCount;
+};
+
+struct Menu
+{
+
+};
+
+struct MenuBar
+{
+
 };
 
 class Gui
@@ -26,6 +37,10 @@ public:
 
 	virtual void BindRenderPass(RHIRenderPass *pRenderPass, unsigned int subpass = 0) = 0;
 
+	virtual void RenderGUI(RHICommandBuffer* pCommandBuffer) = 0;
+
+public:
+
 	static Gui* CreateGui(WEngine::Backend backend);
 
 public:
@@ -37,3 +52,14 @@ protected:
 	ImGuiIO m_io;
 
 };
+
+/*
+
+AddMenuBar
+(
+{
+	{"Option", {  } }
+}
+)
+
+*/
