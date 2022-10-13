@@ -68,6 +68,7 @@ inline Component* GameObject::AddComponent()
 		{
 			RE_ERROR("Not indicate component type or error type.");
 		}
+		return nullptr;
 	}
 }
 

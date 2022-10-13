@@ -36,7 +36,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	};
 	RHISubPassDescriptor subpassDescriptors[] =
 	{
-		{ 0, AttachmentLayout::ColorBuffer, -1, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, 0, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
+		{ 0, AttachmentLayout::ColorBuffer, -1, PIPELINE_STAGE_HOST | PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, 0, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
 	};
 	RHIRenderPassDescriptor renderPassDescriptor = {};
 	{
@@ -90,15 +90,13 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 
 	m_pMesh = Mesh::GetCube();
 
-	BindingResource resource[3] = 
+	BindingResource resource[1] = 
 	{
-		{0, ResourceType::UniformBuffer, 1, ShaderStage::vertex},
-		{1, ResourceType::UniformBuffer, 1, ShaderStage::fragment},
-		{2, ResourceType::UniformBuffer, 3, ShaderStage::fragment}
+		{0, ResourceType::UniformBuffer, 1, ShaderStage::vertex}
 	};
 	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
 	{
-		groupLayoutDescriptor.bindingCount = 3;
+		groupLayoutDescriptor.bindingCount = 1;
 		groupLayoutDescriptor.pBindingResources = resource;
 	}
 	RHIGroupLayout *groupLayout = context->CreateGroupLayout(&groupLayoutDescriptor);
@@ -161,11 +159,11 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 	m_pUniformBuffer = context->CreateUniformBuffer(&uniformBufferDescriptor);
 
-	size_t pSizes[3] = { sizeof(glm::mat4), sizeof(glm::vec3), sizeof(SurfaceData) };
-	size_t pOffsets[3] = { 0, sizeof(glm::mat4), 80 };
+	size_t pSizes[1] = { sizeof(data) };
+	size_t pOffsets[1] = { 0 };
 	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
 	{
-		updateResourceDescriptor.bindingCount = 3;
+		updateResourceDescriptor.bindingCount = 1;
 		updateResourceDescriptor.pBindingResources = resource;
 		updateResourceDescriptor.pBuffer = m_pUniformBuffer;
 		updateResourceDescriptor.pSize = pSizes;
@@ -212,7 +210,7 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 		context->ResetDisplayState();
 	}
 
-	RHICommandBuffer* cmd = context->GetCommandBuffer();
+	RHICommandBuffer *cmd = context->GetCommandBuffer();
 
 	cmd->BeginScopePass("Test");
 	{
@@ -246,8 +244,6 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 		submitDescriptor.pFence = fence;
 	}
 	context->Submit(&submitDescriptor);
-	//cmd->Clear();
 
-	//cmd->~RHICommandBuffer();
-	//WEngine::Allocator::Get()->Deallocate(cmd);
+	vkDeviceWaitIdle(*static_cast<Vulkan::VulkanDevice*>(m_pDevice)->GetHandle());
 }

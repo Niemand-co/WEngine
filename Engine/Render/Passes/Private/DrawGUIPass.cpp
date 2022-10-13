@@ -117,4 +117,5 @@ void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHIS
 	//cmd->Clear();
 	//cmd->~RHICommandBuffer();
 	//WEngine::Allocator::Get()->Deallocate(cmd);
+	vkDeviceWaitIdle(*static_cast<Vulkan::VulkanDevice*>(m_pDevice)->GetHandle());
 }

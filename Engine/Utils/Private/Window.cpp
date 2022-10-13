@@ -40,6 +40,7 @@ Window* Window::Get()
 		{
 			RE_ASSERT(false, "Error Tyoe System.");
 		}
+		return nullptr;
 	}
 }
 

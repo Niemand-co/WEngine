@@ -516,7 +516,7 @@ namespace Vulkan
 
 			::new (pWriteDescriptorSets + i) VkWriteDescriptorSet();
 			pWriteDescriptorSets[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			pWriteDescriptorSets[i].descriptorCount = descriptor->pBindingResources[i].count;
+			pWriteDescriptorSets[i].descriptorCount = 1;//descriptor->pBindingResources[i].count;
 			pWriteDescriptorSets[i].descriptorType = WEngine::ToVulkan(descriptor->pBindingResources[i].type);
 			pWriteDescriptorSets[i].dstSet = *static_cast<VulkanGroup*>(descriptor->pGroup)->GetHandle();
 			pWriteDescriptorSets[i].dstBinding = descriptor->pBindingResources[i].bindingSlot;

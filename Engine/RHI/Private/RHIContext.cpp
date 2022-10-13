@@ -168,7 +168,7 @@ RHIGroup* RHIContext::CreateResourceGroup(RHIGroupDescriptor* descriptor)
 	RHIGroupPoolDescriptor poolDescriptor = {};
 	{
 		poolDescriptor.pGroupLayout = descriptor->pGroupLayout;
-		poolDescriptor.maxSetCount = 1;
+		poolDescriptor.maxSetCount = 3;
 	}
 	RHIGroupPool *pool = m_pDevice->CreateGroupPool(&poolDescriptor);
 

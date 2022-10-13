@@ -16,10 +16,11 @@ private:
 	{
 		time_t timer;
 		time(&timer);
-		tm* date = gmtime(&timer);
-		date->tm_hour = (date->tm_hour + 8) % 24;
+		tm date;
+		gmtime_s(&date, &timer);
+		date.tm_hour = (date.tm_hour + 8) % 24;
 		char sDate[32];
-		strftime(sDate, sizeof(sDate), "[%F %T]", date);
+		strftime(sDate, sizeof(sDate), "[%F %T]", &date);
 		std::string s = sDate;
 		return s;
 	}

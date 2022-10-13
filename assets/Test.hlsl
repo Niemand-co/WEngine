@@ -68,5 +68,5 @@ VSOutput vert(VSInput vin)
 float4 frag(VSOutput pin) : SV_TARGET
 {
     
-	return float4(0.0f, lightPos.yz, 1.0f);
+	return float4(1.0f, 1.0f, 1.0f, 1.0f);
 }
