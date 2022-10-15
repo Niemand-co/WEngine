@@ -7,7 +7,6 @@
 #include "Utils/Public/Window.h"
 #include "Utils/ImGui/Public/Gui.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
-#include "Platform/Vulkan/Public/VulkanEvent.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
 
 DrawGUIPass::DrawGUIPass(RenderPassConfigure *pConfigure)
@@ -28,7 +27,7 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 	};
 	RHISubPassDescriptor subpassDescriptors[] =
 	{
-		{ 0, AttachmentLayout::ColorBuffer, -1, PIPELINE_STAGE_BOTTOM_OF_PIPE, 0, PIPELINE_STAGE_TOP_OF_PIPE, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
+		{ 0, AttachmentLayout::ColorBuffer, -1, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, 0, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
 	};
 	RHIRenderPassDescriptor renderPassDescriptor = {};
 	{
@@ -56,7 +55,7 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 	
 	Gui::g_pGui->BindRenderPass(m_pRenderPass);
 
-	RHICommandBuffer* cmd = context->GetCommandBuffer();
+	RHICommandBuffer* cmd = context->GetCommandBuffer(false);
 	cmd->BeginScopePass("BindFont");
 	{
 		ImGui_ImplVulkan_CreateFontsTexture(*static_cast<Vulkan::VulkanCommandBuffer*>(cmd)->GetHandle());
@@ -73,15 +72,19 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 		submitDescriptor.waitStage = PIPELINE_STAGE_ALL_COMMANDS;
 	}
 	context->Submit(&submitDescriptor);
+	cmd->~RHICommandBuffer();
+	WEngine::Allocator::Get()->Deallocate(cmd);
+
+	m_pCommandBuffers = context->GetCommandBuffer(ScriptableRenderPipeline::g_maxFrame, false);
 }
 
-void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence* fence, RHIEvent* pEvent)
+void DrawGUIPass::Execute(RHIContext* context)
 {
-	RHICommandBuffer* cmd = context->GetCommandBuffer();
+	RHICommandBuffer* cmd = m_pCommandBuffers[ScriptableRenderPipeline::g_currentFrame];
 
-	cmd->BeginScopePass("GUI");
+	cmd->BeginScopePass("Test");
 	{
-		RHIGraphicsEncoder *encoder = cmd->GetGraphicsEncoder();
+		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
 		RHIRenderPassBeginDescriptor renderPassBeginDescriptor = {};
 		{
 			renderPassBeginDescriptor.renderPass = m_pRenderPass;
@@ -103,19 +106,4 @@ void DrawGUIPass::Execute(RHIContext* context, RHISemaphore* waitSemaphore, RHIS
 	}
 	cmd->EndScopePass();
 	context->ExecuteCommandBuffer(cmd);
-	RHISubmitDescriptor submitDescriptor = {};
-	{
-		submitDescriptor.waitSemaphoreCount = 1;
-		submitDescriptor.pWaitSemaphores = &waitSemaphore;
-		submitDescriptor.signalSemaphoreCount = 1;
-		submitDescriptor.pSignalSemaphores = &signalSemaphore;
-		submitDescriptor.pFence = fence;
-		submitDescriptor.waitStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-	}
-	context->Submit(&submitDescriptor);
-
-	//cmd->Clear();
-	//cmd->~RHICommandBuffer();
-	//WEngine::Allocator::Get()->Deallocate(cmd);
-	vkDeviceWaitIdle(*static_cast<Vulkan::VulkanDevice*>(m_pDevice)->GetHandle());
 }

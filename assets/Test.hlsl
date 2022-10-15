@@ -4,25 +4,26 @@ struct VSInput
 {
 	float3 Position : POSITION;
 	float3 Color : COLOR;
+    float3 Normal : NORMAL;
 };
 
 struct VSOutput
 {
 	float4 Position : SV_POSITION;
 	float3 Color : COLOR;
-    float3 WorldPos : TEXCOORD0;
+    float3 Normal : TEXCOORD0;
+    float3 WorldPos : TEXCOORD1;
 };
 
-struct SurfaceData
+struct uniformData
 {
-    float3 albedo;
-    float roughness;
-    float metallic;
+    float4x4 MVP;
+    float4 lightPos;
+    float4 cameraPos;
+    float4 surfaceData;
 };
-uniform float4x4 MVP : register(b0);
-uniform float3 lightPos : register(b1);
-uniform SurfaceData surfaceData : register(b2);
 
+uniformData data : register(b0, space0);
 
 float D_GGX(float NoH, float Roughness)
 {
@@ -41,7 +42,7 @@ float G_Smith(float cos, float Roughness)
     return cos / (cos * (1.0 - squareAlpha) + squareAlpha);
 }
 
-float4 PBRLighting(float3 albedo, float NoL, float NoH, float NoV, float HoV, float roughness, float metallic, float3 normal, float isGI)
+float4 PBRLighting(float3 albedo, float NoL, float NoH, float NoV, float HoV, float roughness, float metallic)
 {
     float F0 = lerp(0.04, albedo, metallic);
     float ks = F0 + (1.0 - F0) * pow(saturate(1.0 - HoV), 5);
@@ -49,17 +50,19 @@ float4 PBRLighting(float3 albedo, float NoL, float NoH, float NoV, float HoV, fl
 
     float3 diffuse = kd * albedo / PI;
     float3 specular = D_GGX(NoH, roughness) * G_Smith(NoV, roughness) * G_Smith(NoL, roughness) / (4.0 * NoV * NoL);
+    float3 ambient = float3(0.2f, 0.2f, 0.2f);
 
-    return float4((diffuse + saturate(specular)) * NoL * float3(1, 1, 1), 1.0f);
+    return float4((diffuse + saturate(specular)) * (NoL * float3(1, 1, 1) + ambient), 1.0f);
 }
 
 VSOutput vert(VSInput vin)
 {
 	VSOutput vout = (VSOutput)0;
 
-	vout.Position = mul(MVP, float4(vin.Position, 1.0));
+	vout.Position = mul(data.MVP, float4(vin.Position, 1.0));
 	vout.Position.y *= -1.0f;
     vout.WorldPos = vin.Position;
+    vout.Normal = normalize(vin.Normal);
 	vout.Color = vin.Color;
 
 	return vout;
@@ -67,6 +70,14 @@ VSOutput vert(VSInput vin)
 
 float4 frag(VSOutput pin) : SV_TARGET
 {
+    float3 L = normalize(data.lightPos.xyz - pin.WorldPos);
+    float3 V = normalize(data.cameraPos.xyz - pin.WorldPos);
+    float3 H = normalize(L + V);
     
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+    float NoL = saturate(dot(pin.Normal, L));
+    float NoH = saturate(dot(pin.Normal, H));
+    float NoV = saturate(dot(pin.Normal, V));
+    float HoV = saturate(dot(H, V));
+
+	return PBRLighting(data.surfaceData.xyz, NoL, NoH, NoV, HoV, data.surfaceData.w, 0.0f);
 }

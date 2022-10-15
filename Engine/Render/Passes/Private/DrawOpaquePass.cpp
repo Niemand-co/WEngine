@@ -6,17 +6,19 @@
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Utils/Public/Window.h"
+#include "Utils/ImGui/Public/Gui.h"
 #include "Render/Mesh/Public/Mesh.h"
 #include "Render/Mesh/Public/Vertex.h"
 #include "Scene/Components/Public/Camera.h"
 #include "Scene/Components/Public/Material.h"
-#include "Platform/Vulkan/Public/VulkanDevice.h"
+#include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 
 struct UniformData
 {
 	glm::mat4 VP;
-	glm::vec3 lightPos;
-	SurfaceData surfaceData;
+	glm::vec4 lightPos;
+	glm::vec4 cameraPos;
+	glm::vec4 surfaceData;
 };
 
 DrawOpaquePass::DrawOpaquePass(RenderPassConfigure* configure)
@@ -36,7 +38,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	};
 	RHISubPassDescriptor subpassDescriptors[] =
 	{
-		{ 0, AttachmentLayout::ColorBuffer, -1, PIPELINE_STAGE_HOST | PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, 0, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
+		{ 0, AttachmentLayout::ColorBuffer, -1, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, 0, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
 	};
 	RHIRenderPassDescriptor renderPassDescriptor = {};
 	{
@@ -92,7 +94,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 
 	BindingResource resource[1] = 
 	{
-		{0, ResourceType::UniformBuffer, 1, ShaderStage::vertex}
+		{0, ResourceType::UniformBuffer, 1, ShaderStage::vertex},
 	};
 	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
 	{
@@ -148,8 +150,9 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	UniformData data = 
 	{
 		cameraData->MatrixVP,
-		glm::vec3(-2.0f, 2.0f, 2.0f),
-		SurfaceData()
+		glm::vec4(-2.0f, 2.0f, -2.0f, 1.0f),
+		glm::vec4(cameraData->Position, 1.0f),
+		glm::vec4(1.0f, 0.0f, 0.0f, 0.6f)
 	};
 	RHIBufferDescriptor uniformBufferDescriptor = {};
 	{
@@ -186,9 +189,11 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		}
 		m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
 	}
+
+	m_pCommandBuffers = context->GetCommandBuffer(ScriptableRenderPipeline::g_maxFrame, false);
 }
 
-void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence, RHIEvent* pEvent)
+void DrawOpaquePass::Execute(RHIContext *context)
 {
 	if (context->IsDisplayChanged())
 	{
@@ -210,7 +215,7 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 		context->ResetDisplayState();
 	}
 
-	RHICommandBuffer *cmd = context->GetCommandBuffer();
+	RHICommandBuffer *cmd = m_pCommandBuffers[ScriptableRenderPipeline::g_currentFrame];
 
 	cmd->BeginScopePass("Test");
 	{
@@ -229,21 +234,10 @@ void DrawOpaquePass::Execute(RHIContext *context, RHISemaphore* waitSemaphore, R
 		encoder->BindGroups(1, m_pGroup, m_pPipelineResourceLayout);
 		encoder->DrawIndexed(m_pMesh->m_indexCount, 0);
 		encoder->EndPass();
+		encoder->ResourceBarrier(PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT);
 		encoder->~RHIGraphicsEncoder();
 		WEngine::Allocator::Get()->Deallocate(encoder);
 	}
 	cmd->EndScopePass();
 	context->ExecuteCommandBuffer(cmd);
-	RHISubmitDescriptor submitDescriptor = {};
-	{
-		submitDescriptor.waitSemaphoreCount = 1;
-		submitDescriptor.pWaitSemaphores = &waitSemaphore;
-		submitDescriptor.signalSemaphoreCount = 1;
-		submitDescriptor.pSignalSemaphores = &signalSemaphore;
-		submitDescriptor.waitStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		submitDescriptor.pFence = fence;
-	}
-	context->Submit(&submitDescriptor);
-
-	vkDeviceWaitIdle(*static_cast<Vulkan::VulkanDevice*>(m_pDevice)->GetHandle());
 }

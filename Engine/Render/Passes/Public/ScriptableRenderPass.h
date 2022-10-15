@@ -8,6 +8,7 @@ class RHIGroup;
 class RHISemaphore;
 class RHIFence;
 class RHIEvent;
+class RHICommandBuffer;
 struct CameraData;
 
 struct RenderPassConfigure
@@ -27,9 +28,19 @@ public:
 
 	virtual void Setup(RHIContext *context, CameraData *cameraData) = 0;
 
-	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore = nullptr, RHISemaphore *signalSemaphore = nullptr, RHIFence *fence = nullptr, RHIEvent *pEvent = nullptr) = 0;
+	virtual void Execute(RHIContext *context) = 0;
 
 	virtual RHIGroup* GetResourceGroup();
+
+	void* operator new(size_t size)
+	{
+		return WEngine::Allocator::Get()->Allocate(size);
+	}
+
+	void operator delete(void* pData)
+	{
+		WEngine::Allocator::Get()->Deallocate(pData);
+	}
 
 protected:
 
@@ -40,5 +51,7 @@ protected:
 	RHIGroup *m_pResource;
 
 	RHIPipelineStateObject *m_pPSO;
+
+	std::vector<RHICommandBuffer*> m_pCommandBuffers;
 
 };

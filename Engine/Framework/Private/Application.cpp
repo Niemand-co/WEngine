@@ -48,12 +48,7 @@ void Application::Init()
 	Camera *camera = (Camera*)go->AddComponent<Component::ComponentType::Camera>();
 	camera->m_aspect = (float)Window::cur_window->GetWidth() / (float)Window::cur_window->GetHeight();
 
-	time_t start, end;
-	start = clock();
 	m_pipeline = ScriptableRenderPipeline::get();
-	end = clock();
-
-	RE_LOG(double(end - start) / CLOCKS_PER_SEC);
 
 	ScriptableRenderer *renderer = m_pipeline->CreateRenderer();
 

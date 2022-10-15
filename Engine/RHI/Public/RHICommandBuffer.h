@@ -13,6 +13,8 @@ public:
 
 	virtual void EndScopePass() = 0;
 
+	virtual void ExecuteCommandBuffer(RHICommandBuffer *pCommandBuffer) = 0;
+
 	virtual RHIGraphicsEncoder* GetGraphicsEncoder() = 0;
 
 	virtual RHIComputeEncoder* GetComputeEncoder() = 0;

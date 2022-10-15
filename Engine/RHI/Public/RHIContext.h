@@ -41,7 +41,9 @@ public:
 
 	virtual RHITextureView* GetTextureView(unsigned int index);
 
-	virtual RHICommandBuffer* GetCommandBuffer();
+	virtual RHICommandBuffer* GetCommandBuffer(bool isPrimary = true);
+
+	virtual std::vector<RHICommandBuffer*> GetCommandBuffer(unsigned int count, bool isPrimary);
 
 	virtual int GetNextImage(RHISemaphore* pSignalSemaphore);
 
@@ -83,9 +85,11 @@ protected:
 
 	RHICommandPool *m_pPool;
 
+	std::vector<RHITextureView*> m_pTextureViews;
+
 	std::vector<RHICommandBuffer*> m_pCommandBuffers;
 
-	std::vector<RHITextureView*> m_pTextureViews;
+	std::vector<RHICommandBuffer*> m_pPrimaryCommandBuffers;
 
 	bool m_isDisplayChagned;
 

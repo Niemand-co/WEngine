@@ -16,6 +16,8 @@ namespace Vulkan
 
 		virtual void EndScopePass() override;
 
+		virtual void ExecuteCommandBuffer(RHICommandBuffer* pCommandBuffer) override;
+
 		virtual RHIGraphicsEncoder* GetGraphicsEncoder() override;
 
 		virtual RHIComputeEncoder* GetComputeEncoder() override;

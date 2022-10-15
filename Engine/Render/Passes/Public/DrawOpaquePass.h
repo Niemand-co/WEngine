@@ -17,7 +17,7 @@ public:
 
 	virtual void Setup(RHIContext *context, CameraData *cameraData) override;
 
-	virtual void Execute(RHIContext *context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence *fence, RHIEvent* pEvent = nullptr) override;
+	virtual void Execute(RHIContext *context) override;
 
 private:
 
@@ -29,7 +29,9 @@ private:
 
 	RHIBuffer *m_pIndexBuffer;
 
-	RHIBuffer *m_pUniformBuffer;
+	RHIBuffer* m_pUniformBuffer;
+
+	RHIBuffer *m_pSurfaceDataBuffer;
 
 	RHIPipelineResourceLayout *m_pPipelineResourceLayout;
 

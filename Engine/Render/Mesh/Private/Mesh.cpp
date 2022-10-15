@@ -19,9 +19,9 @@ Mesh::~Mesh()
 void Mesh::GenerateVertexInputDescription()
 {
 	m_bindingDescription = (VertexBindingDescription*)WEngine::Allocator::Get()->Allocate(sizeof(VertexBindingDescription));
-	VertexAttributeDescription *attributeDescription = (VertexAttributeDescription*)WEngine::Allocator::Get()->Allocate(3 * sizeof(VertexAttributeDescription));
-	m_attributeDescriptions.resize(3);
-	for (int i = 0; i < 3; ++i)
+	VertexAttributeDescription *attributeDescription = (VertexAttributeDescription*)WEngine::Allocator::Get()->Allocate(4 * sizeof(VertexAttributeDescription));
+	m_attributeDescriptions.resize(4);
+	for (int i = 0; i < 4; ++i)
 	{
 		m_attributeDescriptions[i] = attributeDescription + i;
 	}
@@ -42,7 +42,12 @@ void Mesh::GenerateVertexInputDescription()
 	m_attributeDescriptions[2]->slot = 0;
 	m_attributeDescriptions[2]->location = 2;
 	m_attributeDescriptions[2]->offset = sizeof(Vector3) * 2;
-	m_attributeDescriptions[2]->format = Format::R32G32_SFloat;
+	m_attributeDescriptions[2]->format = Format::R32G32B32_SFloat;
+
+	m_attributeDescriptions[3]->slot = 0;
+	m_attributeDescriptions[3]->location = 3;
+	m_attributeDescriptions[3]->offset = sizeof(Vector3) * 3;
+	m_attributeDescriptions[3]->format = Format::R32G32_SFloat;
 }
 
 RHIVertexInputDescriptor Mesh::GetVertexInputDescriptor()
@@ -55,7 +60,7 @@ RHIVertexInputDescriptor Mesh::GetVertexInputDescriptor()
 	RHIVertexInputDescriptor vertexInputDescriptor = {};
 	{
 		vertexInputDescriptor.bindingDescription = m_bindingDescription;
-		vertexInputDescriptor.attributeDescriptionCount = 3;
+		vertexInputDescriptor.attributeDescriptionCount = m_attributeDescriptions.size();
 		vertexInputDescriptor.pAttributeDescription = m_attributeDescriptions.data();
 	}
 
@@ -65,27 +70,55 @@ RHIVertexInputDescriptor Mesh::GetVertexInputDescriptor()
 Mesh* Mesh::GetCube()
 {
 	Mesh *mesh = new Mesh();
-	Vertex *pVertices = (Vertex*)WEngine::Allocator::Get()->Allocate(8 * sizeof(Vertex));
+	Vertex *pVertices = (Vertex*)WEngine::Allocator::Get()->Allocate(24 * sizeof(Vertex));
 	{
-		pVertices[0] = { { -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {} };
-		pVertices[1] = { { 1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {} };
-		pVertices[2] = { { 1.0f, -1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {} };
-		pVertices[3] = { { -1.0f, -1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {} };
-		pVertices[4] = { { -1.0f, 1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {} };
-		pVertices[5] = { { 1.0f, 1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {} };
-		pVertices[6] = { { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {} };
-		pVertices[7] = { { -1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {} };
+		pVertices[0] = { { -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, -1.0f, 0.0f}, {} };
+		pVertices[1] = { { 1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, -1.0f, 0.0f}, {} };
+		pVertices[2] = { { 1.0f, -1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, -1.0f, 0.0f}, {} };
+		pVertices[3] = { { -1.0f, -1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, -1.0f, 0.0f}, {} };
+
+		pVertices[4] = { { -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, -1.0f}, {} };
+		pVertices[5] = { { 1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, -1.0f}, {} };
+		pVertices[6] = { { 1.0f, 1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, -1.0f}, {} };
+		pVertices[7] = { { -1.0f, 1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, -1.0f}, {} };
+
+		pVertices[8] = { { 1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {1.0f, 0.0f, 0.0f}, {} };
+		pVertices[9] = { { 1.0f, -1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {1.0f, 0.0f, 0.0f}, {} };
+		pVertices[10] = { { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {1.0f, 0.0f, 0.0f}, {} };
+		pVertices[11] = { { 1.0f, 1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {1.0f, 0.0f, 0.0f}, {} };
+
+		pVertices[12] = { { 1.0f, -1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 1.0f}, {} };
+		pVertices[13] = { { -1.0f, -1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 1.0f}, {} };
+		pVertices[14] = { { -1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 1.0f}, {} };
+		pVertices[15] = { { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 1.0f}, {} };
+
+		pVertices[16] = { { -1.0f, -1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {-1.0f, 0.0f, 0.0f}, {} };
+		pVertices[17] = { { -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {-1.0f, 0.0f, 0.0f}, {} };
+		pVertices[18] = { { -1.0f, 1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {-1.0f, 0.0f, 0.0f}, {} };
+		pVertices[19] = { { -1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {-1.0f, 0.0f, 0.0f}, {} };
+
+		pVertices[20] = { { -1.0f, 1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f, 0.0f}, {} };
+		pVertices[21] = { { 1.0f, 1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f, 0.0f}, {} };
+		pVertices[22] = { { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f, 0.0f}, {} };
+		pVertices[23] = { { -1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f, 0.0f}, {} };
 	}
-	mesh->m_vertexCount = 8;
+	mesh->m_vertexCount = 24;
 	mesh->m_pVertices = pVertices;
 	unsigned int *pIndices = (unsigned int*)WEngine::Allocator::Get()->Allocate(36 * sizeof(unsigned int));
 	{
 		pIndices[0] = 3, pIndices[1] = 2, pIndices[2] = 1, pIndices[3] = 1, pIndices[4] = 0, pIndices[5] = 3,
-		pIndices[6] = 0, pIndices[7] = 1, pIndices[8] = 5, pIndices[9] = 5, pIndices[10] = 4, pIndices[11] = 0,
-		pIndices[12] = 1, pIndices[13] = 2, pIndices[14] = 6, pIndices[15] = 6, pIndices[16] = 5, pIndices[17] = 1,
-		pIndices[18] = 2, pIndices[19] = 3, pIndices[20] = 7, pIndices[21] = 7, pIndices[22] = 6, pIndices[23] = 2,
-		pIndices[24] = 3, pIndices[25] = 0, pIndices[26] = 4, pIndices[27] = 4, pIndices[28] = 7, pIndices[29] = 3,
-		pIndices[30] = 4, pIndices[31] = 5, pIndices[32] = 6, pIndices[33] = 6, pIndices[34] = 7, pIndices[35] = 4;
+		pIndices[6] = 4, pIndices[7] = 5, pIndices[8] = 6, pIndices[9] = 6, pIndices[10] = 7, pIndices[11] = 4,
+		pIndices[12] = 8, pIndices[13] = 9, pIndices[14] = 10, pIndices[15] = 10, pIndices[16] = 11, pIndices[17] = 8,
+		pIndices[18] = 16, pIndices[19] = 17, pIndices[20] = 18, pIndices[21] = 18, pIndices[22] = 19, pIndices[23] = 16,
+		pIndices[24] = 12, pIndices[25] = 13, pIndices[26] = 14, pIndices[27] = 14, pIndices[28] = 15, pIndices[29] = 12,
+		pIndices[30] = 20, pIndices[31] = 21, pIndices[32] = 22, pIndices[33] = 22, pIndices[34] = 23, pIndices[35] = 20;
+
+		//pIndices[0] = 0, pIndices[1] = 0, pIndices[2] = 0, pIndices[3] = 0, pIndices[4] = 0, pIndices[5] = 0,
+		//	pIndices[6] = 0, pIndices[7] = 0, pIndices[8] = 0, pIndices[9] = 0, pIndices[10] = 0, pIndices[11] = 0,
+		//	pIndices[12] = 0, pIndices[13] = 0, pIndices[14] = 0, pIndices[15] = 0, pIndices[16] = 0, pIndices[17] = 0,
+		//	pIndices[18] = 12, pIndices[19] = 13, pIndices[20] = 14, pIndices[21] = 14, pIndices[22] = 15, pIndices[23] = 12,
+		//	pIndices[24] = 0, pIndices[25] = 0, pIndices[26] = 0, pIndices[27] = 0, pIndices[28] = 0, pIndices[29] = 0,
+		//	pIndices[30] = 0, pIndices[31] = 0, pIndices[32] = 0, pIndices[33] = 0, pIndices[34] = 0, pIndices[35] = 0;
 	};
 	mesh->m_indexCount = 36;
 	mesh->m_pIndices = pIndices;

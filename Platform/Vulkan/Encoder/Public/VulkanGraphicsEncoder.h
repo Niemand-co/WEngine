@@ -32,7 +32,9 @@ namespace Vulkan
 
 		virtual void DrawIndexed(unsigned int indexeCount, unsigned int firstIndex, unsigned int instanceCount = 1, unsigned int firstInstance = 0) override;
 
-		virtual void ResourceBarrier(RHITexture *ptexture) override;
+		virtual void ResourceBarrier(unsigned int srcStage, unsigned int dstStage) override;
+
+		virtual void ResourceBarrier(RHITexture* ptexture) override;
 
 		virtual void ResourceBarrier(RHIBuffer *pBuffer, size_t size) override;
 

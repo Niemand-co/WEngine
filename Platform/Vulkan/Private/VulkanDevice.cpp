@@ -379,10 +379,11 @@ namespace Vulkan
 		VkFramebuffer *framebuffer = (VkFramebuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkFramebuffer));
 		RE_ASSERT(vkCreateFramebuffer(*m_pDevice, &framebufferCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), framebuffer) == VK_SUCCESS, "Failed to Create Framebuffer.");
 
-		RHIRenderTarget *renderTarget = (RHIRenderTarget*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanRenderTarget));
-		::new (renderTarget) VulkanRenderTarget(framebuffer, descriptor->width, descriptor->height, m_pDevice);
+		//VulkanRenderTarget *renderTarget = (VulkanRenderTarget*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanRenderTarget));
+		//::new (renderTarget) VulkanRenderTarget(framebuffer, descriptor->width, descriptor->height, m_pDevice);
 
-		return renderTarget;
+		//return renderTarget;
+		return new VulkanRenderTarget(framebuffer, descriptor->width, descriptor->height, m_pDevice);
 	}
 
 	RHIBuffer* VulkanDevice::CreateBuffer(RHIBufferDescriptor* descriptor)
@@ -429,7 +430,7 @@ namespace Vulkan
 			pDescriptorSetLayoutBindings[i].binding = resource->bindingSlot;
 			pDescriptorSetLayoutBindings[i].descriptorCount = resource->count;
 			pDescriptorSetLayoutBindings[i].descriptorType = WEngine::ToVulkan(resource->type);
-			pDescriptorSetLayoutBindings[i].stageFlags = WEngine::ToVulkan(resource->shaderStage);
+			pDescriptorSetLayoutBindings[i].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 			pDescriptorSetLayoutBindings[i].pImmutableSamplers = nullptr;
 		}
 		

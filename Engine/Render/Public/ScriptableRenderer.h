@@ -23,27 +23,27 @@ public:
 
 	virtual ~ScriptableRenderer();
 
-	virtual void Setup(CameraData *cameraData);
+	virtual void Setup(RHIContext* context, CameraData *cameraData);
 
 	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence);
 
-	virtual void AddRenderPass();
+	virtual void EnqueRenderPass(ScriptableRenderPass* renderPass);
+
+	void* operator new(size_t size)
+	{
+		return WEngine::Allocator::Get()->Allocate(size);
+	}
+
+	void operator delete(void* pData)
+	{
+		WEngine::Allocator::Get()->Deallocate(pData);
+	}
 
 private:
 
 	std::vector<ScriptableRenderPass*> m_passes;
 
 	RHIDevice *m_pDevice;
-
-	RHIContext *m_pContext;
-
-	ScriptableRenderPass *m_drawOpaquePass;
-
-	ScriptableRenderPass *m_mainLightShadowPass;
-
-	ScriptableRenderPass *m_finalBlitPass;
-
-	ScriptableRenderPass *m_drawGuiPass;
 
 	std::vector<RHISemaphore*> m_semaphores;
 

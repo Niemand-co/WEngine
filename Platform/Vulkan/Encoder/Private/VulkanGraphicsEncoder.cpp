@@ -25,7 +25,7 @@ namespace Vulkan
 		renderPassBeginInfo.renderArea.offset = { 0, 0 };
 		renderPassBeginInfo.renderArea.extent = { descriptor->renderTarget->GetWidth(), descriptor->renderTarget->GetHeight() };
 		renderPassBeginInfo.clearValueCount = 1;
-		VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 0.0f}} };
+		VkClearValue clearColor = { {{1.0f, 1.0f, 1.0f, 1.0f}} };
 		renderPassBeginInfo.pClearValues = &clearColor;
 
 		vkCmdBeginRenderPass(*m_cmd, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
@@ -98,6 +98,11 @@ namespace Vulkan
 	void VulkanGraphicsEncoder::DrawIndexed(unsigned int indexeCount, unsigned int firstIndex, unsigned int instanceCount, unsigned int firstInstance)
 	{
 		vkCmdDrawIndexed(*m_cmd, indexeCount, instanceCount, firstIndex, 0, firstInstance);
+	}
+
+	void VulkanGraphicsEncoder::ResourceBarrier(unsigned int srcStage, unsigned int dstStage)
+	{
+		vkCmdPipelineBarrier(*m_cmd, srcStage, dstStage, VkDependencyFlagBits(), 0, nullptr, 0, nullptr, 0, nullptr);
 	}
 
 	void VulkanGraphicsEncoder::ResourceBarrier(RHITexture *pTexture)

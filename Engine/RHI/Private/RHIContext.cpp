@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "RHI/Public/RHIHeads.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
+#include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Utils/Public/Window.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
 
@@ -46,6 +47,8 @@ void RHIContext::Init()
 	m_pTextureViews.push_back(m_pSwapchain->GetTexture(0)->CreateTextureView(&textureViewDescriptor));
 	m_pTextureViews.push_back(m_pSwapchain->GetTexture(1)->CreateTextureView(&textureViewDescriptor));
 	m_pTextureViews.push_back(m_pSwapchain->GetTexture(2)->CreateTextureView(&textureViewDescriptor));
+
+	m_pPrimaryCommandBuffers = m_pPool->GetCommandBuffer(3u, true);
 
 	m_isDisplayChagned = false;
 }
@@ -96,9 +99,14 @@ RHITextureView* RHIContext::GetTextureView(unsigned int index)
 	return m_pTextureViews[index];
 }
 
-RHICommandBuffer* RHIContext::GetCommandBuffer()
+RHICommandBuffer* RHIContext::GetCommandBuffer(bool isPrimary)
 {
-	return m_pPool->GetCommandBuffer();
+	return m_pPool->GetCommandBuffer(isPrimary);
+}
+
+std::vector<RHICommandBuffer*> RHIContext::GetCommandBuffer(unsigned int count, bool isPrimary)
+{
+	return m_pPool->GetCommandBuffer(count, isPrimary);
 }
 
 int RHIContext::GetNextImage(RHISemaphore *pSignalSemaphore)
@@ -113,15 +121,17 @@ void RHIContext::ExecuteCommandBuffer(RHICommandBuffer* cmd)
 
 void RHIContext::Submit(RHISubmitDescriptor* descriptor)
 {
-	descriptor->commandBufferCount = m_pCommandBuffers.size();
-	descriptor->pCommandBuffers = m_pCommandBuffers.data();
+	m_pPrimaryCommandBuffers[ScriptableRenderPipeline::g_currentFrame]->Clear();
+	m_pPrimaryCommandBuffers[ScriptableRenderPipeline::g_currentFrame]->BeginScopePass("Frame");
+	for(unsigned int i = 0; i < m_pCommandBuffers.size(); ++i)
+	{
+		m_pPrimaryCommandBuffers[ScriptableRenderPipeline::g_currentFrame]->ExecuteCommandBuffer(m_pCommandBuffers[i]);
+	}
+	m_pPrimaryCommandBuffers[ScriptableRenderPipeline::g_currentFrame]->EndScopePass();
+
+	descriptor->commandBufferCount = 1;
+	descriptor->pCommandBuffers = &m_pPrimaryCommandBuffers[ScriptableRenderPipeline::g_currentFrame];
 	m_pQueue->Submit(descriptor);
-	//vkDeviceWaitIdle(*static_cast<Vulkan::VulkanDevice*>(m_pDevice)->GetHandle());
-	//for (unsigned int i = 0; i < m_pCommandBuffers.size(); ++i)
-	//{
-	//	m_pCommandBuffers[i]->~RHICommandBuffer();
-	//	WEngine::Allocator::Get()->Deallocate(m_pCommandBuffers[i]);
-	//}
 	m_pCommandBuffers.clear();
 }
 

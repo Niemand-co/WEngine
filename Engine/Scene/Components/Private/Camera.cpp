@@ -38,6 +38,7 @@ CameraData* Camera::GetData()
 	::new (data) CameraData();
 
 	data->camera = this;
+	data->Position = static_cast<Transformer*>(m_pGameObject->GetComponent<Component::ComponentType::Transformer>())->GetPosition();
 	data->MatrixV = this->GetViewMatrix();
 	data->MatrixP = this->GetProjectionMatrix();
 	data->MatrixVP = data->MatrixP * data->MatrixV;

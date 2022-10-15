@@ -39,6 +39,8 @@ public:
 
 	static unsigned int g_currentFrame;
 
+	static unsigned int g_maxFrame;
+
 private:
 
 	static ScriptableRenderPipeline *g_instance;
@@ -58,8 +60,6 @@ private:
 	std::vector<RHISemaphore*> m_pPresentAVailibleSemaphores;
 
 	std::vector<RHIFence*> m_pFences;
-
-	unsigned int m_maxFrame;
 
 	std::vector<Camera*> m_pCameras;
 

@@ -14,7 +14,7 @@ public:
 
 	virtual void Setup(RHIContext *context, CameraData *cameraData) override;
 
-	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence = nullptr, RHIEvent* pEvent = nullptr) override;
+	virtual void Execute(RHIContext *context) override;
 
 private:
 

@@ -40,6 +40,8 @@ public:
 
 	virtual void DrawIndexed(unsigned int indexeCount, unsigned int firstIndex, unsigned int instanceCount = 1, unsigned int firstInstance = 0) = 0;
 
+	virtual void ResourceBarrier(unsigned int srcStage, unsigned int dstStage) = 0;
+
 	virtual void ResourceBarrier(RHITexture *pTexture) = 0;
 
 	virtual void ResourceBarrier(RHIBuffer *pBuffer, size_t size) = 0;

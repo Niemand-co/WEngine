@@ -30,11 +30,14 @@ namespace Vulkan
 		vkEndCommandBuffer(*m_commandBuffer);
 	}
 
+	void VulkanCommandBuffer::ExecuteCommandBuffer(RHICommandBuffer* pCommandBuffer)
+	{
+		vkCmdExecuteCommands(*m_commandBuffer, 1, static_cast<VulkanCommandBuffer*>(pCommandBuffer)->GetHandle());
+	}
+
 	RHIGraphicsEncoder* VulkanCommandBuffer::GetGraphicsEncoder()
 	{
-		VulkanGraphicsEncoder *pEncoder = (VulkanGraphicsEncoder*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanGraphicsEncoder));
-		::new (pEncoder) VulkanGraphicsEncoder(m_commandBuffer);
-		return pEncoder;
+		return new VulkanGraphicsEncoder(m_commandBuffer);
 	}
 
 	RHIComputeEncoder* VulkanCommandBuffer::GetComputeEncoder()
@@ -44,7 +47,7 @@ namespace Vulkan
 
 	void VulkanCommandBuffer::Clear()
 	{
-		vkResetCommandBuffer(*m_commandBuffer, VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
+		vkResetCommandBuffer(*m_commandBuffer, 0);
 	}
 
 	VkCommandBuffer* VulkanCommandBuffer::GetHandle()

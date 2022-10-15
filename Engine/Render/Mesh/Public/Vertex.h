@@ -18,7 +18,7 @@ struct Vertex
 {
 public:
 
-	Vertex(Vector3 position = {0, 0, 0}, Vector3 color = {0, 0, 0}, Vector2 uv = {0, 0});
+	Vertex(Vector3 position = {0, 0, 0}, Vector3 color = {0, 0, 0}, Vector3 normal = {1.0f, 0, 0}, Vector2 uv = {0, 0});
 
 	~Vertex();
 
@@ -27,6 +27,8 @@ public:
 	Vector3 Position;
 
 	Vector3 Color;
+
+	Vector3 Normal;
 
 	Vector2 UV;
 	

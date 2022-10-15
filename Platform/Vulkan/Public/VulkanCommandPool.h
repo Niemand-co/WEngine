@@ -12,7 +12,9 @@ namespace Vulkan
 
 		virtual ~VulkanCommandPool();
 
-		virtual RHICommandBuffer* GetCommandBuffer(unsigned int num = 1) override;
+		virtual RHICommandBuffer* GetCommandBuffer(bool isPrimary = true) override;
+
+		virtual std::vector<RHICommandBuffer*> GetCommandBuffer(unsigned int count, bool isPrimary = true) override;
 
 	private:
 

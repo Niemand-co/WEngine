@@ -64,6 +64,7 @@ private:
 struct CameraData
 {
 	Camera *camera;
+	glm::vec3 Position;
 	glm::mat4x4 MatrixV;
 	glm::mat4x4 MatrixP;
 	glm::mat4x4 MatrixVP;
