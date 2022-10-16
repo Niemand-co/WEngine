@@ -3,7 +3,7 @@
 struct VSInput
 {
 	float3 Position : POSITION;
-	float3 Color : COLOR;
+    float3 Color : COLOR;
     float3 Normal : NORMAL;
 };
 

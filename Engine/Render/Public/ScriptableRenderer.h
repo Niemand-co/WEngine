@@ -25,7 +25,7 @@ public:
 
 	virtual void Setup(RHIContext* context, CameraData *cameraData);
 
-	virtual void Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence);
+	virtual void Execute(RHIContext *context, CameraData* cameraData, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence);
 
 	virtual void EnqueRenderPass(ScriptableRenderPass* renderPass);
 

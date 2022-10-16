@@ -8,4 +8,8 @@ public:
 
 	virtual void LoadData(void *pData, size_t size) = 0;
 
+public:
+
+	unsigned int size;
+
 };

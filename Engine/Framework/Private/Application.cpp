@@ -3,8 +3,9 @@
 #include "Utils/Public/Window.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Scene/Public/GameObject.h"
+#include "Scene/Components/Public/MeshFilter.h"
+#include "Render/Mesh/Public/Mesh.h"
 #include "Scene/Public/World.h"
-#include <time.h>
 
 Application* Application::m_instance = nullptr;
 
@@ -41,12 +42,15 @@ void Application::Init()
 
 	World::CreateWorld();
 
-	GameObject *go = World::GetWorld()->CreateGameObject();
-	
+	GameObject *go = World::GetWorld()->CreateGameObject("Cube");
 	static_cast<Transformer*>(go->GetComponent<Component::ComponentType::Transformer>())->SetPosition(glm::vec3(2.0f, 2.0f, 2.0f));
+	MeshFilter *filter = (MeshFilter*)go->AddComponent<Component::ComponentType::MeshFilter>();
+	filter->SetStaticMesh(Mesh::GetCube());
 
 	Camera *camera = (Camera*)go->AddComponent<Component::ComponentType::Camera>();
 	camera->m_aspect = (float)Window::cur_window->GetWidth() / (float)Window::cur_window->GetHeight();
+
+	go->AddComponent<Component::ComponentType::Material>();
 
 	m_pipeline = ScriptableRenderPipeline::get();
 

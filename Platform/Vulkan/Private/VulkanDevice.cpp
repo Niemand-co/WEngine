@@ -30,6 +30,7 @@ namespace Vulkan
 	RHIQueue* VulkanDevice::GetQueue(RHIQueueType type, unsigned int count)
 	{
 		VkQueue *pQueue = (VkQueue*)WEngine::Allocator::Get()->Allocate(sizeof(VkQueue));
+		::new (pQueue) VkQueue();
 		unsigned int queueFamilyID = 0;
 		for(; queueFamilyID < m_queues.size(); ++queueFamilyID)
 			if(m_queues[queueFamilyID].type == type)
@@ -142,20 +143,46 @@ namespace Vulkan
 			pAttachmentDescriptions[i].finalLayout = WEngine::ToVulkan(pAttachmentDescriptor->finalLayout);
 		}
 
-		VkSubpassDescription *pSubpassDescriptions = (VkSubpassDescription*)WEngine::Allocator::Get()->Allocate(descriptor->subpassCount * sizeof(VkSubpassDescription));
-		VkAttachmentReference *pAttachmentReferences = (VkAttachmentReference*)WEngine::Allocator::Get()->Allocate(descriptor->subpassCount * sizeof(VkAttachmentReference));
-		VkSubpassDependency *pSubpassDependencies = (VkSubpassDependency*)WEngine::Allocator::Get()->Allocate(descriptor->subpassCount * sizeof(VkSubpassDependency));
+		std::vector<VkSubpassDescription> pSubpassDescriptions(descriptor->subpassCount);
+		std::vector<VkAttachmentReference*> pColorAttachmentReferences(descriptor->subpassCount);
+		std::vector<VkAttachmentReference*> pDepthAttachmentReferences(descriptor->subpassCount);
+		std::vector<VkAttachmentReference*> pInputAttachmentReferences(descriptor->subpassCount);
+		std::vector<VkSubpassDependency> pSubpassDependencies(descriptor->subpassCount);
 		for (unsigned int i = 0; i < descriptor->subpassCount; ++i)
 		{
 			RHISubPassDescriptor *pSubpassDescriptor = descriptor->pSubPassDescriptors + i;
-			::new (pAttachmentReferences + i) VkAttachmentReference();
-			pAttachmentReferences[i].attachment = pSubpassDescriptor->attachmentIndex;
-			pAttachmentReferences[i].layout = WEngine::ToVulkan(pSubpassDescriptor->attachmentLayout);
-			::new (pSubpassDescriptions + i) VkSubpassDescription();
+
+			pColorAttachmentReferences[i] = (VkAttachmentReference*)WEngine::Allocator::Get()->Allocate(pSubpassDescriptor->colorAttachmentCount * sizeof(VkAttachmentReference));
+			for (unsigned int j = 0; j < pSubpassDescriptor->colorAttachmentCount; ++j)
+			{
+				::new (pColorAttachmentReferences[i] + j) VkAttachmentReference();
+				pColorAttachmentReferences[i][j].attachment = (pSubpassDescriptor->pColorAttachments + j)->attachmentIndex;
+				pColorAttachmentReferences[i][j].layout = WEngine::ToVulkan((pSubpassDescriptor->pColorAttachments + j)->attachmentLayout);
+			}
+
+			pDepthAttachmentReferences[i] = (VkAttachmentReference*)WEngine::Allocator::Get()->Allocate(sizeof(VkAttachmentReference));
+			if (pSubpassDescriptor->pDepthStencilAttachment != nullptr)
+			{
+				::new (pDepthAttachmentReferences[i]) VkAttachmentReference();
+				pDepthAttachmentReferences[i]->attachment = pSubpassDescriptor->pDepthStencilAttachment->attachmentIndex;
+				pDepthAttachmentReferences[i]->layout = WEngine::ToVulkan(pSubpassDescriptor->pDepthStencilAttachment->attachmentLayout);
+			}
+
+			pInputAttachmentReferences[i] = (VkAttachmentReference*)WEngine::Allocator::Get()->Allocate(pSubpassDescriptor->inputAttachmentCount * sizeof(VkAttachmentReference));
+			for (unsigned int j = 0; j < pSubpassDescriptor->inputAttachmentCount; ++j)
+			{
+				::new (pInputAttachmentReferences[i] + j) VkAttachmentReference();
+				pInputAttachmentReferences[i][j].attachment = (pSubpassDescriptor->pInputAttachments + j)->attachmentIndex;
+				pInputAttachmentReferences[i][j].layout = WEngine::ToVulkan((pSubpassDescriptor->pInputAttachments + j)->attachmentLayout);
+			}
+
 			pSubpassDescriptions[i].pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-			pSubpassDescriptions[i].colorAttachmentCount = 1;
-			pSubpassDescriptions[i].pColorAttachments = &pAttachmentReferences[i];
-			::new (pSubpassDependencies + i) VkSubpassDependency();
+			pSubpassDescriptions[i].colorAttachmentCount = pSubpassDescriptor->colorAttachmentCount;
+			pSubpassDescriptions[i].pColorAttachments = pColorAttachmentReferences[i];
+			pSubpassDescriptions[i].pDepthStencilAttachment = pDepthAttachmentReferences[i];
+			pSubpassDescriptions[i].inputAttachmentCount = pSubpassDescriptor->inputAttachmentCount;
+			pSubpassDescriptions[i].pInputAttachments = pInputAttachmentReferences[i];
+
 			pSubpassDependencies[i].srcSubpass = pSubpassDescriptor->dependedPass >= 0 ? pSubpassDescriptor->dependedPass : VK_SUBPASS_EXTERNAL;
 			pSubpassDependencies[i].dstSubpass = i;
 			pSubpassDependencies[i].srcStageMask = pSubpassDescriptor->dependedStage;
@@ -169,9 +196,9 @@ namespace Vulkan
 		renderPassCreateInfo.attachmentCount = descriptor->attachmentCount;
 		renderPassCreateInfo.pAttachments = pAttachmentDescriptions;
 		renderPassCreateInfo.subpassCount = descriptor->subpassCount;
-		renderPassCreateInfo.pSubpasses = pSubpassDescriptions;
+		renderPassCreateInfo.pSubpasses = pSubpassDescriptions.data();
 		renderPassCreateInfo.dependencyCount = descriptor->subpassCount;
-		renderPassCreateInfo.pDependencies = pSubpassDependencies;
+		renderPassCreateInfo.pDependencies = pSubpassDependencies.data();
 
 		VkRenderPass *pRenderPass = (VkRenderPass*)WEngine::Allocator::Get()->Allocate(sizeof(VkRenderPass));
    		RE_ASSERT(vkCreateRenderPass(*m_pDevice, &renderPassCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pRenderPass) == VK_SUCCESS, "Failed to Create Render Pass.");
@@ -379,11 +406,10 @@ namespace Vulkan
 		VkFramebuffer *framebuffer = (VkFramebuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkFramebuffer));
 		RE_ASSERT(vkCreateFramebuffer(*m_pDevice, &framebufferCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), framebuffer) == VK_SUCCESS, "Failed to Create Framebuffer.");
 
-		//VulkanRenderTarget *renderTarget = (VulkanRenderTarget*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanRenderTarget));
-		//::new (renderTarget) VulkanRenderTarget(framebuffer, descriptor->width, descriptor->height, m_pDevice);
+		VulkanRenderTarget *renderTarget = (VulkanRenderTarget*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanRenderTarget));
+		::new (renderTarget) VulkanRenderTarget(framebuffer, descriptor->width, descriptor->height, m_pDevice);
 
-		//return renderTarget;
-		return new VulkanRenderTarget(framebuffer, descriptor->width, descriptor->height, m_pDevice);
+		return renderTarget;
 	}
 
 	RHIBuffer* VulkanDevice::CreateBuffer(RHIBufferDescriptor* descriptor)
@@ -395,6 +421,7 @@ namespace Vulkan
 		bufferCreateInfo.size = descriptor->size;
 
 		VkBuffer* pBuffer = (VkBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkBuffer));
+		::new (pBuffer) VkBuffer();
 		RE_ASSERT(vkCreateBuffer(*m_pDevice, &bufferCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pBuffer) == VK_SUCCESS, "Failed to Create Buffer.");
 
 		unsigned int index = 0;
@@ -442,6 +469,7 @@ namespace Vulkan
 		}
 
 		VkDescriptorSetLayout *pDescriptorSetLayout = (VkDescriptorSetLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VkDescriptorSetLayout));
+		::new (pDescriptorSetLayout) VkDescriptorSetLayout();
 		RE_ASSERT(vkCreateDescriptorSetLayout(*m_pDevice, &descriptorSetLayoutCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pDescriptorSetLayout) == VK_SUCCESS, "Failed to Create Descriptor Set Layout.");
 
 		RHIGroupLayout *groupLayout = (RHIGroupLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanGroupLayout));
@@ -483,6 +511,7 @@ namespace Vulkan
 		VkDescriptorPoolSize *pDescriptorPoolSizes = (VkDescriptorPoolSize*)WEngine::Allocator::Get()->Allocate(descriptor->pGroupLayout->bindingCount * sizeof(VkDescriptorPoolSize));
 		for (unsigned int i = 0; i < descriptor->pGroupLayout->bindingCount; ++i)
 		{
+			::new (pDescriptorPoolSizes + i) VkDescriptorPoolSize();
 			pDescriptorPoolSizes[i].descriptorCount = descriptor->pGroupLayout->pBindingResources[i].count;
 			pDescriptorPoolSizes[i].type = WEngine::ToVulkan(descriptor->pGroupLayout->pBindingResources[i].type);
 		}

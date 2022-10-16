@@ -146,5 +146,6 @@ ScriptableRenderer* ScriptableRenderPipeline::CreateRenderer()
 
 void ScriptableRenderPipeline::RenderSingleCamera(Camera* camera, RHIContext* context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence* fence)
 {
-	camera->GetRenderer()->Execute(context, waitSemaphore, signalSemaphore, fence);
+	CameraData *data = camera->GetData();
+	camera->GetRenderer()->Execute(context, data, waitSemaphore, signalSemaphore, fence);
 }

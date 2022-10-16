@@ -2,6 +2,7 @@
 #include "Platform/Vulkan/Encoder/Public/VulkanGraphicsEncoder.h"
 #include "Platform/Vulkan/Public/VulkanHeads.h"
 #include "Render/Descriptor/Public/RHIRenderPassBeginDescriptor.h"
+#include "Render/Descriptor/Public/RHIBarrierDescriptor.h"
 #include "Utils/Public/Window.h"
 
 namespace Vulkan
@@ -25,7 +26,9 @@ namespace Vulkan
 		renderPassBeginInfo.renderArea.offset = { 0, 0 };
 		renderPassBeginInfo.renderArea.extent = { descriptor->renderTarget->GetWidth(), descriptor->renderTarget->GetHeight() };
 		renderPassBeginInfo.clearValueCount = 1;
-		VkClearValue clearColor = { {{1.0f, 1.0f, 1.0f, 1.0f}} };
+		VkClearValue clearColor;
+		clearColor.color = {1.0f, 1.0f, 1.0f, 1.0f};
+		clearColor.depthStencil.depth = 0.0f;
 		renderPassBeginInfo.pClearValues = &clearColor;
 
 		vkCmdBeginRenderPass(*m_cmd, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
@@ -105,32 +108,41 @@ namespace Vulkan
 		vkCmdPipelineBarrier(*m_cmd, srcStage, dstStage, VkDependencyFlagBits(), 0, nullptr, 0, nullptr, 0, nullptr);
 	}
 
-	void VulkanGraphicsEncoder::ResourceBarrier(RHITexture *pTexture)
+	void VulkanGraphicsEncoder::ResourceBarrier(RHIBarrierDescriptor* pDescriptor)
 	{
-		VkImageMemoryBarrier imageMemoryBarrier = {};
+		VkBufferMemoryBarrier *pBufferBarriers = (VkBufferMemoryBarrier*)WEngine::Allocator::Get()->Allocate(pDescriptor->bufferCount * sizeof(VkBufferMemoryBarrier));
+		for (unsigned int i = 0; i < pDescriptor->bufferCount; ++i)
 		{
-			imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-			imageMemoryBarrier.image = *static_cast<VulkanTexture*>(pTexture)->GetHandle();
-			imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-			imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			::new (pBufferBarriers + i) VkBufferMemoryBarrier();
+			BufferBarrier *pBarrier = pDescriptor->pBufferBarriers + i;
+			pBufferBarriers[i].sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+			pBufferBarriers[i].buffer = *static_cast<VulkanBuffer*>(pBarrier->pBuffer)->GetHandle();
+			pBufferBarriers[i].size = pBarrier->pBuffer->size;
+			pBufferBarriers[i].offset = 0;
+			pBufferBarriers[i].srcAccessMask = VK_ACCESS_HOST_READ_BIT;
+			pBufferBarriers[i].dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
 		}
-		vkCmdPipelineBarrier(*m_cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VkDependencyFlagBits(), 0, nullptr, 0, nullptr, 0, &imageMemoryBarrier);
-	}
 
-	void VulkanGraphicsEncoder::ResourceBarrier(RHIBuffer* pBuffer, size_t size)
-	{
-		VkBufferMemoryBarrier bufferMemoryBarrier = {};
+		VkImageMemoryBarrier *pImageBarriers = (VkImageMemoryBarrier*)WEngine::Allocator::Get()->Allocate(pDescriptor->textureCount * sizeof(VkImageMemoryBarrier));
+		for (unsigned int i = 0; i < pDescriptor->textureCount; ++i)
 		{
-			bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-			bufferMemoryBarrier.buffer = *static_cast<VulkanBuffer*>(pBuffer)->GetHandle();
-			bufferMemoryBarrier.size = size;
-			bufferMemoryBarrier.offset = 0;
-			bufferMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_READ_BIT;
-			bufferMemoryBarrier.dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
+			::new (pImageBarriers + i) VkImageMemoryBarrier();
+			TextureBarrier *pBarrier = pDescriptor->pTextureBarriers + i;
+			pImageBarriers[i].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			pImageBarriers[i].pNext = nullptr;
+			pImageBarriers[i].image = *static_cast<VulkanTexture*>(pBarrier->pTexture)->GetHandle();
+			pImageBarriers[i].oldLayout = WEngine::ToVulkan(pBarrier->oldLayout);
+			pImageBarriers[i].newLayout = WEngine::ToVulkan(pBarrier->newLayout);
+			pImageBarriers[i].srcAccessMask = pBarrier->srcAccess;
+			pImageBarriers[i].dstAccessMask = pBarrier->dstAccess;
+			pImageBarriers[i].subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+			pImageBarriers[i].subresourceRange.baseArrayLayer = 0;
+			pImageBarriers[i].subresourceRange.layerCount = 1;
+			pImageBarriers[i].subresourceRange.baseMipLevel = 0;
+			pImageBarriers[i].subresourceRange.levelCount = 1;
 		}
-		vkCmdPipelineBarrier(*m_cmd, VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VkDependencyFlagBits(), 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
+
+		vkCmdPipelineBarrier(*m_cmd, pDescriptor->srcStage, pDescriptor->dstStage, VkDependencyFlagBits(), 0, nullptr, pDescriptor->bufferCount, pBufferBarriers, pDescriptor->textureCount, pImageBarriers);
 	}
 
 	void VulkanGraphicsEncoder::SetEvent(RHIEvent* pEvent)

@@ -9,8 +9,7 @@
 #include "Utils/ImGui/Public/Gui.h"
 #include "Render/Mesh/Public/Mesh.h"
 #include "Render/Mesh/Public/Vertex.h"
-#include "Scene/Components/Public/Camera.h"
-#include "Scene/Components/Public/Material.h"
+#include "Scene/Public/GameObject.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 
 struct UniformData
@@ -24,6 +23,7 @@ struct UniformData
 DrawOpaquePass::DrawOpaquePass(RenderPassConfigure* configure)
 	: ScriptableRenderPass(configure)
 {
+	RE_LOG(sizeof(SurfaceData));
 }
 
 DrawOpaquePass::~DrawOpaquePass()
@@ -32,20 +32,52 @@ DrawOpaquePass::~DrawOpaquePass()
 
 void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 {
+	m_pDepthTextures.resize(3);
+	RHITextureDescriptor textureDescriptor = {};
+	{
+		textureDescriptor.format = Format::D32_SFloat;
+		textureDescriptor.height = Window::cur_window->GetHeight();
+		textureDescriptor.width = Window::cur_window->GetWidth();
+		textureDescriptor.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+		textureDescriptor.mipCount = 1;
+		textureDescriptor.layout = AttachmentLayout::Undefined;
+	}
+	m_pDepthTextures[0] = m_pDevice->CreateTexture(&textureDescriptor);
+	m_pDepthTextures[1] = m_pDevice->CreateTexture(&textureDescriptor);
+	m_pDepthTextures[2] = m_pDevice->CreateTexture(&textureDescriptor);
+	//TextureBarrier textureBarrier = { m_pDepthTextures, AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE };
+	//RHIBarrierDescriptor barrierDescriptor = {};
+	//{
+	//	barrierDescriptor.textureCount = 1;
+	//	barrierDescriptor.pTextureBarriers = &textureBarrier;
+	//	barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
+	//	barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
+	//}
+	//context->ImageLayoutTransition(&barrierDescriptor);
+
 	RHIAttachmentDescriptor attachmentDescriptors[] =
 	{
-		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::ColorBuffer },
+		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::DontCare, AttachmentLayout::Undefined, AttachmentLayout::Present },
+		{ Format::D32_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::DontCare, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer }
 	};
-	RHISubPassDescriptor subpassDescriptors[] =
+	SubPassAttachment subpassColorAttachment = { 0, AttachmentLayout::ColorBuffer };
+	SubPassAttachment subpassDepthAttachment = { 1, AttachmentLayout::DepthBuffer };
+
+	RHISubPassDescriptor subpassDescriptors = {};
 	{
-		{ 0, AttachmentLayout::ColorBuffer, -1, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, 0, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
-	};
+		subpassDescriptors.colorAttachmentCount = 1;
+		subpassDescriptors.pColorAttachments = &subpassColorAttachment;
+		subpassDescriptors.pDepthStencilAttachment = &subpassDepthAttachment;
+		subpassDescriptors.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
+		subpassDescriptors.waitingStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
+		subpassDescriptors.waitingAccess = ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE;
+	}
 	RHIRenderPassDescriptor renderPassDescriptor = {};
 	{
-		renderPassDescriptor.attachmentCount = 1;
+		renderPassDescriptor.attachmentCount = 2;
 		renderPassDescriptor.pAttachmentDescriptors = attachmentDescriptors;
 		renderPassDescriptor.subpassCount = 1;
-		renderPassDescriptor.pSubPassDescriptors = subpassDescriptors;
+		renderPassDescriptor.pSubPassDescriptors = &subpassDescriptors;
 	}
 	m_pRenderPass = m_pDevice->CreateRenderPass(&renderPassDescriptor);
 
@@ -82,15 +114,16 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 	RHIDepthStencilDescriptor depthStencilDescriptor = {};
 	{
-		depthStencilDescriptor.depthWriteEnabled = true;
-		depthStencilDescriptor.depthTestEnabled = true;
+		depthStencilDescriptor.depthWriteEnabled = false;
+		depthStencilDescriptor.depthTestEnabled = false;
 		depthStencilDescriptor.depthCompareOP = DepthCompareOP::Greater;
 		depthStencilDescriptor.depthBoundsTest = false;
-		depthStencilDescriptor.maxDepth = 1.0f;
-		depthStencilDescriptor.minDepth = 0.0f;
+		depthStencilDescriptor.maxDepth = 0.0f;
+		depthStencilDescriptor.minDepth = 1.0f;
 	}
 
-	m_pMesh = Mesh::GetCube();
+	GameObject *go = GameObject::Find("Cube");
+	m_pMesh = static_cast<MeshFilter*>(go->GetComponent<Component::ComponentType::MeshFilter>())->GetStaticMesh();
 
 	BindingResource resource[1] = 
 	{
@@ -147,12 +180,14 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 	m_pIndexBuffer = context->CreateIndexBuffer(&indexBufferDescriptor);
 
+	SurfaceData surfaceData = static_cast<Material*>(go->GetComponent<Component::ComponentType::Material>())->GetSurfaceData();
+
 	UniformData data = 
 	{
 		cameraData->MatrixVP,
 		glm::vec4(-2.0f, 2.0f, -2.0f, 1.0f),
 		glm::vec4(cameraData->Position, 1.0f),
-		glm::vec4(1.0f, 0.0f, 0.0f, 0.6f)
+		glm::vec4(surfaceData.albedo, surfaceData.roughness)
 	};
 	RHIBufferDescriptor uniformBufferDescriptor = {};
 	{
@@ -175,13 +210,24 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 	context->UpdateResourceToGroup(&updateResourceDescriptor);
 
+	RHITextureViewDescriptor depthViewDescriptor = {};
+	{
+		depthViewDescriptor.format = Format::D32_SFloat;
+		depthViewDescriptor.mipCount = 1;
+		depthViewDescriptor.baseMipLevel = 0;
+		depthViewDescriptor.arrayLayerCount = 1;
+		depthViewDescriptor.baseArrayLayer = 0;
+		depthViewDescriptor.dimension = Dimension::Texture2D;
+		depthViewDescriptor.imageAspect = IMAGE_ASPECT_DEPTH;
+	}
+	std::vector<RHITextureView*> depthViews;
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
-		std::vector<RHITextureView*> textureViews = { context->GetTextureView(i) };
+		std::vector<RHITextureView*> textureViews = { context->GetTextureView(i), m_pDepthTextures[i]->CreateTextureView(&depthViewDescriptor) };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
-			renderTargetDescriptor.bufferCount = 1;
+			renderTargetDescriptor.bufferCount = 2;
 			renderTargetDescriptor.pBufferView = textureViews.data();
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.width = Window::cur_window->GetWidth();
@@ -193,7 +239,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	m_pCommandBuffers = context->GetCommandBuffer(ScriptableRenderPipeline::g_maxFrame, false);
 }
 
-void DrawOpaquePass::Execute(RHIContext *context)
+void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 {
 	if (context->IsDisplayChanged())
 	{
@@ -217,6 +263,33 @@ void DrawOpaquePass::Execute(RHIContext *context)
 
 	RHICommandBuffer *cmd = m_pCommandBuffers[ScriptableRenderPipeline::g_currentFrame];
 
+	SurfaceData surfaceData = static_cast<Material*>(GameObject::Find("Cube")->GetComponent<Component::ComponentType::Material>())->GetSurfaceData();
+	UniformData data =
+	{
+		cameraData->MatrixVP,
+		glm::vec4(-2.0f, 2.0f, -2.0f, 1.0f),
+		glm::vec4(cameraData->Position, 1.0f),
+		glm::vec4(surfaceData.albedo, surfaceData.roughness)
+	};
+	m_pUniformBuffer->LoadData(&data, sizeof(data));
+
+	size_t pSizes[1] = { sizeof(data) };
+	size_t pOffsets[1] = { 0 };
+	BindingResource resource[1] =
+	{
+		{0, ResourceType::UniformBuffer, 1, ShaderStage::vertex},
+	};
+	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
+	{
+		updateResourceDescriptor.bindingCount = 1;
+		updateResourceDescriptor.pBindingResources = resource;
+		updateResourceDescriptor.pBuffer = m_pUniformBuffer;
+		updateResourceDescriptor.pSize = pSizes;
+		updateResourceDescriptor.pOffsets = pOffsets;
+		updateResourceDescriptor.pGroup = m_pGroup;
+	}
+	context->UpdateResourceToGroup(&updateResourceDescriptor);
+
 	cmd->BeginScopePass("Test");
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
@@ -226,6 +299,19 @@ void DrawOpaquePass::Execute(RHIContext *context)
 			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[ScriptableRenderPipeline::g_currentImage];
 		}
 		encoder->BeginPass(&renderPassBeginDescriptor);
+		TextureBarrier textureBarriers[] =
+		{
+			//{ context->GetTexture(ScriptableRenderPipeline::g_currentImage), AttachmentLayout::Undefined, AttachmentLayout::ColorBuffer, 0, ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE },
+			{ m_pDepthTextures[ScriptableRenderPipeline::g_currentImage], AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE }
+		};
+		RHIBarrierDescriptor barrierDescriptor = {};
+		{
+			barrierDescriptor.textureCount = 1;
+			barrierDescriptor.pTextureBarriers = textureBarriers;
+			barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
+			barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
+		}
+		encoder->ResourceBarrier(&barrierDescriptor);
 		encoder->SetPipeline(m_pPSO);
 		encoder->SetViewport(nullptr);
 		encoder->SetScissor(nullptr);
@@ -234,7 +320,6 @@ void DrawOpaquePass::Execute(RHIContext *context)
 		encoder->BindGroups(1, m_pGroup, m_pPipelineResourceLayout);
 		encoder->DrawIndexed(m_pMesh->m_indexCount, 0);
 		encoder->EndPass();
-		encoder->ResourceBarrier(PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT);
 		encoder->~RHIGraphicsEncoder();
 		WEngine::Allocator::Get()->Deallocate(encoder);
 	}

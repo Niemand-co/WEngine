@@ -24,6 +24,7 @@ class RHIUpdateResourceDescriptor;
 class RHIPipelineResourceLayoutDescriptor;
 class RHIPipelineStateObjectDescriptor;
 class RHISubmitDescriptor;
+class RHIBarrierDescriptor;
 
 class RHIContext : public RenderContext
 {
@@ -56,6 +57,8 @@ public:
 	virtual bool IsDisplayChanged();
 
 	virtual void ResetDisplayState();
+
+	virtual void ImageLayoutTransition(RHIBarrierDescriptor* pDescriptor);
 
 	virtual RHIBuffer* CreateVertexBuffer(RHIBufferDescriptor *descriptor);
 

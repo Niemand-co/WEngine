@@ -23,6 +23,7 @@ namespace Vulkan
 		commandBufferAllocateInfo.commandBufferCount = 1;
 
 		VkCommandBuffer* pCommandBuffer = (VkCommandBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkCommandBuffer));
+		::new (pCommandBuffer) VkCommandBuffer();
 
 		VulkanCommandBuffer *commandBuffers = (VulkanCommandBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanCommandBuffer));
 		vkAllocateCommandBuffers(*m_device, &commandBufferAllocateInfo, pCommandBuffer);
@@ -44,6 +45,7 @@ namespace Vulkan
 			commandBufferAllocateInfo.commandBufferCount = 1;
 
 			VkCommandBuffer* pCommandBuffer = (VkCommandBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkCommandBuffer));
+			::new (pCommandBuffer) VkCommandBuffer();
 			vkAllocateCommandBuffers(*m_device, &commandBufferAllocateInfo, pCommandBuffer);
 
 			commandBuffers[i] = (VulkanCommandBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanCommandBuffer));

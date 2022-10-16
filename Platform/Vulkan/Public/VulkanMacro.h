@@ -15,8 +15,8 @@
 #define QUEUE_PROPERTY_PROTECTED      0x00000010
 #define QUEUE_PROPERTY_PRESENT        0x00000020
 
-#define    FEATURE_GEOMETRY_SHADER                        0x0001
-#define    FEATURE_TESSELATION_SHADER                     0x0002
+#define FEATURE_GEOMETRY_SHADER                        0x0001
+#define FEATURE_TESSELATION_SHADER                     0x0002
 
 #define MEMORY_PROPERTY_DEVICE_LOCAL        0x0001
 #define MEMORY_PROPERTY_HOST_VISIBLE        0x0002
@@ -74,5 +74,9 @@
 #define ACCESS_HOST_WRITE                        0x00004000
 #define ACCESS_MEMORY_READ                       0x00008000
 #define ACCESS_MEMORY_WRITE                      0x00010000
+
+#define IMAGE_ASPECT_COLOR      0x00000001
+#define IMAGE_ASPECT_DEPTH      0x00000002
+#define IMAGE_ASPECT_STENCIL    0x00000004
 
 #endif

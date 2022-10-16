@@ -11,6 +11,6 @@ public:
 
 	virtual void Setup(RHIContext *context, CameraData *cameraData) override;
 
-	virtual void Execute(RHIContext *context) override;
+	virtual void Execute(RHIContext *context, CameraData* cameraData) override;
 
 };

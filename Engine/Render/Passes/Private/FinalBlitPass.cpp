@@ -14,6 +14,6 @@ void FinalBlitPass::Setup(RHIContext *context, CameraData *cameraData)
 {
 }
 
-void FinalBlitPass::Execute(RHIContext *context)
+void FinalBlitPass::Execute(RHIContext *context, CameraData* cameraData)
 {
 }

@@ -1,16 +1,31 @@
 #pragma once
 
+struct SubPassAttachment
+{
+	unsigned int attachmentIndex;
+
+	AttachmentLayout attachmentLayout;
+};
+
 class RHISubPassDescriptor
 {
 public:
+
+	RHISubPassDescriptor();
 
 	~RHISubPassDescriptor();
 
 public:
 
-	unsigned int attachmentIndex;
+	unsigned int colorAttachmentCount;
 
-	AttachmentLayout attachmentLayout;
+	SubPassAttachment *pColorAttachments;
+
+	SubPassAttachment *pDepthStencilAttachment;
+
+	unsigned int inputAttachmentCount;
+
+	SubPassAttachment *pInputAttachments;
 
 	int dependedPass;
 

@@ -34,9 +34,7 @@ namespace Vulkan
 
 		virtual void ResourceBarrier(unsigned int srcStage, unsigned int dstStage) override;
 
-		virtual void ResourceBarrier(RHITexture* ptexture) override;
-
-		virtual void ResourceBarrier(RHIBuffer *pBuffer, size_t size) override;
+		virtual void ResourceBarrier(RHIBarrierDescriptor* pDescriptor) override;
 
 		virtual void SetEvent(RHIEvent* pEvent) override;
 

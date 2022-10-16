@@ -28,7 +28,7 @@ public:
 
 	virtual void Setup(RHIContext *context, CameraData *cameraData) = 0;
 
-	virtual void Execute(RHIContext *context) = 0;
+	virtual void Execute(RHIContext *context, CameraData* cameraData) = 0;
 
 	virtual RHIGroup* GetResourceGroup();
 

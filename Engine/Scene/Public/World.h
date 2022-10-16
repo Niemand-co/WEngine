@@ -20,6 +20,8 @@ public:
 
 	static World* GetWorld();
 
+	std::vector<GameObject*>& GetGameObjects();
+
 private:
 
 	std::vector<GameObject*> m_pEntities;

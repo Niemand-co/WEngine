@@ -7,6 +7,8 @@ namespace Vulkan
 	VulkanBuffer::VulkanBuffer(VkBuffer* buffer, VkDevice *device, unsigned int memoryHeapIndex, size_t size, void* pData)
 		: m_pBuffer(buffer), m_pDevice(device)
 	{
+		RHIBuffer::size = size;
+
 		m_pMemoryRequirements = (VkMemoryRequirements*)WEngine::Allocator::Get()->Allocate(sizeof(VkMemoryRequirements));
 		vkGetBufferMemoryRequirements(*m_pDevice, *m_pBuffer, m_pMemoryRequirements);
 
@@ -33,7 +35,9 @@ namespace Vulkan
 
 	void VulkanBuffer::LoadData(void* pData, size_t size)
 	{
-
+		RE_ASSERT(vkMapMemory(*m_pDevice, *m_pDeviceMemory, 0, size, 0, &m_pData) == VK_SUCCESS, "Failed to Map Memory To Host.");
+		std::memcpy(m_pData, pData, size);
+		vkUnmapMemory(*m_pDevice, *m_pDeviceMemory);
 	}
 
 	VkBuffer* VulkanBuffer::GetHandle()

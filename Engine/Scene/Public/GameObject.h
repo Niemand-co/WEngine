@@ -16,11 +16,17 @@ public:
 
 	virtual ~GameObject();
 
+	bool IsName(std::string name);
+
 	template<Component::ComponentType type>
 	Component* AddComponent();
 
 	template<Component::ComponentType type>
 	Component* GetComponent();
+
+public:
+
+	static GameObject* Find(std::string name);
 
 private:
 

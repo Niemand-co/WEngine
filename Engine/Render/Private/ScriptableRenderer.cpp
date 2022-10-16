@@ -28,11 +28,11 @@ void ScriptableRenderer::Setup(RHIContext* context, CameraData* cameraData)
 	m_semaphores = m_pDevice->GetSemaphore(ScriptableRenderPipeline::g_maxFrame * (m_passes.size() - 1));
 }
 
-void ScriptableRenderer::Execute(RHIContext *context, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence)
+void ScriptableRenderer::Execute(RHIContext *context, CameraData *cameraData, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence)
 {
 	for (unsigned int i = 0; i < m_passes.size(); ++i)
 	{
-		m_passes[i]->Execute(context);
+		m_passes[i]->Execute(context, cameraData);
 	}
 
 	RHISubmitDescriptor submitDescriptor = {};

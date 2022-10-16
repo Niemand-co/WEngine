@@ -17,7 +17,7 @@ World::~World()
 
 GameObject* World::CreateGameObject(std::string name)
 {
-	GameObject* gameObject = new GameObject();
+	GameObject* gameObject = new GameObject(name);
 	g_pInstance->m_pEntities.push_back(std::move(gameObject));
 	gameObject->AddComponent<Component::ComponentType::Transformer>();
 	return gameObject;
@@ -46,6 +46,11 @@ World* World::CreateWorld()
 World* World::GetWorld()
 {
 	return g_pInstance;
+}
+
+std::vector<GameObject*>& World::GetGameObjects()
+{
+	return m_pEntities;
 }
 
 std::vector<Camera*>& World::GetCameras()

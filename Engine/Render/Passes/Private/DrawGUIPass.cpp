@@ -8,6 +8,7 @@
 #include "Utils/ImGui/Public/Gui.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
+#include "Scene/Public/GameObject.h"
 
 DrawGUIPass::DrawGUIPass(RenderPassConfigure *pConfigure)
 	: ScriptableRenderPass(pConfigure)
@@ -25,16 +26,21 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 	{
 		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::ColorBuffer, AttachmentLayout::Present },
 	};
-	RHISubPassDescriptor subpassDescriptors[] =
+	SubPassAttachment subpassColorAttachment = { 0, AttachmentLayout::ColorBuffer };
+	RHISubPassDescriptor subpassDescriptors = {};
 	{
-		{ 0, AttachmentLayout::ColorBuffer, -1, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, 0, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
-	};
+		subpassDescriptors.colorAttachmentCount = 1;
+		subpassDescriptors.pColorAttachments = &subpassColorAttachment;
+		subpassDescriptors.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
+		subpassDescriptors.waitingStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
+		subpassDescriptors.waitingAccess = ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE;
+	}
 	RHIRenderPassDescriptor renderPassDescriptor = {};
 	{
 		renderPassDescriptor.attachmentCount = 1;
 		renderPassDescriptor.pAttachmentDescriptors = attachmentDescriptors;
 		renderPassDescriptor.subpassCount = 1;
-		renderPassDescriptor.pSubPassDescriptors = subpassDescriptors;
+		renderPassDescriptor.pSubPassDescriptors = &subpassDescriptors;
 	}
 	m_pRenderPass = m_pDevice->CreateRenderPass(&renderPassDescriptor);
 
@@ -76,9 +82,11 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 	WEngine::Allocator::Get()->Deallocate(cmd);
 
 	m_pCommandBuffers = context->GetCommandBuffer(ScriptableRenderPipeline::g_maxFrame, false);
+
+	m_currentGo = GameObject::Find("Cube");
 }
 
-void DrawGUIPass::Execute(RHIContext* context)
+void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 {
 	RHICommandBuffer* cmd = m_pCommandBuffers[ScriptableRenderPipeline::g_currentFrame];
 
@@ -96,7 +104,16 @@ void DrawGUIPass::Execute(RHIContext* context)
 		ImGui::NewFrame();
 		{
 			ImGui::Begin("Inspector");
-			//ImGui::SliderFloat("Roughness")
+			Material *material = static_cast<Material*>(m_currentGo->GetComponent<Component::ComponentType::Material>());
+			SurfaceData surfaceData = material->GetSurfaceData();
+			float roughness = surfaceData.roughness;
+			ImGui::SliderFloat("Roughness", &roughness, 0.01f, 1.0f);
+			material->SetRoughness(roughness);
+
+			glm::vec3 color = surfaceData.albedo;
+			ImGui::ColorEdit3("Albedo", (float*)&color);
+			material->SetColor(color);
+
 			ImGui::End();
 		}
 		Gui::g_pGui->RenderGUI(cmd);

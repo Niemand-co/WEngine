@@ -3,7 +3,7 @@
 #include "RHI/Public/RHIShader.h"
 
 Material::Material()
-	: albedo(glm::vec3(1.0f, 1.0f, 1.0f)), roughness(1.0f), metallic(0.0f), m_shader(nullptr)
+	: albedo(glm::vec3(1.0f, 1.0f, 1.0f)), roughness(0.5f), metallic(0.0f), m_shader(nullptr)
 {
 	m_type = Component::ComponentType::Material;
 }
@@ -20,5 +20,19 @@ RHIShader* Material::GetShader()
 
 SurfaceData Material::GetSurfaceData()
 {
-	return SurfaceData(albedo, roughness, metallic);
+	SurfaceData surfaceData = {};
+	surfaceData.albedo = albedo;
+	surfaceData.roughness = roughness;
+	surfaceData.mettalic = metallic;
+	return surfaceData;
+}
+
+void Material::SetColor(glm::vec3 color)
+{
+	albedo = color;
+}
+
+void Material::SetRoughness(float roughness)
+{
+	this->roughness = roughness;
 }

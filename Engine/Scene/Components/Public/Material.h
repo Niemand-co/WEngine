@@ -5,11 +5,18 @@ class RHIShader;
 
 struct SurfaceData
 {
-	glm::vec3 albedo;
+	union
+	{
+		glm::vec4 buffer0;
+		struct { glm::vec3 albedo; float roughness; };
+	};
 
-	float roughness;
+	union
+	{
+		glm::vec4 buffer1;
+		struct { float mettalic, y, z, w; };
+	};
 
-	float metallic;
 };
 
 class Material : public Component
@@ -25,6 +32,10 @@ public:
 	RHIShader* GetShader();
 
 	SurfaceData GetSurfaceData();
+
+	void SetColor(glm::vec3 color);
+
+	void SetRoughness(float roughness);
 
 private:
 

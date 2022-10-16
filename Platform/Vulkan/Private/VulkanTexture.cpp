@@ -29,7 +29,7 @@ namespace Vulkan
 		imageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
 		imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
 		imageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-		imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		imageViewCreateInfo.subresourceRange.aspectMask = descriptor->imageAspect;
 		imageViewCreateInfo.subresourceRange.baseMipLevel = descriptor->baseMipLevel;
 		imageViewCreateInfo.subresourceRange.baseArrayLayer = descriptor->baseArrayLayer;
 		imageViewCreateInfo.subresourceRange.levelCount = descriptor->mipCount;

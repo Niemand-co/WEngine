@@ -12,3 +12,21 @@ GameObject::~GameObject()
 {
 
 }
+
+bool GameObject::IsName(std::string name)
+{
+	return name == m_name;
+}
+
+GameObject* GameObject::Find(std::string name)
+{
+	for (GameObject* gameObject : World::GetWorld()->GetGameObjects())
+	{
+		if (gameObject->IsName(name))
+		{
+			return gameObject;
+		}
+	}
+	RE_LOG("No GameObject Found.");
+	return nullptr;
+}

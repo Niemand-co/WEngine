@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "RHI/Public/RHIHeads.h"
+#include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Utils/Public/Window.h"
@@ -29,6 +30,7 @@ void RHIContext::Init()
 	RHITextureViewDescriptor textureViewDescriptor = {};
 	{
 		textureViewDescriptor.format = Format::A16R16G16B16_SFloat;
+		textureViewDescriptor.imageAspect = IMAGE_ASPECT_COLOR;
 		textureViewDescriptor.mipCount = 1;
 		textureViewDescriptor.baseMipLevel = 0;
 		textureViewDescriptor.arrayLayerCount = 1;
@@ -148,6 +150,34 @@ bool RHIContext::IsDisplayChanged()
 void RHIContext::ResetDisplayState()
 {
 	m_isDisplayChagned = false;
+}
+
+void RHIContext::ImageLayoutTransition(RHIBarrierDescriptor *pDescriptor)
+{
+	RHICommandBuffer *cmd = m_pPool->GetCommandBuffer(true);
+	
+	cmd->BeginScopePass("Layout Transition");
+	{
+		RHIGraphicsEncoder *encoder = cmd->GetGraphicsEncoder();
+		encoder->ResourceBarrier(pDescriptor);
+		encoder->~RHIGraphicsEncoder();
+		WEngine::Allocator::Get()->Deallocate(encoder);
+	}
+	cmd->EndScopePass();
+	RHISubmitDescriptor submitDescriptor = {};
+	{
+		submitDescriptor.pFence = nullptr;
+		submitDescriptor.waitSemaphoreCount = 0;
+		submitDescriptor.pWaitSemaphores = nullptr;
+		submitDescriptor.signalSemaphoreCount = 0;
+		submitDescriptor.pSignalSemaphores = nullptr;
+		submitDescriptor.waitStage = PIPELINE_STAGE_ALL_COMMANDS;
+		submitDescriptor.commandBufferCount = 1;
+		submitDescriptor.pCommandBuffers = &cmd;
+	}
+	m_pQueue->Submit(&submitDescriptor);
+	cmd->~RHICommandBuffer();
+	WEngine::Allocator::Get()->Deallocate(cmd);
 }
 
 RHIBuffer* RHIContext::CreateVertexBuffer(RHIBufferDescriptor* descriptor)

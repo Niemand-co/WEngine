@@ -321,13 +321,13 @@ namespace WEngine
 		case AttachmentLayout::ColorBuffer:
 			return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		case AttachmentLayout::DepthBuffer:
-			return VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
+			return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		case AttachmentLayout::General:
 			return VK_IMAGE_LAYOUT_GENERAL;
 		case AttachmentLayout::ReadOnlyColor:
 			return VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
 		case AttachmentLayout::ReadOnlyDepth:
-			return VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_OPTIMAL;
+			return VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 		default:
 			RE_ASSERT(false, "Error Type Image Layout.");
 		}

@@ -12,6 +12,8 @@ public:
 
 	Format format;
 
+	unsigned int imageAspect;
+
 	unsigned int mipCount;
 
 	unsigned int baseMipLevel;

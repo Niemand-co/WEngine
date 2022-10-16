@@ -13,6 +13,7 @@ class RHITexture;
 class RHIEvent;
 
 class RHIRenderPassBeginDescriptor;
+class RHIBarrierDescriptor;
 
 class RHIGraphicsEncoder : public RHIEncoder
 {
@@ -42,9 +43,7 @@ public:
 
 	virtual void ResourceBarrier(unsigned int srcStage, unsigned int dstStage) = 0;
 
-	virtual void ResourceBarrier(RHITexture *pTexture) = 0;
-
-	virtual void ResourceBarrier(RHIBuffer *pBuffer, size_t size) = 0;
+	virtual void ResourceBarrier(RHIBarrierDescriptor *pDescriptor) = 0;
 
 	virtual void SetEvent(RHIEvent *pEvent) = 0;
 

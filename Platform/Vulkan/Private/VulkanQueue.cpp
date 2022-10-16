@@ -35,6 +35,7 @@ namespace Vulkan
 		commandPoolCreateInfo.queueFamilyIndex = m_queueFamilyIndex;
 
 		VkCommandPool *pPool = (VkCommandPool*)WEngine::Allocator::Get()->Allocate(sizeof(VkCommandPool));
+		::new (pPool) VkCommandPool();
 		RE_ASSERT(vkCreateCommandPool(*m_device, &commandPoolCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pPool) == VK_SUCCESS, "Failed to Get Command Pool.");
 
 		RHICommandPool *pool = (RHICommandPool*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanCommandPool));
