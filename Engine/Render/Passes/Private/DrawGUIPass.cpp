@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Render/Passes/Public/DrawGUIPass.h"
+#include "Render/Passes/Public/DrawSkyboxPass.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
@@ -107,6 +108,9 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 
 			Material *material = static_cast<Material*>(m_currentGo->GetComponent<Component::ComponentType::Material>());
 			material->ShowInInspector();
+
+			ImGui::ColorEdit4("Top Color", &DrawSkyboxPass::topColor[0]);
+			ImGui::ColorEdit4("Bottom Color", &DrawSkyboxPass::bottomColor[0]);
 
 			ImGui::End();
 		}

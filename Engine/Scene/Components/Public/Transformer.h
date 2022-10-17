@@ -21,6 +21,8 @@ public:
 
 	glm::mat4 GetWorldToLocalMatrix();
 
+	glm::vec3 GetForward();
+
 private:
 
 	glm::vec3 m_scale;

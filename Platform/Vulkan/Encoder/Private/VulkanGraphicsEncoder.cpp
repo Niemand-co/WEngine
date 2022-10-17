@@ -98,9 +98,9 @@ namespace Vulkan
 		vkCmdDraw(*m_cmd, 3, 1, 0, 0);
 	}
 
-	void VulkanGraphicsEncoder::DrawIndexed(unsigned int indexeCount, unsigned int firstIndex, unsigned int instanceCount, unsigned int firstInstance)
+	void VulkanGraphicsEncoder::DrawIndexed(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount, unsigned int firstInstance)
 	{
-		vkCmdDrawIndexed(*m_cmd, indexeCount, instanceCount, firstIndex, 0, firstInstance);
+		vkCmdDrawIndexed(*m_cmd, indexCount, instanceCount, firstIndex, 0, firstInstance);
 	}
 
 	void VulkanGraphicsEncoder::ResourceBarrier(unsigned int srcStage, unsigned int dstStage)

@@ -9,6 +9,9 @@
 #include "Scene/Components/Public/Camera.h"
 #include "Utils/Public/Window.h"
 
+glm::vec4 DrawSkyboxPass::topColor = glm::vec4(1.0f);
+glm::vec4 DrawSkyboxPass::bottomColor = glm::vec4(1.0f);
+
 DrawSkyboxPass::DrawSkyboxPass(RenderPassConfigure* configure)
 	: ScriptableRenderPass(configure)
 {
@@ -23,6 +26,8 @@ struct UniformData
 	glm::mat4 V;
 	glm::mat4 P;
 	glm::vec4 cameraPos;
+	glm::vec4 topColor;
+	glm::vec4 bottomColor;
 };
 
 void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
@@ -54,7 +59,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	};
 
 	SubPassAttachment colorAttachments[] = { { 0, AttachmentLayout::ColorBuffer } };
-	SubPassAttachment depthStencilAttachment = { 0, AttachmentLayout::DepthBuffer };
+	SubPassAttachment depthStencilAttachment = { 1, AttachmentLayout::DepthBuffer };
 
 	RHISubPassDescriptor subpassDescriptor = {};
 	{
@@ -81,7 +86,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 		depthStencilDescriptor.depthWriteEnabled = true;
 		depthStencilDescriptor.depthTestEnabled = true;
 		depthStencilDescriptor.depthBoundsTest = false;
-		depthStencilDescriptor.depthCompareOP = DepthCompareOP::Less;
+		depthStencilDescriptor.depthCompareOP = DepthCompareOP::LE;
 		depthStencilDescriptor.minDepth = 0.0f;
 		depthStencilDescriptor.maxDepth = 1.0f;
 	}
@@ -97,6 +102,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 		blendDescriptor.alphaDstFactor = BlendFactor::FactorZero;
 	}
 
+	m_pMesh = Mesh::GetCube();
 	RHIVertexInputDescriptor vertexInputDescriptor = m_pMesh->GetVertexInputDescriptor();
 
 	BindingResource resource[] = 
@@ -134,7 +140,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 		psoDescriptor.vertexDescriptor = &vertexInputDescriptor;
 		psoDescriptor.pipelineResourceLayout = m_pPipelineLayout;
 	}
-	m_pPSO = m_pDevice->CreatePipelineStateObject(&psoDescriptor);
+	m_pPSO = context->CreatePSO(&psoDescriptor);
 
 	RHIBufferDescriptor vertexBufferDescriptor = {};
 	{
@@ -156,7 +162,9 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	{
 		cameraData->MatrixV,
 		cameraData->MatrixP,
-		glm::vec4(cameraData->Position, 1.0f)
+		glm::vec4(cameraData->Position, 1.0f),
+		topColor,
+		bottomColor
 	};
 	RHIBufferDescriptor uniformBufferDescriptor = {};
 	{
@@ -179,17 +187,6 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	context->UpdateResourceToGroup(&updateResourceDescriptor);
 
-	RHITextureViewDescriptor depthViewDescriptor = {};
-	{
-		depthViewDescriptor.format = Format::D16_Unorm;
-		depthViewDescriptor.mipCount = 1;
-		depthViewDescriptor.baseMipLevel = 0;
-		depthViewDescriptor.arrayLayerCount = 1;
-		depthViewDescriptor.baseArrayLayer = 0;
-		depthViewDescriptor.dimension = Dimension::Texture2D;
-		depthViewDescriptor.imageAspect = IMAGE_ASPECT_DEPTH;
-	}
-	std::vector<RHITextureView*> depthViews;
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
@@ -212,6 +209,32 @@ void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 {
 	RHICommandBuffer *cmd = m_pCommandBuffers[ScriptableRenderPipeline::g_currentFrame];
 
+	UniformData data =
+	{
+		cameraData->MatrixV,
+		cameraData->MatrixP,
+		glm::vec4(cameraData->Position, 1.0f),
+		topColor,
+		bottomColor
+	};
+	m_pUniformBuffer->LoadData(&data, sizeof(data));
+	size_t offsets[] = { 0 };
+	size_t sizes[] = { sizeof(data) };
+	BindingResource resource[1] =
+	{
+		{0, ResourceType::UniformBuffer, 1, ShaderStage::vertex},
+	};
+	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
+	{
+		updateResourceDescriptor.bindingCount = 1;
+		updateResourceDescriptor.pBindingResources = resource;
+		updateResourceDescriptor.pBuffer = m_pUniformBuffer;
+		updateResourceDescriptor.pGroup = m_pGroup;
+		updateResourceDescriptor.pOffsets = offsets;
+		updateResourceDescriptor.pSize = sizes;
+	}
+	context->UpdateResourceToGroup(&updateResourceDescriptor);
+
 	cmd->BeginScopePass("Skybox");
 	{
 		RHIGraphicsEncoder *encoder = cmd->GetGraphicsEncoder();
@@ -222,6 +245,9 @@ void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 			renderpassBeginDescriptor.renderTarget = m_pRenderTargets[ScriptableRenderPipeline::g_currentImage];
 		}
 		encoder->BeginPass(&renderpassBeginDescriptor);
+		encoder->SetPipeline(m_pPSO);
+		encoder->SetViewport(nullptr);
+		encoder->SetScissor(nullptr);
 		encoder->BindVertexBuffer(m_pVertexBuffer);
 		encoder->BindIndexBuffer(m_pIndexBuffer);
 		encoder->BindGroups(1, m_pGroup, m_pPipelineLayout);

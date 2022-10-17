@@ -2,8 +2,7 @@
 #include "Utils/Public/OBJLoader.h"
 //#include "Render/Mesh/Public/Vertex.h"
 //#include "Scene/Components/Public/MeshFilter.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "deps/stb_image.h"
+
 //
 //MeshFilter* OBJLoader::ModelLoad( const char* filePath )
 //{

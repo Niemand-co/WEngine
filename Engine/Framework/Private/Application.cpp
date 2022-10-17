@@ -37,6 +37,7 @@ void Application::Init()
 {
 	WEngine::Allocator::Init(WEngine::Backend::Vulkan);
 
+
 	WinProc proc = { "WEngine", 1920u, 1080u };
 	m_window = Window::Get(&proc);
 

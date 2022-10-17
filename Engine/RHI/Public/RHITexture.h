@@ -12,4 +12,8 @@ public:
 
 	virtual RHITextureView* CreateTextureView(RHITextureViewDescriptor* descriptor) = 0;
 
+public:
+
+	static RHITexture LoadTextureFromDisk(std::string path);
+
 };

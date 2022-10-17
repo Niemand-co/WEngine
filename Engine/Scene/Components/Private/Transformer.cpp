@@ -43,3 +43,8 @@ glm::mat4 Transformer::GetWorldToLocalMatrix()
 	return glm::inverse(GetWorldToLocalMatrix());
 }
 
+glm::vec3 Transformer::GetForward()
+{
+	return glm::vec3(0.0f, 0.0f, -1.0f);
+}
+

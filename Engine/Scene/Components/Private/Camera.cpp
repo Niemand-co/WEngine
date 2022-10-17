@@ -48,7 +48,9 @@ CameraData* Camera::GetData()
 
 void Camera::UpdateViewMatrix()
 {
-	m_viewMatrix = glm::lookAt(static_cast<Transformer*>(m_pGameObject->GetComponent<ComponentType::Transformer>())->GetPosition(), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::vec3 position = static_cast<Transformer*>(m_pGameObject->GetComponent<Component::ComponentType::Transformer>())->GetPosition();
+	glm::vec3 forward = static_cast<Transformer*>(m_pGameObject->GetComponent<Component::ComponentType::Transformer>())->GetForward();
+	m_viewMatrix = glm::lookAt(position, position + forward, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void Camera::UpdateProjectionMatrix()

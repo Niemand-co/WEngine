@@ -7,6 +7,7 @@ class RHIBuffer;
 class RHIGroup;
 class RHIContext;
 class RHICommandBuffer;
+class RHIPipelineResourceLayout;
 
 struct CameraData;
 
@@ -39,5 +40,11 @@ private:
 	RHIBuffer *m_pIndexBuffer;
 
 	RHIBuffer *m_pUniformBuffer;
+
+public:
+
+	static glm::vec4 topColor;
+
+	static glm::vec4 bottomColor;
 
 };
