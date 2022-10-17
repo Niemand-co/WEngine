@@ -21,3 +21,20 @@ Gui* Gui::CreateGui(WEngine::Backend backend)
 	}
 	return nullptr;
 }
+
+void Gui::DrawSlider(std::string title, float* pValue, float minValue, float maxValue)
+{
+	ImGui::SliderFloat(title.c_str(), pValue, minValue, maxValue);
+}
+
+void Gui::DrawColorEdit(std::string title, float* pColor, bool hasAlpha)
+{
+	if (hasAlpha)
+	{
+		ImGui::ColorEdit4(title.c_str(), pColor);
+	}
+	else
+	{
+		ImGui::ColorEdit3(title.c_str(), pColor);
+	}
+}

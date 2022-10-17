@@ -17,7 +17,7 @@ namespace Vulkan
 		for (unsigned int i = 0; i < imageCount; ++i)
 		{
 			m_textures[i] = (RHITexture*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanAllocator));
-			::new (m_textures[i]) VulkanTexture(pImages + i, m_pDevice, true);
+			::new (m_textures[i]) VulkanTexture(pImages + i, nullptr, nullptr, m_pDevice, true);
 		}
 	}
 

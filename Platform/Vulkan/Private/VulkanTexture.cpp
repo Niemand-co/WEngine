@@ -7,9 +7,10 @@
 
 namespace Vulkan
 {
-	VulkanTexture::VulkanTexture(VkImage* image, VkDevice *device, bool isDisplay)
-		: m_pImage(image), m_pDevice(device), m_isDisplayTexture(isDisplay)
+	VulkanTexture::VulkanTexture(VkImage* image, VkMemoryRequirements *pMemoryRequirements, VkDeviceMemory *pDeviceMemory, VkDevice *device, bool isDisplay)
+		: m_pImage(image), m_pMemoryRequirements(pMemoryRequirements), m_pDeviceMemory(pDeviceMemory), m_pDevice(device), m_isDisplayTexture(isDisplay)
 	{
+		
 	}
 
 	VulkanTexture::~VulkanTexture()

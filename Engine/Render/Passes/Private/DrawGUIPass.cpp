@@ -104,15 +104,9 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 		ImGui::NewFrame();
 		{
 			ImGui::Begin("Inspector");
-			Material *material = static_cast<Material*>(m_currentGo->GetComponent<Component::ComponentType::Material>());
-			SurfaceData surfaceData = material->GetSurfaceData();
-			float roughness = surfaceData.roughness;
-			ImGui::SliderFloat("Roughness", &roughness, 0.01f, 1.0f);
-			material->SetRoughness(roughness);
 
-			glm::vec3 color = surfaceData.albedo;
-			ImGui::ColorEdit3("Albedo", (float*)&color);
-			material->SetColor(color);
+			Material *material = static_cast<Material*>(m_currentGo->GetComponent<Component::ComponentType::Material>());
+			material->ShowInInspector();
 
 			ImGui::End();
 		}

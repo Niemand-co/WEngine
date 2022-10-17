@@ -44,6 +44,7 @@ enum class Format
 	A32R32G32B32_SInt,
 	A32R32G32B32_UInt,
 	D32_SFloat,
+	D16_Unorm,
 };
 
 enum class ColorSpace

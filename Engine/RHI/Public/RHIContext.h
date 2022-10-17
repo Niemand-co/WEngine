@@ -42,6 +42,8 @@ public:
 
 	virtual RHITextureView* GetTextureView(unsigned int index);
 
+	virtual RHITextureView* GetDepthView(unsigned int index);
+
 	virtual RHICommandBuffer* GetCommandBuffer(bool isPrimary = true);
 
 	virtual std::vector<RHICommandBuffer*> GetCommandBuffer(unsigned int count, bool isPrimary);
@@ -89,6 +91,10 @@ protected:
 	RHICommandPool *m_pPool;
 
 	std::vector<RHITextureView*> m_pTextureViews;
+
+	std::vector<RHITexture*> m_pDepthTextures;
+
+	std::vector<RHITextureView*> m_pDepthTextureViews;
 
 	std::vector<RHICommandBuffer*> m_pCommandBuffers;
 

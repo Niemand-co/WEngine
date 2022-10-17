@@ -10,7 +10,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTexture(VkImage *image, VkDevice *device, bool isDisplay = false);
+		VulkanTexture(VkImage *image, VkMemoryRequirements* pMemoryRequirements, VkDeviceMemory* pDeviceMemory, VkDevice *device, bool isDisplay = false);
 
 		virtual ~VulkanTexture();
 
@@ -27,6 +27,10 @@ namespace Vulkan
 		VkDevice *m_pDevice;
 
 		bool m_isDisplayTexture;
+
+		VkMemoryRequirements *m_pMemoryRequirements;
+
+		VkDeviceMemory *m_pDeviceMemory;
 
 	};
 

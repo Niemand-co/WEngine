@@ -17,8 +17,6 @@ public:
 
 	RHIAttachmentDescriptor *pAttachmentDescriptors;
 
-	RHIAttachmentDescriptor *pDepthStencilAttachmentDescriptor;
-
 	unsigned int subpassCount;
 
 	RHISubPassDescriptor *pSubPassDescriptors;

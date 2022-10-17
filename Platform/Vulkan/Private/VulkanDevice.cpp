@@ -145,7 +145,7 @@ namespace Vulkan
 
 		std::vector<VkSubpassDescription> pSubpassDescriptions(descriptor->subpassCount);
 		std::vector<VkAttachmentReference*> pColorAttachmentReferences(descriptor->subpassCount);
-		std::vector<VkAttachmentReference*> pDepthAttachmentReferences(descriptor->subpassCount);
+		std::vector<VkAttachmentReference*> pDepthAttachmentReferences(descriptor->subpassCount, nullptr);
 		std::vector<VkAttachmentReference*> pInputAttachmentReferences(descriptor->subpassCount);
 		std::vector<VkSubpassDependency> pSubpassDependencies(descriptor->subpassCount);
 		for (unsigned int i = 0; i < descriptor->subpassCount; ++i)
@@ -160,9 +160,9 @@ namespace Vulkan
 				pColorAttachmentReferences[i][j].layout = WEngine::ToVulkan((pSubpassDescriptor->pColorAttachments + j)->attachmentLayout);
 			}
 
-			pDepthAttachmentReferences[i] = (VkAttachmentReference*)WEngine::Allocator::Get()->Allocate(sizeof(VkAttachmentReference));
 			if (pSubpassDescriptor->pDepthStencilAttachment != nullptr)
 			{
+				pDepthAttachmentReferences[i] = (VkAttachmentReference*)WEngine::Allocator::Get()->Allocate(sizeof(VkAttachmentReference));
 				::new (pDepthAttachmentReferences[i]) VkAttachmentReference();
 				pDepthAttachmentReferences[i]->attachment = pSubpassDescriptor->pDepthStencilAttachment->attachmentIndex;
 				pDepthAttachmentReferences[i]->layout = WEngine::ToVulkan(pSubpassDescriptor->pDepthStencilAttachment->attachmentLayout);
@@ -367,7 +367,7 @@ namespace Vulkan
 	{
 		VkImageCreateInfo imageCreateInfo = {};
 		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		imageCreateInfo.extent = { descriptor->width, descriptor->height };
+		imageCreateInfo.extent = { descriptor->width, descriptor->height, 1 };
 		imageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
 		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
 		imageCreateInfo.usage = descriptor->usage;
@@ -380,8 +380,32 @@ namespace Vulkan
 		VkImage *image = (VkImage*)WEngine::Allocator::Get()->Allocate(sizeof(VkImage));
 		vkCreateImage(*m_pDevice, &imageCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), image);
 
+		VkMemoryRequirements *memoryRequirements = (VkMemoryRequirements*)WEngine::Allocator::Get()->Allocate(sizeof(VkMemoryRequirements));
+		::new (memoryRequirements) VkMemoryRequirements();
+		vkGetImageMemoryRequirements(*m_pDevice, *image, memoryRequirements);
+
+		unsigned int index = 0;
+		GPUFeature feature = m_pGPU->GetFeature();
+		for (; index < feature.memorySupports.size(); ++index)
+		{
+			if((memoryRequirements->memoryTypeBits & 1) && (feature.memorySupports[index]->properties & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) == VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT )
+				break;
+			memoryRequirements->memoryTypeBits >>= 1;
+		}
+
+		VkMemoryAllocateInfo memoryAllocateInfo = {};
+		{
+			memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+			memoryAllocateInfo.allocationSize = memoryRequirements->size;
+			memoryAllocateInfo.memoryTypeIndex = index;
+		}
+		VkDeviceMemory *pMemory = (VkDeviceMemory*)WEngine::Allocator::Get()->Allocate(sizeof(VkDeviceMemory));
+		vkAllocateMemory(*m_pDevice, &memoryAllocateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pMemory);
+
+		vkBindImageMemory(*m_pDevice, *image, *pMemory, 0);
+
 		RHITexture *pTexture = (RHITexture*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanTexture));
-		::new (pTexture) VulkanTexture(image, m_pDevice);
+		::new (pTexture) VulkanTexture(image, memoryRequirements, pMemory, m_pDevice);
 
 		return pTexture;
 	}
@@ -428,7 +452,7 @@ namespace Vulkan
 		GPUFeature feature = m_pGPU->GetFeature();
 		for (; index < feature.memorySupports.size(); ++index)
 		{
-			if (feature.memorySupports[index]->type == MemoryType::LocalMemory && (feature.memorySupports[index]->properties & descriptor->memoryType) != 0)
+			if (feature.memorySupports[index]->type == MemoryType::LocalMemory && (feature.memorySupports[index]->properties & descriptor->memoryType) == descriptor->memoryType )
 			{
 				break;
 			}

@@ -24,8 +24,6 @@ private:
 
 	std::vector<RHIRenderTarget*> m_pRenderTargets;
 
-	std::vector<RHITexture*> m_pDepthTextures;
-
 	Mesh *m_pMesh;
 
 	RHIBuffer *m_pVertexBuffer;

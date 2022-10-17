@@ -109,16 +109,9 @@ Mesh* Mesh::GetCube()
 		pIndices[0] = 3, pIndices[1] = 2, pIndices[2] = 1, pIndices[3] = 1, pIndices[4] = 0, pIndices[5] = 3,
 		pIndices[6] = 4, pIndices[7] = 5, pIndices[8] = 6, pIndices[9] = 6, pIndices[10] = 7, pIndices[11] = 4,
 		pIndices[12] = 8, pIndices[13] = 9, pIndices[14] = 10, pIndices[15] = 10, pIndices[16] = 11, pIndices[17] = 8,
-		pIndices[18] = 16, pIndices[19] = 17, pIndices[20] = 18, pIndices[21] = 18, pIndices[22] = 19, pIndices[23] = 16,
-		pIndices[24] = 12, pIndices[25] = 13, pIndices[26] = 14, pIndices[27] = 14, pIndices[28] = 15, pIndices[29] = 12,
+		pIndices[18] = 12, pIndices[19] = 13, pIndices[20] = 14, pIndices[21] = 14, pIndices[22] = 15, pIndices[23] = 12,
+		pIndices[24] = 16, pIndices[25] = 17, pIndices[26] = 18, pIndices[27] = 18, pIndices[28] = 19, pIndices[29] = 16,
 		pIndices[30] = 20, pIndices[31] = 21, pIndices[32] = 22, pIndices[33] = 22, pIndices[34] = 23, pIndices[35] = 20;
-
-		//pIndices[0] = 0, pIndices[1] = 0, pIndices[2] = 0, pIndices[3] = 0, pIndices[4] = 0, pIndices[5] = 0,
-		//	pIndices[6] = 0, pIndices[7] = 0, pIndices[8] = 0, pIndices[9] = 0, pIndices[10] = 0, pIndices[11] = 0,
-		//	pIndices[12] = 0, pIndices[13] = 0, pIndices[14] = 0, pIndices[15] = 0, pIndices[16] = 0, pIndices[17] = 0,
-		//	pIndices[18] = 12, pIndices[19] = 13, pIndices[20] = 14, pIndices[21] = 14, pIndices[22] = 15, pIndices[23] = 12,
-		//	pIndices[24] = 0, pIndices[25] = 0, pIndices[26] = 0, pIndices[27] = 0, pIndices[28] = 0, pIndices[29] = 0,
-		//	pIndices[30] = 0, pIndices[31] = 0, pIndices[32] = 0, pIndices[33] = 0, pIndices[34] = 0, pIndices[35] = 0;
 	};
 	mesh->m_indexCount = 36;
 	mesh->m_pIndices = pIndices;

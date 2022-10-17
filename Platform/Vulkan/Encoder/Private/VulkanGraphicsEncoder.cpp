@@ -25,11 +25,11 @@ namespace Vulkan
 		renderPassBeginInfo.renderPass = *static_cast<VulkanRenderPass*>(descriptor->renderPass)->GetHandle();
 		renderPassBeginInfo.renderArea.offset = { 0, 0 };
 		renderPassBeginInfo.renderArea.extent = { descriptor->renderTarget->GetWidth(), descriptor->renderTarget->GetHeight() };
-		renderPassBeginInfo.clearValueCount = 1;
-		VkClearValue clearColor;
-		clearColor.color = {1.0f, 1.0f, 1.0f, 1.0f};
-		clearColor.depthStencil.depth = 0.0f;
-		renderPassBeginInfo.pClearValues = &clearColor;
+		renderPassBeginInfo.clearValueCount = 2;
+		VkClearValue clearColor[2];
+		clearColor[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		clearColor[1].depthStencil = { 1.0f, 0 };
+		renderPassBeginInfo.pClearValues = clearColor;
 
 		vkCmdBeginRenderPass(*m_cmd, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 	}

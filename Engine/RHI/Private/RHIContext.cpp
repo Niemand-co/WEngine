@@ -50,6 +50,47 @@ void RHIContext::Init()
 	m_pTextureViews.push_back(m_pSwapchain->GetTexture(1)->CreateTextureView(&textureViewDescriptor));
 	m_pTextureViews.push_back(m_pSwapchain->GetTexture(2)->CreateTextureView(&textureViewDescriptor));
 
+	m_pDepthTextures.resize(3);
+	m_pDepthTextureViews.resize(3);
+	RHITextureDescriptor depthTextureDescriptor = {};
+	{
+		depthTextureDescriptor.format = Format::D16_Unorm;
+		depthTextureDescriptor.height = Window::cur_window->GetHeight();
+		depthTextureDescriptor.width = Window::cur_window->GetWidth();
+		depthTextureDescriptor.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+		depthTextureDescriptor.mipCount = 1;
+		depthTextureDescriptor.layout = AttachmentLayout::Undefined;
+	}
+	m_pDepthTextures[0] = m_pDevice->CreateTexture(&depthTextureDescriptor);
+	m_pDepthTextures[1] = m_pDevice->CreateTexture(&depthTextureDescriptor);
+	m_pDepthTextures[2] = m_pDevice->CreateTexture(&depthTextureDescriptor);
+
+	for(int i = 0; i < 3; ++i)
+	{
+		TextureBarrier textureBarrier = { m_pDepthTextures[i], AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE };
+		RHIBarrierDescriptor barrierDescriptor = {};
+		{
+			barrierDescriptor.textureCount = 1;
+			barrierDescriptor.pTextureBarriers = &textureBarrier;
+			barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
+			barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
+		}
+		ImageLayoutTransition(&barrierDescriptor);
+	}
+
+	RHITextureViewDescriptor depthViewDescriptor = {};
+	{
+		depthViewDescriptor.format = Format::D16_Unorm;
+		depthViewDescriptor.mipCount = 1;
+		depthViewDescriptor.baseMipLevel = 0;
+		depthViewDescriptor.arrayLayerCount = 1;
+		depthViewDescriptor.baseArrayLayer = 0;
+		depthViewDescriptor.dimension = Dimension::Texture2D;
+		depthViewDescriptor.imageAspect = IMAGE_ASPECT_DEPTH;
+	}
+	for(int i = 0; i < 3; ++i)
+		m_pDepthTextureViews[i] = m_pDepthTextures[i]->CreateTextureView(&depthViewDescriptor);
+
 	m_pPrimaryCommandBuffers = m_pPool->GetCommandBuffer(3u, true);
 
 	m_isDisplayChagned = false;
@@ -99,6 +140,11 @@ RHITexture* RHIContext::GetTexture(unsigned int index)
 RHITextureView* RHIContext::GetTextureView(unsigned int index)
 {
 	return m_pTextureViews[index];
+}
+
+RHITextureView* RHIContext::GetDepthView(unsigned int index)
+{
+	return m_pDepthTextureViews[index];
 }
 
 RHICommandBuffer* RHIContext::GetCommandBuffer(bool isPrimary)

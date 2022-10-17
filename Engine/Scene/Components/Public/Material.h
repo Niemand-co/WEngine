@@ -37,6 +37,8 @@ public:
 
 	void SetRoughness(float roughness);
 
+	void ShowInInspector();
+
 private:
 
 	glm::vec3 albedo;
