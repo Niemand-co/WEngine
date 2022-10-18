@@ -50,20 +50,9 @@ namespace Vulkan
 
 	void VulkanTexture::LoadData(std::string path, RHIContext* context)
 	{
-		ImageData *data = FileLoader::ImageLoad(path.c_str());
-		VkDeviceSize imageSize = data->width * data->height * 4;
-
-		RHIBufferDescriptor bufferDescriptor = {};
-		{
-			bufferDescriptor.pData = data;
-			bufferDescriptor.size = imageSize;
-			bufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
-		}
-		RHIBuffer *buffer = context->CreateTextureBuffer(&bufferDescriptor);
+		RHIBuffer *pBuffer = FileLoader::ImageLoad(path.c_str(), context);
 	
-		context->CopyBufferToImage(this, buffer, data->width, data->height);
-
-		delete data;
+		context->CopyBufferToImage(this, pBuffer, 1024, 1024);
 	}
 
 	VkImage* VulkanTexture::GetHandle()

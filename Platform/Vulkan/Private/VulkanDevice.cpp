@@ -410,6 +410,36 @@ namespace Vulkan
 		return pTexture;
 	}
 
+	RHISampler* VulkanDevice::CreateSampler(RHISamplerDescriptor* descriptor)
+	{
+		VkSamplerCreateInfo samplerCreateInfo = {};
+		{
+			samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+			samplerCreateInfo.anisotropyEnable = true;
+			samplerCreateInfo.maxAnisotropy = 16;
+			samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
+			samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
+			samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+			samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+			samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+			samplerCreateInfo.compareEnable = false;
+			samplerCreateInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+			samplerCreateInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+			samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+			samplerCreateInfo.minLod = 0;
+			samplerCreateInfo.maxLod = 0;
+			samplerCreateInfo.mipLodBias = 0;
+		}
+
+		VkSampler *pSampler = (VkSampler*)WEngine::Allocator::Get()->Allocate(sizeof(VkSampler));
+		RE_ASSERT(vkCreateSampler(*m_pDevice, &samplerCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pSampler) == VK_SUCCESS, "Failed to Create Sampler.");
+		
+		VulkanSampler *sampler = (VulkanSampler*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanSampler));
+		::new (sampler) VulkanSampler(pSampler);
+
+		return sampler;
+	}
+
 	RHIRenderTarget* VulkanDevice::CreateRenderTarget(RHIRenderTargetDescriptor* descriptor)
 	{
 		std::vector<VkImageView> views(descriptor->bufferCount);
@@ -459,7 +489,7 @@ namespace Vulkan
 		}
 		RE_ASSERT(feature.memorySupports.size() > index, "No Suitable Memory Heap Exists.");
 
-		RHIBuffer *buffer = (RHIBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanBuffer));
+		VulkanBuffer *buffer = (VulkanBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanBuffer));
 		::new (buffer) VulkanBuffer(pBuffer, m_pDevice, index, descriptor->size, descriptor->pData);
 
 		return buffer;

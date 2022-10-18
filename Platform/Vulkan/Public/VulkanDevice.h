@@ -36,6 +36,8 @@ namespace Vulkan
 
 		virtual RHITexture* CreateTexture(RHITextureDescriptor *descriptor) override;
 
+		virtual RHISampler* CreateSampler(RHISamplerDescriptor * descriptor) override;
+
 		virtual RHIRenderTarget* CreateRenderTarget(RHIRenderTargetDescriptor *descriptor) override;
 
 		virtual RHIBuffer* CreateBuffer(RHIBufferDescriptor *descriptor) override;

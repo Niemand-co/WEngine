@@ -1,6 +1,8 @@
 #pragma once
 
 class MeshFilter;
+class RHIBuffer;
+class RHIContext;
 
 struct ImageData
 {
@@ -21,6 +23,8 @@ public:
 
 	//static MeshFilter* ModelLoad( const char* filePath );
 
-	static ImageData* ImageLoad( const char* filePath );
+	static ImageData* ImageLoad(const char* filePath);
+
+	static RHIBuffer* ImageLoad(const char* filePath, RHIContext* pContext);
 
 };

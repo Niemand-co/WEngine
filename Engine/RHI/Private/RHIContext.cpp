@@ -282,7 +282,7 @@ void RHIContext::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, uns
 		submitDescriptor.pWaitSemaphores = nullptr;
 		submitDescriptor.signalSemaphoreCount = 0;
 		submitDescriptor.pSignalSemaphores = nullptr;
-		submitDescriptor.waitStage = PIPELINE_STAGE_ALL_COMMANDS;
+		submitDescriptor.waitStage = 0;
 		submitDescriptor.commandBufferCount = 1;
 		submitDescriptor.pCommandBuffers = &cmd;
 	}

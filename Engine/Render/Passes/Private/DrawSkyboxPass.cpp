@@ -200,7 +200,12 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	for(unsigned int i = 0; i < 6; ++i)
 		m_pCubemap[i] = m_pDevice->CreateTexture(&textureDescriptor);
 
-	m_pCubemap[0]->LoadData("assets/chino.png", context);
+	m_pCubemap[0]->LoadData("assets/px.png", context);
+	m_pCubemap[1]->LoadData("assets/nx.png", context);
+	m_pCubemap[2]->LoadData("assets/py.png", context);
+	m_pCubemap[3]->LoadData("assets/ny.png", context);
+	m_pCubemap[4]->LoadData("assets/pz.png", context);
+	m_pCubemap[5]->LoadData("assets/nz.png", context);
 
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)

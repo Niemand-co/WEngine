@@ -7,6 +7,7 @@ class RHIShader;
 class RHIRenderPass;
 class RHIPipelineStateObject;
 class RHITexture;
+class RHISampler;
 class RHIRenderTarget;
 class RHISemaphore;
 class RHIFence;
@@ -22,6 +23,7 @@ class RHIShaderDescriptor;
 class RHIRenderPassDescriptor;
 class RHIPipelineStateObjectDescriptor;
 class RHITextureDescriptor;
+class RHISamplerDescriptor;
 class RHIRenderTargetDescriptor;
 class RHIBufferDescriptor;
 class RHIGroupPoolDescriptor;
@@ -53,6 +55,8 @@ public:
 	virtual RHIPipelineStateObject* CreatePipelineStateObject(RHIPipelineStateObjectDescriptor *descriptor) = 0;
 
 	virtual RHITexture* CreateTexture(RHITextureDescriptor *descriptor) = 0;
+
+	virtual RHISampler* CreateSampler(RHISamplerDescriptor * descriptor) = 0;
 
 	virtual RHIRenderTarget* CreateRenderTarget(RHIRenderTargetDescriptor *descriptor) = 0;
 
