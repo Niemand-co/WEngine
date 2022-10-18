@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Platform/GLFWWindow/Public/GLFWWindow.h"
 #include "Math/Matrix.h"
-#include "Utils/Public/OBJLoader.h"
+#include "Utils/Public/FileLoader.h"
 
 static void WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, int bit)
 {
@@ -60,7 +60,10 @@ void GLFWWindow::Init()
 	glfwSetKeyCallback(m_handle, WindowKeyCallback);
 
 	GLFWimage icons[1];
-	icons[0].pixels = OBJLoader::ImageLoad("assets/chino.png", &icons[0].width, &icons[0].height, 0, 4);
+	ImageData *data = FileLoader::ImageLoad("assets/chino.png");
+	icons[0].pixels = data->pData;
+	icons[0].width = data->width;
+	icons[0].height = data->height;
 	glfwSetWindowIcon(m_handle, 1, icons);
 }
 

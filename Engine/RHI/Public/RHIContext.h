@@ -68,6 +68,10 @@ public:
 
 	virtual RHIBuffer* CreateUniformBuffer(RHIBufferDescriptor *descriptor);
 
+	virtual RHIBuffer* CreateTextureBuffer(RHIBufferDescriptor *descriptor);
+
+	virtual void CopyBufferToImage(RHITexture *pTexture, RHIBuffer *pBuffer, unsigned int width, unsigned int height);
+
 	virtual RHIGroupLayout* CreateGroupLayout(RHIGroupLayoutDescriptor *descriptor);
 
 	virtual RHIGroup* CreateResourceGroup(RHIGroupDescriptor *descriptor);

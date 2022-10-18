@@ -42,7 +42,7 @@ void RHIContext::Init()
 		textureDescriptor.format = Format::A16R16G16B16_SFloat;
 		textureDescriptor.width = 1920;
 		textureDescriptor.height = 1080;
-		textureDescriptor.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+		textureDescriptor.usage = IMAGE_USAGE_COLOR_ATTACHMENT;
 		textureDescriptor.mipCount = 1;
 		textureDescriptor.layout = AttachmentLayout::ColorBuffer;
 	}
@@ -57,7 +57,7 @@ void RHIContext::Init()
 		depthTextureDescriptor.format = Format::D16_Unorm;
 		depthTextureDescriptor.height = Window::cur_window->GetHeight();
 		depthTextureDescriptor.width = Window::cur_window->GetWidth();
-		depthTextureDescriptor.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+		depthTextureDescriptor.usage = IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT;
 		depthTextureDescriptor.mipCount = 1;
 		depthTextureDescriptor.layout = AttachmentLayout::Undefined;
 	}
@@ -242,6 +242,53 @@ RHIBuffer* RHIContext::CreateUniformBuffer(RHIBufferDescriptor* descriptor)
 {
 	descriptor->bufferType = BUFFER_USAGE_UNIFORM_BUFFER;
 	return m_pDevice->CreateBuffer(descriptor);
+}
+
+RHIBuffer* RHIContext::CreateTextureBuffer(RHIBufferDescriptor* descriptor)
+{
+	descriptor->bufferType = BUFFER_USAGE_TRANSFER_SRC;
+	return m_pDevice->CreateBuffer(descriptor);
+}
+
+void RHIContext::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height)
+{
+	RHICommandBuffer *cmd = GetCommandBuffer(true);
+	cmd->BeginScopePass("Copy Buffer");
+	{
+		RHIGraphicsEncoder *encoder = cmd->GetGraphicsEncoder();
+		TextureBarrier textureBarrier = { pTexture, AttachmentLayout::Undefined, AttachmentLayout::BlitDst, 0, ACCESS_TRANSFER_WRITE };
+		RHIBarrierDescriptor barrierDescriptor = {};
+		{
+			barrierDescriptor.srcStage = PIPELINE_STAGE_HOST;
+			barrierDescriptor.dstStage = PIPELINE_STAGE_TRANSFER;
+			barrierDescriptor.textureCount = 1;
+			barrierDescriptor.pTextureBarriers = &textureBarrier;
+		}
+		encoder->ResourceBarrier(&barrierDescriptor);
+		encoder->CopyBufferToImage(pTexture, pBuffer, width, height);
+		{
+			textureBarrier.srcAccess = ACCESS_TRANSFER_WRITE;
+			textureBarrier.dstAccess = ACCESS_SHADER_READ;
+			textureBarrier.oldLayout = AttachmentLayout::BlitDst;
+			textureBarrier.newLayout = AttachmentLayout::ReadOnlyColor;
+		}
+		encoder->ResourceBarrier(&barrierDescriptor);
+	}
+	cmd->EndScopePass();
+	RHISubmitDescriptor submitDescriptor = {};
+	{
+		submitDescriptor.pFence = nullptr;
+		submitDescriptor.waitSemaphoreCount = 0;
+		submitDescriptor.pWaitSemaphores = nullptr;
+		submitDescriptor.signalSemaphoreCount = 0;
+		submitDescriptor.pSignalSemaphores = nullptr;
+		submitDescriptor.waitStage = PIPELINE_STAGE_ALL_COMMANDS;
+		submitDescriptor.commandBufferCount = 1;
+		submitDescriptor.pCommandBuffers = &cmd;
+	}
+	m_pQueue->Submit(&submitDescriptor);
+	cmd->~RHICommandBuffer();
+	WEngine::Allocator::Get()->Deallocate(cmd);
 }
 
 RHIGroupLayout* RHIContext::CreateGroupLayout(RHIGroupLayoutDescriptor* descriptor)

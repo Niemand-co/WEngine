@@ -3,6 +3,7 @@
 class RHITextureViewDescriptor;
 class RHITextureView;
 class RHIDevice;
+class RHIContext;
 
 class RHITexture
 {
@@ -12,8 +13,6 @@ public:
 
 	virtual RHITextureView* CreateTextureView(RHITextureViewDescriptor* descriptor) = 0;
 
-public:
-
-	static RHITexture LoadTextureFromDisk(std::string path);
+	virtual void LoadData(std::string path, RHIContext *context) = 0;
 
 };

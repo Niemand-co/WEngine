@@ -45,6 +45,8 @@ public:
 
 	virtual void ResourceBarrier(RHIBarrierDescriptor *pDescriptor) = 0;
 
+	virtual void CopyBufferToImage(RHITexture *pTexture, RHIBuffer *pBuffer, unsigned int width, unsigned int height) = 0;
+
 	virtual void SetEvent(RHIEvent *pEvent) = 0;
 
 	virtual void NextSubpass() = 0;

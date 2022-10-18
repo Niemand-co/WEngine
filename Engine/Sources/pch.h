@@ -22,9 +22,6 @@
 #endif
 //-------------------------------------------------------------
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "deps/stb_image.h"
-
 //-------------------------Graphics API------------------------
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
@@ -57,5 +54,6 @@
 #include "Render/Public/RenderCore.h"
 #include "RHI/Public/RHICore.h"
 #include "Utils/Public/ShaderCodeBlob.h"
+#include "Utils/Public/FileLoader.h"
 
 #endif

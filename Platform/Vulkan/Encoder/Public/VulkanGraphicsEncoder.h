@@ -36,6 +36,8 @@ namespace Vulkan
 
 		virtual void ResourceBarrier(RHIBarrierDescriptor* pDescriptor) override;
 
+		virtual void CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height) override;
+
 		virtual void SetEvent(RHIEvent* pEvent) override;
 
 		virtual void NextSubpass() override;

@@ -4,6 +4,7 @@
 class Mesh;
 class RHIRenderTarget;
 class RHIBuffer;
+class RHITexture;
 class RHIGroup;
 class RHIContext;
 class RHICommandBuffer;
@@ -28,6 +29,8 @@ private:
 	std::vector<RHIRenderTarget*> m_pRenderTargets;
 
 	std::vector<RHICommandBuffer*> m_pCommandBuffers;
+
+	std::vector<RHITexture*> m_pCubemap;
 
 	Mesh *m_pMesh;
 

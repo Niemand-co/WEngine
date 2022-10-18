@@ -3,7 +3,10 @@
 #include "Platform/Vulkan/Public/VulkanTextureView.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
 #include "RHI/Public/RHIDevice.h"
+#include "RHI/Public/RHIContext.h"
 #include "Render/Descriptor/Public/RHITextureViewDescriptor.h"
+#include "Render/Descriptor/Public/RHIBufferDescriptor.h"
+#include "Utils/Public/FileLoader.h"
 
 namespace Vulkan
 {
@@ -43,6 +46,24 @@ namespace Vulkan
 		::new (textureView) VulkanTextureView(imageView, m_pDevice, descriptor);
 
 		return textureView;
+	}
+
+	void VulkanTexture::LoadData(std::string path, RHIContext* context)
+	{
+		ImageData *data = FileLoader::ImageLoad(path.c_str());
+		VkDeviceSize imageSize = data->width * data->height * 4;
+
+		RHIBufferDescriptor bufferDescriptor = {};
+		{
+			bufferDescriptor.pData = data;
+			bufferDescriptor.size = imageSize;
+			bufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
+		}
+		RHIBuffer *buffer = context->CreateTextureBuffer(&bufferDescriptor);
+	
+		context->CopyBufferToImage(this, buffer, data->width, data->height);
+
+		delete data;
 	}
 
 	VkImage* VulkanTexture::GetHandle()

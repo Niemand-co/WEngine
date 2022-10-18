@@ -16,6 +16,8 @@ namespace Vulkan
 
 		virtual RHITextureView* CreateTextureView(RHITextureViewDescriptor *descriptor) override;
 
+		virtual void LoadData(std::string path, RHIContext* context) override;
+
 		VkImage* GetHandle();
 
 		void SetHandle(VkImage *image);

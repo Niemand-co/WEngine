@@ -187,6 +187,21 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	context->UpdateResourceToGroup(&updateResourceDescriptor);
 
+	RHITextureDescriptor textureDescriptor = {};
+	{
+		textureDescriptor.format = Format::A8R8G8B8_UNorm;
+		textureDescriptor.width = 1024;
+		textureDescriptor.height = 1024;
+		textureDescriptor.layout = AttachmentLayout::Undefined;
+		textureDescriptor.mipCount = 1;
+		textureDescriptor.usage = IMAGE_USAGE_TRANSFER_DST | IMAGE_USAGE_SAMPLED;
+	}
+	m_pCubemap.resize(6);
+	for(unsigned int i = 0; i < 6; ++i)
+		m_pCubemap[i] = m_pDevice->CreateTexture(&textureDescriptor);
+
+	m_pCubemap[0]->LoadData("assets/chino.png", context);
+
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
 	{

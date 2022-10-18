@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "Utils/Public/OBJLoader.h"
-//#include "Render/Mesh/Public/Vertex.h"
-//#include "Scene/Components/Public/MeshFilter.h"
+#include "Utils/Public/FileLoader.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "deps/stb_image.h"
 
 //
 //MeshFilter* OBJLoader::ModelLoad( const char* filePath )
@@ -85,7 +85,9 @@
 //	return mesh;
 //}
 //
-unsigned char* OBJLoader::ImageLoad(const char* filePath, int* width, int* height, int* comp, int nrChannel)
+ImageData* FileLoader::ImageLoad(const char* filePath)
 {
-	return stbi_load(filePath, width, height, comp, nrChannel);
+	ImageData *data = new ImageData();
+	data->pData = stbi_load(filePath, &data->width, &data->height, &data->nrChannel, STBI_rgb_alpha);
+	return data;
 }

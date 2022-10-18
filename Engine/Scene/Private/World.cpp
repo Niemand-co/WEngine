@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Scene/Public/World.h"
 #include "Scene/Public/GameObject.h"
-#include "Render/Public/RenderCommand.h"
 
 World* World::g_pInstance = nullptr;
 

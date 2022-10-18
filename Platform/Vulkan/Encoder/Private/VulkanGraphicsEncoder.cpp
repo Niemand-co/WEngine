@@ -145,6 +145,25 @@ namespace Vulkan
 		vkCmdPipelineBarrier(*m_cmd, pDescriptor->srcStage, pDescriptor->dstStage, VkDependencyFlagBits(), 0, nullptr, pDescriptor->bufferCount, pBufferBarriers, pDescriptor->textureCount, pImageBarriers);
 	}
 
+	void VulkanGraphicsEncoder::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height)
+	{
+		VkBufferImageCopy bufferImageCopy = {};
+		{
+			bufferImageCopy.bufferOffset = 0;
+			bufferImageCopy.bufferImageHeight = 0;
+			bufferImageCopy.bufferRowLength = 0;
+
+			bufferImageCopy.imageExtent = { width, height, 1 };
+			bufferImageCopy.imageOffset = { 0, 0, 0 };
+
+			bufferImageCopy.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			bufferImageCopy.imageSubresource.baseArrayLayer = 0;
+			bufferImageCopy.imageSubresource.mipLevel = 0;
+			bufferImageCopy.imageSubresource.layerCount = 1;
+		}
+		vkCmdCopyBufferToImage(*m_cmd, *static_cast<VulkanBuffer*>(pBuffer)->GetHandle(), *static_cast<VulkanTexture*>(pTexture)->GetHandle(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
+	}
+
 	void VulkanGraphicsEncoder::SetEvent(RHIEvent* pEvent)
 	{
 		vkCmdSetEvent(*m_cmd, *static_cast<VulkanEvent*>(pEvent)->GetHandle(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
