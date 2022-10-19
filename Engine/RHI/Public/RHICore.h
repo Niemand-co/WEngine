@@ -327,7 +327,7 @@ namespace WEngine
 		case AttachmentLayout::General:
 			return VK_IMAGE_LAYOUT_GENERAL;
 		case AttachmentLayout::ReadOnlyColor:
-			return VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
+			return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		case AttachmentLayout::ReadOnlyDepth:
 			return VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 		default:

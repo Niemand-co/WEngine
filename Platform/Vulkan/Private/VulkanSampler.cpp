@@ -9,3 +9,8 @@ VulkanSampler::VulkanSampler(VkSampler* pSampler)
 VulkanSampler::~VulkanSampler()
 {
 }
+
+VkSampler* VulkanSampler::GetHandle()
+{
+	return m_pSampler;
+}

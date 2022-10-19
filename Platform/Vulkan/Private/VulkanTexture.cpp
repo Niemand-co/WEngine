@@ -52,7 +52,7 @@ namespace Vulkan
 	{
 		RHIBuffer *pBuffer = FileLoader::ImageLoad(path.c_str(), context);
 	
-		context->CopyBufferToImage(this, pBuffer, 1024, 1024);
+		context->CopyBufferToImage(this, pBuffer, 477, 377);
 	}
 
 	VkImage* VulkanTexture::GetHandle()

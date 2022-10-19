@@ -3,6 +3,7 @@
 
 class RHIRenderTarget;
 class RHITexture;
+class RHISampler;
 class Mesh;
 class RHIBuffer;
 class RHIGroup;
@@ -23,6 +24,10 @@ public:
 private:
 
 	std::vector<RHIRenderTarget*> m_pRenderTargets;
+
+	RHITexture *m_pTexture;
+
+	RHISampler *m_pSampler;
 
 	Mesh *m_pMesh;
 

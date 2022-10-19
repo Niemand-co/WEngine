@@ -1,6 +1,8 @@
 #pragma once
 
 class RHIBuffer;
+class RHITextureView;
+class RHISampler;
 class RHIGroup;
 class RHIGroupLayout;
 struct BindingResource;
@@ -18,6 +20,10 @@ public:
 	unsigned int bindingCount;
 
 	RHIBuffer *pBuffer;
+
+	RHITextureView *pTextureView;
+
+	RHISampler *pSampler;
 
 	size_t *pSize;
 

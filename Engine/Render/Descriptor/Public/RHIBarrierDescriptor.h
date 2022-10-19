@@ -15,6 +15,7 @@ struct TextureBarrier
 	AttachmentLayout newLayout;
 	unsigned int srcAccess;
 	unsigned int dstAccess;
+	unsigned int imageAspect;
 };
 
 class RHIBarrierDescriptor

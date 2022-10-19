@@ -376,6 +376,7 @@ namespace Vulkan
 		imageCreateInfo.mipLevels = descriptor->mipCount;
 		imageCreateInfo.samples = WEngine::ToVulkan(1);
 		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 
 		VkImage *image = (VkImage*)WEngine::Allocator::Get()->Allocate(sizeof(VkImage));
 		vkCreateImage(*m_pDevice, &imageCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), image);
@@ -587,9 +588,9 @@ namespace Vulkan
 		return groupPool;
 	}
 
-	void VulkanDevice::UpdateResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
+	void VulkanDevice::UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
 	{
-		VkWriteDescriptorSet* pWriteDescriptorSets = (VkWriteDescriptorSet*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkWriteDescriptorSet));
+		VkWriteDescriptorSet *pWriteDescriptorSets = (VkWriteDescriptorSet*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkWriteDescriptorSet));
 		VkDescriptorBufferInfo *pDescriptorBufferInfo = (VkDescriptorBufferInfo*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkDescriptorBufferInfo));
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
@@ -600,13 +601,53 @@ namespace Vulkan
 
 			::new (pWriteDescriptorSets + i) VkWriteDescriptorSet();
 			pWriteDescriptorSets[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			pWriteDescriptorSets[i].descriptorCount = 1;//descriptor->pBindingResources[i].count;
+			pWriteDescriptorSets[i].descriptorCount = descriptor->pBindingResources[i].count;
 			pWriteDescriptorSets[i].descriptorType = WEngine::ToVulkan(descriptor->pBindingResources[i].type);
 			pWriteDescriptorSets[i].dstSet = *static_cast<VulkanGroup*>(descriptor->pGroup)->GetHandle();
 			pWriteDescriptorSets[i].dstBinding = descriptor->pBindingResources[i].bindingSlot;
 			pWriteDescriptorSets[i].pBufferInfo = pDescriptorBufferInfo + i;
 		}
 		vkUpdateDescriptorSets(*m_pDevice, descriptor->bindingCount, pWriteDescriptorSets, 0, nullptr);
+
+		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
+		{
+			(pDescriptorBufferInfo + i)->~VkDescriptorBufferInfo();
+			(pWriteDescriptorSets + i)->~VkWriteDescriptorSet();
+		}
+
+		WEngine::Allocator::Get()->Deallocate(pDescriptorBufferInfo);
+		WEngine::Allocator::Get()->Deallocate(pWriteDescriptorSets);
+	}
+
+	void VulkanDevice::UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
+	{
+		VkWriteDescriptorSet *pWriteDescriptorSets = (VkWriteDescriptorSet*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkWriteDescriptorSet));
+		VkDescriptorImageInfo *pDescriptorImageInfo = (VkDescriptorImageInfo*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkDescriptorImageInfo));
+		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
+		{
+			::new (pDescriptorImageInfo + i) VkDescriptorImageInfo();
+			pDescriptorImageInfo[i].imageView = *static_cast<VulkanTextureView*>(descriptor->pTextureView)->GetHandle();
+			pDescriptorImageInfo[i].sampler = *static_cast<VulkanSampler*>(descriptor->pSampler)->GetHandle();
+			pDescriptorImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+			::new (pWriteDescriptorSets + i) VkWriteDescriptorSet();
+			pWriteDescriptorSets[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			pWriteDescriptorSets[i].descriptorCount = descriptor->pBindingResources[i].count;
+			pWriteDescriptorSets[i].descriptorType = WEngine::ToVulkan(descriptor->pBindingResources[i].type);
+			pWriteDescriptorSets[i].dstSet = *static_cast<VulkanGroup*>(descriptor->pGroup)->GetHandle();
+			pWriteDescriptorSets[i].dstBinding = descriptor->pBindingResources[i].bindingSlot;
+			pWriteDescriptorSets[i].pImageInfo = pDescriptorImageInfo + i;
+		}
+		vkUpdateDescriptorSets(*m_pDevice, descriptor->bindingCount, pWriteDescriptorSets, 0, nullptr);
+
+		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
+		{
+			(pDescriptorImageInfo + i)->~VkDescriptorImageInfo();
+			(pWriteDescriptorSets + i)->~VkWriteDescriptorSet();
+		}
+
+		WEngine::Allocator::Get()->Deallocate(pDescriptorImageInfo);
+		WEngine::Allocator::Get()->Deallocate(pWriteDescriptorSets);
 	}
 
 	std::vector<RHISemaphore*> VulkanDevice::GetSemaphore(unsigned int count)
@@ -661,6 +702,11 @@ namespace Vulkan
 			return -1;
 		}
 		return index;
+	}
+
+	void VulkanDevice::Wait()
+	{
+		vkDeviceWaitIdle(*m_pDevice);
 	}
 
 	VkDevice* VulkanDevice::GetHandle()

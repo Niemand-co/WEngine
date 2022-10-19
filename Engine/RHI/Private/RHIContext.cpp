@@ -67,7 +67,7 @@ void RHIContext::Init()
 
 	for(int i = 0; i < 3; ++i)
 	{
-		TextureBarrier textureBarrier = { m_pDepthTextures[i], AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE };
+		TextureBarrier textureBarrier = { m_pDepthTextures[i], AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE, IMAGE_ASPECT_DEPTH };
 		RHIBarrierDescriptor barrierDescriptor = {};
 		{
 			barrierDescriptor.textureCount = 1;
@@ -75,7 +75,7 @@ void RHIContext::Init()
 			barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
 			barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
 		}
-		ImageLayoutTransition(&barrierDescriptor);
+		ResourceBarrier(&barrierDescriptor);
 	}
 
 	RHITextureViewDescriptor depthViewDescriptor = {};
@@ -198,7 +198,7 @@ void RHIContext::ResetDisplayState()
 	m_isDisplayChagned = false;
 }
 
-void RHIContext::ImageLayoutTransition(RHIBarrierDescriptor *pDescriptor)
+void RHIContext::ResourceBarrier(RHIBarrierDescriptor *pDescriptor)
 {
 	RHICommandBuffer *cmd = m_pPool->GetCommandBuffer(true);
 	
@@ -222,6 +222,7 @@ void RHIContext::ImageLayoutTransition(RHIBarrierDescriptor *pDescriptor)
 		submitDescriptor.pCommandBuffers = &cmd;
 	}
 	m_pQueue->Submit(&submitDescriptor);
+	m_pDevice->Wait();
 	cmd->~RHICommandBuffer();
 	WEngine::Allocator::Get()->Deallocate(cmd);
 }
@@ -252,27 +253,20 @@ RHIBuffer* RHIContext::CreateTextureBuffer(RHIBufferDescriptor* descriptor)
 
 void RHIContext::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height)
 {
+	TextureBarrier textureBarrier = { pTexture, AttachmentLayout::Undefined, AttachmentLayout::BlitDst, 0, ACCESS_TRANSFER_WRITE, IMAGE_ASPECT_COLOR };
+	RHIBarrierDescriptor barrierDescriptor = {};
+	{
+		barrierDescriptor.srcStage = PIPELINE_STAGE_HOST;
+		barrierDescriptor.dstStage = PIPELINE_STAGE_TRANSFER;
+		barrierDescriptor.textureCount = 1;
+		barrierDescriptor.pTextureBarriers = &textureBarrier;
+	}
+	ResourceBarrier(&barrierDescriptor);
 	RHICommandBuffer *cmd = GetCommandBuffer(true);
 	cmd->BeginScopePass("Copy Buffer");
 	{
 		RHIGraphicsEncoder *encoder = cmd->GetGraphicsEncoder();
-		TextureBarrier textureBarrier = { pTexture, AttachmentLayout::Undefined, AttachmentLayout::BlitDst, 0, ACCESS_TRANSFER_WRITE };
-		RHIBarrierDescriptor barrierDescriptor = {};
-		{
-			barrierDescriptor.srcStage = PIPELINE_STAGE_HOST;
-			barrierDescriptor.dstStage = PIPELINE_STAGE_TRANSFER;
-			barrierDescriptor.textureCount = 1;
-			barrierDescriptor.pTextureBarriers = &textureBarrier;
-		}
-		encoder->ResourceBarrier(&barrierDescriptor);
 		encoder->CopyBufferToImage(pTexture, pBuffer, width, height);
-		{
-			textureBarrier.srcAccess = ACCESS_TRANSFER_WRITE;
-			textureBarrier.dstAccess = ACCESS_SHADER_READ;
-			textureBarrier.oldLayout = AttachmentLayout::BlitDst;
-			textureBarrier.newLayout = AttachmentLayout::ReadOnlyColor;
-		}
-		encoder->ResourceBarrier(&barrierDescriptor);
 	}
 	cmd->EndScopePass();
 	RHISubmitDescriptor submitDescriptor = {};
@@ -287,8 +281,17 @@ void RHIContext::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, uns
 		submitDescriptor.pCommandBuffers = &cmd;
 	}
 	m_pQueue->Submit(&submitDescriptor);
-	cmd->~RHICommandBuffer();
-	WEngine::Allocator::Get()->Deallocate(cmd);
+	//cmd->~RHICommandBuffer();
+	//WEngine::Allocator::Get()->Deallocate(cmd);
+	{
+		barrierDescriptor.srcStage = PIPELINE_STAGE_TRANSFER;
+		barrierDescriptor.dstStage = PIPELINE_STAGE_FRAGMENT_SHADER;
+		textureBarrier.srcAccess = ACCESS_TRANSFER_WRITE;
+		textureBarrier.dstAccess = ACCESS_SHADER_READ;
+		textureBarrier.oldLayout = AttachmentLayout::BlitDst;
+		textureBarrier.newLayout = AttachmentLayout::ReadOnlyColor;
+	}
+	ResourceBarrier(&barrierDescriptor);
 }
 
 RHIGroupLayout* RHIContext::CreateGroupLayout(RHIGroupLayoutDescriptor* descriptor)
@@ -310,9 +313,9 @@ RHIGroup* RHIContext::CreateResourceGroup(RHIGroupDescriptor* descriptor)
 	return group;
 }
 
-void RHIContext::UpdateResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
+void RHIContext::UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
 {
-	m_pDevice->UpdateResourceToGroup(descriptor);
+	m_pDevice->UpdateUniformResourceToGroup(descriptor);
 }
 
 RHIPipelineResourceLayout* RHIContext::CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor* descriptor)

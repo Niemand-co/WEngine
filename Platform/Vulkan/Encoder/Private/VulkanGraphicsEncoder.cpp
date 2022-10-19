@@ -135,14 +135,14 @@ namespace Vulkan
 			pImageBarriers[i].newLayout = WEngine::ToVulkan(pBarrier->newLayout);
 			pImageBarriers[i].srcAccessMask = pBarrier->srcAccess;
 			pImageBarriers[i].dstAccessMask = pBarrier->dstAccess;
-			pImageBarriers[i].subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+			pImageBarriers[i].subresourceRange.aspectMask = pBarrier->imageAspect;
 			pImageBarriers[i].subresourceRange.baseArrayLayer = 0;
 			pImageBarriers[i].subresourceRange.layerCount = 1;
 			pImageBarriers[i].subresourceRange.baseMipLevel = 0;
 			pImageBarriers[i].subresourceRange.levelCount = 1;
 		}
 
-		vkCmdPipelineBarrier(*m_cmd, pDescriptor->srcStage, pDescriptor->dstStage, VkDependencyFlagBits(), 0, nullptr, pDescriptor->bufferCount, pBufferBarriers, pDescriptor->textureCount, pImageBarriers);
+		vkCmdPipelineBarrier(*m_cmd, pDescriptor->srcStage, pDescriptor->dstStage, 0, 0, nullptr, pDescriptor->bufferCount, pBufferBarriers, pDescriptor->textureCount, pImageBarriers);
 	}
 
 	void VulkanGraphicsEncoder::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height)

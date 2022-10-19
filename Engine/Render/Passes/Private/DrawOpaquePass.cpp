@@ -101,9 +101,10 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	GameObject *go = GameObject::Find("Cube");
 	m_pMesh = static_cast<MeshFilter*>(go->GetComponent<Component::ComponentType::MeshFilter>())->GetStaticMesh();
 
-	BindingResource resource[1] = 
+	BindingResource resource[2] = 
 	{
 		{0, ResourceType::UniformBuffer, 1, ShaderStage::vertex},
+		{1, ResourceType::Sampler, 1, ShaderStage::fragment},
 	};
 	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
 	{
@@ -184,7 +185,31 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		updateResourceDescriptor.pOffsets = pOffsets;
 		updateResourceDescriptor.pGroup = m_pGroup;
 	}
-	context->UpdateResourceToGroup(&updateResourceDescriptor);
+	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
+
+	RHITextureDescriptor textureDescriptor = {};
+	{
+		textureDescriptor.format = Format::A8R8G8B8_SNorm;
+		textureDescriptor.width = 477;
+		textureDescriptor.height = 377;
+		textureDescriptor.layout = AttachmentLayout::Undefined;
+		textureDescriptor.mipCount = 1;
+		textureDescriptor.usage = IMAGE_USAGE_TRANSFER_DST | IMAGE_USAGE_SAMPLED;
+	}
+	m_pTexture = m_pDevice->CreateTexture(&textureDescriptor);
+	m_pSampler = m_pDevice->CreateSampler(nullptr);
+
+	RHITextureViewDescriptor uvd = {};
+	{
+		uvd.format = Format::A8R8G8B8_SNorm;
+		uvd.arrayLayerCount = 1;
+		uvd.baseArrayLayer = 0;
+		uvd.mipCount = 1;
+		uvd.baseMipLevel = 0;
+		uvd.dimension = Dimension::Texture2D;
+		uvd.imageAspect = IMAGE_ASPECT_COLOR;
+	}
+	m_pTexture->CreateTextureView(&uvd);
 
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
@@ -253,7 +278,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		updateResourceDescriptor.pOffsets = pOffsets;
 		updateResourceDescriptor.pGroup = m_pGroup;
 	}
-	context->UpdateResourceToGroup(&updateResourceDescriptor);
+	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 
 	cmd->BeginScopePass("Test");
 	{

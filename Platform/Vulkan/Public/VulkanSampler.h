@@ -9,6 +9,8 @@ public:
 
 	virtual ~VulkanSampler();
 
+	VkSampler* GetHandle();
+
 private:
 
 	VkSampler *m_pSampler;

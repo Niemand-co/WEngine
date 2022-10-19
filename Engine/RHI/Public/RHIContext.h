@@ -60,7 +60,7 @@ public:
 
 	virtual void ResetDisplayState();
 
-	virtual void ImageLayoutTransition(RHIBarrierDescriptor* pDescriptor);
+	virtual void ResourceBarrier(RHIBarrierDescriptor* pDescriptor);
 
 	virtual RHIBuffer* CreateVertexBuffer(RHIBufferDescriptor *descriptor);
 
@@ -76,7 +76,7 @@ public:
 
 	virtual RHIGroup* CreateResourceGroup(RHIGroupDescriptor *descriptor);
 
-	virtual void UpdateResourceToGroup(RHIUpdateResourceDescriptor *descriptor);
+	virtual void UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor *descriptor);
 
 	virtual RHIPipelineResourceLayout* CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor *descriptor);
 

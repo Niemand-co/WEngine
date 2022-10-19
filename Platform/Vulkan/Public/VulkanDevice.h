@@ -50,7 +50,9 @@ namespace Vulkan
 
 		virtual RHIGroupPool* CreateGroupPool(RHIGroupPoolDescriptor *descriptor) override;
 
-		virtual void UpdateResourceToGroup(RHIUpdateResourceDescriptor *descriptor) override;
+		virtual void UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor *descriptor) override;
+
+		virtual void UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor *descriptor) override;
 
 		virtual std::vector<RHISemaphore*> GetSemaphore(unsigned int count) override;
 
@@ -59,6 +61,8 @@ namespace Vulkan
 		virtual void ResetFences(RHIFence* pFences, unsigned int count) override;
 
 		virtual int GetNextImage(RHISwapchain *swapchain, RHISemaphore *semaphore) override;
+
+		virtual void Wait() override;
 
 		VkDevice* GetHandle();
 

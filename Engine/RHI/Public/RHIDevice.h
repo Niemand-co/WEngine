@@ -70,7 +70,9 @@ public:
 
 	virtual RHIGroupPool* CreateGroupPool(RHIGroupPoolDescriptor *descriptor) = 0;
 
-	virtual void UpdateResourceToGroup(RHIUpdateResourceDescriptor *descriptor) = 0;
+	virtual void UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor *descriptor) = 0;
+
+	virtual void UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor *descriptor) = 0;
 
 	virtual std::vector<RHISemaphore*> GetSemaphore(unsigned int count) = 0;
 
@@ -79,5 +81,7 @@ public:
 	virtual void ResetFences(RHIFence *pFences, unsigned int count) = 0;
 
 	virtual int GetNextImage(RHISwapchain *swapchain, RHISemaphore *semaphore) = 0;
+
+	virtual void Wait() = 0;
 
 };
