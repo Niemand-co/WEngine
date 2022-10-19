@@ -13,12 +13,12 @@ ImageData* FileLoader::ImageLoad(const char* filePath)
 	return data;
 }
 
-RHIBuffer* FileLoader::ImageLoad(const char* filePath, RHIContext *pContext)
+RHIBuffer* FileLoader::ImageLoad(const char* filePath, RHIContext *pContext, int *width, int *height)
 {
-	int width, height, nrChannel;
-	unsigned char *pData = stbi_load(filePath, &width, &height, &nrChannel, 0);
+	int nrChannel;
+	unsigned char *pData = stbi_load(filePath, width, height, &nrChannel, STBI_rgb_alpha);
 
-	size_t imageSize = width * height * nrChannel;
+	size_t imageSize = *width * *height * 4;
 
 	RE_ASSERT(pData, "Failed to Load Image.");
 

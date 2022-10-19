@@ -25,6 +25,6 @@ public:
 
 	static ImageData* ImageLoad(const char* filePath);
 
-	static RHIBuffer* ImageLoad(const char* filePath, RHIContext* pContext);
+	static RHIBuffer* ImageLoad(const char* filePath, RHIContext* pContext, int* width, int* height);
 
 };

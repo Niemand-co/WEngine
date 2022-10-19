@@ -299,7 +299,7 @@ namespace WEngine
 		case ResourceType::Texture:
 			return VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
 		case ResourceType::Sampler:
-			return VK_DESCRIPTOR_TYPE_SAMPLER;
+			return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		default:
 			break;
 		}

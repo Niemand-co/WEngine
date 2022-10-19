@@ -108,7 +108,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	};
 	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
 	{
-		groupLayoutDescriptor.bindingCount = 1;
+		groupLayoutDescriptor.bindingCount = 2;
 		groupLayoutDescriptor.pBindingResources = resource;
 	}
 	RHIGroupLayout *groupLayout = context->CreateGroupLayout(&groupLayoutDescriptor);
@@ -187,21 +187,9 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 
-	RHITextureDescriptor textureDescriptor = {};
-	{
-		textureDescriptor.format = Format::A8R8G8B8_SNorm;
-		textureDescriptor.width = 477;
-		textureDescriptor.height = 377;
-		textureDescriptor.layout = AttachmentLayout::Undefined;
-		textureDescriptor.mipCount = 1;
-		textureDescriptor.usage = IMAGE_USAGE_TRANSFER_DST | IMAGE_USAGE_SAMPLED;
-	}
-	m_pTexture = m_pDevice->CreateTexture(&textureDescriptor);
-	m_pSampler = m_pDevice->CreateSampler(nullptr);
-
 	RHITextureViewDescriptor uvd = {};
 	{
-		uvd.format = Format::A8R8G8B8_SNorm;
+		uvd.format = Format::A8R8G8B8_UNorm;
 		uvd.arrayLayerCount = 1;
 		uvd.baseArrayLayer = 0;
 		uvd.mipCount = 1;
@@ -209,7 +197,30 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		uvd.dimension = Dimension::Texture2D;
 		uvd.imageAspect = IMAGE_ASPECT_COLOR;
 	}
-	m_pTexture->CreateTextureView(&uvd);
+	
+	RHITextureDescriptor textureDescriptor = {};
+	{
+		textureDescriptor.format = Format::A8R8G8B8_UNorm;
+		textureDescriptor.width = 477;
+		textureDescriptor.height = 377;
+		textureDescriptor.layout = AttachmentLayout::Undefined;
+		textureDescriptor.mipCount = 1;
+		textureDescriptor.usage = IMAGE_USAGE_TRANSFER_DST | IMAGE_USAGE_SAMPLED;
+	}
+	m_pTexture = m_pDevice->CreateTexture(&textureDescriptor);
+	m_pTexture->LoadData("assets/chino.png", context);
+
+	m_pSampler = m_pDevice->CreateSampler(nullptr);
+
+	RHIUpdateResourceDescriptor textureResourceDescriptor = {};
+	{
+		textureResourceDescriptor.bindingCount = 1;
+		textureResourceDescriptor.pBindingResources = resource + 1;
+		textureResourceDescriptor.pGroup = m_pGroup;
+		textureResourceDescriptor.pSampler = m_pSampler;
+		textureResourceDescriptor.pTextureView = m_pTexture->CreateTextureView(&uvd);
+	}
+	context->UpdateTextureResourceToGroup(&textureResourceDescriptor);
 
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)

@@ -318,6 +318,11 @@ void RHIContext::UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor* descr
 	m_pDevice->UpdateUniformResourceToGroup(descriptor);
 }
 
+void RHIContext::UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
+{
+	m_pDevice->UpdateTextureResourceToGroup(descriptor);
+}
+
 RHIPipelineResourceLayout* RHIContext::CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor* descriptor)
 {
 	return m_pDevice->CreatePipelineResourceLayout(descriptor);

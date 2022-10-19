@@ -78,6 +78,8 @@ public:
 
 	virtual void UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor *descriptor);
 
+	virtual void UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor *descriptor);
+
 	virtual RHIPipelineResourceLayout* CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor *descriptor);
 
 	virtual RHIPipelineStateObject* CreatePSO(RHIPipelineStateObjectDescriptor *descriptor);

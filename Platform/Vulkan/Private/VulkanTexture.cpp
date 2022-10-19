@@ -50,9 +50,10 @@ namespace Vulkan
 
 	void VulkanTexture::LoadData(std::string path, RHIContext* context)
 	{
-		RHIBuffer *pBuffer = FileLoader::ImageLoad(path.c_str(), context);
+		int width, height;
+		RHIBuffer *pBuffer = FileLoader::ImageLoad(path.c_str(), context, &width, &height);
 	
-		context->CopyBufferToImage(this, pBuffer, 477, 377);
+		context->CopyBufferToImage(this, pBuffer, (unsigned int)width, (unsigned int)height);
 	}
 
 	VkImage* VulkanTexture::GetHandle()

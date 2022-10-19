@@ -107,11 +107,12 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 
 	BindingResource resource[] = 
 	{
-		{ 0, ResourceType::UniformBuffer, 1, ShaderStage::vertex }
+		{ 0, ResourceType::UniformBuffer, 1, ShaderStage::vertex },
+		{ 1, ResourceType::Sampler, 1, ShaderStage::fragment }
 	};
 	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
 	{
-		groupLayoutDescriptor.bindingCount = 1;
+		groupLayoutDescriptor.bindingCount = 2;
 		groupLayoutDescriptor.pBindingResources = resource;
 	}
 	RHIGroupLayout *pGroupLayout = context->CreateGroupLayout(&groupLayoutDescriptor);
@@ -190,8 +191,8 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	RHITextureDescriptor textureDescriptor = {};
 	{
 		textureDescriptor.format = Format::A8R8G8B8_SNorm;
-		textureDescriptor.width = 477;
-		textureDescriptor.height = 377;
+		textureDescriptor.width = 256;
+		textureDescriptor.height = 256;
 		textureDescriptor.layout = AttachmentLayout::Undefined;
 		textureDescriptor.mipCount = 1;
 		textureDescriptor.usage = IMAGE_USAGE_TRANSFER_DST | IMAGE_USAGE_SAMPLED;
@@ -200,12 +201,41 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	for(unsigned int i = 0; i < 6; ++i)
 		m_pCubemap[i] = m_pDevice->CreateTexture(&textureDescriptor);
 
-	//m_pCubemap[0]->LoadData("assets/chino.png", context);
-	//m_pCubemap[1]->LoadData("assets/nx.png", context);
-	//m_pCubemap[2]->LoadData("assets/py.png", context);
-	//m_pCubemap[3]->LoadData("assets/ny.png", context);
-	//m_pCubemap[4]->LoadData("assets/pz.png", context);
-	//m_pCubemap[5]->LoadData("assets/nz.png", context);
+	m_pCubemap[0]->LoadData("assets/px.png", context);
+	m_pCubemap[1]->LoadData("assets/nx.png", context);
+	m_pCubemap[2]->LoadData("assets/py.png", context);
+	m_pCubemap[3]->LoadData("assets/ny.png", context);
+	m_pCubemap[4]->LoadData("assets/pz.png", context);
+	m_pCubemap[5]->LoadData("assets/nz.png", context);
+
+	//RHITextureViewDescriptor uvd = {};
+	//{
+	//	uvd.format = Format::A8R8G8B8_UNorm;
+	//	uvd.arrayLayerCount = 1;
+	//	uvd.baseArrayLayer = 0;
+	//	uvd.mipCount = 1;
+	//	uvd.baseMipLevel = 0;
+	//	uvd.dimension = Dimension::Texture2D;
+	//	uvd.imageAspect = IMAGE_ASPECT_COLOR;
+	//}
+
+	//RHISampler* samplers[6];
+	//RHITextureView* views[6];
+	//for (int i = 0; i < 6; ++i)
+	//{
+	//	views[i] = m_pCubemap[i]->CreateTextureView(&uvd);
+	//	samplers[i] = m_pDevice->CreateSampler(nullptr);
+	//}
+
+	//RHIUpdateResourceDescriptor textureResourceDescriptor = {};
+	//{
+	//	textureResourceDescriptor.bindingCount = 1;
+	//	textureResourceDescriptor.pBindingResources = resource + 1;
+	//	textureResourceDescriptor.pGroup = m_pGroup;
+	//	textureResourceDescriptor.pSampler = samplers;
+	//	textureResourceDescriptor.pTextureView = views;
+	//}
+	//context->UpdateTextureResourceToGroup(&textureResourceDescriptor);
 
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)

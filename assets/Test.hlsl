@@ -5,14 +5,16 @@ struct VSInput
 	float3 Position : POSITION;
     float3 Color : COLOR;
     float3 Normal : NORMAL;
+    float2 UV : TEXCOORD0;
 };
 
 struct VSOutput
 {
 	float4 Position : SV_POSITION;
 	float3 Color : COLOR;
-    float3 Normal : TEXCOORD0;
-    float3 WorldPos : TEXCOORD1;
+    float2 uv : TEXCOORD0;
+    float3 Normal : TEXCOORD1;
+    float3 WorldPos : TEXCOORD2;
 };
 
 struct uniformData
@@ -24,6 +26,9 @@ struct uniformData
 };
 
 uniformData data : register(b0, space0);
+Texture2D tex : register(t1, space0);
+
+SamplerState testSampler : register(s1, space0);
 
 float D_GGX(float NoH, float Roughness)
 {
@@ -64,6 +69,7 @@ VSOutput vert(VSInput vin)
     vout.WorldPos = vin.Position;
     vout.Normal = normalize(vin.Normal);
 	vout.Color = vin.Color;
+    vout.uv = vin.UV;
 
 	return vout;
 }
@@ -79,5 +85,8 @@ float4 frag(VSOutput pin) : SV_TARGET
     float NoV = saturate(dot(pin.Normal, V));
     float HoV = saturate(dot(H, V));
 
-	return PBRLighting(data.surfaceData.xyz, NoL, NoH, NoV, HoV, data.surfaceData.w, 0.0f);
+    float3 color = tex.Sample(testSampler, pin.uv).rgb;
+
+    return float4(color, 1.0f);
+	// return PBRLighting(color, NoL, NoH, NoV, HoV, data.surfaceData.w, 0.0f);
 }
