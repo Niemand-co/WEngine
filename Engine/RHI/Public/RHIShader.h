@@ -6,13 +6,13 @@ public:
 
 	virtual ~RHIShader() = default;
 
-	virtual ShaderStage GetStage();
+	virtual unsigned int GetStage();
 
 	virtual const char* GetEntry();
 
 protected:
 
-	ShaderStage m_stage;
+	unsigned int m_stage;
 
 	std::string m_entryName;
 

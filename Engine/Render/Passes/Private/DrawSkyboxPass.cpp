@@ -36,7 +36,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	RHIShaderDescriptor vertShaderDescriptor = {};
 	{
 		vertShaderDescriptor.entryName = "vert";
-		vertShaderDescriptor.shaderStage = ShaderStage::vertex;
+		vertShaderDescriptor.shaderStage = SHADER_STAGE_VERTEX;
 		vertShaderDescriptor.pCode = vertBlob->GetCode();
 		vertShaderDescriptor.codeSize = vertBlob->GetSize();
 	}
@@ -46,7 +46,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	RHIShaderDescriptor fragShaderDescriptor = {};
 	{
 		fragShaderDescriptor.entryName = "frag";
-		fragShaderDescriptor.shaderStage = ShaderStage::fragment;
+		fragShaderDescriptor.shaderStage = SHADER_STAGE_FRAGMENT;
 		fragShaderDescriptor.pCode = fragBlob->GetCode();
 		fragShaderDescriptor.codeSize = fragBlob->GetSize();
 	}
@@ -107,12 +107,13 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 
 	BindingResource resource[] = 
 	{
-		{ 0, ResourceType::UniformBuffer, 1, ShaderStage::vertex },
-		{ 1, ResourceType::Sampler, 1, ShaderStage::fragment }
+		{ 0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT },
+		{ 1, ResourceType::Sampler, 1, SHADER_STAGE_FRAGMENT },
+		{ 2, ResourceType::Texture, 6, SHADER_STAGE_FRAGMENT},
 	};
 	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
 	{
-		groupLayoutDescriptor.bindingCount = 2;
+		groupLayoutDescriptor.bindingCount = 3;
 		groupLayoutDescriptor.pBindingResources = resource;
 	}
 	RHIGroupLayout *pGroupLayout = context->CreateGroupLayout(&groupLayoutDescriptor);
@@ -175,16 +176,17 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	m_pUniformBuffer = context->CreateUniformBuffer(&uniformBufferDescriptor);
 	
-	size_t offsets[] = { 0 };
-	size_t sizes[] = { sizeof(data) };
+	BufferResourceInfo bufferInfo[] = 
+	{
+		{ m_pUniformBuffer, 0, sizeof(UniformData) },
+	};
 	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
 	{
 		updateResourceDescriptor.bindingCount = 1;
 		updateResourceDescriptor.pBindingResources = resource;
-		updateResourceDescriptor.pBuffer = m_pUniformBuffer;
 		updateResourceDescriptor.pGroup = m_pGroup;
-		updateResourceDescriptor.pOffsets = offsets;
-		updateResourceDescriptor.pSize = sizes;
+		updateResourceDescriptor.bufferResourceCount = 1;
+		updateResourceDescriptor.pBufferInfo = bufferInfo;
 	}
 	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 
@@ -208,34 +210,60 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	m_pCubemap[4]->LoadData("assets/pz.png", context);
 	m_pCubemap[5]->LoadData("assets/nz.png", context);
 
-	//RHITextureViewDescriptor uvd = {};
-	//{
-	//	uvd.format = Format::A8R8G8B8_UNorm;
-	//	uvd.arrayLayerCount = 1;
-	//	uvd.baseArrayLayer = 0;
-	//	uvd.mipCount = 1;
-	//	uvd.baseMipLevel = 0;
-	//	uvd.dimension = Dimension::Texture2D;
-	//	uvd.imageAspect = IMAGE_ASPECT_COLOR;
-	//}
+	RHITextureViewDescriptor uvd = {};
+	{
+		uvd.format = Format::A8R8G8B8_UNorm;
+		uvd.arrayLayerCount = 1;
+		uvd.baseArrayLayer = 0;
+		uvd.mipCount = 1;
+		uvd.baseMipLevel = 0;
+		uvd.dimension = Dimension::Texture2D;
+		uvd.imageAspect = IMAGE_ASPECT_COLOR;
+	}
 
-	//RHISampler* samplers[6];
-	//RHITextureView* views[6];
-	//for (int i = 0; i < 6; ++i)
-	//{
-	//	views[i] = m_pCubemap[i]->CreateTextureView(&uvd);
-	//	samplers[i] = m_pDevice->CreateSampler(nullptr);
-	//}
+	RHITextureView* views[6];
+	for (int i = 0; i < 6; ++i)
+	{
+		views[i] = m_pCubemap[i]->CreateTextureView(&uvd);
+	}
 
+	RHISamplerDescriptor samplerDescriptor = {};
+	{
+		samplerDescriptor.minFilter = Filter::Cube;
+		samplerDescriptor.magFilter = Filter::Cube;
+	}
+	TextureResourceInfo samplerInfo[] = 
+	{
+		{ nullptr, m_pDevice->CreateSampler(&samplerDescriptor), AttachmentLayout::ReadOnlyColor },
+	};
+	RHIUpdateResourceDescriptor textureResourceDescriptor = {};
+	{
+		textureResourceDescriptor.bindingCount = 1;
+		textureResourceDescriptor.pBindingResources = resource + 1;
+		textureResourceDescriptor.pGroup = m_pGroup;
+		textureResourceDescriptor.textureResourceCount = 1;
+		textureResourceDescriptor.pTextureInfo = samplerInfo;
+	}
+	context->UpdateTextureResourceToGroup(&textureResourceDescriptor);
+
+	TextureResourceInfo texturesInfo[] = 
+	{
+		{ views[0], nullptr, AttachmentLayout::ReadOnlyColor },
+		{ views[1], nullptr, AttachmentLayout::ReadOnlyColor },
+		{ views[2], nullptr, AttachmentLayout::ReadOnlyColor },
+		{ views[3], nullptr, AttachmentLayout::ReadOnlyColor },
+		{ views[4], nullptr, AttachmentLayout::ReadOnlyColor },
+		{ views[5], nullptr, AttachmentLayout::ReadOnlyColor },
+	};
 	//RHIUpdateResourceDescriptor textureResourceDescriptor = {};
-	//{
-	//	textureResourceDescriptor.bindingCount = 1;
-	//	textureResourceDescriptor.pBindingResources = resource + 1;
-	//	textureResourceDescriptor.pGroup = m_pGroup;
-	//	textureResourceDescriptor.pSampler = samplers;
-	//	textureResourceDescriptor.pTextureView = views;
-	//}
-	//context->UpdateTextureResourceToGroup(&textureResourceDescriptor);
+	{
+		textureResourceDescriptor.bindingCount = 1;
+		textureResourceDescriptor.pBindingResources = resource + 2;
+		//textureResourceDescriptor.pGroup = m_pGroup;
+		textureResourceDescriptor.textureResourceCount = 6;
+		textureResourceDescriptor.pTextureInfo = texturesInfo;
+	}
+	context->UpdateTextureResourceToGroup(&textureResourceDescriptor);
 
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
@@ -268,20 +296,21 @@ void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 		bottomColor
 	};
 	m_pUniformBuffer->LoadData(&data, sizeof(data));
-	size_t offsets[] = { 0 };
-	size_t sizes[] = { sizeof(data) };
 	BindingResource resource[1] =
 	{
-		{0, ResourceType::UniformBuffer, 1, ShaderStage::vertex},
+		{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
+	};
+	BufferResourceInfo bufferInfo[] = 
+	{
+		{ m_pUniformBuffer, 0, sizeof(UniformData) },
 	};
 	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
 	{
 		updateResourceDescriptor.bindingCount = 1;
 		updateResourceDescriptor.pBindingResources = resource;
-		updateResourceDescriptor.pBuffer = m_pUniformBuffer;
 		updateResourceDescriptor.pGroup = m_pGroup;
-		updateResourceDescriptor.pOffsets = offsets;
-		updateResourceDescriptor.pSize = sizes;
+		updateResourceDescriptor.bufferResourceCount = 1;
+		updateResourceDescriptor.pBufferInfo = bufferInfo;
 	}
 	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 

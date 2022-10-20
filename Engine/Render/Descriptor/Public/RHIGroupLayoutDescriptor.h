@@ -5,7 +5,7 @@ struct BindingResource
 	unsigned int bindingSlot;
 	ResourceType type;
 	unsigned int count;
-	ShaderStage shaderStage;
+	unsigned int shaderStage;
 };
 
 class RHIGroupLayoutDescriptor

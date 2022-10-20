@@ -7,6 +7,20 @@ class RHIGroup;
 class RHIGroupLayout;
 struct BindingResource;
 
+struct BufferResourceInfo
+{
+	RHIBuffer *pBuffer;
+	size_t offset;
+	size_t range;
+};
+
+struct TextureResourceInfo
+{
+	RHITextureView *pTextureView;
+	RHISampler *pSampler;
+	AttachmentLayout layout;
+};
+
 class RHIUpdateResourceDescriptor
 {
 public:
@@ -19,15 +33,13 @@ public:
 
 	unsigned int bindingCount;
 
-	RHIBuffer *pBuffer;
+	unsigned int bufferResourceCount;
 
-	RHITextureView *pTextureView;
+	BufferResourceInfo *pBufferInfo;
 
-	RHISampler *pSampler;
+	unsigned int textureResourceCount;
 
-	size_t *pSize;
-
-	size_t *pOffsets;
+	TextureResourceInfo *pTextureInfo;
 
 	BindingResource *pBindingResources;
 

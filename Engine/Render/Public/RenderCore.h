@@ -135,14 +135,6 @@ struct ImageSupport
 	ColorSpace colorSpace;
 };
 
-enum class ShaderStage
-{
-	vertex = 0,
-	fragment,
-	compute,
-	geometry,
-};
-
 enum class EncoderType
 {
 	Graphics = 0,
@@ -211,4 +203,12 @@ enum class ResourceType
 	DynamicUniformBuffer,
 	Texture,
 	Sampler,
+	CombinedImageSampler,
+};
+
+enum class Filter
+{
+	Linear = 0,
+	Nearest,
+	Cube,
 };

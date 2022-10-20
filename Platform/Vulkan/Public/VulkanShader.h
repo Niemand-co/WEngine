@@ -8,7 +8,7 @@ namespace Vulkan
 	{
 	public:
 	
-		VulkanShader(VkShaderModule *shaderModule, ShaderStage stage, std::string entryName);
+		VulkanShader(VkShaderModule *shaderModule, unsigned int stage, std::string entryName);
 
 		virtual ~VulkanShader();
 

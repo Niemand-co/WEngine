@@ -61,7 +61,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	RHIShaderDescriptor vertShaderDescriptor = {};
 	{
 		vertShaderDescriptor.entryName = "vert";
-		vertShaderDescriptor.shaderStage = ShaderStage::vertex;
+		vertShaderDescriptor.shaderStage = SHADER_STAGE_VERTEX;
 		vertShaderDescriptor.pCode = vertBlob->GetCode();
 		vertShaderDescriptor.codeSize = vertBlob->GetSize();
 	}
@@ -71,7 +71,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	RHIShaderDescriptor fragShaderDescriptor = {};
 	{
 		fragShaderDescriptor.entryName = "frag";
-		fragShaderDescriptor.shaderStage = ShaderStage::fragment;
+		fragShaderDescriptor.shaderStage = SHADER_STAGE_FRAGMENT;
 		fragShaderDescriptor.pCode = fragBlob->GetCode();
 		fragShaderDescriptor.codeSize = fragBlob->GetSize();
 	}
@@ -103,8 +103,8 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 
 	BindingResource resource[2] = 
 	{
-		{0, ResourceType::UniformBuffer, 1, ShaderStage::vertex},
-		{1, ResourceType::Sampler, 1, ShaderStage::fragment},
+		{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
+		{1, ResourceType::CombinedImageSampler, 1, SHADER_STAGE_FRAGMENT},
 	};
 	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
 	{
@@ -174,16 +174,17 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 	m_pUniformBuffer = context->CreateUniformBuffer(&uniformBufferDescriptor);
 
-	size_t pSizes[1] = { sizeof(data) };
-	size_t pOffsets[1] = { 0 };
+	BufferResourceInfo bufferInfo[] = 
+	{
+		{ m_pUniformBuffer, 0, sizeof(data) },
+	};
 	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
 	{
 		updateResourceDescriptor.bindingCount = 1;
 		updateResourceDescriptor.pBindingResources = resource;
-		updateResourceDescriptor.pBuffer = m_pUniformBuffer;
-		updateResourceDescriptor.pSize = pSizes;
-		updateResourceDescriptor.pOffsets = pOffsets;
 		updateResourceDescriptor.pGroup = m_pGroup;
+		updateResourceDescriptor.bufferResourceCount = 1;
+		updateResourceDescriptor.pBufferInfo = bufferInfo;
 	}
 	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 
@@ -210,15 +211,24 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	m_pTexture = m_pDevice->CreateTexture(&textureDescriptor);
 	m_pTexture->LoadData("assets/chino.png", context);
 
-	m_pSampler = m_pDevice->CreateSampler(nullptr);
+	RHISamplerDescriptor samplerDescriptor = {};
+	{
+		samplerDescriptor.minFilter = Filter::Linear;
+		samplerDescriptor.magFilter = Filter::Linear;
+	}
+	m_pSampler = m_pDevice->CreateSampler(&samplerDescriptor);
 
+	TextureResourceInfo textureInfo[] = 
+	{
+		{ m_pTexture->CreateTextureView(&uvd), m_pSampler, AttachmentLayout::ReadOnlyColor },
+	};
 	RHIUpdateResourceDescriptor textureResourceDescriptor = {};
 	{
 		textureResourceDescriptor.bindingCount = 1;
 		textureResourceDescriptor.pBindingResources = resource + 1;
 		textureResourceDescriptor.pGroup = m_pGroup;
-		textureResourceDescriptor.pSampler = m_pSampler;
-		textureResourceDescriptor.pTextureView = m_pTexture->CreateTextureView(&uvd);
+		textureResourceDescriptor.textureResourceCount = 1;
+		textureResourceDescriptor.pTextureInfo = textureInfo;
 	}
 	context->UpdateTextureResourceToGroup(&textureResourceDescriptor);
 
@@ -274,20 +284,21 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 	};
 	m_pUniformBuffer->LoadData(&data, sizeof(data));
 
-	size_t pSizes[1] = { sizeof(data) };
-	size_t pOffsets[1] = { 0 };
 	BindingResource resource[1] =
 	{
-		{0, ResourceType::UniformBuffer, 1, ShaderStage::vertex},
+		{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
+	};
+	BufferResourceInfo bufferInfo[] =
+	{
+		{ m_pUniformBuffer, 0, sizeof(data) },
 	};
 	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
 	{
 		updateResourceDescriptor.bindingCount = 1;
 		updateResourceDescriptor.pBindingResources = resource;
-		updateResourceDescriptor.pBuffer = m_pUniformBuffer;
-		updateResourceDescriptor.pSize = pSizes;
-		updateResourceDescriptor.pOffsets = pOffsets;
 		updateResourceDescriptor.pGroup = m_pGroup;
+		updateResourceDescriptor.bufferResourceCount = 1;
+		updateResourceDescriptor.pBufferInfo = bufferInfo;
 	}
 	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 

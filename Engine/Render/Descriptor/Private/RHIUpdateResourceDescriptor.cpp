@@ -2,7 +2,7 @@
 #include "Render/Descriptor/Public/RHIUpdateResourceDescriptor.h"
 
 RHIUpdateResourceDescriptor::RHIUpdateResourceDescriptor()
-	: pBuffer(nullptr), pTextureView(nullptr), pSampler(nullptr)
+	: pBufferInfo(nullptr), pTextureInfo(nullptr), bufferResourceCount(0), textureResourceCount(0)
 {
 }
 

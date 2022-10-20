@@ -217,7 +217,7 @@ namespace Vulkan
 		{
 			RHIShader* shader = descriptor->pShader[i];
 			shaderStageCreateInfos[i].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-			shaderStageCreateInfos[i].stage = WEngine::ToVulkan(shader->GetStage());
+			shaderStageCreateInfos[i].stage = (VkShaderStageFlagBits)shader->GetStage();
 			shaderStageCreateInfos[i].module = *static_cast<VulkanShader*>(shader)->GetShaderModule();
 			shaderStageCreateInfos[i].pName = shader->GetEntry();
 		}
@@ -418,8 +418,8 @@ namespace Vulkan
 			samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
 			samplerCreateInfo.anisotropyEnable = true;
 			samplerCreateInfo.maxAnisotropy = 16;
-			samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
-			samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
+			samplerCreateInfo.magFilter = WEngine::ToVulkan(descriptor->magFilter);
+			samplerCreateInfo.minFilter = WEngine::ToVulkan(descriptor->minFilter);
 			samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 			samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 			samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
@@ -512,7 +512,7 @@ namespace Vulkan
 			pDescriptorSetLayoutBindings[i].binding = resource->bindingSlot;
 			pDescriptorSetLayoutBindings[i].descriptorCount = resource->count;
 			pDescriptorSetLayoutBindings[i].descriptorType = WEngine::ToVulkan(resource->type);
-			pDescriptorSetLayoutBindings[i].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+			pDescriptorSetLayoutBindings[i].stageFlags = resource->shaderStage;
 			pDescriptorSetLayoutBindings[i].pImmutableSamplers = nullptr;
 		}
 		
@@ -591,13 +591,17 @@ namespace Vulkan
 	void VulkanDevice::UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
 	{
 		VkWriteDescriptorSet *pWriteDescriptorSets = (VkWriteDescriptorSet*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkWriteDescriptorSet));
-		VkDescriptorBufferInfo *pDescriptorBufferInfo = (VkDescriptorBufferInfo*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkDescriptorBufferInfo));
+		std::vector<VkDescriptorBufferInfo*> pDescriptorBufferInfos(descriptor->bindingCount);
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
-			::new (pDescriptorBufferInfo + i) VkDescriptorBufferInfo();
-			pDescriptorBufferInfo[i].buffer = *static_cast<VulkanBuffer*>(descriptor->pBuffer)->GetHandle();
-			pDescriptorBufferInfo[i].offset = descriptor->pOffsets[i];
-			pDescriptorBufferInfo[i].range = descriptor->pSize[i];
+			pDescriptorBufferInfos[i] = (VkDescriptorBufferInfo*)WEngine::Allocator::Get()->Allocate(descriptor->bufferResourceCount * sizeof(VkDescriptorBufferInfo));
+			for (unsigned int j = 0; j < descriptor->bufferResourceCount; ++j)
+			{
+				::new (pDescriptorBufferInfos[i] + j) VkDescriptorBufferInfo();
+				pDescriptorBufferInfos[i][j].buffer = *static_cast<VulkanBuffer*>((descriptor->pBufferInfo + j)->pBuffer)->GetHandle();
+				pDescriptorBufferInfos[i][j].offset = (descriptor->pBufferInfo + j)->offset;
+				pDescriptorBufferInfos[i][j].range = (descriptor->pBufferInfo + j)->range;
+			}
 
 			::new (pWriteDescriptorSets + i) VkWriteDescriptorSet();
 			pWriteDescriptorSets[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -605,30 +609,38 @@ namespace Vulkan
 			pWriteDescriptorSets[i].descriptorType = WEngine::ToVulkan(descriptor->pBindingResources[i].type);
 			pWriteDescriptorSets[i].dstSet = *static_cast<VulkanGroup*>(descriptor->pGroup)->GetHandle();
 			pWriteDescriptorSets[i].dstBinding = descriptor->pBindingResources[i].bindingSlot;
-			pWriteDescriptorSets[i].pBufferInfo = pDescriptorBufferInfo + i;
+			pWriteDescriptorSets[i].pBufferInfo = pDescriptorBufferInfos[i];
 		}
 		vkUpdateDescriptorSets(*m_pDevice, descriptor->bindingCount, pWriteDescriptorSets, 0, nullptr);
 
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
-			(pDescriptorBufferInfo + i)->~VkDescriptorBufferInfo();
+			for (unsigned int j = 0; j < descriptor->textureResourceCount; ++j)
+			{
+				pDescriptorBufferInfos[i][j].~VkDescriptorBufferInfo();
+			}
 			(pWriteDescriptorSets + i)->~VkWriteDescriptorSet();
+			WEngine::Allocator::Get()->Deallocate(pDescriptorBufferInfos[i]);
 		}
 
-		WEngine::Allocator::Get()->Deallocate(pDescriptorBufferInfo);
 		WEngine::Allocator::Get()->Deallocate(pWriteDescriptorSets);
 	}
 
 	void VulkanDevice::UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
 	{
 		VkWriteDescriptorSet *pWriteDescriptorSets = (VkWriteDescriptorSet*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkWriteDescriptorSet));
-		VkDescriptorImageInfo *pDescriptorImageInfo = (VkDescriptorImageInfo*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkDescriptorImageInfo));
+		std::vector<VkDescriptorImageInfo*> pDescriptorImageInfos(descriptor->bindingCount, nullptr);
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
-			::new (pDescriptorImageInfo + i) VkDescriptorImageInfo();
-			pDescriptorImageInfo[i].imageView = *static_cast<VulkanTextureView*>(descriptor->pTextureView)->GetHandle();
-			pDescriptorImageInfo[i].sampler = *static_cast<VulkanSampler*>(descriptor->pSampler)->GetHandle();
-			pDescriptorImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			pDescriptorImageInfos[i] = (VkDescriptorImageInfo*)WEngine::Allocator::Get()->Allocate(descriptor->textureResourceCount * sizeof(VkDescriptorImageInfo));
+			for (int j = 0; j < descriptor->textureResourceCount; ++j)
+			{
+				::new (pDescriptorImageInfos[i] + j) VkDescriptorImageInfo();
+				TextureResourceInfo *info = descriptor->pTextureInfo + j;
+				pDescriptorImageInfos[i][j].imageView = info->pTextureView ? *static_cast<VulkanTextureView*>(info->pTextureView)->GetHandle() : nullptr;
+				pDescriptorImageInfos[i][j].sampler = info->pSampler ? *static_cast<VulkanSampler*>(info->pSampler)->GetHandle() : nullptr;
+				pDescriptorImageInfos[i][j].imageLayout = WEngine::ToVulkan(info->layout);
+			}
 
 			::new (pWriteDescriptorSets + i) VkWriteDescriptorSet();
 			pWriteDescriptorSets[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -636,17 +648,20 @@ namespace Vulkan
 			pWriteDescriptorSets[i].descriptorType = WEngine::ToVulkan(descriptor->pBindingResources[i].type);
 			pWriteDescriptorSets[i].dstSet = *static_cast<VulkanGroup*>(descriptor->pGroup)->GetHandle();
 			pWriteDescriptorSets[i].dstBinding = descriptor->pBindingResources[i].bindingSlot;
-			pWriteDescriptorSets[i].pImageInfo = pDescriptorImageInfo + i;
+			pWriteDescriptorSets[i].pImageInfo = pDescriptorImageInfos[i];
 		}
 		vkUpdateDescriptorSets(*m_pDevice, descriptor->bindingCount, pWriteDescriptorSets, 0, nullptr);
 
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
-			(pDescriptorImageInfo + i)->~VkDescriptorImageInfo();
+			for (unsigned int j = 0; j < descriptor->textureResourceCount; ++j)
+			{
+				pDescriptorImageInfos[i][j].~VkDescriptorImageInfo();
+			}
 			(pWriteDescriptorSets + i)->~VkWriteDescriptorSet();
+			WEngine::Allocator::Get()->Deallocate(pDescriptorImageInfos[i]);
 		}
 
-		WEngine::Allocator::Get()->Deallocate(pDescriptorImageInfo);
 		WEngine::Allocator::Get()->Deallocate(pWriteDescriptorSets);
 	}
 

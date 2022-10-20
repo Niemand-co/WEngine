@@ -152,24 +152,6 @@ namespace WEngine
 		return VK_IMAGE_VIEW_TYPE_MAX_ENUM;
 	}
 
-	static VkShaderStageFlagBits ToVulkan(ShaderStage stage)
-	{
-		switch (stage)
-		{
-		case ShaderStage::vertex:
-			return VK_SHADER_STAGE_VERTEX_BIT;
-		case ShaderStage::fragment:
-			return VK_SHADER_STAGE_FRAGMENT_BIT;
-		case ShaderStage::compute:
-			return VK_SHADER_STAGE_COMPUTE_BIT;
-		case ShaderStage::geometry:
-			return VK_SHADER_STAGE_GEOMETRY_BIT;
-		default:
-			RE_ASSERT(false, "Error Type Shader Stage.");
-		}
-		return VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM;
-	}
-
 	static VkCompareOp ToVulkan(DepthCompareOP op)
 	{
 		switch (op)
@@ -299,6 +281,8 @@ namespace WEngine
 		case ResourceType::Texture:
 			return VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
 		case ResourceType::Sampler:
+			return VK_DESCRIPTOR_TYPE_SAMPLER;
+		case ResourceType::CombinedImageSampler:
 			return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		default:
 			break;
@@ -334,6 +318,22 @@ namespace WEngine
 			RE_ASSERT(false, "Error Type Image Layout.");
 		}
 		return VK_IMAGE_LAYOUT_MAX_ENUM;
+	}
+
+	static VkFilter ToVulkan(Filter filter)
+	{
+		switch (filter)
+		{
+		case Filter::Linear:
+			return VK_FILTER_LINEAR;
+		case Filter::Nearest:
+			return VK_FILTER_NEAREST;
+		case Filter::Cube:
+			return VK_FILTER_CUBIC_IMG;
+		default:
+			RE_ASSERT(false, "Error Type Filter.");
+		}
+		return VK_FILTER_MAX_ENUM;
 	}
 
 }

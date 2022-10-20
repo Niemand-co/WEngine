@@ -10,7 +10,7 @@ public:
 
 public:
 
-	ShaderStage shaderStage;
+	unsigned int shaderStage;
 
 	unsigned int* pCode;
 

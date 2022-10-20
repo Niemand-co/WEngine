@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "RHI/Public/RHIShader.h"
 
-ShaderStage RHIShader::GetStage()
+unsigned int RHIShader::GetStage()
 {
 	return m_stage;
 }
