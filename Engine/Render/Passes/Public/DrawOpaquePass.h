@@ -31,9 +31,9 @@ private:
 
 	Mesh *m_pMesh;
 
-	RHIBuffer *m_pVertexBuffer;
+	std::vector<RHIBuffer*> m_pVertexBuffers;
 
-	RHIBuffer *m_pIndexBuffer;
+	std::vector<RHIBuffer*> m_pIndexBuffers;
 
 	RHIBuffer* m_pUniformBuffer;
 

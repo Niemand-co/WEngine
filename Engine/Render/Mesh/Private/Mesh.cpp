@@ -117,3 +117,32 @@ Mesh* Mesh::GetCube()
 	mesh->m_pIndices = pIndices;
 	return mesh;
 }
+
+Mesh* Mesh::GetPlane()
+{
+	Mesh *mesh = new Mesh();
+	Vertex* pVertices = (Vertex*)WEngine::Allocator::Get()->Allocate(4 * sizeof(Vertex));
+	{
+		pVertices[0] = { { -1.0f, 0.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f} };
+		pVertices[1] = { { 1.0f, 0.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f} };
+		pVertices[2] = { { 1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f} };
+		pVertices[3] = { { -1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f} };
+	}
+	mesh->m_vertexCount = 4;
+	mesh->m_pVertices = pVertices;
+	unsigned int* pIndices = (unsigned int*)WEngine::Allocator::Get()->Allocate(6 * sizeof(unsigned int));
+	{
+		pIndices[0] = 0, pIndices[1] = 1, pIndices[2] = 2, pIndices[3] = 2, pIndices[4] = 3, pIndices[5] = 0;
+	}
+	mesh->m_indexCount = 6;
+	mesh->m_pIndices = pIndices;
+	return mesh;
+}
+
+MeshLibrary::MeshLibrary()
+{
+}
+
+MeshLibrary::~MeshLibrary()
+{
+}

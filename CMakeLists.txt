@@ -45,6 +45,7 @@ file(GLOB DESCR_INCLUDE Engine/Render/Descriptor/Public/*.h)
 file(GLOB MESH_INCLUDE Engine/Render/Mesh/Public/*.h)
 file(GLOB RENDER_INCLUDE Engine/Render/Public/*.h)
 
+file(GLOB CORE_INCLUDE Engine/Core/*.h)
 file(GLOB FRAME_INCLUDE Engine/Framework/Public/*.h)
 file(GLOB COMP_INCLUDE Engine/Scene/Components/Public/*.h)
 file(GLOB SCENE_INCLUDE Engine/Scene/Public/*.h)
@@ -111,6 +112,7 @@ set(WE_SRC
     ${GLM_SRC})
 
 set(WE_INCLUDE
+    ${CORE_INCLUDE}
     ${FRAME_INCLUDE}
     ${MATH_INCLUDE}
     ${RENDER_INCLUDE}
@@ -156,6 +158,7 @@ source_group(Platform/Vulkan/Encoder/Private FILES ${VULKAN_ENCODER_SRC})
 source_group(Platform/Vulkan/Allocator/Private FILES ${VULKAN_ALLOC_SRC})
 source_group(Platform/Vulkan/ImGui/Private FILES ${VULKAN_GUI_SRC})
 
+source_group(Engine/Core FILES ${CORE_INCLUDE})
 source_group(Engine/Framework/Public FILES ${FRAME_INCLUDE})
 source_group(Engine/Math/Public FILES ${MATH_INCLUDE})
 source_group(Engine/Render/Public FILES ${RENDER_INCLUDE})

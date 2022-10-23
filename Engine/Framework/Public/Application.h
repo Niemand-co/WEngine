@@ -2,35 +2,47 @@
 
 class Window;
 class ScriptableRenderPipeline;
-
-class Application
+namespace WEngine
 {
-public:
 
-	Application();
+	class Event;
+	class Layer;
+	class LayerStack;
 
-	~Application();
+	class Application
+	{
+	public:
 
-	static Application* CreateApplication();
+		Application();
 
-	void Init();
+		~Application();
 
-	void Tick();
+		static Application* CreateApplication();
 
-	bool IsQuit();
+		void Init();
 
-	void Finalize();
+		void Tick();
 
-private:
+		void OnEvent(Event *pEvent);
 
-	static Application* m_instance;
+		bool IsQuit();
 
-private:
+		void Finalize();
 
-	bool m_isQuit = false;
+	private:
 
-	Window* m_window;
+		static Application* m_instance;
 
-	ScriptableRenderPipeline *m_pipeline;
+	private:
 
-};
+		bool m_isQuit = false;
+
+		Window* m_window;
+
+		LayerStack *m_pLayerStack;
+
+		ScriptableRenderPipeline *m_pipeline;
+
+	};
+
+}

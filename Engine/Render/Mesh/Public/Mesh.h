@@ -31,6 +31,8 @@ public:
 
 	static Mesh* GetCube();
 
+	static Mesh* GetPlane();
+
 public:
 
 	Vertex *m_pVertices;
@@ -46,5 +48,19 @@ private:
 	VertexBindingDescription *m_bindingDescription;
 
 	std::vector<VertexAttributeDescription*> m_attributeDescriptions;
+
+};
+
+class MeshLibrary
+{
+public:
+
+	MeshLibrary();
+
+	~MeshLibrary();
+
+private:
+
+	std::vector<Mesh*> m_pMeshes;
 
 };

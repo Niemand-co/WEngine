@@ -13,6 +13,7 @@
 #include <fstream>
 #include <math.h>
 #include <float.h>
+#include <functional>
 
 //------------------------OS SDK-------------------------------
 #if defined(WIN32) || defined(_WIN32)
@@ -45,6 +46,7 @@
 #include "imgui/backends/imgui_impl_glfw.h"
 //-------------------------------------------------------------
 
+#include "Core/Core.h"
 #include "Math/Common.h"
 #include "Math/Vector.h"
 #include "Math/Matrix.h"

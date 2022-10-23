@@ -1,6 +1,6 @@
 #pragma once
-#ifndef SR_WINDOW_H
-#define SR_WINDOW_H
+
+class Event;
 
 struct WinProc
 {
@@ -39,6 +39,8 @@ public:
 
 	virtual void SetHeight(unsigned int) = 0;
 
+	virtual void SetEventCallback(std::function<void(Event*)> func);
+
 	virtual bool GetIsClosed();
 
 	virtual bool GetShouldClose();
@@ -64,5 +66,3 @@ protected:
 	bool m_isSizeChanged;
 
 };
-
-#endif
