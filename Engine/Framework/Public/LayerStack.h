@@ -16,9 +16,21 @@ namespace WEngine
 
 		void PushLayer(Layer *pLayer);
 
+		void PushOverLayer(Layer *pLayer);
+
 		void OnEvent(Event *e);
 
 		void OnUpdate();
+
+		void* operator new(size_t size)
+		{
+			return Allocator::Get()->Allocate(size);
+		}
+
+		void operator delete(void* pData)
+		{
+			Allocator::Get()->Deallocate(pData);
+		}
 
 	private:
 

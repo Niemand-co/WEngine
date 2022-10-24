@@ -9,6 +9,12 @@ namespace WEngine
 	{
 
 	}
+
+	int KeyEvent::GetKeycode()
+	{
+		return m_keycode;
+	}
+
 	KeyEvent::~KeyEvent()
 	{
 	}

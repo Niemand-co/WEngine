@@ -1,7 +1,25 @@
 #pragma once
-#include "Engine/Framework/Public/Layer.h"
+#include "Sources/WEngine.h"
 
-class SandBox : public WEngine::Layer
+class GameScene : public WEngine::Layer
+{
+public:
+
+	GameScene(std::string name);
+
+	virtual ~GameScene();
+
+	virtual void OnAttach() override;
+
+	virtual void OnDettach() override;
+
+	virtual void OnEvent(WEngine::Event* pEvent) override;
+
+	virtual void OnUpdate() override;
+
+};
+
+class SandBox : public WEngine::Application
 {
 public:
 
@@ -9,8 +27,9 @@ public:
 
 	virtual ~SandBox();
 
-private:
-
-	
-
 };
+
+WEngine::Application* WEngine::CreateApplication()
+{
+	return new SandBox();
+}

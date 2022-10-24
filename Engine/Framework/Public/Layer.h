@@ -9,8 +9,6 @@ namespace WEngine
 	{
 	public:
 
-		virtual ~Layer() = default;
-
 		virtual void OnAttach() = 0;
 
 		virtual void OnDettach() = 0;
@@ -23,6 +21,22 @@ namespace WEngine
 		{
 			return m_debugName;
 		}
+
+		void* operator new(size_t size)
+		{
+			return Allocator::Get()->Allocate(size);
+		}
+
+		void operator delete(void* pData)
+		{
+			Allocator::Get()->Deallocate(pData);
+		}
+
+	protected:
+
+		Layer(std::string name);
+
+		virtual ~Layer() = default;
 
 	private:
 

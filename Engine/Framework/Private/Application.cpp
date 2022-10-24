@@ -12,26 +12,12 @@ namespace WEngine
 
 	Application::Application()
 	{
-		if(m_instance != nullptr)return;
-		m_instance = this;
+		Init();
 	}
 
 	Application::~Application()
 	{
 
-	}
-
-	Application* Application::CreateApplication()
-	{
-		if (m_instance == nullptr)
-		{
-			return new Application();
-		}
-		else
-		{
-			std::cout<<"Over Created Application"<<std::endl;
-			exit(0);
-		}
 	}
 
 	void Application::Init()
@@ -44,8 +30,7 @@ namespace WEngine
 
 		m_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
-		World::CreateWorld();
-
+		m_pLayerStack = new LayerStack();
 	}
 
 	void Application::Tick()
@@ -54,12 +39,6 @@ namespace WEngine
 		{
 			m_pLayerStack->OnUpdate();
 			m_window->Update();
-			if(m_window->GetIsClosed())
-			{
-				m_isQuit = true;
-				m_window->Destroy();
-				continue;
-			}
 		}
 		Finalize();
 	}
@@ -67,8 +46,9 @@ namespace WEngine
 	void Application::OnEvent(Event* pEvent)
 	{
 		EventDispatcher dispatcher(pEvent);
-		dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent*)->bool
+		dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent* e)->bool
 		{
+			if(e->GetKeycode() == GLFW_KEY_ESCAPE)
 			this->m_isQuit = true;
 			this->m_window->Destroy();
 			return true;
@@ -85,6 +65,16 @@ namespace WEngine
 	void Application::Finalize()
 	{
 		exit(0);
+	}
+
+	void Application::PushLayer(Layer* pLayer)
+	{
+		m_pLayerStack->PushLayer(pLayer);
+	}
+
+	void Application::PushOverLayer(Layer* pLayer)
+	{
+		m_pLayerStack->PushOverLayer(pLayer);
 	}
 
 }

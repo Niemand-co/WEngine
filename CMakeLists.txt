@@ -65,6 +65,8 @@ file(GLOB VULKAN_GUI_INCLUDE Platform/Vulkan/ImGui/Public/*.h)
 
 file(GLOB EXAMPLE_INCLUDE Example/Public/*.h)
 file(GLOB EXAMPLE_SRC Example/Private/*.cpp)
+file(GLOB EXAMPLE_RESOURCE_INCLUDE Example/Resources/Public/*.h)
+file(GLOB EXAMPLE_RESOURCE_SRC Example/Resources/Private/*.cpp)
 
 macro(use_precompiled_header TARGET HEADER_FILE SRC_FILE)
   get_filename_component(HEADER ${HEADER_FILE} NAME)
@@ -134,6 +136,14 @@ set(WE_INCLUDE
     ${RHI_ENCODER_INCLUDE}
     ${GUI_INCLUDE})
 
+set(EXA_INCLUDE
+    ${EXAMPLE_INCLUDE}
+    ${EXAMPLE_RESOURCE_INCLUDE})
+
+set(EXA_SRC
+    ${EXAMPLE_SRC}
+    ${EXAMPLE_RESOURCE_SRC})
+
 list(APPEND WENGINE_INCLUDE ${GLAD_INCLUDE})
 list(APPEND WENGINE_INCLUDE ${DEPS_INCLUDE})
 
@@ -187,13 +197,15 @@ source_group(Platform/Vulkan/ImGui/Public FILES ${VULKAN_GUI_INCLUDE})
 
 source_group(Example/Public FILES ${EXAMPLE_INCLUDE})
 source_group(Example/Private FILES ${EXAMPLE_SRC})
+source_group(Example/Resources/Public FILES ${EXAMPLE_RESOURCE_INCLUDE})
+source_group(Example/Resources/Private FILES ${EXAMPLE_RESOURCE_SRC})
 
 link_directories(Engine/deps/Vulkan/Lib)
 link_directories(${CMAKE_BINARY_DIR}/Engine/deps/imgui/Debug)
 
 add_subdirectory(Engine/deps/imgui)
 
-add_executable(WEngine ${WE_SRC} ${EXAMPLE_SRC} ${WE_INCLUDE} ${EXAMPLE_INCLUDE})
+add_executable(WEngine ${WE_SRC} ${EXA_SRC} ${WE_INCLUDE} ${EXA_INCLUDE})
 use_precompiled_header(${PROJECT_NAME} "${CMAKE_SOURCE_DIR}/Sources/pch.h" "${CMAKE_SOURCE_DIR}/Sources/pch.cpp")
 
 set(GLFW_DIR ${CMAKE_SOURCE_DIR}/Engine/deps/glfw)

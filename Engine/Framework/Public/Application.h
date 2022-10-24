@@ -16,25 +16,27 @@ namespace WEngine
 
 		Application();
 
-		~Application();
+		virtual ~Application();
 
-		static Application* CreateApplication();
+		virtual void Init();
 
-		void Init();
+		virtual void Tick();
 
-		void Tick();
+		virtual void OnEvent(Event *pEvent);
 
-		void OnEvent(Event *pEvent);
+		virtual bool IsQuit();
 
-		bool IsQuit();
+		virtual void Finalize();
 
-		void Finalize();
+		virtual void PushLayer(Layer *pLayer);
+
+		virtual void PushOverLayer(Layer *pLayer);
 
 	private:
 
 		static Application* m_instance;
 
-	private:
+	protected:
 
 		bool m_isQuit = false;
 
@@ -42,8 +44,8 @@ namespace WEngine
 
 		LayerStack *m_pLayerStack;
 
-		ScriptableRenderPipeline *m_pipeline;
-
 	};
+
+	Application* CreateApplication();
 
 }

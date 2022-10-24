@@ -8,6 +8,7 @@ namespace WEngine
 
 	LayerStack::LayerStack()
 	{
+		m_pLayers = std::vector<Layer*>(0);
 	}
 
 	LayerStack::~LayerStack()
@@ -16,11 +17,20 @@ namespace WEngine
 
 	void LayerStack::PushLayer(Layer* pLayer)
 	{
+		if(m_pLayers.empty())
+			m_pLayers.emplace_back(pLayer);
+		else
+			m_pLayers.emplace(m_pLayers.begin(), pLayer);
+	}
+
+	void LayerStack::PushOverLayer(Layer* pLayer)
+	{
+		m_pLayers.emplace_back(pLayer);
 	}
 
 	void LayerStack::OnEvent(Event *e)
 	{
-		for (unsigned int i = m_pLayers.size() - 1; i >= 0; --i)
+		for (int i = m_pLayers.size() - 1; i >= 0; --i)
 		{
 			m_pLayers[i]->OnEvent(e);
 			if(e->m_handled)

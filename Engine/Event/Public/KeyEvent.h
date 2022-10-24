@@ -8,6 +8,8 @@ namespace WEngine
 	{
 	public:
 
+		virtual int GetKeycode();
+
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput);
 
 	protected:
