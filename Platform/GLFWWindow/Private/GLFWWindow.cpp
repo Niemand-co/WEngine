@@ -2,6 +2,7 @@
 #include "Platform/GLFWWindow/Public/GLFWWindow.h"
 #include "Math/Matrix.h"
 #include "Utils/Public/FileLoader.h"
+#include "Event/Public/KeyEvent.h"
 
 static void WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, int bit)
 {
@@ -65,6 +66,21 @@ void GLFWWindow::Init()
 	icons[0].width = data->width;
 	icons[0].height = data->height;
 	glfwSetWindowIcon(m_handle, 1, icons);
+
+	glfwSetKeyCallback(m_handle, [](GLFWwindow *window, int key, int scancode, int action, int mods)
+	{
+		GLFWWindow *win = reinterpret_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
+		switch (action)
+		{
+		case GLFW_PRESS:
+		{
+			WEngine::Event *e = new WEngine::KeyPressedEvent(key, scancode);
+			win->ExecuteEventCallback(e);
+		}
+		default:
+			break;
+		}
+	});
 }
 
 void GLFWWindow::Destroy()

@@ -1,11 +1,9 @@
 #include "pch.h"
 #include "Framework/Public/Application.h"
 #include "Utils/Public/Window.h"
-#include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
-#include "Scene/Public/GameObject.h"
-#include "Scene/Components/Public/MeshFilter.h"
-#include "Render/Mesh/Public/Mesh.h"
 #include "Scene/Public/World.h"
+#include "Event/Public/KeyEvent.h"
+#include "FrameWork/Public/LayerStack.h"
 
 namespace WEngine
 {
@@ -44,29 +42,9 @@ namespace WEngine
 		WinProc proc = { "WEngine", 1920u, 1080u };
 		m_window = Window::Get(&proc);
 
+		m_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+
 		World::CreateWorld();
-
-		GameObject *go = World::GetWorld()->CreateGameObject("Cube");
-		static_cast<Transformer*>(go->GetComponent<Component::ComponentType::Transformer>())->SetPosition(glm::vec3(2.0f, 2.0f, 2.0f));
-		MeshFilter *filter = (MeshFilter*)go->AddComponent<Component::ComponentType::MeshFilter>();
-		filter->SetStaticMesh(Mesh::GetCube());
-
-		Camera *camera = (Camera*)go->AddComponent<Component::ComponentType::Camera>();
-		camera->m_aspect = (float)Window::cur_window->GetWidth() / (float)Window::cur_window->GetHeight();
-
-		GameObject *floor = World::GetWorld()->CreateGameObject("Floor");
-		filter = (MeshFilter*)floor->AddComponent<Component::ComponentType::MeshFilter>();
-		filter->SetStaticMesh(Mesh::GetPlane());
-
-		go->AddComponent<Component::ComponentType::Material>();
-
-		m_pipeline = ScriptableRenderPipeline::get();
-
-		ScriptableRenderer *renderer = m_pipeline->CreateRenderer();
-
-		camera->SetRenderer(renderer);
-
-		m_pipeline->Setup();
 
 	}
 
@@ -74,21 +52,29 @@ namespace WEngine
 	{
 		while (!IsQuit())
 		{
+			m_pLayerStack->OnUpdate();
 			m_window->Update();
-			if (m_window->GetShouldClose())
+			if(m_window->GetIsClosed())
 			{
 				m_isQuit = true;
 				m_window->Destroy();
 				continue;
 			}
-			m_pipeline->Execute();
 		}
 		Finalize();
 	}
 
 	void Application::OnEvent(Event* pEvent)
 	{
-	
+		EventDispatcher dispatcher(pEvent);
+		dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent*)->bool
+		{
+			this->m_isQuit = true;
+			this->m_window->Destroy();
+			return true;
+		});
+
+		m_pLayerStack->OnEvent(pEvent);
 	}
 
 	bool Application::IsQuit()

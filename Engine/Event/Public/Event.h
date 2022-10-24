@@ -38,7 +38,17 @@ namespace WEngine
 			return (GetCategoryFlags() & category) == category;
 		}
 
-	protected:
+		void* operator new(size_t size)
+		{
+			return WEngine::Allocator::Get()->Allocate(size);
+		}
+
+		void operator delete(void* pData)
+		{
+			WEngine::Allocator::Get()->Deallocate(pData);
+		}
+
+	public:
 
 		bool m_handled;
 
@@ -47,7 +57,7 @@ namespace WEngine
 	class EventDispatcher
 	{
 		template<typename type>
-		using EventDipatchFunc = std::function<void(type)>;
+		using EventDipatchFunc = std::function<bool(type*)>;
 
 	public:
 

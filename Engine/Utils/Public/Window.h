@@ -1,6 +1,9 @@
 #pragma once
 
-class Event;
+namespace WEngine 
+{
+	class Event;
+}
 
 struct WinProc
 {
@@ -21,6 +24,9 @@ public:
 class Window
 {
 public:
+
+	using EventCallbackFunc = std::function<void(WEngine::Event*)>;
+
 	virtual ~Window() = default;
 
 	virtual void Init() = 0;
@@ -39,7 +45,9 @@ public:
 
 	virtual void SetHeight(unsigned int) = 0;
 
-	virtual void SetEventCallback(std::function<void(Event*)> func);
+	void SetEventCallback(EventCallbackFunc func);
+
+	void ExecuteEventCallback(WEngine::Event *pEvent);
 
 	virtual bool GetIsClosed();
 
@@ -64,5 +72,7 @@ protected:
 	bool m_isClosed;
 
 	bool m_isSizeChanged;
+
+	EventCallbackFunc m_eventCallbackFunc;
 
 };

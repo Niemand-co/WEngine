@@ -5,6 +5,16 @@
 
 Window* Window::cur_window = nullptr;
 
+void Window::SetEventCallback(EventCallbackFunc func)
+{
+	m_eventCallbackFunc = func;
+}
+
+void Window::ExecuteEventCallback(WEngine::Event* pEvent)
+{
+	m_eventCallbackFunc(pEvent);
+}
+
 bool Window::GetIsClosed()
 {
 	return m_isClosed;

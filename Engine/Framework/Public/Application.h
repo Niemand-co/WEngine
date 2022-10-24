@@ -2,6 +2,7 @@
 
 class Window;
 class ScriptableRenderPipeline;
+
 namespace WEngine
 {
 

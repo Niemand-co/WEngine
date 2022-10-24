@@ -63,6 +63,9 @@ file(GLOB VULKAN_ENCODER_INCLUDE Platform/Vulkan/Encoder/Public/*.h)
 file(GLOB VULKAN_ALLOC_INCLUDE Platform/Vulkan/Allocator/Public/*.h)
 file(GLOB VULKAN_GUI_INCLUDE Platform/Vulkan/ImGui/Public/*.h)
 
+file(GLOB EXAMPLE_INCLUDE Example/Public/*.h)
+file(GLOB EXAMPLE_SRC Example/Private/*.cpp)
+
 macro(use_precompiled_header TARGET HEADER_FILE SRC_FILE)
   get_filename_component(HEADER ${HEADER_FILE} NAME)
   # Use MSVC_IDE to exclude NMake from using PCHs
@@ -182,12 +185,15 @@ source_group(Platform/Vulkan/Encoder/Public FILES ${VULKAN_ENCODER_INCLUDE})
 source_group(Platform/Vulkan/Allocator/Public FILES ${VULKAN_ALLOC_INCLUDE})
 source_group(Platform/Vulkan/ImGui/Public FILES ${VULKAN_GUI_INCLUDE})
 
+source_group(Example/Public FILES ${EXAMPLE_INCLUDE})
+source_group(Example/Private FILES ${EXAMPLE_SRC})
+
 link_directories(Engine/deps/Vulkan/Lib)
 link_directories(${CMAKE_BINARY_DIR}/Engine/deps/imgui/Debug)
 
 add_subdirectory(Engine/deps/imgui)
 
-add_executable(WEngine ${WE_SRC} ${WE_INCLUDE})
+add_executable(WEngine ${WE_SRC} ${EXAMPLE_SRC} ${WE_INCLUDE} ${EXAMPLE_INCLUDE})
 use_precompiled_header(${PROJECT_NAME} "${CMAKE_SOURCE_DIR}/Sources/pch.h" "${CMAKE_SOURCE_DIR}/Sources/pch.cpp")
 
 set(GLFW_DIR ${CMAKE_SOURCE_DIR}/Engine/deps/glfw)

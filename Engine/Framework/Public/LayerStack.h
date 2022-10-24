@@ -4,6 +4,7 @@ namespace WEngine
 {
 
 	class Layer;
+	class Event;
 
 	class LayerStack
 	{
@@ -14,6 +15,10 @@ namespace WEngine
 		~LayerStack();
 
 		void PushLayer(Layer *pLayer);
+
+		void OnEvent(Event *e);
+
+		void OnUpdate();
 
 	private:
 
