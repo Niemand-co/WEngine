@@ -20,7 +20,7 @@ namespace WEngine
 
 		void OnEvent(Event *e);
 
-		void OnUpdate();
+		void OnUpdate(TimeStep timeStep);
 
 		void* operator new(size_t size)
 		{

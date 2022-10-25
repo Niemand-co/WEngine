@@ -32,6 +32,8 @@ public:
 
 	CameraData* GetData();
 
+	void Move(direction dir, float speed);
+
 private:
 
 	void UpdateViewMatrix();

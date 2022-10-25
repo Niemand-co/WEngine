@@ -11,7 +11,9 @@ struct WinProc;
 class GLFWWindow : public Window
 {
 public:
+
 	GLFWWindow(WinProc* pProc);
+
 	virtual ~GLFWWindow();
 
 	virtual void Init();
@@ -25,6 +27,8 @@ public:
 	virtual unsigned int GetWidth() const override { return m_width; }
 
 	virtual unsigned int GetHeight() const override { return m_height; }
+
+	virtual bool IsKeyPressed(int keycode) override;
 
 	void SetWidth(unsigned int width) { m_width = width; }
 

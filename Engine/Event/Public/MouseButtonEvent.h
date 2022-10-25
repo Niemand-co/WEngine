@@ -8,6 +8,8 @@ namespace WEngine
 	{
 	public:
 
+		int GetMouseCode();
+
 		EVENT_CLASS_CATEGORY(EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput);
 
 	protected:

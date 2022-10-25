@@ -1,9 +1,10 @@
 #include "pch.h"
 #include "Framework/Public/Application.h"
 #include "Utils/Public/Window.h"
-#include "Scene/Public/World.h"
 #include "Event/Public/KeyEvent.h"
 #include "FrameWork/Public/LayerStack.h"
+#include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
+#include "Event/Public/WindowInput.h"
 
 namespace WEngine
 {
@@ -30,6 +31,8 @@ namespace WEngine
 
 		m_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
+		Input::Init();
+
 		m_pLayerStack = new LayerStack();
 	}
 
@@ -37,8 +40,9 @@ namespace WEngine
 	{
 		while (!IsQuit())
 		{
-			m_pLayerStack->OnUpdate();
+			m_pLayerStack->OnUpdate(TimeStep::GetTimeStep());
 			m_window->Update();
+			m_renderPipeline->Execute();
 		}
 		Finalize();
 	}
@@ -48,10 +52,16 @@ namespace WEngine
 		EventDispatcher dispatcher(pEvent);
 		dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent* e)->bool
 		{
-			if(e->GetKeycode() == GLFW_KEY_ESCAPE)
-			this->m_isQuit = true;
-			this->m_window->Destroy();
-			return true;
+			if (e->GetKeycode() == GLFW_KEY_ESCAPE)
+			{
+				this->m_isQuit = true;
+				this->m_window->Destroy();
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		});
 
 		m_pLayerStack->OnEvent(pEvent);

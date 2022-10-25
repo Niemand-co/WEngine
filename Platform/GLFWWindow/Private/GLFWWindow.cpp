@@ -3,6 +3,7 @@
 #include "Math/Matrix.h"
 #include "Utils/Public/FileLoader.h"
 #include "Event/Public/KeyEvent.h"
+#include "Event/Public/MouseButtonEvent.h"
 
 static void WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, int bit)
 {
@@ -77,6 +78,33 @@ void GLFWWindow::Init()
 			WEngine::Event *e = new WEngine::KeyPressedEvent(key, scancode);
 			win->ExecuteEventCallback(e);
 		}
+		case GLFW_RELEASE:
+		{
+			WEngine::Event *e = new WEngine::KeyReleasedEvent(key);
+			win->ExecuteEventCallback(e);
+		}
+		default:
+			break;
+		}
+	});
+
+	glfwSetMouseButtonCallback(m_handle, [](GLFWwindow* window, int button, int action, int mods)
+	{
+		GLFWWindow *win = reinterpret_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
+		switch (action)
+		{
+		case GLFW_PRESS:
+		{
+			WEngine::Event *e = new WEngine::MouseButtonPressedEvent(button);
+			win->ExecuteEventCallback(e);
+			break;
+		}
+		case GLFW_RELEASE:
+		{
+			WEngine::Event *e = new WEngine::MouseButtonReleasedEvent(button);
+			win->ExecuteEventCallback(e);
+			break;
+		}
 		default:
 			break;
 		}
@@ -99,4 +127,9 @@ void GLFWWindow::Update()
 void* GLFWWindow::GetHandle() const
 {
 	return m_handle;
+}
+
+bool GLFWWindow::IsKeyPressed(int keycode)
+{
+	return glfwGetKey(m_handle, keycode) == GLFW_PRESS;
 }

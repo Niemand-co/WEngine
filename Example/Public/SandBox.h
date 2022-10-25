@@ -15,7 +15,31 @@ public:
 
 	virtual void OnEvent(WEngine::Event* pEvent) override;
 
-	virtual void OnUpdate() override;
+	virtual void OnUpdate(WEngine::TimeStep timeStep) override;
+
+private:
+	
+	bool m_isMoving;
+
+	Camera *m_sceneCamera;
+
+};
+
+class GuiLayer : public WEngine::Layer
+{
+public:
+
+	GuiLayer(std::string name);
+
+	virtual ~GuiLayer();
+
+	virtual void OnAttach() override;
+
+	virtual void OnDettach() override;
+
+	virtual void OnEvent(WEngine::Event *pEvent) override;
+
+	virtual void OnUpdate(WEngine::TimeStep timeStep) override;
 
 };
 
@@ -26,6 +50,10 @@ public:
 	SandBox();
 
 	virtual ~SandBox();
+
+private:
+
+	World *m_scene;
 
 };
 

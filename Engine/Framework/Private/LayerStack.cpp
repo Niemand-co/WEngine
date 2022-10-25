@@ -8,7 +8,6 @@ namespace WEngine
 
 	LayerStack::LayerStack()
 	{
-		m_pLayers = std::vector<Layer*>(0);
 	}
 
 	LayerStack::~LayerStack()
@@ -38,11 +37,11 @@ namespace WEngine
 		}
 	}
 
-	void LayerStack::OnUpdate()
+	void LayerStack::OnUpdate(TimeStep timeStep)
 	{
 		for (unsigned int i = 0; i < m_pLayers.size(); ++i)
 		{
-			m_pLayers[i]->OnUpdate();
+			m_pLayers[i]->OnUpdate(timeStep);
 		}
 	}
 

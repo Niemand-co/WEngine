@@ -3,6 +3,10 @@
 
 namespace WEngine
 {
+	int MouseButtonEvent::GetMouseCode()
+	{
+		return m_mouseCode;
+	}
 
 	MouseButtonEvent::MouseButtonEvent(int mouseCode)
 		: m_mouseCode(mouseCode)

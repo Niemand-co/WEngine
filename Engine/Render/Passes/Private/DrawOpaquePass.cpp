@@ -283,7 +283,9 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		glm::vec4(surfaceData.albedo, surfaceData.roughness)
 	};
 	m_pUniformBuffer->LoadData(&data, sizeof(data));
-
+	RE_LOG(cameraData->Position.x);
+	RE_LOG(cameraData->Position.y);
+	RE_LOG(cameraData->Position.z);
 	BindingResource resource[1] =
 	{
 		{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},

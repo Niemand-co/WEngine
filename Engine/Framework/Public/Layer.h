@@ -15,7 +15,7 @@ namespace WEngine
 
 		virtual void OnEvent(Event *pEvent) = 0;
 
-		virtual void OnUpdate() = 0;
+		virtual void OnUpdate(TimeStep timeStep) = 0;
 
 		virtual const std::string GetName() const
 		{

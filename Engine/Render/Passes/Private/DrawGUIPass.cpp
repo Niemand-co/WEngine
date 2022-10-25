@@ -59,7 +59,7 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 		}
 		m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
 	}
-	
+
 	Gui::g_pGui->BindRenderPass(m_pRenderPass);
 
 	RHICommandBuffer* cmd = context->GetCommandBuffer(false);

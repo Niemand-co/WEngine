@@ -57,5 +57,6 @@
 #include "RHI/Public/RHICore.h"
 #include "Utils/Public/ShaderCodeBlob.h"
 #include "Utils/Public/FileLoader.h"
+#include "Event/Public/TimeStep.h"
 
 #endif

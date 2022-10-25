@@ -45,6 +45,8 @@ public:
 
 	virtual void SetHeight(unsigned int) = 0;
 
+	virtual bool IsKeyPressed(int keycode) = 0;
+
 	void SetEventCallback(EventCallbackFunc func);
 
 	void ExecuteEventCallback(WEngine::Event *pEvent);

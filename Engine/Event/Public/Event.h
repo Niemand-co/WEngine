@@ -70,7 +70,7 @@ namespace WEngine
 		{
 			if (m_pEvent->GetEventType() == type::GetStaticType())
 			{
-				func(static_cast<type*>(m_pEvent));
+				m_pEvent->m_handled = func(static_cast<type*>(m_pEvent));
 			}
 		}
 
