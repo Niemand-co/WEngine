@@ -16,6 +16,8 @@ namespace WEngine
 
 		virtual bool IsKeyPressedImpl(int keycode) override;
 
+		virtual glm::vec2 GetMousePositionImpl() override;
+
 	};
 
 }

@@ -46,25 +46,28 @@ void GameScene::OnEvent(WEngine::Event* pEvent)
 
 void GameScene::OnUpdate(WEngine::TimeStep timeStep)
 {
+	float OffsetX = WEngine::Input::GetMouseOffsetX();
+	float OffsetY = WEngine::Input::GetMouseOffsetY();
 	if (m_isMoving)
 	{
 		if (WEngine::Input::IsKeyPressed(GLFW_KEY_W))
 		{
-			m_sceneCamera->Move(Camera::direction::FORWARD, (float)timeStep.GetSeconds() * 0.8f);
+			m_sceneCamera->Move(Direction::FORWARD, (float)timeStep.GetSeconds() * 1.0f);
 		}
-		if (WEngine::Input::IsKeyPressed(GLFW_KEY_S))
+		else if (WEngine::Input::IsKeyPressed(GLFW_KEY_S))
 		{
-			m_sceneCamera->Move(Camera::direction::BACKWARD, (float)timeStep.GetSeconds() * 0.8f);
+			m_sceneCamera->Move(Direction::BACKWARD, (float)timeStep.GetSeconds() * 1.0f);
 		}
 		if (WEngine::Input::IsKeyPressed(GLFW_KEY_A))
 		{
-			m_sceneCamera->Move(Camera::direction::LEFT, (float)timeStep.GetSeconds() * 0.8f);
+			m_sceneCamera->Move(Direction::LEFT, (float)timeStep.GetSeconds() * 1.0f);
 		}
-		if (WEngine::Input::IsKeyPressed(GLFW_KEY_D))
+		else if (WEngine::Input::IsKeyPressed(GLFW_KEY_D))
 		{
-			m_sceneCamera->Move(Camera::direction::RIGHT, (float)timeStep.GetSeconds() * 0.8f);
+			m_sceneCamera->Move(Direction::RIGHT, (float)timeStep.GetSeconds() * 1.0f);
 		}
-
+		m_sceneCamera->Rotate(RotateDirection::Yaw,  OffsetX * 0.05f);
+		m_sceneCamera->Rotate(RotateDirection::Pitch, OffsetY * 0.05f);
 	}
 }
 

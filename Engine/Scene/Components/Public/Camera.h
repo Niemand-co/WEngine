@@ -8,15 +8,6 @@ struct CameraData;
 class Camera : public Component
 {
 public:
-	enum class direction
-	{
-		FORWARD = 0,
-		BACKWARD,
-		LEFT,
-		RIGHT,
-		UP,
-		DOWN
-	};
 
 	Camera(GameObject* pGameObject, const float& fov = 3.1415926535f / 2.0f, const float& aspect = 1.0f, const float& nearPlane = 0.1f, const float& farPlane = 1000.0f);
 
@@ -32,7 +23,9 @@ public:
 
 	CameraData* GetData();
 
-	void Move(direction dir, float speed);
+	void Move(Direction dir, float dis);
+
+	void Rotate(RotateDirection dir, float dis);
 
 private:
 

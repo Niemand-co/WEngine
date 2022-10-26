@@ -23,7 +23,13 @@ public:
 
 	glm::vec3 GetForward();
 
+	void Move(Direction dir, float dis);
+
+	void Rotate(RotateDirection dir, float dis);
+
 private:
+
+	glm::vec3 m_forward;
 
 	glm::vec3 m_scale;
 

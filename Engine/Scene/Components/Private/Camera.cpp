@@ -46,41 +46,23 @@ CameraData* Camera::GetData()
 	return data;
 }
 
-void Camera::Move(direction dir, float dis)
+void Camera::Move(Direction dir, float dis)
 {
-	glm::vec3 displacement = glm::vec3(0.0f);
-	switch (dir)
-	{
-	case Camera::direction::FORWARD:
-		displacement = dis * glm::vec3(0.0f, 0.0f, -1.0f);
-		break;
-	case Camera::direction::BACKWARD:
-		displacement = dis * glm::vec3(0.0f, 0.0f, 1.0f);
-		break;
-	case Camera::direction::LEFT:
-		displacement = dis * glm::vec3(-1.0f, 0.0f, 0.0f);
-		break;
-	case Camera::direction::RIGHT:
-		displacement = dis * glm::vec3(1.0f, 0.0f, 0.0f);
-		break;
-	case Camera::direction::UP:
-		displacement = dis * glm::vec3(0.0f, 1.0f, 0.0f);
-		break;
-	case Camera::direction::DOWN:
-		displacement = dis * glm::vec3(0.0f, -1.0f, 0.0f);
-		break;
-	default:
-		break;
-	}
 	Transformer *transformer = static_cast<Transformer*>(m_pGameObject->GetComponent<Component::ComponentType::Transformer>());
-	transformer->SetPosition(transformer->GetPosition() + displacement);
+	transformer->Move(dir, dis);
+}
+
+void Camera::Rotate(RotateDirection dir, float dis)
+{
+	Transformer* transformer = static_cast<Transformer*>(m_pGameObject->GetComponent<Component::ComponentType::Transformer>());
+	transformer->Rotate(dir, dis);
 }
 
 void Camera::UpdateViewMatrix()
 {
 	glm::vec3 position = static_cast<Transformer*>(m_pGameObject->GetComponent<Component::ComponentType::Transformer>())->GetPosition();
 	glm::vec3 forward = static_cast<Transformer*>(m_pGameObject->GetComponent<Component::ComponentType::Transformer>())->GetForward();
-	m_viewMatrix = glm::lookAt(position, glm::vec3(0.0f, 0.0f, 0.0f) /*position  + forward */, glm::vec3(0.0f, 1.0f, 0.0f));
+	m_viewMatrix = glm::lookAt(position, position  + forward, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void Camera::UpdateProjectionMatrix()

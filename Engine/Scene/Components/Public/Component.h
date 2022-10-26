@@ -1,6 +1,23 @@
 #pragma once
 #include "Scene/Public/Object.h"
 
+enum class Direction
+{
+	FORWARD = 0,
+	BACKWARD,
+	LEFT,
+	RIGHT,
+	UP,
+	DOWN
+};
+
+enum class RotateDirection
+{
+	Pitch = 0,
+	Yaw,
+	Roll
+};
+
 class Component : public Object
 {
 public:

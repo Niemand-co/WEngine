@@ -109,6 +109,12 @@ void GLFWWindow::Init()
 			break;
 		}
 	});
+
+	glfwSetCursorPosCallback(m_handle, [](GLFWwindow *window, double xpos, double ypos)
+	{
+		GLFWWindow* win = reinterpret_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
+		win->SetMousePosition(glm::vec2(xpos, ypos));
+	});
 }
 
 void GLFWWindow::Destroy()
@@ -132,4 +138,14 @@ void* GLFWWindow::GetHandle() const
 bool GLFWWindow::IsKeyPressed(int keycode)
 {
 	return glfwGetKey(m_handle, keycode) == GLFW_PRESS;
+}
+
+void GLFWWindow::SetMousePosition(glm::vec2 pos)
+{
+	m_cursorPosition = pos;
+}
+
+glm::vec2 GLFWWindow::GetMousePosition()
+{
+	return m_cursorPosition;
 }

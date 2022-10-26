@@ -18,4 +18,8 @@ namespace WEngine
 		return Window::cur_window->IsKeyPressed(keycode);
 	}
 
+	glm::vec2 WindowInput::GetMousePositionImpl()
+	{
+		return Window::cur_window->GetMousePosition();
+	}
 }

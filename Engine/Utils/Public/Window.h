@@ -47,6 +47,10 @@ public:
 
 	virtual bool IsKeyPressed(int keycode) = 0;
 
+	virtual void SetMousePosition(glm::vec2 pos) = 0;
+
+	virtual glm::vec2 GetMousePosition() = 0;
+
 	void SetEventCallback(EventCallbackFunc func);
 
 	void ExecuteEventCallback(WEngine::Event *pEvent);
