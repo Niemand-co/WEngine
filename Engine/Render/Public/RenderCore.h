@@ -67,11 +67,6 @@ struct Extent
 	unsigned int height;
 };
 
-enum class ViewType
-{
-
-};
-
 enum class Dimension
 {
 	Texture1D = 0,

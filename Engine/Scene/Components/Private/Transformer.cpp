@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "Scene/Components/Public/Transformer.h"
 
-Transformer::Transformer()
+Transformer::Transformer(GameObject* pGameObject)
+	: Component(pGameObject)
 {
 	m_type = Component::ComponentType::Transformer;
 	m_localToWorldMatrix = glm::mat4(1.0f);

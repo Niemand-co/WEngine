@@ -15,13 +15,11 @@ class Light : public Component
 
 public:
 
-	Light(GameObject* gameObject);
+	Light(GameObject* pGameObject);
 
 	virtual ~Light();
 
 private:
-
-	GameObject *m_pGameObject;
 
 	LightType m_type;
 

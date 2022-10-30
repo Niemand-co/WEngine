@@ -18,8 +18,8 @@ public:
 
 	bool IsName(std::string name);
 
-	template<Component::ComponentType type>
-	Component* AddComponent();
+	template<typename T>
+	T* AddComponent();
 
 	template<Component::ComponentType type>
 	Component* GetComponent();
@@ -36,46 +36,12 @@ private:
 
 };
 
-template<Component::ComponentType type>
-inline Component* GameObject::AddComponent()
+template<typename T>
+inline T* GameObject::AddComponent()
 {
-	switch (type)
-	{
-		case Component::ComponentType::Transformer:
-		{
-			Component* pComponent = new Transformer();
-			m_components.push_back(pComponent);
-			return pComponent;
-		}
-
-		case Component::ComponentType::Camera:
-		{
-			Component* pComponent = new Camera(this);
-			m_components.push_back(pComponent);
-			World::GetWorld()->AddCamera(static_cast<Camera*>(pComponent));
-			return pComponent;
-		}
-
-		case Component::ComponentType::MeshFilter:
-		{
-			Component* pComponent = new MeshFilter();
-			m_components.push_back(pComponent);
-			return pComponent;
-		}
-
-		case Component::ComponentType::Material:
-		{
-			Component* pComponent = new Material();
-			m_components.push_back(pComponent);
-			return pComponent;
-		}
-
-		default:
-		{
-			RE_ERROR("Not indicate component type or error type.");
-		}
-		return nullptr;
-	}
+	T* component = new T(this);
+	m_components.push_back(component);
+	return component;
 }
 
 template<Component::ComponentType type>

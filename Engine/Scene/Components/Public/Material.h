@@ -23,7 +23,7 @@ class Material : public Component
 {
 public:
 
-	Material();
+	Material(GameObject *pGameObject);
 
 	~Material() = default;
 

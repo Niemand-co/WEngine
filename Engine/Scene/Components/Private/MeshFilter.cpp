@@ -2,7 +2,8 @@
 #include "Scene/Components/Public/MeshFilter.h"
 #include "Render/Mesh/Public/Mesh.h"
 
-MeshFilter::MeshFilter()
+MeshFilter::MeshFilter(GameObject* pGameObject)
+	: Component(pGameObject)
 {
 	m_type = Component::ComponentType::MeshFilter;
 }

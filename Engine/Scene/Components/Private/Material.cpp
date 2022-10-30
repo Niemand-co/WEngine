@@ -3,8 +3,8 @@
 #include "RHI/Public/RHIShader.h"
 #include "Utils/ImGui/Public/Gui.h"
 
-Material::Material()
-	: albedo(glm::vec3(1.0f, 1.0f, 1.0f)), roughness(0.5f), metallic(0.0f), m_shader(nullptr)
+Material::Material(GameObject* pGameObject)
+	: Component(pGameObject), albedo(glm::vec3(1.0f, 1.0f, 1.0f)), roughness(0.5f), metallic(0.0f), m_shader(nullptr)
 {
 	m_type = Component::ComponentType::Material;
 }

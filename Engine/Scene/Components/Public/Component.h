@@ -18,6 +18,8 @@ enum class RotateDirection
 	Roll
 };
 
+class GameObject;
+
 class Component : public Object
 {
 public:
@@ -41,6 +43,15 @@ public:
 	}
 
 protected:
+
+	Component(GameObject *pGameObject)
+		: m_pGameObject(pGameObject)
+	{
+	};
+
+protected:
+
+	GameObject* m_pGameObject;
 
 	ComponentType m_type;
 

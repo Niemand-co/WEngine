@@ -2,11 +2,13 @@
 #include "Scene/Components/Public/Camera.h"
 #include "Scene/Public/GameObject.h"
 #include "Render/Public/ScriptableRenderer.h"
+#include "Scene/Public/World.h"
 
 Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, const float& nearPlane, const float& farPlane)
-	: m_fov(fov), m_aspect(aspect), m_nearPlane(nearPlane), m_farPlane(farPlane), m_pGameObject(pGameObject)
+	: m_fov(fov), m_aspect(aspect), m_nearPlane(nearPlane), m_farPlane(farPlane), Component(pGameObject)
 {
 	m_type = Component::ComponentType::Camera; 
+	World::GetWorld()->AddCamera(this);
 	UpdateProjectionMatrix();
 }
 

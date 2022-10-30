@@ -5,7 +5,7 @@ class Transformer : public Component
 {
 public:
 
-	Transformer();
+	Transformer(GameObject* pGameObject);
 
 	~Transformer() = default;
 
