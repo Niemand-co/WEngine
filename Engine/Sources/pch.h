@@ -14,6 +14,7 @@
 #include <math.h>
 #include <float.h>
 #include <functional>
+#include <tuple>
 
 //------------------------OS SDK-------------------------------
 #if defined(WIN32) || defined(_WIN32)

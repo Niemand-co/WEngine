@@ -181,6 +181,23 @@ namespace WEngine
 			constexpr bool operator==(const BaseValue<U>&) const { return false; }
 		};
 
+		template<typename ...Es>
+		struct ElementList
+		{
+			std::tuple<Es...> elements;
+			enum { count = sizeof...(Es) };
+
+			constexpr ElementList(Es ...elems) : elements{ elems... } {}
+
+
+		};
+
+		template<bool s, bool f>
+		struct VTraits
+		{
+			enum { isStatic = s, isFunc = f };
+		};
+
 	}
 
 }
