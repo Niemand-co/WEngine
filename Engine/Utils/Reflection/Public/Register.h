@@ -17,6 +17,18 @@ namespace WEngine
 		return s.substr(start, end - start);
 	}
 
+	template<typename T, typename U>
+	struct is_same
+	{
+		enum { isSame = false };
+	};
+
+	template<typename T>
+	struct is_same<T, T>
+	{
+		enum { isSame = true };
+	};
+
 	template<bool>
 	struct enable_if
 	{
@@ -51,10 +63,17 @@ namespace WEngine
 		static_for<Begin + 1, End>(func);
 	}
 
-	template<int = 0>
-	std::string foo()
+	template<typename T>
+	void foo(T val)
 	{
-		return __FUNCSIG__;
+		TypeList<T>();
+	}
+
+	template<typename T, typename ...Args>
+	void foo(T val, Args ...args)
+	{
+		TypeList<T>();
+		foo(args...);
 	}
 
 	template<typename T, T N>
@@ -97,6 +116,71 @@ namespace WEngine
 			if(name == GetEnumName((T)i));
 				return (T)i;
 		}
+	}
+
+	template<typename ...T>
+	struct TypeList
+	{
+		enum { count = sizeof...(T) };
+	};
+
+	template<typename list, typename newType>
+	struct PushTypeList
+	{
+	};
+
+	template<typename newType, typename ...T>
+	struct PushTypeList<TypeList<T...>, newType>
+	{
+		typedef TypeList<newType, T...> type;
+	};
+
+	template<typename _ArgsList, TypeList ...T>
+	struct TemplateList
+	{
+	};
+
+
+
+	template<typename ArgsList, template<typename...> class T>
+	struct TemplateInstance
+	{
+		typedef ArgsList type;
+	};
+
+/*	template<template<typename...> class T, typename ...Args>
+	struct TemplateInstance<TypeList<Args...>, T>{};*/// { typedef T<Args...> type; };
+
+	namespace SRefl
+	{
+
+		template<typename T>
+		struct BaseValue
+		{
+			std::string_view name;
+			T value;
+			enum { hasValue = true };
+			
+			template<typename U>
+			constexpr bool operator==(const BaseValue<U>& other) const { if constexpr(is_same<T, U>::isSame)return other.value == value; else return false; }
+
+			template<typename U>
+			constexpr bool operator==(const U& v) const { if constexpr(is_same<T, U>::isSame)return v == value; else return false; }
+		};
+
+		template<>
+		struct BaseValue<void>
+		{
+			std::string_view name;
+			enum { hasValue = false };
+
+			template<typename U>
+			constexpr bool operator==(const U&) const { return false; }
+
+			template<typename U>
+			constexpr bool operator==(const BaseValue<U>&) const { return false; }
+		};
+
 	}
 
 }

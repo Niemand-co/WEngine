@@ -15,6 +15,13 @@ int main(int argc, char** argv)
 	//g_pApp->Tick();
 	std::cout<<WEngine::GetEnumName(Color::RED)<<std::endl;
 	std::cout<<(int)WEngine::GetEnumFromName<Color>("RED")<<std::endl;
-	std::cout<<WEngine::foo()<<std::endl;
+	
+	std::string name = "Test";
+	WEngine::SRefl::BaseValue<float> a(name, 1.0f);
+	WEngine::SRefl::BaseValue<float> b(name, 1);
+	if (a == b)
+	{
+		RE_LOG("Same");
+	}
 	return 0;
 }
