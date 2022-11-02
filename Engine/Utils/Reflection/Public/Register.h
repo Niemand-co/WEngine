@@ -17,35 +17,38 @@ namespace WEngine
 		return s.substr(start, end - start);
 	}
 
+	template<bool>
+	struct enable_if { };
+
+	template<>
+	struct enable_if<true> { typedef int type; };
+
+	template<>
+	struct enable_if<false> { };
+
 	template<typename T, typename U>
-	struct is_same
-	{
-		enum { isSame = false };
-	};
+	struct is_same { enum { isSame = false }; };
 
 	template<typename T>
-	struct is_same<T, T>
-	{
-		enum { isSame = true };
-	};
+	struct is_same<T, T> { enum { isSame = true }; };
 
-	template<bool>
-	struct enable_if
-	{
+	template<typename T>
+	struct is_const { enum { isConst = false }; };
 
-	};
+	template<typename T>
+	struct is_const<const T> { enum { isConst = true }; };
 
-	template<>
-	struct enable_if<true>
-	{
-		typedef int type;
-	};
+	template<typename T>
+	struct is_reference { enum { isRef = false }; };
 
-	template<>
-	struct enable_if<false>
-	{
+	template<typename T>
+	struct is_reference<T&> { enum { isRef = true }; };
 
-	};
+	template<typename T>
+	struct is_reference<T&&> { enum { isRef = true }; };
+
+	template<typename T>
+	struct is_function { enum { isFunction = !is_const<const T>::isConst && !is_reference<T>::isRef }; };
 
 	template<int Begin, int End, class Func, typename enable_if<Begin == End>::type = 0>
 	void static_for(Func const& func)
@@ -193,9 +196,67 @@ namespace WEngine
 		};
 
 		template<bool s, bool f>
-		struct VTraits
+		struct VTraitsBase
 		{
 			enum { isStatic = s, isFunc = f };
+		};
+
+		template<typename T>
+		struct VTraits : public VTraitsBase<true, is_function<T>::isFunction>
+		{
+
+		};
+
+		template<typename T>
+		struct VTraits<T*> : public VTraitsBase<true, is_function<T>::isFunction>
+		{
+
+		};
+
+		template<typename T, typename U>
+		struct VTrats : public VTraitsBase<false, is_function<T>::isFunction>
+		{
+
+		};
+
+		template<typename T, typename U>
+		struct VTraits<T U::*> : public VTraitsBase<false, is_function<T>::isFunction>
+		{
+		
+		};
+
+		template<typename T>
+		struct Field : public VTraits<T>, public BaseValue<T>
+		{
+			constexpr Field(std::string_view name, T val) : BaseValue<T>(name, val), VTraits<T>() {  }
+		};
+
+		template<typename T>
+		struct Field<T*> : public VTraits<T>, public BaseValue<T>
+		{
+			constexpr Field(std::string_view name, T* val) : BaseValue<T>(name, val), VTraits<T>() {  }
+		};
+
+		template<typename ...Fields>
+		struct FieldList : public ElementList<Fields...>
+		{
+			constexpr FieldList(Fields ...fields) : ElementList<Fields...>(fields...) {  }
+		};
+
+		template<typename T, typename ...ElementLists>
+		struct TypeInfoBase
+		{
+			typedef T type;
+			static constexpr ElementList list = { ElementLists{}... };
+		};
+
+		template<typename T>
+		struct TypeInfo;
+
+		template<typename ...Infos>
+		struct TypeInfoList
+		{
+
 		};
 
 	}
