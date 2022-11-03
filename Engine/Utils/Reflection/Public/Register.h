@@ -143,16 +143,30 @@ namespace WEngine
 	{
 	};
 
-
-
-	template<typename ArgsList, template<typename...> class T>
-	struct TemplateInstance
+	template<size_t N>
+	struct index_sequence
 	{
-		typedef ArgsList type;
+		enum { index = N - 1 };
+		typedef index_sequence<N - 1> next_index;
 	};
 
-/*	template<template<typename...> class T, typename ...Args>
-	struct TemplateInstance<TypeList<Args...>, T>{};*/// { typedef T<Args...> type; };
+	template<>
+	struct index_sequence<0>
+	{
+	};
+
+	template<class Func>
+	constexpr size_t FindIf(Func const func, index_sequence<0> index)
+	{
+		return -1;
+	}
+
+	template<class Func, size_t N0>
+	constexpr size_t FindIf(Func const func, index_sequence<N0> sequence)
+	{
+		struct value { enum { val = sequence.index }; };
+		return func(value()) ? sequence.index : FindIf(func, index_sequence<N0 - 1>());
+	}
 
 	namespace SRefl
 	{
@@ -192,38 +206,38 @@ namespace WEngine
 
 			constexpr ElementList(Es ...elems) : elements{ elems... } {}
 
+			constexpr size_t Find(std::string_view name) const
+			{
+				return FindIf([&](auto e) -> bool { return Get<e.val>().name == name; }, index_sequence<count>());
+			}
 
+			template<size_t N>
+			constexpr auto Get() const
+			{
+				return std::get<N>(elements);
+			}
+
+			template<class Func>
+			constexpr void EachMem(Func const func) const
+			{
+				static_for<0, count>([&](auto val){ func(Get<val.value>().value); });
+			}
 		};
 
 		template<bool s, bool f>
-		struct VTraitsBase
-		{
-			enum { isStatic = s, isFunc = f };
-		};
+		struct VTraitsBase { enum { isStatic = s, isFunc = f }; };
 
 		template<typename T>
-		struct VTraits : public VTraitsBase<true, is_function<T>::isFunction>
-		{
-
-		};
+		struct VTraits : public VTraitsBase<true, is_function<T>::isFunction> { };
 
 		template<typename T>
-		struct VTraits<T*> : public VTraitsBase<true, is_function<T>::isFunction>
-		{
-
-		};
+		struct VTraits<T*> : public VTraitsBase<true, is_function<T>::isFunction> { };
 
 		template<typename T, typename U>
-		struct VTrats : public VTraitsBase<false, is_function<T>::isFunction>
-		{
-
-		};
+		struct VTrats : public VTraitsBase<false, is_function<T>::isFunction> { };
 
 		template<typename T, typename U>
-		struct VTraits<T U::*> : public VTraitsBase<false, is_function<T>::isFunction>
-		{
-		
-		};
+		struct VTraits<T U::*> : public VTraitsBase<false, is_function<T>::isFunction> { };
 
 		template<typename T>
 		struct Field : public VTraits<T>, public BaseValue<T>
@@ -247,16 +261,16 @@ namespace WEngine
 		struct TypeInfoBase
 		{
 			typedef T type;
-			static constexpr ElementList list = { ElementLists{}... };
+			typedef TypeList<ElementLists...> BaseTypes;
 		};
 
 		template<typename T>
 		struct TypeInfo;
 
 		template<typename ...Infos>
-		struct TypeInfoList
+		struct TypeInfoList : public ElementList<Infos...>
 		{
-
+			constexpr TypeInfoList(Infos ...infos) : ElementList<Infos...>(infos...) {  }
 		};
 
 	}
