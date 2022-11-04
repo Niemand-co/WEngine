@@ -6,7 +6,7 @@ public:
 
 	RHIQueueDescriptor();
 
-	virtual ~RHIQueueDescriptor();
+	~RHIQueueDescriptor() = default;
 
 public:
 	

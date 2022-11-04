@@ -5,7 +5,3 @@
 RHIVertexInputDescriptor::RHIVertexInputDescriptor()
 {
 }
-
-RHIVertexInputDescriptor::~RHIVertexInputDescriptor()
-{
-}

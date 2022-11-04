@@ -4,7 +4,3 @@
 RHIDepthStencilDescriptor::RHIDepthStencilDescriptor()
 {
 }
-
-RHIDepthStencilDescriptor::~RHIDepthStencilDescriptor()
-{
-}

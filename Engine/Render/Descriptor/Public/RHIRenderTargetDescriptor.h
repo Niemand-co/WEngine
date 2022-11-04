@@ -9,7 +9,7 @@ public:
 
 	RHIRenderTargetDescriptor();
 
-	virtual ~RHIRenderTargetDescriptor();
+	~RHIRenderTargetDescriptor() = default;
 
 public:
 

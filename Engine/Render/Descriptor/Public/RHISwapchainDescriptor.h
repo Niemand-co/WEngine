@@ -8,7 +8,7 @@ public:
 	
 	RHISwapchainDescriptor();
 
-	virtual ~RHISwapchainDescriptor();
+	~RHISwapchainDescriptor() = default;
 
 public:
 

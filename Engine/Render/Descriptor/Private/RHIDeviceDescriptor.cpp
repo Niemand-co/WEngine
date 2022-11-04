@@ -4,7 +4,3 @@
 RHIDeviceDescriptor::RHIDeviceDescriptor()
 {
 }
-
-RHIDeviceDescriptor::~RHIDeviceDescriptor()
-{
-}

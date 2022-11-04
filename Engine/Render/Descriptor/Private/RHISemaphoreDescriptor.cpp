@@ -4,7 +4,3 @@
 RHISemaphoreDescriptor::RHISemaphoreDescriptor()
 {
 }
-
-RHISemaphoreDescriptor::~RHISemaphoreDescriptor()
-{
-}

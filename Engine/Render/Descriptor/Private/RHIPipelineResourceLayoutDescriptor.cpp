@@ -5,7 +5,3 @@
 RHIPipelineResourceLayoutDescriptor::RHIPipelineResourceLayoutDescriptor()
 {
 }
-
-RHIPipelineResourceLayoutDescriptor::~RHIPipelineResourceLayoutDescriptor()
-{
-}

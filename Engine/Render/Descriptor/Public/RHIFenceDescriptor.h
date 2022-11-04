@@ -6,5 +6,5 @@ public:
 
 	RHIFenceDescriptor();
 
-	virtual ~RHIFenceDescriptor();
+	~RHIFenceDescriptor() = default;
 };

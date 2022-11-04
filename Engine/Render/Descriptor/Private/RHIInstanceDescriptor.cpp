@@ -7,7 +7,3 @@ RHIInstanceDescriptor::RHIInstanceDescriptor()
 	enableDebugLayer = false;
 	enableGPUValidator = false;
 }
-
-RHIInstanceDescriptor::~RHIInstanceDescriptor()
-{
-}

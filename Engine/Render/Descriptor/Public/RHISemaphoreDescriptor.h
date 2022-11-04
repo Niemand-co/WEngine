@@ -6,5 +6,5 @@ public:
 
 	RHISemaphoreDescriptor();
 
-	virtual ~RHISemaphoreDescriptor();
+	~RHISemaphoreDescriptor() = default;
 };

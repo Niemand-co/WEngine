@@ -6,7 +6,7 @@ public:
 
 	RHITextureViewDescriptor();
 
-	virtual ~RHITextureViewDescriptor();
+	~RHITextureViewDescriptor() = default;
 
 public:
 

@@ -4,7 +4,3 @@
 RHITextureDescriptor::RHITextureDescriptor()
 {
 }
-
-RHITextureDescriptor::~RHITextureDescriptor()
-{
-}

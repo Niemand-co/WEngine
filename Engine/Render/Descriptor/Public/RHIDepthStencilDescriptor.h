@@ -6,7 +6,7 @@ public:
 
 	RHIDepthStencilDescriptor();
 
-	virtual ~RHIDepthStencilDescriptor();
+	~RHIDepthStencilDescriptor() = default;
 
 public:
 

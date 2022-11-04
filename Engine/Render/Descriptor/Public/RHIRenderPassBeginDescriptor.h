@@ -9,7 +9,7 @@ public:
 
 	RHIRenderPassBeginDescriptor();
 
-	virtual ~RHIRenderPassBeginDescriptor();
+	~RHIRenderPassBeginDescriptor() = default;
 
 public:
 

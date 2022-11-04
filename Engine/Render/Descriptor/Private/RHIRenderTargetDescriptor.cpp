@@ -6,7 +6,3 @@
 RHIRenderTargetDescriptor::RHIRenderTargetDescriptor()
 {
 }
-
-RHIRenderTargetDescriptor::~RHIRenderTargetDescriptor()
-{
-}

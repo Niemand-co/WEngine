@@ -4,7 +4,3 @@
 RHIQueueDescriptor::RHIQueueDescriptor()
 {
 }
-
-RHIQueueDescriptor::~RHIQueueDescriptor()
-{
-}

@@ -1,7 +1,5 @@
-# SoftRenderer
+# WEngine
 
-<strong>使用方式:</strong></br>
-运行build.bat</br>
-进入build文件夹编译sln
+Copy the Engine/deps/CMakeLists.txt to Engine/deps/imgui after ```git submodule update```.
 
-<img src="/Cube.jpg" style="zoom:67%;" />
+<img src="SimpleScene.png" alt="sample" style="zoom: 33%;" />

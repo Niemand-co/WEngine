@@ -6,7 +6,7 @@ public:
 
 	RHIBlendDescriptor();
 
-	virtual ~RHIBlendDescriptor();
+	~RHIBlendDescriptor() = default;
 
 public:
 

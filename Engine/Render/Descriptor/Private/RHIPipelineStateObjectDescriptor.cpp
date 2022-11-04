@@ -10,8 +10,3 @@ RHIPipelineStateObjectDescriptor::RHIPipelineStateObjectDescriptor()
 {
 
 }
-
-RHIPipelineStateObjectDescriptor::~RHIPipelineStateObjectDescriptor()
-{
-
-}

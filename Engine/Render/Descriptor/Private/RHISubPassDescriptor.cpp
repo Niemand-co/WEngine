@@ -7,7 +7,3 @@ RHISubPassDescriptor::RHISubPassDescriptor()
 	  dependedAccess(0), waitingStage(0), waitingAccess(0)
 {
 }
-
-RHISubPassDescriptor::~RHISubPassDescriptor()
-{
-}

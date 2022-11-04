@@ -22,6 +22,8 @@ class GameObject;
 
 class Component : public Object
 {
+	ENABLE_REFLECTION
+
 public:
 	enum class ComponentType
 	{
@@ -56,3 +58,23 @@ protected:
 	ComponentType m_type;
 
 };
+
+namespace WEngine
+{
+	namespace SRefl
+	{
+		template<>
+		struct TypeInfo<Component> : public TypeInfoBase<Component, Object>
+		{
+			static constexpr std::string_view name = "Component";
+
+			static constexpr FieldList lis = 
+			{
+				Field{"m_pGameObject", &Component::m_pGameObject},
+				Field{"m_type", &Component::m_type},
+				Field{"GetType", &Component::GetType},
+				Field{"IsType", &Component::IsType},
+			};
+		};
+	}
+}

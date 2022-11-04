@@ -4,7 +4,3 @@
 RHIRenderPassDescriptor::RHIRenderPassDescriptor()
 {
 }
-
-RHIRenderPassDescriptor::~RHIRenderPassDescriptor()
-{
-}

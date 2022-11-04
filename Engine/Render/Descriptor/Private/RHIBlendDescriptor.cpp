@@ -4,7 +4,3 @@
 RHIBlendDescriptor::RHIBlendDescriptor()
 {
 }
-
-RHIBlendDescriptor::~RHIBlendDescriptor()
-{
-}

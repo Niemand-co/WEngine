@@ -4,7 +4,3 @@
 RHICommandPoolDescriptor::RHICommandPoolDescriptor()
 {
 }
-
-RHICommandPoolDescriptor::~RHICommandPoolDescriptor()
-{
-}

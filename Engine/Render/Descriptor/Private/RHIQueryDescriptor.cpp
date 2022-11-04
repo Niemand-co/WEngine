@@ -4,7 +4,3 @@
 RHIQueryDescriptor::RHIQueryDescriptor()
 {
 }
-
-RHIQueryDescriptor::~RHIQueryDescriptor()
-{
-}

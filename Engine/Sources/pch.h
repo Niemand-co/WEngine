@@ -59,5 +59,8 @@
 #include "Utils/Public/ShaderCodeBlob.h"
 #include "Utils/Public/FileLoader.h"
 #include "Event/Public/TimeStep.h"
+#include "Utils/Reflection/Public/Register.h"
+
+#define ENABLE_REFLECTION template<typename T> friend struct WEngine::SRefl::TypeInfo;
 
 #endif

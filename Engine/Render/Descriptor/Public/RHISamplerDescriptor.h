@@ -6,7 +6,7 @@ public:
 
 	RHISamplerDescriptor();
 
-	virtual ~RHISamplerDescriptor();
+	~RHISamplerDescriptor() = default;
 
 public:
 

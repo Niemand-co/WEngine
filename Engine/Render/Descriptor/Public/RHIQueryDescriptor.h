@@ -6,5 +6,5 @@ public:
 
 	RHIQueryDescriptor();
 
-	virtual ~RHIQueryDescriptor();
+	~RHIQueryDescriptor() = default;
 };

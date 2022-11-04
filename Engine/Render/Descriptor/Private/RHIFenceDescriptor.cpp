@@ -4,7 +4,3 @@
 RHIFenceDescriptor::RHIFenceDescriptor()
 {
 }
-
-RHIFenceDescriptor::~RHIFenceDescriptor()
-{
-}

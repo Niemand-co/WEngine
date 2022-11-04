@@ -4,7 +4,3 @@
 RHISubmitDescriptor::RHISubmitDescriptor()
 {
 }
-
-RHISubmitDescriptor::~RHISubmitDescriptor()
-{
-}

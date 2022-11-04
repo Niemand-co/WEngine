@@ -12,7 +12,3 @@ RHISwapchainDescriptor::RHISwapchainDescriptor()
 	surface = nullptr;
 
 }
-
-RHISwapchainDescriptor::~RHISwapchainDescriptor()
-{
-}

@@ -14,7 +14,7 @@ public:
 
 	RHIInstanceDescriptor();
 
-	virtual ~RHIInstanceDescriptor();
+	~RHIInstanceDescriptor() = default;
 
 public:
 	RHIBackend backend;

@@ -8,7 +8,7 @@ public:
 
 	RHIPipelineResourceLayoutDescriptor();
 
-	virtual ~RHIPipelineResourceLayoutDescriptor();
+	~RHIPipelineResourceLayoutDescriptor() = default;
 
 public:
 

@@ -6,6 +6,6 @@ public:
 
 	RHICommandPoolDescriptor();
 
-	virtual ~RHICommandPoolDescriptor();
+	~RHICommandPoolDescriptor() = default;
 
 };

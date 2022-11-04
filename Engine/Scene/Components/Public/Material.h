@@ -21,6 +21,8 @@ struct SurfaceData
 
 class Material : public Component
 {
+	ENABLE_REFLECTION
+
 public:
 
 	Material(GameObject *pGameObject);
@@ -49,3 +51,30 @@ private:
 
 	RHIShader* m_shader;
 };
+
+
+namespace WEngine
+{
+	namespace SRefl
+	{
+		template<>
+		struct TypeInfo<Material> : public TypeInfoBase<Material, Component>
+		{
+			static constexpr std::string_view name = "Material";
+
+			static constexpr FieldList list = 
+			{
+				Field("albedo", &Material::albedo),
+				Field("roughness", &Material::roughness),
+				Field("metallic", &Material::metallic),
+				Field("m_shader", &Material::m_shader),
+				Field("SetShader", &Material::SetShader),
+				Field("GetShader", &Material::GetShader),
+				Field("GetSurfaceData", &Material::GetSurfaceData),
+				Field("SetColor", &Material::SetColor),
+				Field("SetRoughness", &Material::SetRoughness),
+				Field("ShowInInspector", &Material::ShowInInspector),
+			};
+		};
+	}
+}

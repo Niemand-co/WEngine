@@ -13,7 +13,7 @@ public:
 
 	RHISubPassDescriptor();
 
-	~RHISubPassDescriptor();
+	~RHISubPassDescriptor() = default;
 
 public:
 

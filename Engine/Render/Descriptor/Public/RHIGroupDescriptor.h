@@ -8,7 +8,7 @@ public:
 
 	RHIGroupDescriptor();
 
-	~RHIGroupDescriptor();
+	~RHIGroupDescriptor() = default;
 
 public:
 

@@ -4,7 +4,3 @@
 RHIGroupPoolDescriptor::RHIGroupPoolDescriptor()
 {
 }
-
-RHIGroupPoolDescriptor::~RHIGroupPoolDescriptor()
-{
-}

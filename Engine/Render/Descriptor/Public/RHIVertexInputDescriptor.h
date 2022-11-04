@@ -9,7 +9,7 @@ public:
 
 	RHIVertexInputDescriptor();
 
-	virtual ~RHIVertexInputDescriptor();
+	~RHIVertexInputDescriptor() = default;
 
 public:
 

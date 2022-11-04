@@ -24,7 +24,7 @@ public:
 
 	RHIBarrierDescriptor();
 
-	~RHIBarrierDescriptor();
+	~RHIBarrierDescriptor() = default;
 
 public:
 

@@ -14,7 +14,7 @@ public:
 
 	RHIGroupLayoutDescriptor();
 
-	~RHIGroupLayoutDescriptor();
+	~RHIGroupLayoutDescriptor() = default;
 
 public:
 

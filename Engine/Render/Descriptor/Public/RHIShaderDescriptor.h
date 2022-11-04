@@ -6,7 +6,7 @@ public:
 
 	RHIShaderDescriptor();
 
-	virtual ~RHIShaderDescriptor();
+	~RHIShaderDescriptor() = default;
 
 public:
 

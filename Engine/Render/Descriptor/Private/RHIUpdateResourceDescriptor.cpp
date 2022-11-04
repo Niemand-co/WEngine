@@ -5,7 +5,3 @@ RHIUpdateResourceDescriptor::RHIUpdateResourceDescriptor()
 	: pBufferInfo(nullptr), pTextureInfo(nullptr), bufferResourceCount(0), textureResourceCount(0)
 {
 }
-
-RHIUpdateResourceDescriptor::~RHIUpdateResourceDescriptor()
-{
-}

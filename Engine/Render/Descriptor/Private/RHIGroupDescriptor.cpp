@@ -4,7 +4,3 @@
 RHIGroupDescriptor::RHIGroupDescriptor()
 {
 }
-
-RHIGroupDescriptor::~RHIGroupDescriptor()
-{
-}

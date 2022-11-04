@@ -4,7 +4,7 @@ class RHIAttachmentDescriptor
 {
 public:
 
-	~RHIAttachmentDescriptor();
+	~RHIAttachmentDescriptor() = default;
 
 public:
 

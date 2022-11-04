@@ -6,7 +6,3 @@
 RHIRenderPassBeginDescriptor::RHIRenderPassBeginDescriptor()
 {
 }
-
-RHIRenderPassBeginDescriptor::~RHIRenderPassBeginDescriptor()
-{
-}

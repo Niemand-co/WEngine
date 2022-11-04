@@ -4,7 +4,3 @@
 RHIShaderDescriptor::RHIShaderDescriptor()
 {
 }
-
-RHIShaderDescriptor::~RHIShaderDescriptor()
-{
-}

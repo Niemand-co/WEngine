@@ -8,7 +8,7 @@ public:
 
 	RHIGroupPoolDescriptor();
 
-	~RHIGroupPoolDescriptor();
+	~RHIGroupPoolDescriptor() = default;
 
 public:
 

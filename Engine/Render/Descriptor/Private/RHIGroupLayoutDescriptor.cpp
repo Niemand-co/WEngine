@@ -4,7 +4,3 @@
 RHIGroupLayoutDescriptor::RHIGroupLayoutDescriptor()
 {
 }
-
-RHIGroupLayoutDescriptor::~RHIGroupLayoutDescriptor()
-{
-}

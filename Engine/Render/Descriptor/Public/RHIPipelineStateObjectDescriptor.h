@@ -13,7 +13,7 @@ public:
 
 	RHIPipelineStateObjectDescriptor();
 
-	virtual ~RHIPipelineStateObjectDescriptor();
+	~RHIPipelineStateObjectDescriptor() = default;
 
 public:
 

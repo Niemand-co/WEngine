@@ -15,7 +15,7 @@ public:
 
 	RHIBufferDescriptor();
 
-	virtual ~RHIBufferDescriptor();
+	~RHIBufferDescriptor() = default;
 
 public:
 

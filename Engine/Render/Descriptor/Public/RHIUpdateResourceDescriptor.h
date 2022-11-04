@@ -27,7 +27,7 @@ public:
 
 	RHIUpdateResourceDescriptor();
 
-	~RHIUpdateResourceDescriptor();
+	~RHIUpdateResourceDescriptor() = default;
 
 public:
 

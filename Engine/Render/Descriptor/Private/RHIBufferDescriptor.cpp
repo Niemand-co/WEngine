@@ -5,7 +5,3 @@
 RHIBufferDescriptor::RHIBufferDescriptor()
 {
 }
-
-RHIBufferDescriptor::~RHIBufferDescriptor()
-{
-}

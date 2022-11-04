@@ -10,7 +10,7 @@ public:
 
 	RHISubmitDescriptor();
 
-	~RHISubmitDescriptor();
+	~RHISubmitDescriptor() = default;
 
 public:
 
