@@ -4,6 +4,8 @@
 
 Gui* Gui::g_pGui = nullptr;
 
+GameObject* Gui::m_pGameObject = nullptr;
+
 Gui* Gui::CreateGui(WEngine::Backend backend)
 {
 	switch (backend)
@@ -22,19 +24,19 @@ Gui* Gui::CreateGui(WEngine::Backend backend)
 	return nullptr;
 }
 
-void Gui::DrawSlider(std::string title, float* pValue, float minValue, float maxValue)
+void Gui::DrawSlider(std::string_view title, float* pValue, float minValue, float maxValue)
 {
-	ImGui::SliderFloat(title.c_str(), pValue, minValue, maxValue);
+	ImGui::SliderFloat(title.data(), pValue, minValue, maxValue);
 }
 
-void Gui::DrawColorEdit(std::string title, float* pColor, bool hasAlpha)
+void Gui::DrawColorEdit(std::string_view title, float* pColor, bool hasAlpha)
 {
 	if (hasAlpha)
 	{
-		ImGui::ColorEdit4(title.c_str(), pColor);
+		ImGui::ColorEdit4(title.data(), pColor);
 	}
 	else
 	{
-		ImGui::ColorEdit3(title.c_str(), pColor);
+		ImGui::ColorEdit3(title.data(), pColor);
 	}
 }

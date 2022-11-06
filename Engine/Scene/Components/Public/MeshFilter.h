@@ -7,6 +7,8 @@ class MeshFilter : public Component
 {
 public:
 
+	typedef MeshFilter type;
+
 	MeshFilter(GameObject* pGameObject);
 
 	~MeshFilter() = default;

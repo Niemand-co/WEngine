@@ -11,6 +11,8 @@ class Camera : public Component
 
 public:
 
+	typedef Camera type;
+
 	Camera(GameObject* pGameObject, const float& fov = 3.1415926535f / 2.0f, const float& aspect = 1.0f, const float& nearPlane = 0.1f, const float& farPlane = 1000.0f);
 
 	~Camera() = default;
@@ -77,21 +79,21 @@ namespace WEngine
 
 			static constexpr FieldList list = 
 			{
-				Field{"m_isOrthographic", &Camera::m_isOrthographic},
-				Field{"m_nearPlane", &Camera::m_nearPlane},
-				Field{"m_farPlane", &Camera::m_farPlane},
-				Field{"m_fov", &Camera::m_fov},
-				Field{"m_aspect", &Camera::m_aspect},
-				Field{"m_viewMatrix", &Camera::m_viewMatrix},
-				Field{"m_projectionMatrix", &Camera::m_projectionMatrix},
-				Field{"m_renderer", &Camera::m_renderer},
-				Field{"GetViewMatrix", &Camera::GetViewMatrix},
-				Field{"GetProjectionMatrix", &Camera::GetProjectionMatrix},
-				Field{"SetRenderer", &Camera::SetRenderer},
-				Field{"GetRenderer", &Camera::GetRenderer},
-				Field{"GetData", &Camera::GetData},
-				Field{"Move", &Camera::Move},
-				Field{"Rotate", &Camera::Rotate},
+				Field{"m_isOrthographic", &Camera::m_isOrthographic, AttrList{}},
+				Field{"m_nearPlane", &Camera::m_nearPlane, AttrList{}},
+				Field{"m_farPlane", &Camera::m_farPlane, AttrList{}},
+				Field{"m_fov", &Camera::m_fov, AttrList{}},
+				Field{"m_aspect", &Camera::m_aspect, AttrList{}},
+				Field{"m_viewMatrix", &Camera::m_viewMatrix, AttrList{}},
+				Field{"m_projectionMatrix", &Camera::m_projectionMatrix, AttrList{}},
+				Field{"m_renderer", &Camera::m_renderer, AttrList{}},
+				Field{"GetViewMatrix", &Camera::GetViewMatrix, AttrList{}},
+				Field{"GetProjectionMatrix", &Camera::GetProjectionMatrix, AttrList{}},
+				Field{"SetRenderer", &Camera::SetRenderer, AttrList{}},
+				Field{"GetRenderer", &Camera::GetRenderer, AttrList{}},
+				Field{"GetData", &Camera::GetData, AttrList{}},
+				Field{"Move", &Camera::Move, AttrList{}},
+				Field{"Rotate", &Camera::Rotate, AttrList{}},
 			};
 		};
 	}

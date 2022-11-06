@@ -2,6 +2,7 @@
 #include "Platform/Vulkan/ImGui/Public/VulkanGui.h"
 #include "Platform/Vulkan/Public/VulkanHeads.h"
 #include "Utils/Public/Window.h"
+#include "Scene/Public/GameObject.h"
 
 namespace Vulkan
 {
@@ -78,6 +79,28 @@ namespace Vulkan
 		ImGui::Render();
 		ImDrawData* data = ImGui::GetDrawData();
 		ImGui_ImplVulkan_RenderDrawData(data, *static_cast<VulkanCommandBuffer*>(pCommandBuffer)->GetHandle(), nullptr);
+	}
+
+	void VulkanGui::ShowInspector()
+	{
+		if(m_pGameObject == nullptr)
+			return;
+		Material *mat = m_pGameObject->GetComponent<Material>();
+		WEngine::SRefl::TypeInfo<Material>::fields.EachMem([&](auto e)
+		{
+			RE_LOG(WEngine::GetTypeName<decltype(e)>());
+			//if constexpr(e.alist.count > 0)
+			//	e.alist.Get<1>();
+			//if (e.alist.Get<0>() == Range)
+			//{
+			//	//Gui::DrawSlider(e.name, mat->*(e.value), e.alist.Get<1>(), e.alist.Get<2>());
+			//	RE_LOG(e.name);
+			//}
+			//else if (e.alist.Get<0>() == Color)
+			//{
+			//	//Gui::DrawColorEdit(e.name, (float*)&(mat->*(e.value)), true);
+			//}
+		});
 	}
 
 }

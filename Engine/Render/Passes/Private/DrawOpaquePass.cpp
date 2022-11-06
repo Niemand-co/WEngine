@@ -99,7 +99,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 
 	GameObject *go = GameObject::Find("Cube");
-	m_pMesh = static_cast<MeshFilter*>(go->GetComponent<Component::ComponentType::MeshFilter>())->GetStaticMesh();
+	m_pMesh = go->GetComponent<MeshFilter>()->GetStaticMesh();
 
 	BindingResource resource[2] = 
 	{
@@ -157,7 +157,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 	m_pIndexBuffer = context->CreateIndexBuffer(&indexBufferDescriptor);
 
-	SurfaceData surfaceData = static_cast<Material*>(go->GetComponent<Component::ComponentType::Material>())->GetSurfaceData();
+	SurfaceData surfaceData = go->GetComponent<Material>()->GetSurfaceData();
 
 	UniformData data = 
 	{
@@ -274,7 +274,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 
 	RHICommandBuffer *cmd = m_pCommandBuffers[ScriptableRenderPipeline::g_currentFrame];
 
-	SurfaceData surfaceData = static_cast<Material*>(GameObject::Find("Cube")->GetComponent<Component::ComponentType::Material>())->GetSurfaceData();
+	SurfaceData surfaceData = GameObject::Find("Cube")->GetComponent<Material>()->GetSurfaceData();
 	UniformData data =
 	{
 		cameraData->MatrixVP,

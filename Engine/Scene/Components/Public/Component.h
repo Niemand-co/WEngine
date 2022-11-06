@@ -35,6 +35,8 @@ public:
 
 public:
 
+	typedef Component type;
+
 	virtual ~Component() = default;
 
 	virtual ComponentType GetType() { return m_type; }
@@ -70,10 +72,10 @@ namespace WEngine
 
 			static constexpr FieldList lis = 
 			{
-				Field{"m_pGameObject", &Component::m_pGameObject},
-				Field{"m_type", &Component::m_type},
-				Field{"GetType", &Component::GetType},
-				Field{"IsType", &Component::IsType},
+				Field{"m_pGameObject", &Component::m_pGameObject, AttrList{}},
+				Field{"m_type", &Component::m_type, AttrList{}},
+				Field{"GetType", &Component::GetType, AttrList{}},
+				Field{"IsType", &Component::IsType, AttrList{}},
 			};
 		};
 	}

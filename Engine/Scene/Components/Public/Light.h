@@ -14,6 +14,8 @@ class Light : public Component
 	};
 
 public:
+	
+	typedef Light type;
 
 	Light(GameObject* pGameObject);
 

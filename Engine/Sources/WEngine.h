@@ -21,6 +21,7 @@
 #include "Render/Mesh/Public/Mesh.h"
 
 #include "Utils/Public/Window.h"
+#include "Utils/ImGui/Public/Gui.h"
 
 #include "Framework/Public/Application.h"
 

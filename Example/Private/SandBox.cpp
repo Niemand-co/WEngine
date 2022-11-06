@@ -10,7 +10,8 @@ GameScene::GameScene(std::string name)
 	m_sceneCamera = go->AddComponent<Camera>();
 	m_sceneCamera->SetRenderer(ScriptableRenderPipeline::get()->CreateRenderer());
 	m_sceneCamera->m_aspect = (float)Window::cur_window->GetWidth() / (float)Window::cur_window->GetHeight();
-	static_cast<Transformer*>(go->GetComponent<Component::ComponentType::Transformer>())->SetPosition(glm::vec3(2.0f, 2.0f, 2.0f));
+	go->GetComponent<Transformer>()->SetPosition(glm::vec3(2.0f, 2.0f, 2.0f));
+	
 }
 
 GameScene::~GameScene()
@@ -107,7 +108,7 @@ SandBox::SandBox()
 	MeshFilter *filter = go->AddComponent<MeshFilter>();
 	filter->SetStaticMesh(Mesh::GetCube());
 	go->AddComponent<Material>();
-
+	Gui::SetSelectedObject(go);
 	m_pLayerStack->PushLayer(new GameScene("Game Scene"));
 
 	m_renderPipeline->Setup();

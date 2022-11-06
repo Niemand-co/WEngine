@@ -4,7 +4,7 @@
 #include "Utils/ImGui/Public/Gui.h"
 
 Material::Material(GameObject* pGameObject)
-	: Component(pGameObject), albedo(glm::vec3(1.0f, 1.0f, 1.0f)), roughness(0.5f), metallic(0.0f), m_shader(nullptr)
+	: Component(pGameObject), albedo(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)), roughness(0.5f), metallic(0.0f), m_shader(nullptr)
 {
 	m_type = Component::ComponentType::Material;
 }
@@ -28,7 +28,7 @@ SurfaceData Material::GetSurfaceData()
 	return surfaceData;
 }
 
-void Material::SetColor(glm::vec3 color)
+void Material::SetColor(glm::vec4 color)
 {
 	albedo = color;
 }
@@ -40,9 +40,10 @@ void Material::SetRoughness(float roughness)
 
 void Material::ShowInInspector()
 {
-	Gui::DrawSlider("Roughness", &roughness, 0.01f, 1.0f);
 
-	Gui::DrawSlider("Metallic", &metallic, 0.0f, 1.0f);
+	//Gui::DrawSlider("Roughness", &(this->*(e.value)), 0.01f, 1.0f);
 
-	Gui::DrawColorEdit("Albedo", &albedo[0], false);
+	//Gui::DrawSlider("Metallic", &metallic, 0.0f, 1.0f);
+
+	//Gui::DrawColorEdit("Albedo", &albedo[0], false);
 }

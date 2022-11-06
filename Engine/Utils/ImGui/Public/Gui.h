@@ -7,6 +7,7 @@ class RHIDevice;
 class RHIQueue;
 class RHIRenderPass;
 class RHICommandBuffer;
+class GameObject;
 
 struct GuiConfigure
 {
@@ -39,13 +40,20 @@ public:
 
 	virtual void RenderGUI(RHICommandBuffer* pCommandBuffer) = 0;
 
+	virtual void ShowInspector() = 0;
+
+	inline static void SetSelectedObject(GameObject *pGameObject) { m_pGameObject = pGameObject; }
+
 public:
 
 	static Gui* CreateGui(WEngine::Backend backend);
 
-	static void DrawSlider(std::string title, float *pValue, float minValue, float maxValue);
+	static void DrawSlider(std::string_view title, float *pValue, float minValue, float maxValue);
 
-	static void DrawColorEdit(std::string title, float *pColor, bool hasAlpha = false);
+	static void DrawColorEdit(std::string_view title, float *pColor, bool hasAlpha = false);
+
+	template<typename T, typename ...Args>
+	static void ShowElement(std::string_view title, T &value, Args ...args);
 
 public:
 	
@@ -55,4 +63,27 @@ protected:
 
 	ImGuiIO m_io;
 
+	static GameObject *m_pGameObject;
+
 };
+
+template<typename T, typename ...Args>
+inline void Gui::ShowElement(std::string_view title, T &value, Args ...args)
+{
+	if (WEngine::is_same<T, float>::isSame)
+	{
+		DrawSlider(title, (void*)&value, 0.01f, 1.0f);
+	}
+	else if (WEngine::is_same<T, glm::vec3>::isSame)
+	{
+		//DrawColorEdit(title, &value[0], false);
+	}
+	else if (WEngine::is_same<T, glm::vec4>::isSame)
+	{
+		//DrawColorEdit(title, &value[0], true);
+	}
+	//else
+	//{
+	//	RE_ASSERT(false, "No Match Type Element to be Shown in Inspector.");
+	//}
+}

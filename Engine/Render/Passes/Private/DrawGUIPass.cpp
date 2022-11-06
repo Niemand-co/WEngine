@@ -106,8 +106,7 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 		{
 			ImGui::Begin("Inspector");
 
-			Material *material = static_cast<Material*>(m_currentGo->GetComponent<Component::ComponentType::Material>());
-			material->ShowInInspector();
+			Gui::g_pGui->ShowInspector();
 
 			ImGui::ColorEdit4("Top Color", &DrawSkyboxPass::topColor[0]);
 			ImGui::ColorEdit4("Bottom Color", &DrawSkyboxPass::bottomColor[0]);

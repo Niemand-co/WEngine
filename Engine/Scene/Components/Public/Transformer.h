@@ -5,6 +5,8 @@ class Transformer : public Component
 {
 public:
 
+	typedef Transformer type;
+
 	Transformer(GameObject* pGameObject);
 
 	~Transformer() = default;

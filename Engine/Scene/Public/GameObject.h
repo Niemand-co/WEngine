@@ -21,8 +21,8 @@ public:
 	template<typename T>
 	T* AddComponent();
 
-	template<Component::ComponentType type>
-	Component* GetComponent();
+	template<typename T>
+	T* GetComponent();
 
 public:
 
@@ -44,13 +44,22 @@ inline T* GameObject::AddComponent()
 	return component;
 }
 
-template<Component::ComponentType type>
-inline Component* GameObject::GetComponent()
+template<typename T>
+struct remove_reference { typedef T type; };
+
+template<typename T>
+struct remove_reference<T&> { typedef T type; };
+
+template<typename T>
+struct remove_reference<T&&> { typedef T type; };
+
+template<typename T>
+inline T* GameObject::GetComponent()
 {
 	for (Component* component : m_components)
 	{
-		if (component->IsType(type))
-			return component;
+		if (std::strcmp(WEngine::GetTypeName<T>().data(), typeid(*component).name()) == 0)
+			return static_cast<T*>(component);
 	}
 	return nullptr;
 }

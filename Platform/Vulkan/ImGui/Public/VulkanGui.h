@@ -18,6 +18,8 @@ namespace Vulkan
 
 		virtual void RenderGUI(RHICommandBuffer* pCommandBuffer) override;
 
+		virtual void ShowInspector() override;
+
 	private:
 
 		VkInstance *m_pInstance;

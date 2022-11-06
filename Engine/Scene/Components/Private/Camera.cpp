@@ -40,7 +40,7 @@ CameraData* Camera::GetData()
 	::new (data) CameraData();
 
 	data->camera = this;
-	data->Position = static_cast<Transformer*>(m_pGameObject->GetComponent<Component::ComponentType::Transformer>())->GetPosition();
+	data->Position = m_pGameObject->GetComponent<Transformer>()->GetPosition();
 	data->MatrixV = this->GetViewMatrix();
 	data->MatrixP = this->GetProjectionMatrix();
 	data->MatrixVP = data->MatrixP * data->MatrixV;
@@ -50,20 +50,20 @@ CameraData* Camera::GetData()
 
 void Camera::Move(Direction dir, float dis)
 {
-	Transformer *transformer = static_cast<Transformer*>(m_pGameObject->GetComponent<Component::ComponentType::Transformer>());
+	Transformer *transformer = m_pGameObject->GetComponent<Transformer>();
 	transformer->Move(dir, dis);
 }
 
 void Camera::Rotate(RotateDirection dir, float dis)
 {
-	Transformer* transformer = static_cast<Transformer*>(m_pGameObject->GetComponent<Component::ComponentType::Transformer>());
+	Transformer* transformer = m_pGameObject->GetComponent<Transformer>();
 	transformer->Rotate(dir, dis);
 }
 
 void Camera::UpdateViewMatrix()
 {
-	glm::vec3 position = static_cast<Transformer*>(m_pGameObject->GetComponent<Component::ComponentType::Transformer>())->GetPosition();
-	glm::vec3 forward = static_cast<Transformer*>(m_pGameObject->GetComponent<Component::ComponentType::Transformer>())->GetForward();
+	glm::vec3 position = m_pGameObject->GetComponent<Transformer>()->GetPosition();
+	glm::vec3 forward = m_pGameObject->GetComponent<Transformer>()->GetForward();
 	m_viewMatrix = glm::lookAt(position, position  + forward, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 

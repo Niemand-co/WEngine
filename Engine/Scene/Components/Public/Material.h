@@ -19,11 +19,23 @@ struct SurfaceData
 
 };
 
+enum Property
+{
+	Float = 0,
+	Range,
+	Color,
+	Shader,
+};
+
 class Material : public Component
 {
 	ENABLE_REFLECTION
 
+	friend class VulkanGui;
+
 public:
+
+	typedef Material type;
 
 	Material(GameObject *pGameObject);
 
@@ -35,7 +47,7 @@ public:
 
 	SurfaceData GetSurfaceData();
 
-	void SetColor(glm::vec3 color);
+	void SetColor(glm::vec4 color);
 
 	void SetRoughness(float roughness);
 
@@ -43,10 +55,13 @@ public:
 
 private:
 
-	glm::vec3 albedo;
+	[[Color(1, 1, 1, 1)]]
+	glm::vec4 albedo;
 
+	[[Range(0.01, 1)]]
 	float roughness;
 
+	[[Range(0, 1)]]
 	float metallic;
 
 	RHIShader* m_shader;
@@ -62,18 +77,18 @@ namespace WEngine
 		{
 			static constexpr std::string_view name = "Material";
 
-			static constexpr FieldList list = 
+			static constexpr FieldList fields = 
 			{
-				Field("albedo", &Material::albedo),
-				Field("roughness", &Material::roughness),
-				Field("metallic", &Material::metallic),
-				Field("m_shader", &Material::m_shader),
-				Field("SetShader", &Material::SetShader),
-				Field("GetShader", &Material::GetShader),
-				Field("GetSurfaceData", &Material::GetSurfaceData),
-				Field("SetColor", &Material::SetColor),
-				Field("SetRoughness", &Material::SetRoughness),
-				Field("ShowInInspector", &Material::ShowInInspector),
+				Field("albedo", &Material::albedo, AttrList{ Color, 1, 1, 1, 1 }),
+				Field("roughness", &Material::roughness, AttrList{ Range,  0.01f, 1.0f }),
+				Field("metallic", &Material::metallic, AttrList{ Range, 0.0f, 1.0f }),
+				Field("m_shader", &Material::m_shader, AttrList{ Shader }),
+				Field("SetShader", &Material::SetShader, AttrList{}),
+				Field("GetShader", &Material::GetShader, AttrList{}),
+				Field("GetSurfaceData", &Material::GetSurfaceData, AttrList{}),
+				Field("SetColor", &Material::SetColor, AttrList{}),
+				Field("SetRoughness", &Material::SetRoughness, AttrList{}),
+				Field("ShowInInspector", &Material::ShowInInspector, AttrList{}),
 			};
 		};
 	}
