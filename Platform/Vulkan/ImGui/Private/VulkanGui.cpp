@@ -16,6 +16,7 @@ namespace Vulkan
 	{
 		ImGui::CreateContext();
 		m_io = ImGui::GetIO();
+		m_io.ConfigFlags |= (ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_ViewportsEnable);
 		ImGui_ImplGlfw_InitForVulkan(static_cast<GLFWwindow*>(Window::cur_window->GetHandle()), true);
 	}
 

@@ -37,12 +37,12 @@
 //-------------------------------------------------------------
 
 //-------------------------ImGui-------------------------------
-#include "imgui.h"
-#include "imgui_internal.h"
-#include "imconfig.h"
-#include "imstb_rectpack.h"
-#include "imstb_textedit.h"
-#include "imstb_truetype.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_internal.h"
+#include "imgui/imconfig.h"
+#include "imgui/imstb_rectpack.h"
+#include "imgui/imstb_textedit.h"
+#include "imgui/imstb_truetype.h"
 #include "imgui/backends/imgui_impl_vulkan.h"
 #include "imgui/backends/imgui_impl_glfw.h"
 //-------------------------------------------------------------

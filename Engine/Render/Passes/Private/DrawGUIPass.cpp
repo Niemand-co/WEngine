@@ -106,23 +106,24 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		{
-			ImGui::Begin("Inspector");
-			
-			ImGui::BeginMainMenuBar();
-			if (ImGui::BeginMenu("File"))
+			if (ImGui::BeginMainMenuBar())
 			{
-				ImGui::EndMenu();
+				if (ImGui::BeginMenu("File"))
+				{
+					ImGui::EndMenu();
+				}
+				if (ImGui::BeginMenu("Edit"))
+				{
+					ImGui::EndMenu();
+				}
+				ImGui::EndMainMenuBar();
 			}
-			if (ImGui::BeginMenu("Edit"))
-			{
-				ImGui::EndMenu();
-			}
-			ImGui::EndMainMenuBar();
 
+			ImGui::Begin("Inspector");
 			ImGui::ColorEdit4("Top Color", &DrawSkyboxPass::topColor[0]);
 			ImGui::ColorEdit4("Bottom Color", &DrawSkyboxPass::bottomColor[0]);
-
 			ImGui::End();
+
 		}
 		Gui::g_pGui->RenderGUI(cmd);
 		encoder->EndPass();
