@@ -36,7 +36,7 @@ public:
 
 	virtual void Init(GuiConfigure *pConfigure) = 0;
 
-	inline ImGuiIO GetIO() { return m_io; }
+	inline ImGuiIO& GetIO() { return m_io; }
 
 	virtual void BindRenderPass(RHIRenderPass *pRenderPass, unsigned int subpass = 0) = 0;
 

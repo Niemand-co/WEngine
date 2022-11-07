@@ -106,6 +106,7 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		{
+			ImGui::DockSpaceOverViewport();
 			if (ImGui::BeginMainMenuBar())
 			{
 				if (ImGui::BeginMenu("File"))
@@ -124,8 +125,21 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 			ImGui::ColorEdit4("Bottom Color", &DrawSkyboxPass::bottomColor[0]);
 			ImGui::End();
 
+			ImGui::Begin("Display");
+			ImGui::End();
+
 		}
 		Gui::g_pGui->RenderGUI(cmd);
+		ImGui::EndFrame();
+
+		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			GLFWwindow *window = glfwGetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+			glfwMakeContextCurrent(window);
+		}
+
 		encoder->EndPass();
 		encoder->~RHIGraphicsEncoder();
 		WEngine::Allocator::Get()->Deallocate(encoder);
