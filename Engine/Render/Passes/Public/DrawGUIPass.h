@@ -3,6 +3,7 @@
 
 class RHIRenderTarget;
 class RHIPipelineStateObject;
+class RHISampler;
 class GameObject;
 
 class DrawGUIPass : public ScriptableRenderPass
@@ -24,5 +25,9 @@ private:
 	RHIPipelineStateObject *m_pPSO;
 
 	GameObject *m_currentGo;
+
+	RHISampler *m_pSampler;
+
+
 
 };

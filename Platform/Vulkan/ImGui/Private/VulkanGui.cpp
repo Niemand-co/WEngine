@@ -86,21 +86,30 @@ namespace Vulkan
 		if(m_pGameObject == nullptr)
 			return;
 		Material *mat = m_pGameObject->GetComponent<Material>();
-		WEngine::SRefl::TypeInfo<Material>::fields.EachMem([&](auto e)
-		{
-			RE_LOG(WEngine::GetTypeName<decltype(e)>());
-			//if constexpr(e.alist.count > 0)
-			//	e.alist.Get<1>();
-			//if (e.alist.Get<0>() == Range)
-			//{
-			//	//Gui::DrawSlider(e.name, mat->*(e.value), e.alist.Get<1>(), e.alist.Get<2>());
-			//	RE_LOG(e.name);
-			//}
-			//else if (e.alist.Get<0>() == Color)
-			//{
-			//	//Gui::DrawColorEdit(e.name, (float*)&(mat->*(e.value)), true);
-			//}
-		});
+		//WEngine::SRefl::TypeInfo<Material>::fields.EachVar([&](auto e)
+		//{
+		//	if constexpr (e.alist.count > 0)
+		//	{
+		//		constexpr auto property = e.alist.Get<0>();
+		//		if constexpr (property == Range)
+		//		{
+		//			Gui::DrawSlider(e.name, mat->*(e.value), e.alist.Get<1>(), e.alist.Get<2>());
+		//		}
+		//		else if (property == Color)
+		//		{
+		//			//Gui::DrawColorEdit(e.name, (float*)&(mat->*(e.value)), true);
+		//		}
+		//	}
+		//});
+	}
+
+	void VulkanGui::CollectComponents()
+	{
+		
+	}
+
+	void VulkanGui::CollectVariables()
+	{
 	}
 
 }

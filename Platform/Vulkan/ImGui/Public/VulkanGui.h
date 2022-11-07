@@ -20,6 +20,10 @@ namespace Vulkan
 
 		virtual void ShowInspector() override;
 
+		virtual void CollectComponents() override;
+
+		virtual void CollectVariables() override;
+
 	private:
 
 		VkInstance *m_pInstance;

@@ -171,6 +171,12 @@ namespace WEngine
 	template<typename ...Args>
 	struct tuple;
 
+	template<>
+	struct tuple<>
+	{
+
+	};
+
 	template<typename T, typename ...Args>
 	struct tuple<T, Args...> : public tuple<Args...>
 	{
@@ -183,44 +189,26 @@ namespace WEngine
 		constexpr T get_value() const { return element; }
 	};
 
-	template<typename T>
-	struct tuple<T>
-	{
-		typedef T type;
-		enum { count = 1 };
-		T element;
-
-		constexpr tuple(T e) : element(e) {  }
-
-		constexpr T get_value() const { return element; }
-	};
-
-	template<>
-	struct tuple<>
-	{
-
-	};
-
 	template<size_t N, typename ...Args>
 	struct element;
 
 	template<typename T, typename ...Args>
-	struct element<0, T, Args...>
+	struct element<0, tuple<T, Args...>>
 	{
 		typedef T value_type;
 		typedef tuple<T, Args...> class_type;
+	};
+
+	template<size_t N>
+	struct element<N, tuple<>>
+	{
+		static_assert(0 > N, "Out of Index.");
 	};
 
 	template<size_t N, typename T, typename ...Args>
 	struct element<N, tuple<T, Args...>> : public element<N - 1, tuple<Args...>>
 	{
 
-	};
-
-	template<size_t N>
-	struct element<N>
-	{
-		typedef tuple<> class_type;
 	};
 
 	template<size_t N, typename ...Args>

@@ -11,6 +11,8 @@
 #include "Platform/Vulkan/Public/VulkanDevice.h"
 #include "Scene/Public/GameObject.h"
 
+#include "deps/imgui/imgui_internal.h"
+
 DrawGUIPass::DrawGUIPass(RenderPassConfigure *pConfigure)
 	: ScriptableRenderPass(pConfigure)
 {
@@ -25,7 +27,7 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 {
 	RHIAttachmentDescriptor attachmentDescriptors[] =
 	{
-		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::ColorBuffer, AttachmentLayout::Present },
+		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::Present },
 	};
 	SubPassAttachment subpassColorAttachment = { 0, AttachmentLayout::ColorBuffer };
 	RHISubPassDescriptor subpassDescriptors = {};
@@ -105,8 +107,17 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 		ImGui::NewFrame();
 		{
 			ImGui::Begin("Inspector");
-
-			Gui::g_pGui->ShowInspector();
+			
+			ImGui::BeginMainMenuBar();
+			if (ImGui::BeginMenu("File"))
+			{
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Edit"))
+			{
+				ImGui::EndMenu();
+			}
+			ImGui::EndMainMenuBar();
 
 			ImGui::ColorEdit4("Top Color", &DrawSkyboxPass::topColor[0]);
 			ImGui::ColorEdit4("Bottom Color", &DrawSkyboxPass::bottomColor[0]);

@@ -27,6 +27,7 @@ file(GLOB SCENE_SRC Engine/Scene/Private/*.*)
 file(GLOB UTILS_SRC Engine/Utils/Private/*.*)
 file(GLOB ALLOC_SRC Engine/Utils/Allocator/Private/*.*)
 file(GLOB EVENT_SRC Engine/Event/Private/*.*)
+file(GLOB EDITOR_SRC Engine/Editor/Private/*.*)
 file(GLOB ROOT_SRC Engine/Sources/*.cpp Engine/Sources/*.h)
 file(GLOB LOG_SRC Engine/Log/Private/*.*)
 file(GLOB RHI_SRC Engine/RHI/Private/*.*)
@@ -53,6 +54,7 @@ file(GLOB SCENE_INCLUDE Engine/Scene/Public/*.h)
 file(GLOB UTILS_INCLUDE Engine/Utils/Public/*.h)
 file(GLOB ALLOC_INCLUDE Engine/Utils/Allocator/Public/*.h)
 file(GLOB EVENT_INCLUDE Engine/Event/Public/*.h)
+file(GLOB EDITOR_INCLUDE Engine/Editor/Public/*.h)
 file(GLOB LOG_INCLUDE Engine/Log/Public/*.h)
 file(GLOB RHI_INCLUDE Engine/RHI/Public/*.h)
 file(GLOB RHI_ENCODER_INCLUDE Engine/RHI/Encoder/Public/*.h)
@@ -107,6 +109,7 @@ set(WE_SRC
     ${UTILS_SRC}
     ${ALLOC_SRC}
     ${EVENT_SRC}
+    ${EDITOR_SRC}
     ${ROOT_SRC}
     ${PLATFORM_SRC}
     ${PASS_SRC}
@@ -130,6 +133,7 @@ set(WE_INCLUDE
     ${UTILS_INCLUDE}
     ${ALLOC_INCLUDE}
     ${EVENT_INCLUDE}
+    ${EDITOR_INCLUDE}
     ${PLATFORM_INCLUDE}
     ${PASS_INCLUDE}
     ${PIPELINE_INCLUDE}
@@ -162,7 +166,8 @@ source_group(Engine/Utils/Allocator/Private FILES ${ALLOC_SRC})
 source_group(Engine/Sources FILES ${ROOT_SRC})
 source_group(Engine/Scene/Components/Private FILES ${COMP_SRC})
 source_group(Engine/Scene/Private FILES ${SCENE_SRC})
-source_group(Engine/Event/Privatet FILES ${EVENT_SRC})
+source_group(Engine/Event/Private FILES ${EVENT_SRC})
+source_group(Engine/Editor/Private FILES ${EDITOR_SRC})
 source_group(Engine/Log/Private FILES ${LOG_SRC})
 source_group(Engine/Render/Pass/Private FILES ${PASS_SRC})
 source_group(Engine/Render/Mesh/Private FILES ${MESH_SRC})
@@ -187,7 +192,8 @@ source_group(Engine/Utils/Public FILES ${UTILS_INCLUDE})
 source_group(Engine/Utils/Allocator/Public FILES ${ALLOC_INCLUDE})
 source_group(Engine/Scene/Components/Public FILES ${COMP_INCLUDE})
 source_group(Engine/Scene/Public FILES ${SCENE_INCLUDE})
-source_group(Engine/Event/Publict FILES ${EVENT_INCLUDE})
+source_group(Engine/Event/Public FILES ${EVENT_INCLUDE})
+source_group(Engine/Editor/Public FILES ${EDITOR_INCLUDE})
 source_group(Engine/Render/Pass/Public FILES ${PASS_INCLUDE})
 source_group(Engine/Render/Mesh/Public FILES ${MESH_INCLUDE})
 source_group(Engine/Log/Public FILES ${LOG_INCLUDE})

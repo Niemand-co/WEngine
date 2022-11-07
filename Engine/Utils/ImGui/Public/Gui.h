@@ -36,11 +36,17 @@ public:
 
 	virtual void Init(GuiConfigure *pConfigure) = 0;
 
+	inline ImGuiIO GetIO() { return m_io; }
+
 	virtual void BindRenderPass(RHIRenderPass *pRenderPass, unsigned int subpass = 0) = 0;
 
 	virtual void RenderGUI(RHICommandBuffer* pCommandBuffer) = 0;
 
 	virtual void ShowInspector() = 0;
+
+	virtual void CollectComponents() = 0;
+
+	virtual void CollectVariables() = 0;
 
 	inline static void SetSelectedObject(GameObject *pGameObject) { m_pGameObject = pGameObject; }
 

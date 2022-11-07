@@ -23,9 +23,6 @@ int main(int argc, char** argv)
 	WEngine::Application* g_pApp = WEngine::CreateApplication();
 	g_pApp->Tick();
 
-	//constexpr size_t index = WEngine::SRefl::TypeInfo<test>::fields.Find("a");
-	//auto e = WEngine::SRefl::TypeInfo<test>::fields.Get<index>();
-
 	//test t;
 	//t.a = 10;
 
