@@ -1,14 +1,14 @@
 #include "pch.h"
 #include "Example/Public/SandBox.h"
+#include "..\..\Engine\Framework\Public\GuiLayer.h"
 
-GameScene::GameScene(std::string name)
+GameScene::GameScene(std::string_view name)
 	: Layer(name)
 {
 
 	m_isMoving = false;
 	GameObject* go = World::GetWorld()->CreateGameObject("Camera");
 	m_sceneCamera = go->AddComponent<Camera>();
-	m_sceneCamera->SetRenderer(ScriptableRenderPipeline::get()->CreateRenderer());
 	m_sceneCamera->m_aspect = (float)Window::cur_window->GetWidth() / (float)Window::cur_window->GetHeight();
 	go->GetComponent<Transformer>()->SetPosition(glm::vec3(2.0f, 2.0f, 2.0f));
 	
@@ -72,46 +72,15 @@ void GameScene::OnUpdate(WEngine::TimeStep timeStep)
 	}
 }
 
-GuiLayer::GuiLayer(std::string name)
-	: Layer(name)
-{
-
-}
-
-GuiLayer::~GuiLayer()
-{
-}
-
-void GuiLayer::OnAttach()
-{
-}
-
-void GuiLayer::OnDettach()
-{
-}
-
-void GuiLayer::OnEvent(WEngine::Event* pEvent)
-{
-}
-
-void GuiLayer::OnUpdate(WEngine::TimeStep timeStep)
-{
-}
-
 SandBox::SandBox()
 {
-	m_scene = World::CreateWorld();
+	//GameObject *go = m_scene->CreateGameObject("Cube");
+	//MeshFilter *filter = go->AddComponent<MeshFilter>();
+	//filter->SetStaticMesh(Mesh::GetCube());
+	//go->AddComponent<Material>();
+	//Gui::SetSelectedObject(go);
+	//m_pLayerStack->PushLayer(new GameScene("Game Scene"));
 
-	m_renderPipeline = ScriptableRenderPipeline::get();
-
-	GameObject *go = m_scene->CreateGameObject("Cube");
-	MeshFilter *filter = go->AddComponent<MeshFilter>();
-	filter->SetStaticMesh(Mesh::GetCube());
-	go->AddComponent<Material>();
-	Gui::SetSelectedObject(go);
-	m_pLayerStack->PushLayer(new GameScene("Game Scene"));
-
-	m_renderPipeline->Setup();
 }
 
 SandBox::~SandBox()

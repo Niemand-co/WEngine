@@ -16,6 +16,7 @@ namespace WEngine
 
 	void LayerStack::PushLayer(Layer* pLayer)
 	{
+		pLayer->OnAttach();
 		if(m_pLayers.empty())
 			m_pLayers.emplace_back(pLayer);
 		else

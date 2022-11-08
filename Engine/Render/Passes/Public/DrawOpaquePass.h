@@ -13,7 +13,7 @@ class DrawOpaquePass : public ScriptableRenderPass
 {
 public:
 
-	DrawOpaquePass(RenderPassConfigure *configure);
+	DrawOpaquePass();
 
 	virtual ~DrawOpaquePass();
 

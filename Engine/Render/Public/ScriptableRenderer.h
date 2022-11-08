@@ -9,17 +9,11 @@ class RHIFence;
 class RHIEvent;
 struct CameraData;
 
-struct RendererConfigure
-{
-	RHIDevice *pDevice;
-	RHIContext *pContext;
-};
-
 class ScriptableRenderer
 {
 public:
 
-	ScriptableRenderer(RendererConfigure *pConfigure);
+	ScriptableRenderer(RHIContext *pContext);
 
 	virtual ~ScriptableRenderer();
 
@@ -43,7 +37,7 @@ private:
 
 	std::vector<ScriptableRenderPass*> m_passes;
 
-	RHIDevice *m_pDevice;
+	RHIContext *m_pContext;
 
 	std::vector<RHISemaphore*> m_semaphores;
 

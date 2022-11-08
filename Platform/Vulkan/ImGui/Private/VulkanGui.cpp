@@ -20,7 +20,6 @@ namespace Vulkan
 		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 		ImGui::GetIO().ConfigFlags |= ImGuiCol_DockingEmptyBg;
 		ImGui_ImplGlfw_InitForVulkan(static_cast<GLFWwindow*>(Window::cur_window->GetHandle()), true);
-		m_io = ImGui::GetIO();
 	}
 
 

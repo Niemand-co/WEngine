@@ -17,7 +17,7 @@ namespace WEngine
 
 		virtual void OnUpdate(TimeStep timeStep) = 0;
 
-		virtual const std::string GetName() const
+		virtual const std::string_view GetName() const
 		{
 			return m_debugName;
 		}
@@ -34,13 +34,13 @@ namespace WEngine
 
 	protected:
 
-		Layer(std::string name);
+		Layer(std::string_view name);
 
 		virtual ~Layer() = default;
 
 	private:
 
-		std::string m_debugName;
+		std::string_view m_debugName;
 
 	};
 

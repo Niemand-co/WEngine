@@ -1,6 +1,7 @@
 #pragma once
 
 class GameObject;
+class Camera;
 
 namespace WEngine
 {
@@ -24,6 +25,8 @@ namespace WEngine
 	public:
 
 		static std::vector<GameObject*> g_selectedObjects;
+
+		Camera *m_pEditorCamera;
 
 	};
 

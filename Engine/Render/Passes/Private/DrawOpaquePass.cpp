@@ -20,8 +20,7 @@ struct UniformData
 	glm::vec4 surfaceData;
 };
 
-DrawOpaquePass::DrawOpaquePass(RenderPassConfigure* configure)
-	: ScriptableRenderPass(configure)
+DrawOpaquePass::DrawOpaquePass()
 {
 }
 
@@ -247,7 +246,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
 	}
 
-	m_pCommandBuffers = context->GetCommandBuffer(ScriptableRenderPipeline::g_maxFrame, false);
+	m_pCommandBuffers = context->GetCommandBuffer(RHIContext::g_maxFrames, false);
 }
 
 void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
@@ -272,7 +271,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		context->ResetDisplayState();
 	}
 
-	RHICommandBuffer *cmd = m_pCommandBuffers[ScriptableRenderPipeline::g_currentFrame];
+	RHICommandBuffer *cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
 	SurfaceData surfaceData = GameObject::Find("Cube")->GetComponent<Material>()->GetSurfaceData();
 	UniformData data =
@@ -308,7 +307,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		RHIRenderPassBeginDescriptor renderPassBeginDescriptor = {};
 		{
 			renderPassBeginDescriptor.renderPass = m_pRenderPass;
-			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[ScriptableRenderPipeline::g_currentImage];
+			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[RHIContext::g_currentFrame];
 		}
 		encoder->BeginPass(&renderPassBeginDescriptor);
 		//TextureBarrier textureBarriers[] =

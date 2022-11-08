@@ -1,7 +1,9 @@
 #pragma once
 #include "Render/Public/RenderContext.h"
+#include "RHI/Public/RHIInstance.h"
 
 class RHIDevice;
+class RHIGPU;
 class RHIQueue;
 class RHISwapchain;
 class RHISurface;
@@ -30,11 +32,11 @@ class RHIContext : public RenderContext
 {
 public:
 
-	RHIContext(RHIQueue *queue, RHISurface *surface, RHIDevice *device);
+	RHIContext();
 
 	virtual ~RHIContext() = default;
 
-	void Init();
+	static void Init();
 
 	virtual void RecreateSwapchain();
 
@@ -54,7 +56,9 @@ public:
 
 	virtual void Submit(RHISubmitDescriptor *descriptor);
 
-	virtual bool Present(unsigned int imageIndex, RHISemaphore *semaphore);
+	virtual int GetNextImage();
+
+	virtual void Present(unsigned int imageIndex);
 
 	virtual bool IsDisplayChanged();
 
@@ -84,28 +88,65 @@ public:
 
 	virtual RHIPipelineStateObject* CreatePSO(RHIPipelineStateObjectDescriptor *descriptor);
 
-protected:
+public:
 
-	RHIDevice *m_pDevice;
+	static inline RHIContext* GetContext() { return g_pContext; }
 
-	RHIQueue *m_pQueue;
+	static inline RHIInstance* GetInstance() { return g_pInstance; }
 
-	RHISurface *m_pSurface;
+	static inline RHIGPU* GetGPU() { return g_pInstance->GetGPU(0); }
 
-	RHISwapchain *m_pSwapchain;
+	static inline RHIDevice* GetDevice() { return g_pDevice; }
 
-	RHICommandPool *m_pPool;
+	static inline RHIQueue* GetQueue() { return g_pQueue; }
 
-	std::vector<RHITextureView*> m_pTextureViews;
+	template<typename T>
+	static T* CreateRenderPipeline();
 
-	std::vector<RHITexture*> m_pDepthTextures;
+public:
 
-	std::vector<RHITextureView*> m_pDepthTextureViews;
+	static unsigned int g_maxFrames;
 
-	std::vector<RHICommandBuffer*> m_pCommandBuffers;
+	static unsigned int g_currentFrame;
 
-	std::vector<RHICommandBuffer*> m_pPrimaryCommandBuffers;
+private:
 
-	bool m_isDisplayChagned;
+	static RHIInstance* g_pInstance;
+
+	static RHIDevice* g_pDevice;
+
+	static RHISwapchain* g_pSwapchain;
+
+	static RHIContext* g_pContext;
+
+	static RHIQueue *g_pQueue;
+
+	static RHISurface *g_pSurface;
+
+	static RHICommandPool *g_pPool;
+
+	static std::vector<RHISemaphore*> g_pImageAvailibleSemaphores;
+
+	static std::vector<RHISemaphore*> g_pPresentAVailibleSemaphores;
+
+	static std::vector<RHIFence*> g_pFences;
+
+	static std::vector<RHITextureView*> g_pTextureViews;
+
+	static std::vector<RHITexture*> g_pDepthTextures;
+
+	static std::vector<RHITextureView*> g_pDepthTextureViews;
+
+	static std::vector<RHICommandBuffer*> g_pCommandBuffers;
+
+	static std::vector<RHICommandBuffer*> g_pPrimaryCommandBuffers;
+
+	static bool m_isDisplayChagned;
 
 };
+
+template<typename T>
+inline T* RHIContext::CreateRenderPipeline()
+{
+	return new T(g_pContext);
+}

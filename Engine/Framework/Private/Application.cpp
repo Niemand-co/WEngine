@@ -5,6 +5,9 @@
 #include "FrameWork/Public/LayerStack.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Event/Public/WindowInput.h"
+#include "Framework/Public/GuiLayer.h"
+#include "RHI/Public/RHIContext.h"
+#include "Scene/Public/World.h"
 
 namespace WEngine
 {
@@ -25,15 +28,21 @@ namespace WEngine
 	{
 		WEngine::Allocator::Init(WEngine::Backend::Vulkan);
 
-
 		WinProc proc = { "WEngine", 1920u, 1080u };
 		m_window = Window::Get(&proc);
 
 		m_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
+		RHIContext::Init();
+
 		Input::Init();
 
+		World::CreateWorld();
+
 		m_pLayerStack = new LayerStack();
+
+		m_pLayerStack->PushLayer(new GuiLayer("ImGui"));
+
 	}
 
 	void Application::Tick()
@@ -42,7 +51,6 @@ namespace WEngine
 		{
 			m_pLayerStack->OnUpdate(TimeStep::GetTimeStep());
 			m_window->Update();
-			m_renderPipeline->Execute();
 		}
 		Finalize();
 	}

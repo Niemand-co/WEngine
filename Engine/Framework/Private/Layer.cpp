@@ -4,7 +4,7 @@
 namespace WEngine
 {
 
-	Layer::Layer(std::string name)
+	Layer::Layer(std::string_view name)
 		: m_debugName(name)
 	{
 	}

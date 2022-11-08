@@ -9,8 +9,8 @@
 #include "RHI/Public/RHIHeads.h"
 #include "Scene/Components/Public/Camera.h"
 
-ScriptableRenderer::ScriptableRenderer(RendererConfigure *pConfigure)
-	: m_pDevice(pConfigure->pDevice)
+ScriptableRenderer::ScriptableRenderer(RHIContext* pContext)
+	: m_pContext(pContext)
 {
 }
 
@@ -25,7 +25,7 @@ void ScriptableRenderer::Setup(RHIContext* context, CameraData* cameraData)
 		pass->Setup(context, cameraData);
 	}
 
-	m_semaphores = m_pDevice->GetSemaphore(ScriptableRenderPipeline::g_maxFrame * (m_passes.size() - 1));
+	m_semaphores = RHIContext::GetDevice()->GetSemaphore(RHIContext::g_maxFrames * (m_passes.size() - 1));
 }
 
 void ScriptableRenderer::Execute(RHIContext *context, CameraData *cameraData, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence)

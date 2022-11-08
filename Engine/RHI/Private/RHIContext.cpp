@@ -6,27 +6,90 @@
 #include "Utils/Public/Window.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
 
-RHIContext::RHIContext(RHIQueue *queue, RHISurface *surface, RHIDevice *device)
-	: m_pQueue(queue), m_pDevice(device), m_pSurface(surface)
+unsigned int RHIContext::g_maxFrames = 3;
+
+unsigned int RHIContext::g_currentFrame = 0;
+
+RHIInstance* RHIContext::g_pInstance = nullptr;
+
+RHIDevice* RHIContext::g_pDevice = nullptr;
+
+RHISwapchain* RHIContext::g_pSwapchain = nullptr;
+
+RHIContext* RHIContext::g_pContext = nullptr;
+
+RHIQueue* RHIContext::g_pQueue = nullptr;
+
+RHISurface* RHIContext::g_pSurface = nullptr;
+
+RHICommandPool* RHIContext::g_pPool = nullptr;
+
+std::vector<RHISemaphore*> RHIContext::g_pImageAvailibleSemaphores = std::vector<RHISemaphore*>();
+
+std::vector<RHISemaphore*> RHIContext::g_pPresentAVailibleSemaphores = std::vector<RHISemaphore*>();
+
+std::vector<RHIFence*> RHIContext::g_pFences = std::vector<RHIFence*>();
+
+std::vector<RHITextureView*> RHIContext::g_pTextureViews = std::vector<RHITextureView*>();
+
+std::vector<RHITexture*> RHIContext::g_pDepthTextures = std::vector<RHITexture*>();
+
+std::vector<RHITextureView*> RHIContext::g_pDepthTextureViews = std::vector<RHITextureView*>();
+
+std::vector<RHICommandBuffer*> RHIContext::g_pCommandBuffers = std::vector<RHICommandBuffer*>();
+
+std::vector<RHICommandBuffer*> RHIContext::g_pPrimaryCommandBuffers = std::vector<RHICommandBuffer*>();
+
+bool RHIContext::m_isDisplayChagned = false;
+
+RHIContext::RHIContext()
 {
-	m_pPool = queue->GetCommandPool();
 }
 
 void RHIContext::Init()
 {
+	g_pContext = new RHIContext();
+
+	RHIInstanceDescriptor descriptor = {};
+	{
+		descriptor.backend = RHIBackend::Vulkan;
+		descriptor.enableDebugLayer = true;
+		descriptor.enableGPUValidator = true;
+	}
+	g_pInstance = RHIInstance::CreateInstance(&descriptor);
+
+	std::vector<RHIQueueDescriptor> queueDescriptors(1, RHIQueueDescriptor());
+	{
+		queueDescriptors[0].count = 1;
+		queueDescriptors[0].type = RHIQueueType::Graphics;
+	}
+	RHIDeviceDescriptor deviceDescriptor;
+	{
+		deviceDescriptor.queueInfos = queueDescriptors.data();
+		deviceDescriptor.queueInfoCount = queueDescriptors.size();
+	}
+
+	g_pDevice = g_pInstance->GetGPU(0)->CreateDevice(&deviceDescriptor);
+
+	g_pQueue = g_pDevice->GetQueue(RHIQueueType::Graphics, 1);
+
+	g_pPool = g_pQueue->GetCommandPool();
+
+	g_pSurface = g_pInstance->GetSurface();
+
 	RHISwapchainDescriptor swapchainDescriptor = {};
 	{
 		swapchainDescriptor.count = 3;
 		swapchainDescriptor.format = Format::A16R16G16B16_SFloat;
 		swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
 		swapchainDescriptor.presenMode = PresentMode::Immediate;
-		swapchainDescriptor.surface = m_pSurface;
-		swapchainDescriptor.presentFamilyIndex = m_pQueue->GetIndex();
+		swapchainDescriptor.surface = g_pSurface;
+		swapchainDescriptor.presentFamilyIndex = g_pQueue->GetIndex();
 		swapchainDescriptor.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
 	}
-	m_pSwapchain = m_pDevice->CreateSwapchain(&swapchainDescriptor);
+	g_pSwapchain = g_pDevice->CreateSwapchain(&swapchainDescriptor);
 
-	m_pTextureViews.reserve(3);
+	g_pTextureViews.reserve(3);
 	RHITextureViewDescriptor textureViewDescriptor = {};
 	{
 		textureViewDescriptor.format = Format::A16R16G16B16_SFloat;
@@ -46,12 +109,12 @@ void RHIContext::Init()
 		textureDescriptor.mipCount = 1;
 		textureDescriptor.layout = AttachmentLayout::ColorBuffer;
 	}
-	m_pTextureViews.push_back(m_pSwapchain->GetTexture(0)->CreateTextureView(&textureViewDescriptor));
-	m_pTextureViews.push_back(m_pSwapchain->GetTexture(1)->CreateTextureView(&textureViewDescriptor));
-	m_pTextureViews.push_back(m_pSwapchain->GetTexture(2)->CreateTextureView(&textureViewDescriptor));
+	g_pTextureViews.push_back(g_pSwapchain->GetTexture(0)->CreateTextureView(&textureViewDescriptor));
+	g_pTextureViews.push_back(g_pSwapchain->GetTexture(1)->CreateTextureView(&textureViewDescriptor));
+	g_pTextureViews.push_back(g_pSwapchain->GetTexture(2)->CreateTextureView(&textureViewDescriptor));
 
-	m_pDepthTextures.resize(3);
-	m_pDepthTextureViews.resize(3);
+	g_pDepthTextures.resize(3);
+	g_pDepthTextureViews.resize(3);
 	RHITextureDescriptor depthTextureDescriptor = {};
 	{
 		depthTextureDescriptor.format = Format::D16_Unorm;
@@ -61,13 +124,13 @@ void RHIContext::Init()
 		depthTextureDescriptor.mipCount = 1;
 		depthTextureDescriptor.layout = AttachmentLayout::Undefined;
 	}
-	m_pDepthTextures[0] = m_pDevice->CreateTexture(&depthTextureDescriptor);
-	m_pDepthTextures[1] = m_pDevice->CreateTexture(&depthTextureDescriptor);
-	m_pDepthTextures[2] = m_pDevice->CreateTexture(&depthTextureDescriptor);
+	g_pDepthTextures[0] = g_pDevice->CreateTexture(&depthTextureDescriptor);
+	g_pDepthTextures[1] = g_pDevice->CreateTexture(&depthTextureDescriptor);
+	g_pDepthTextures[2] = g_pDevice->CreateTexture(&depthTextureDescriptor);
 
 	for(int i = 0; i < 3; ++i)
 	{
-		TextureBarrier textureBarrier = { m_pDepthTextures[i], AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE, IMAGE_ASPECT_DEPTH };
+		TextureBarrier textureBarrier = { g_pDepthTextures[i], AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE, IMAGE_ASPECT_DEPTH };
 		RHIBarrierDescriptor barrierDescriptor = {};
 		{
 			barrierDescriptor.textureCount = 1;
@@ -75,7 +138,7 @@ void RHIContext::Init()
 			barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
 			barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
 		}
-		ResourceBarrier(&barrierDescriptor);
+		g_pContext->ResourceBarrier(&barrierDescriptor);
 	}
 
 	RHITextureViewDescriptor depthViewDescriptor = {};
@@ -89,17 +152,21 @@ void RHIContext::Init()
 		depthViewDescriptor.imageAspect = IMAGE_ASPECT_DEPTH;
 	}
 	for(int i = 0; i < 3; ++i)
-		m_pDepthTextureViews[i] = m_pDepthTextures[i]->CreateTextureView(&depthViewDescriptor);
+		g_pDepthTextureViews[i] = g_pDepthTextures[i]->CreateTextureView(&depthViewDescriptor);
 
-	m_pPrimaryCommandBuffers = m_pPool->GetCommandBuffer(3u, true);
+	g_pPrimaryCommandBuffers = g_pPool->GetCommandBuffer(3u, true);
+
+	g_pFences = g_pDevice->CreateFence(g_maxFrames);
+	g_pImageAvailibleSemaphores = g_pDevice->GetSemaphore(g_maxFrames);
+	g_pPresentAVailibleSemaphores = g_pDevice->GetSemaphore(g_maxFrames);
 
 	m_isDisplayChagned = false;
 }
 
 void RHIContext::RecreateSwapchain()
 {
-	m_pSwapchain->~RHISwapchain();
-	WEngine::Allocator::Get()->Deallocate(m_pSwapchain);
+	g_pSwapchain->~RHISwapchain();
+	WEngine::Allocator::Get()->Deallocate(g_pSwapchain);
 
 	RHISwapchainDescriptor swapchainDescriptor = {};
 	{
@@ -107,11 +174,11 @@ void RHIContext::RecreateSwapchain()
 		swapchainDescriptor.format = Format::A16R16G16B16_SFloat;
 		swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
 		swapchainDescriptor.presenMode = PresentMode::Immediate;
-		swapchainDescriptor.surface = m_pSurface;
+		swapchainDescriptor.surface = g_pSurface;
 		swapchainDescriptor.presentFamilyIndex = 0;
 		swapchainDescriptor.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
 	}
-	m_pSwapchain = m_pDevice->CreateSwapchain(&swapchainDescriptor);
+	g_pSwapchain = g_pDevice->CreateSwapchain(&swapchainDescriptor);
 
 	RHITextureViewDescriptor textureViewDescriptor = {};
 	{
@@ -124,9 +191,9 @@ void RHIContext::RecreateSwapchain()
 	}
 	for (int i = 0; i < 3; ++i)
 	{
-		m_pTextureViews[i]->~RHITextureView();
-		WEngine::Allocator::Get()->Deallocate(m_pTextureViews[i]);
-		m_pTextureViews[i] = m_pSwapchain->GetTexture(i)->CreateTextureView(&textureViewDescriptor);
+		g_pTextureViews[i]->~RHITextureView();
+		WEngine::Allocator::Get()->Deallocate(g_pTextureViews[i]);
+		g_pTextureViews[i] = g_pSwapchain->GetTexture(i)->CreateTextureView(&textureViewDescriptor);
 	}
 
 	m_isDisplayChagned = true;
@@ -134,58 +201,83 @@ void RHIContext::RecreateSwapchain()
 
 RHITexture* RHIContext::GetTexture(unsigned int index)
 {
-	return m_pSwapchain->GetTexture(index);
+	return g_pSwapchain->GetTexture(index);
 }
 
 RHITextureView* RHIContext::GetTextureView(unsigned int index)
 {
-	return m_pTextureViews[index];
+	return g_pTextureViews[index];
 }
 
 RHITextureView* RHIContext::GetDepthView(unsigned int index)
 {
-	return m_pDepthTextureViews[index];
+	return g_pDepthTextureViews[index];
 }
 
 RHICommandBuffer* RHIContext::GetCommandBuffer(bool isPrimary)
 {
-	return m_pPool->GetCommandBuffer(isPrimary);
+	return g_pPool->GetCommandBuffer(isPrimary);
 }
 
 std::vector<RHICommandBuffer*> RHIContext::GetCommandBuffer(unsigned int count, bool isPrimary)
 {
-	return m_pPool->GetCommandBuffer(count, isPrimary);
+	return g_pPool->GetCommandBuffer(count, isPrimary);
 }
 
 int RHIContext::GetNextImage(RHISemaphore *pSignalSemaphore)
 {
-	return m_pDevice->GetNextImage(m_pSwapchain, pSignalSemaphore);
+	return g_pDevice->GetNextImage(g_pSwapchain, pSignalSemaphore);
 }
 
 void RHIContext::ExecuteCommandBuffer(RHICommandBuffer* cmd)
 {
-	m_pCommandBuffers.push_back(cmd);
+	g_pCommandBuffers.push_back(cmd);
 }
 
 void RHIContext::Submit(RHISubmitDescriptor* descriptor)
 {
-	m_pPrimaryCommandBuffers[ScriptableRenderPipeline::g_currentFrame]->Clear();
-	m_pPrimaryCommandBuffers[ScriptableRenderPipeline::g_currentFrame]->BeginScopePass("Frame");
-	for(unsigned int i = 0; i < m_pCommandBuffers.size(); ++i)
+	g_pPrimaryCommandBuffers[g_currentFrame]->Clear();
+	g_pPrimaryCommandBuffers[g_currentFrame]->BeginScopePass("Frame");
+	for(unsigned int i = 0; i < g_pCommandBuffers.size(); ++i)
 	{
-		m_pPrimaryCommandBuffers[ScriptableRenderPipeline::g_currentFrame]->ExecuteCommandBuffer(m_pCommandBuffers[i]);
+		g_pPrimaryCommandBuffers[g_currentFrame]->ExecuteCommandBuffer(g_pCommandBuffers[i]);
 	}
-	m_pPrimaryCommandBuffers[ScriptableRenderPipeline::g_currentFrame]->EndScopePass();
+	g_pPrimaryCommandBuffers[g_currentFrame]->EndScopePass();
 
 	descriptor->commandBufferCount = 1;
-	descriptor->pCommandBuffers = &m_pPrimaryCommandBuffers[ScriptableRenderPipeline::g_currentFrame];
-	m_pQueue->Submit(descriptor);
-	m_pCommandBuffers.clear();
+	descriptor->pCommandBuffers = &g_pPrimaryCommandBuffers[g_currentFrame];
+	descriptor->pWaitSemaphores = &g_pImageAvailibleSemaphores[g_currentFrame];
+	descriptor->pSignalSemaphores = &g_pPresentAVailibleSemaphores[g_currentFrame];
+	descriptor->pFence = g_pFences[g_currentFrame];
+	g_pQueue->Submit(descriptor);
+	g_pCommandBuffers.clear();
 }
 
-bool RHIContext::Present(unsigned int imageIndex, RHISemaphore *semaphore)
+int RHIContext::GetNextImage()
 {
-	return m_pQueue->Present(m_pSwapchain, imageIndex, semaphore);
+	g_pDevice->WaitForFences(g_pFences[g_currentFrame], 1);
+
+	int currentImage = GetNextImage(g_pImageAvailibleSemaphores[g_currentFrame]);
+	if (currentImage < 0)
+	{
+		g_pInstance->UpdateSurface();
+		g_pContext->RecreateSwapchain();
+		return -1;
+	}
+	g_pDevice->ResetFences(g_pFences[g_currentFrame], 1);
+
+	return currentImage;
+}
+
+void RHIContext::Present(unsigned int imageIndex)
+{
+	if (!g_pQueue->Present(g_pSwapchain, imageIndex, g_pPresentAVailibleSemaphores[g_currentFrame]))
+	{
+		g_pInstance->UpdateSurface();
+		g_pContext->RecreateSwapchain();
+	}
+
+	g_currentFrame = (g_currentFrame + 1) % g_maxFrames;
 }
 
 bool RHIContext::IsDisplayChanged()
@@ -200,7 +292,7 @@ void RHIContext::ResetDisplayState()
 
 void RHIContext::ResourceBarrier(RHIBarrierDescriptor *pDescriptor)
 {
-	RHICommandBuffer *cmd = m_pPool->GetCommandBuffer(true);
+	RHICommandBuffer *cmd = g_pPool->GetCommandBuffer(true);
 	
 	cmd->BeginScopePass("Layout Transition");
 	{
@@ -221,8 +313,8 @@ void RHIContext::ResourceBarrier(RHIBarrierDescriptor *pDescriptor)
 		submitDescriptor.commandBufferCount = 1;
 		submitDescriptor.pCommandBuffers = &cmd;
 	}
-	m_pQueue->Submit(&submitDescriptor);
-	m_pDevice->Wait();
+	g_pQueue->Submit(&submitDescriptor);
+	g_pDevice->Wait();
 	cmd->~RHICommandBuffer();
 	WEngine::Allocator::Get()->Deallocate(cmd);
 }
@@ -230,25 +322,25 @@ void RHIContext::ResourceBarrier(RHIBarrierDescriptor *pDescriptor)
 RHIBuffer* RHIContext::CreateVertexBuffer(RHIBufferDescriptor* descriptor)
 {
 	descriptor->bufferType = BUFFER_USAGE_VERTEX_BUFFER;
-	return m_pDevice->CreateBuffer(descriptor);
+	return g_pDevice->CreateBuffer(descriptor);
 }
 
 RHIBuffer* RHIContext::CreateIndexBuffer(RHIBufferDescriptor* descriptor)
 {
 	descriptor->bufferType = BUFFER_USAGE_INDEX_BUFFER;
-	return m_pDevice->CreateBuffer(descriptor);
+	return g_pDevice->CreateBuffer(descriptor);
 }
 
 RHIBuffer* RHIContext::CreateUniformBuffer(RHIBufferDescriptor* descriptor)
 {
 	descriptor->bufferType = BUFFER_USAGE_UNIFORM_BUFFER;
-	return m_pDevice->CreateBuffer(descriptor);
+	return g_pDevice->CreateBuffer(descriptor);
 }
 
 RHIBuffer* RHIContext::CreateTextureBuffer(RHIBufferDescriptor* descriptor)
 {
 	descriptor->bufferType = BUFFER_USAGE_TRANSFER_SRC;
-	return m_pDevice->CreateBuffer(descriptor);
+	return g_pDevice->CreateBuffer(descriptor);
 }
 
 void RHIContext::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height)
@@ -290,8 +382,8 @@ void RHIContext::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, uns
 		submitDescriptor.commandBufferCount = 1;
 		submitDescriptor.pCommandBuffers = &cmd;
 	}
-	m_pQueue->Submit(&submitDescriptor);
-	m_pDevice->Wait();
+	g_pQueue->Submit(&submitDescriptor);
+	g_pDevice->Wait();
 	cmd->~RHICommandBuffer();
 	WEngine::Allocator::Get()->Deallocate(cmd);
 
@@ -299,7 +391,7 @@ void RHIContext::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, uns
 
 RHIGroupLayout* RHIContext::CreateGroupLayout(RHIGroupLayoutDescriptor* descriptor)
 {
-	return m_pDevice->CreateGroupLayout(descriptor);
+	return g_pDevice->CreateGroupLayout(descriptor);
 }
 
 RHIGroup* RHIContext::CreateResourceGroup(RHIGroupDescriptor* descriptor)
@@ -309,7 +401,7 @@ RHIGroup* RHIContext::CreateResourceGroup(RHIGroupDescriptor* descriptor)
 		poolDescriptor.pGroupLayout = descriptor->pGroupLayout;
 		poolDescriptor.maxSetCount = 3;
 	}
-	RHIGroupPool *pool = m_pDevice->CreateGroupPool(&poolDescriptor);
+	RHIGroupPool *pool = g_pDevice->CreateGroupPool(&poolDescriptor);
 
 	RHIGroup *group = pool->GetGroup();
 
@@ -318,20 +410,20 @@ RHIGroup* RHIContext::CreateResourceGroup(RHIGroupDescriptor* descriptor)
 
 void RHIContext::UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
 {
-	m_pDevice->UpdateUniformResourceToGroup(descriptor);
+	g_pDevice->UpdateUniformResourceToGroup(descriptor);
 }
 
 void RHIContext::UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
 {
-	m_pDevice->UpdateTextureResourceToGroup(descriptor);
+	g_pDevice->UpdateTextureResourceToGroup(descriptor);
 }
 
 RHIPipelineResourceLayout* RHIContext::CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor* descriptor)
 {
-	return m_pDevice->CreatePipelineResourceLayout(descriptor);
+	return g_pDevice->CreatePipelineResourceLayout(descriptor);
 }
 
 RHIPipelineStateObject* RHIContext::CreatePSO(RHIPipelineStateObjectDescriptor* descriptor)
 {
-	return m_pDevice->CreatePipelineStateObject(descriptor);
+	return g_pDevice->CreatePipelineStateObject(descriptor);
 }

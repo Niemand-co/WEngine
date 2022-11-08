@@ -5,7 +5,7 @@ class FinalBlitPass : public ScriptableRenderPass
 {
 public:
 
-	FinalBlitPass(RenderPassConfigure *configure);
+	FinalBlitPass();
 
 	virtual ~FinalBlitPass();
 

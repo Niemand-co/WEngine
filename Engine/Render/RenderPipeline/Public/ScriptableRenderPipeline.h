@@ -15,13 +15,13 @@ struct CameraData;
 
 class ScriptableRenderPipeline
 {
+	friend class RHIContext;
+
 public:
 
-	ScriptableRenderPipeline();
+	ScriptableRenderPipeline(RHIContext *context);
 
 	virtual ~ScriptableRenderPipeline();
-
-	static ScriptableRenderPipeline* get();
 
 	virtual void Init();
 
@@ -31,35 +31,23 @@ public:
 
 	virtual ScriptableRenderer* CreateRenderer();
 
-	virtual void RenderSingleCamera(Camera *camera, RHIContext* context, RHISemaphore* waitSemaphore, RHISemaphore* signalSemaphore, RHIFence* fence);
+	//virtual void RenderSingleCamera(Camera *camera, RHIContext* context);
 
-public:
+protected:
 
-	static int g_currentImage;
+	void* operator new(size_t size)
+	{
+		return WEngine::Allocator::Get()->Allocate(size);
+	}
 
-	static unsigned int g_currentFrame;
+	void operator delete(void* pData)
+	{
+		WEngine::Allocator::Get()->Deallocate(pData);
+	}
 
-	static unsigned int g_maxFrame;
-
-private:
-
-	static ScriptableRenderPipeline *g_instance;
-
-private:
-
-	RHIInstance *m_pInstance;
-
-	RHIDevice *m_pDevice;
-
-	RHISwapchain *m_pSwapchain;
+protected:
 
 	RHIContext *m_pContext;
-
-	std::vector<RHISemaphore*> m_pImageAvailibleSemaphores;
-
-	std::vector<RHISemaphore*> m_pPresentAVailibleSemaphores;
-
-	std::vector<RHIFence*> m_pFences;
 
 	std::vector<Camera*> m_pCameras;
 

@@ -10,7 +10,7 @@ class DrawGUIPass : public ScriptableRenderPass
 {
 public:
 
-	DrawGUIPass(RenderPassConfigure* pConfigure);
+	DrawGUIPass();
 
 	virtual ~DrawGUIPass();
 
@@ -27,7 +27,5 @@ private:
 	GameObject *m_currentGo;
 
 	RHISampler *m_pSampler;
-
-
 
 };

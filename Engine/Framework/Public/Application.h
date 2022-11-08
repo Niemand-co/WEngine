@@ -44,8 +44,6 @@ namespace WEngine
 
 		LayerStack *m_pLayerStack;
 
-		ScriptableRenderPipeline* m_renderPipeline;
-
 	};
 
 	Application* CreateApplication();

@@ -11,18 +11,11 @@ class RHIEvent;
 class RHICommandBuffer;
 struct CameraData;
 
-struct RenderPassConfigure
-{
-	RHIDevice *pDevice;
-	RHIRenderPass *pRenderPass;
-	RHIPipelineStateObject *pPSO;
-};
-
 class ScriptableRenderPass
 {
 public:
 
-	ScriptableRenderPass(RenderPassConfigure *configure);
+	ScriptableRenderPass();
 
 	virtual ~ScriptableRenderPass();
 

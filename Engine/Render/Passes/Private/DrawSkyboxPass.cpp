@@ -12,8 +12,7 @@
 glm::vec4 DrawSkyboxPass::topColor = glm::vec4(1.0f);
 glm::vec4 DrawSkyboxPass::bottomColor = glm::vec4(1.0f);
 
-DrawSkyboxPass::DrawSkyboxPass(RenderPassConfigure* configure)
-	: ScriptableRenderPass(configure)
+DrawSkyboxPass::DrawSkyboxPass()
 {
 }
 
@@ -280,12 +279,12 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 		m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
 	}
 
-	m_pCommandBuffers = context->GetCommandBuffer(ScriptableRenderPipeline::g_maxFrame, false);
+	m_pCommandBuffers = context->GetCommandBuffer(RHIContext::g_maxFrames, false);
 }
 
 void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 {
-	RHICommandBuffer *cmd = m_pCommandBuffers[ScriptableRenderPipeline::g_currentFrame];
+	RHICommandBuffer *cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
 	UniformData data =
 	{
@@ -321,7 +320,7 @@ void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 		RHIRenderPassBeginDescriptor renderpassBeginDescriptor = {};
 		{
 			renderpassBeginDescriptor.renderPass = m_pRenderPass;
-			renderpassBeginDescriptor.renderTarget = m_pRenderTargets[ScriptableRenderPipeline::g_currentImage];
+			renderpassBeginDescriptor.renderTarget = m_pRenderTargets[RHIContext::g_currentFrame];
 		}
 		encoder->BeginPass(&renderpassBeginDescriptor);
 		encoder->SetPipeline(m_pPSO);

@@ -13,8 +13,7 @@
 
 #include "deps/imgui/imgui_internal.h"
 
-DrawGUIPass::DrawGUIPass(RenderPassConfigure *pConfigure)
-	: ScriptableRenderPass(pConfigure)
+DrawGUIPass::DrawGUIPass()
 {
 
 }
@@ -84,14 +83,19 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 	cmd->~RHICommandBuffer();
 	WEngine::Allocator::Get()->Deallocate(cmd);
 
-	m_pCommandBuffers = context->GetCommandBuffer(ScriptableRenderPipeline::g_maxFrame, false);
+	m_pCommandBuffers = context->GetCommandBuffer(RHIContext::g_maxFrames, false);
 
-	m_currentGo = GameObject::Find("Cube");
 }
 
 void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 {
-	RHICommandBuffer* cmd = m_pCommandBuffers[ScriptableRenderPipeline::g_currentFrame];
+	int currentImage = context->GetNextImage();
+	if (currentImage < 0)
+	{
+		return;
+	}
+
+	RHICommandBuffer* cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
 	cmd->BeginScopePass("Test");
 	{
@@ -99,46 +103,11 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 		RHIRenderPassBeginDescriptor renderPassBeginDescriptor = {};
 		{
 			renderPassBeginDescriptor.renderPass = m_pRenderPass;
-			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[ScriptableRenderPipeline::g_currentImage];
+			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[currentImage];
 		}
 		encoder->BeginPass(&renderPassBeginDescriptor);
-		ImGui_ImplVulkan_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-		{
-			ImGui::DockSpaceOverViewport();
-			if (ImGui::BeginMainMenuBar())
-			{
-				if (ImGui::BeginMenu("File"))
-				{
-					ImGui::EndMenu();
-				}
-				if (ImGui::BeginMenu("Edit"))
-				{
-					ImGui::EndMenu();
-				}
-				ImGui::EndMainMenuBar();
-			}
 
-			ImGui::Begin("Inspector");
-			ImGui::ColorEdit4("Top Color", &DrawSkyboxPass::topColor[0]);
-			ImGui::ColorEdit4("Bottom Color", &DrawSkyboxPass::bottomColor[0]);
-			ImGui::End();
-
-			ImGui::Begin("Display");
-			ImGui::End();
-
-		}
 		Gui::g_pGui->RenderGUI(cmd);
-		ImGui::EndFrame();
-
-		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
-			GLFWwindow *window = glfwGetCurrentContext();
-			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault();
-			glfwMakeContextCurrent(window);
-		}
 
 		encoder->EndPass();
 		encoder->~RHIGraphicsEncoder();
@@ -146,4 +115,13 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 	}
 	cmd->EndScopePass();
 	context->ExecuteCommandBuffer(cmd);
+
+	RHISubmitDescriptor submitDescriptor = {};
+	{
+		submitDescriptor.waitSemaphoreCount = 1;
+		submitDescriptor.signalSemaphoreCount = 1;
+		submitDescriptor.waitStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
+	}
+	context->Submit(&submitDescriptor);
+	context->Present(currentImage);
 }

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef WENGINE_RHI_H
-#define WENGINE_RHI_H
 
 class RHIInstanceDescriptor;
 class RHIGPU;
@@ -37,5 +35,3 @@ protected:
 	RHISurface* m_surface;
 
 };
-
-#endif

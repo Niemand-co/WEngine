@@ -57,6 +57,8 @@ private:
 
 	ScriptableRenderer *m_renderer;
 
+
+
 };
 
 struct CameraData

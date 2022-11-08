@@ -1,3 +1,5 @@
+#include "RHI/Public/RHIInstance.h"
+#include "RHI/Public/RHIGPU.h"
 #include "RHI/Public/RHIBuffer.h"
 #include "RHI/Public/RHICommandBuffer.h"
 #include "RHI/Public/RHICommandPool.h"
