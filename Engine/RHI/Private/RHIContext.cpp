@@ -10,6 +10,8 @@ unsigned int RHIContext::g_maxFrames = 3;
 
 unsigned int RHIContext::g_currentFrame = 0;
 
+int RHIContext::g_currentImage = 0;
+
 RHIInstance* RHIContext::g_pInstance = nullptr;
 
 RHIDevice* RHIContext::g_pDevice = nullptr;
@@ -246,9 +248,6 @@ void RHIContext::Submit(RHISubmitDescriptor* descriptor)
 
 	descriptor->commandBufferCount = 1;
 	descriptor->pCommandBuffers = &g_pPrimaryCommandBuffers[g_currentFrame];
-	descriptor->pWaitSemaphores = &g_pImageAvailibleSemaphores[g_currentFrame];
-	descriptor->pSignalSemaphores = &g_pPresentAVailibleSemaphores[g_currentFrame];
-	descriptor->pFence = g_pFences[g_currentFrame];
 	g_pQueue->Submit(descriptor);
 	g_pCommandBuffers.clear();
 }
@@ -257,8 +256,8 @@ int RHIContext::GetNextImage()
 {
 	g_pDevice->WaitForFences(g_pFences[g_currentFrame], 1);
 
-	int currentImage = GetNextImage(g_pImageAvailibleSemaphores[g_currentFrame]);
-	if (currentImage < 0)
+	g_currentImage = GetNextImage(g_pImageAvailibleSemaphores[g_currentFrame]);
+	if (g_currentImage < 0)
 	{
 		g_pInstance->UpdateSurface();
 		g_pContext->RecreateSwapchain();
@@ -266,7 +265,7 @@ int RHIContext::GetNextImage()
 	}
 	g_pDevice->ResetFences(g_pFences[g_currentFrame], 1);
 
-	return currentImage;
+	return g_currentImage;
 }
 
 void RHIContext::Present(unsigned int imageIndex)

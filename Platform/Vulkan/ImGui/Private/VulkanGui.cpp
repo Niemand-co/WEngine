@@ -77,6 +77,11 @@ namespace Vulkan
 		ImGui_ImplVulkan_Init(&m_vulkanInitInfo, *static_cast<VulkanRenderPass*>(pRenderPass)->GetHandle());
 	}
 
+	ImTextureID VulkanGui::LoadTexture(RHITextureView* pTextureView, RHISampler* pSampler)
+	{
+		return (ImTextureID)ImGui_ImplVulkan_AddTexture(*static_cast<VulkanSampler*>(pSampler)->GetHandle(), *static_cast<VulkanTextureView*>(pTextureView)->GetHandle(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	}
+
 	void VulkanGui::RenderGUI(RHICommandBuffer *pCommandBuffer)
 	{
 		ImGui::Render();
@@ -86,9 +91,6 @@ namespace Vulkan
 
 	void VulkanGui::ShowInspector()
 	{
-		if(m_pGameObject == nullptr)
-			return;
-		Material *mat = m_pGameObject->GetComponent<Material>();
 		//WEngine::SRefl::TypeInfo<Material>::fields.EachVar([&](auto e)
 		//{
 		//	if constexpr (e.alist.count > 0)

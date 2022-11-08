@@ -5,10 +5,8 @@ class RHIContext;
 class RHIPipelineStateObject;
 class RHIRenderPass;
 class RHIGroup;
-class RHISemaphore;
-class RHIFence;
-class RHIEvent;
 class RHICommandBuffer;
+class RHISemaphore;
 struct CameraData;
 
 class ScriptableRenderPass

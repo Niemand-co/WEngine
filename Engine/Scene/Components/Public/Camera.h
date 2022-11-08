@@ -3,7 +3,14 @@
 
 class GameObject;
 class ScriptableRenderer;
+class RHITextureView;
 struct CameraData;
+
+struct RenderTarget
+{
+	RHITextureView *pColorTexture;
+	RHITextureView *pDepthTexture;
+};
 
 class Camera : public Component
 {
@@ -22,6 +29,8 @@ public:
 	glm::mat4x4 GetProjectionMatrix();
 
 	void SetRenderer(ScriptableRenderer *renderer);
+
+	inline RenderTarget& GetRenderTarget(unsigned int index) { return m_rendertargets[index]; }
 
 	ScriptableRenderer* GetRenderer();
 
@@ -57,7 +66,7 @@ private:
 
 	ScriptableRenderer *m_renderer;
 
-
+	std::vector<RenderTarget> m_rendertargets;
 
 };
 
@@ -68,6 +77,7 @@ struct CameraData
 	glm::mat4x4 MatrixV;
 	glm::mat4x4 MatrixP;
 	glm::mat4x4 MatrixVP;
+	RenderTarget *pRenderTarget;
 };
 
 namespace WEngine

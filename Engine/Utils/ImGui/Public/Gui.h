@@ -7,6 +7,8 @@ class RHIDevice;
 class RHIQueue;
 class RHIRenderPass;
 class RHICommandBuffer;
+class RHITextureView;
+class RHISampler;
 class GameObject;
 
 struct GuiConfigure
@@ -40,6 +42,8 @@ public:
 
 	virtual void BindRenderPass(RHIRenderPass *pRenderPass, unsigned int subpass = 0) = 0;
 
+	virtual ImTextureID LoadTexture(RHITextureView *pTextureView, RHISampler* pSampler) = 0;
+
 	virtual void RenderGUI(RHICommandBuffer* pCommandBuffer) = 0;
 
 	virtual void ShowInspector() = 0;
@@ -47,8 +51,6 @@ public:
 	virtual void CollectComponents() = 0;
 
 	virtual void CollectVariables() = 0;
-
-	inline static void SetSelectedObject(GameObject *pGameObject) { m_pGameObject = pGameObject; }
 
 public:
 
@@ -68,8 +70,6 @@ public:
 protected:
 
 	ImGuiIO m_io;
-
-	static GameObject *m_pGameObject;
 
 };
 

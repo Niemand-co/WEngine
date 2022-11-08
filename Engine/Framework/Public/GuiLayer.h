@@ -1,6 +1,9 @@
 #pragma once
 #include "Framework/Public/Layer.h"
 
+class RHITexture;
+class RHISampler;
+
 namespace WEngine
 {
 
@@ -25,7 +28,11 @@ namespace WEngine
 
 	private:
 
-		GuiRenderPipeline *m_pPipeline;
+		RHISampler *m_pSampler;
+
+		RHITexture *m_pTexture;
+
+		ImTextureID m_imageID;
 
 	};
 

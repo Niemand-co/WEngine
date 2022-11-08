@@ -1,14 +1,25 @@
 #include "pch.h"
 #include "Editor/Public/Editor.h"
 #include "Scene/Public/GameObject.h"
+#include "Scene/Public/World.h"
+#include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 
 namespace WEngine
 {
 
 	std::vector<GameObject*> Editor::g_selectedObjects = std::vector<GameObject*>();
 
+	Camera* Editor::g_pEditorCamera = nullptr;
+
 	Editor::Editor()
 	{
+	}
+
+	void Editor::Init()
+	{
+		GameObject *go = World::GetWorld()->CreateGameObject("Editor");
+		Camera *pCamera = g_pEditorCamera = go->AddComponent<Camera>();
+		pCamera->SetRenderer(ScriptableRenderPipeline::CreateRenderer());
 	}
 
 	void Editor::SelectObject(GameObject* pGameObject)

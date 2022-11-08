@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Scene/Public/Object.h"
 #include "Scene/Components/Public/Transformer.h"
 #include "Scene/Components/Public/MeshFilter.h"
@@ -43,15 +42,6 @@ inline T* GameObject::AddComponent()
 	m_components.push_back(component);
 	return component;
 }
-
-template<typename T>
-struct remove_reference { typedef T type; };
-
-template<typename T>
-struct remove_reference<T&> { typedef T type; };
-
-template<typename T>
-struct remove_reference<T&&> { typedef T type; };
 
 template<typename T>
 inline T* GameObject::GetComponent()

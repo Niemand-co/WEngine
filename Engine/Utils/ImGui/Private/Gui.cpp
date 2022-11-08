@@ -4,8 +4,6 @@
 
 Gui* Gui::g_pGui = nullptr;
 
-GameObject* Gui::m_pGameObject = nullptr;
-
 Gui* Gui::CreateGui(WEngine::Backend backend)
 {
 	switch (backend)

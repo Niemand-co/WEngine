@@ -22,8 +22,6 @@ ScriptableRenderPipeline::~ScriptableRenderPipeline()
 
 void ScriptableRenderPipeline::Init()
 {
-
-
 	m_pCameras = World::GetWorld()->GetCameras();
 }
 
@@ -36,8 +34,8 @@ void ScriptableRenderPipeline::Setup()
 	{
 		CameraData *data = camera->GetData();
 		ScriptableRenderer* renderer = camera->GetRenderer();
-		//renderer->EnqueRenderPass(new DrawOpaquePass(&configure));
-		//renderer->EnqueRenderPass(new DrawSkyboxPass(&configure));
+		renderer->EnqueRenderPass(new DrawOpaquePass());
+		//renderer->EnqueRenderPass(new DrawSkyboxPass());
 		renderer->Setup(m_pContext, data);
 		m_pCameraDatas.push_back(data);
 	}
@@ -45,12 +43,15 @@ void ScriptableRenderPipeline::Setup()
 
 void ScriptableRenderPipeline::Execute()
 {
-
+	for (Camera* camera : m_pCameras)
+	{
+		camera->GetRenderer()->Execute(m_pContext, camera->GetData());
+	}
 }
 
 ScriptableRenderer* ScriptableRenderPipeline::CreateRenderer()
 {
-	ScriptableRenderer *renderer = new ScriptableRenderer(m_pContext);
+	ScriptableRenderer *renderer = new ScriptableRenderer(RHIContext::GetContext());
 	
 	return renderer;
 }

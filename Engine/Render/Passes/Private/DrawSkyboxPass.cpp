@@ -8,6 +8,7 @@
 #include "Render/Mesh/Public/Vertex.h"
 #include "Scene/Components/Public/Camera.h"
 #include "Utils/Public/Window.h"
+#include "Editor/Public/Screen.h"
 
 glm::vec4 DrawSkyboxPass::topColor = glm::vec4(1.0f);
 glm::vec4 DrawSkyboxPass::bottomColor = glm::vec4(1.0f);
@@ -67,7 +68,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 		subpassDescriptor.pDepthStencilAttachment = &depthStencilAttachment;
 		subpassDescriptor.dependedPass = -1;
 		subpassDescriptor.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		subpassDescriptor.waitingStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
+		subpassDescriptor.waitingStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT | PIPELINE_STAGE_FRAGMENT_SHADER;
 		subpassDescriptor.waitingAccess = ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE;
 	}
 
@@ -273,8 +274,8 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 			renderTargetDescriptor.bufferCount = 2;
 			renderTargetDescriptor.pBufferView = textureViews.data();
 			renderTargetDescriptor.renderPass = m_pRenderPass;
-			renderTargetDescriptor.width = Window::cur_window->GetWidth();
-			renderTargetDescriptor.height = Window::cur_window->GetHeight();
+			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
+			renderTargetDescriptor.height = WEngine::Screen::GetHeight();
 		}
 		m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
 	}

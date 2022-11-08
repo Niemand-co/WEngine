@@ -8,6 +8,7 @@
 #include "Framework/Public/GuiLayer.h"
 #include "RHI/Public/RHIContext.h"
 #include "Scene/Public/World.h"
+#include "Editor/Public/Editor.h"
 
 namespace WEngine
 {
@@ -38,6 +39,8 @@ namespace WEngine
 		Input::Init();
 
 		World::CreateWorld();
+
+		Editor::Init();
 
 		m_pLayerStack = new LayerStack();
 

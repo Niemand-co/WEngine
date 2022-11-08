@@ -9,17 +9,21 @@ namespace WEngine
 		
 		Screen();
 
-		~Screen();
+		~Screen() = default;
 
-		unsigned int GetWidth();
+		static void SetWidth(unsigned int width);
 
-		unsigned int GetHeight();
+		static void SetHeight(unsigned int height);
+
+		static unsigned int GetWidth();
+
+		static unsigned int GetHeight();
 
 	private:
 
-		unsigned int m_width;
+		static unsigned int m_width;
 
-		unsigned int m_height;
+		static unsigned int m_height;
 
 	};
 

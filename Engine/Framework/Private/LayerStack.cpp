@@ -2,6 +2,7 @@
 #include "Framework/Public/LayerStack.h"
 #include "Framework/Public/Layer.h"
 #include "Event/Public/Event.h"
+#include "RHI/Public/RHIContext.h"
 
 namespace WEngine
 {
@@ -40,6 +41,11 @@ namespace WEngine
 
 	void LayerStack::OnUpdate(TimeStep timeStep)
 	{
+		int currentImage = RHIContext::GetContext()->GetNextImage();
+		if (currentImage < 0)
+		{
+			return;
+		}
 		for (unsigned int i = 0; i < m_pLayers.size(); ++i)
 		{
 			m_pLayers[i]->OnUpdate(timeStep);

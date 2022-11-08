@@ -58,6 +58,12 @@ public:
 
 	virtual int GetNextImage();
 
+	virtual RHISemaphore* GetImageVailableSemaphore() { return g_pImageAvailibleSemaphores[g_currentFrame]; }
+
+	virtual RHISemaphore* GetPresentVailableSemaphore() { return g_pPresentAVailibleSemaphores[g_currentFrame]; }
+
+	virtual RHIFence* GetFence() { return g_pFences[g_currentFrame]; }
+
 	virtual void Present(unsigned int imageIndex);
 
 	virtual bool IsDisplayChanged();
@@ -108,6 +114,8 @@ public:
 	static unsigned int g_maxFrames;
 
 	static unsigned int g_currentFrame;
+
+	static int g_currentImage;
 
 private:
 

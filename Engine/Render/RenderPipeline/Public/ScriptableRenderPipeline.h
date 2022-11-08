@@ -29,7 +29,7 @@ public:
 
 	virtual void Execute();
 
-	virtual ScriptableRenderer* CreateRenderer();
+	static ScriptableRenderer* CreateRenderer();
 
 	//virtual void RenderSingleCamera(Camera *camera, RHIContext* context);
 

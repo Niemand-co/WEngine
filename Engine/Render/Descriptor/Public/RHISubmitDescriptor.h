@@ -14,6 +14,8 @@ public:
 
 public:
 
+	std::string_view submissionName;
+
 	RHISemaphore **pWaitSemaphores;
 
 	unsigned int waitSemaphoreCount;

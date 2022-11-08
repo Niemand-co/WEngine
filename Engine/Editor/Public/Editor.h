@@ -14,6 +14,8 @@ namespace WEngine
 
 		~Editor() = default;
 
+		static void Init();
+
 		static void SelectObject(GameObject *pGameObject);
 
 		static void SelectObject(const std::vector<GameObject*>& gameObjects);
@@ -26,7 +28,7 @@ namespace WEngine
 
 		static std::vector<GameObject*> g_selectedObjects;
 
-		Camera *m_pEditorCamera;
+		static Camera *g_pEditorCamera;
 
 	};
 

@@ -25,24 +25,33 @@ void ScriptableRenderer::Setup(RHIContext* context, CameraData* cameraData)
 		pass->Setup(context, cameraData);
 	}
 
-	m_semaphores = RHIContext::GetDevice()->GetSemaphore(RHIContext::g_maxFrames * (m_passes.size() - 1));
+	m_pSignalSemaphore = RHIContext::GetDevice()->GetSemaphore(1);
+	m_blockSubmission.push_back("Gui");
+
+	WEngine::Trigger *trigger = new WEngine::Trigger();
+	trigger->signal = m_pSignalSemaphore[0];
+	trigger->waitingSubmissionCount = m_blockSubmission.size();
+	trigger->pSubmissionNames = m_blockSubmission.data();
+	WEngine::Synchronizer::RegisterTrigger(trigger);
 }
 
-void ScriptableRenderer::Execute(RHIContext *context, CameraData *cameraData, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence)
+void ScriptableRenderer::Execute(RHIContext *context, CameraData *cameraData)
 {
 	for (unsigned int i = 0; i < m_passes.size(); ++i)
 	{
 		m_passes[i]->Execute(context, cameraData);
 	}
 
+	RHISemaphore *waitSemaphores[] = { context->GetImageVailableSemaphore() };
+
 	RHISubmitDescriptor submitDescriptor = {};
 	{
 		submitDescriptor.waitSemaphoreCount = 1;
-		submitDescriptor.pWaitSemaphores = &waitSemaphore;
-		submitDescriptor.signalSemaphoreCount = 1;
-		submitDescriptor.pSignalSemaphores = &signalSemaphore;
+		submitDescriptor.pWaitSemaphores = waitSemaphores;
+		submitDescriptor.signalSemaphoreCount = m_pSignalSemaphore.size();
+		submitDescriptor.pSignalSemaphores = m_pSignalSemaphore.data();
 		submitDescriptor.waitStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		submitDescriptor.pFence = fence;
+		submitDescriptor.pFence = nullptr;
 	}
 	context->Submit(&submitDescriptor);
 }

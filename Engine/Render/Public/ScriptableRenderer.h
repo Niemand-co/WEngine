@@ -19,7 +19,7 @@ public:
 
 	virtual void Setup(RHIContext* context, CameraData *cameraData);
 
-	virtual void Execute(RHIContext *context, CameraData* cameraData, RHISemaphore *waitSemaphore, RHISemaphore *signalSemaphore, RHIFence *fence);
+	virtual void Execute(RHIContext *context, CameraData* cameraData);
 
 	virtual void EnqueRenderPass(ScriptableRenderPass* renderPass);
 
@@ -39,8 +39,12 @@ private:
 
 	RHIContext *m_pContext;
 
-	std::vector<RHISemaphore*> m_semaphores;
-
 	RHIEvent * m_pEvent;
+
+	std::vector<RHISemaphore*> m_pWaitSemaphore;
+
+	std::vector<RHISemaphore*> m_pSignalSemaphore;
+
+	std::vector<std::string_view> m_blockSubmission;
 
 };

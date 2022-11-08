@@ -18,10 +18,15 @@
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Render/Public/ScriptableRenderer.h"
 
+#include "RHI/Public/RHIHeads.h"
+#include "Render/Descriptor/Public/RHIDescriptorHeads.h"
+
 #include "Render/Mesh/Public/Mesh.h"
 
 #include "Utils/Public/Window.h"
 #include "Utils/ImGui/Public/Gui.h"
+
+#include "Editor/Public/Editor.h"
 
 #include "Framework/Public/Application.h"
 

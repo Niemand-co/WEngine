@@ -53,6 +53,7 @@
 #include "Math/Matrix.h"
 #include "Log/Public/Logger.h"
 #include "Platform/Vulkan/Allocator/Public/VulkanAllocator.h"
+#include "Utils/Public/Synchronizer.h"
 #include "Platform/Vulkan/Public/VulkanMacro.h"
 #include "Render/Public/RenderCore.h"
 #include "RHI/Public/RHICore.h"

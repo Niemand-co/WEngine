@@ -11,6 +11,7 @@
 #include "Render/Mesh/Public/Vertex.h"
 #include "Scene/Public/GameObject.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
+#include "Editor/Public/Screen.h"
 
 struct UniformData
 {
@@ -21,14 +22,6 @@ struct UniformData
 };
 
 DrawOpaquePass::DrawOpaquePass()
-{
-}
-
-DrawOpaquePass::~DrawOpaquePass()
-{
-}
-
-void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 {
 	RHIAttachmentDescriptor attachmentDescriptors[] =
 	{
@@ -55,6 +48,15 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		renderPassDescriptor.pSubPassDescriptors = &subpassDescriptors;
 	}
 	m_pRenderPass = m_pDevice->CreateRenderPass(&renderPassDescriptor);
+}
+
+DrawOpaquePass::~DrawOpaquePass()
+{
+}
+
+void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
+{
+
 
 	ShaderCodeBlob* vertBlob = new ShaderCodeBlob("../assets/vert.spv");
 	RHIShaderDescriptor vertShaderDescriptor = {};
@@ -234,14 +236,15 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
-		std::vector<RHITextureView*> textureViews = { context->GetTextureView(i), context->GetDepthView(i) };
+		RenderTarget &target = cameraData->camera->GetRenderTarget(i);
+		std::vector<RHITextureView*> textureViews = { target.pColorTexture, target.pDepthTexture };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
 			renderTargetDescriptor.bufferCount = 2;
 			renderTargetDescriptor.pBufferView = textureViews.data();
 			renderTargetDescriptor.renderPass = m_pRenderPass;
-			renderTargetDescriptor.width = Window::cur_window->GetWidth();
-			renderTargetDescriptor.height = Window::cur_window->GetHeight();
+			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
+			renderTargetDescriptor.height = WEngine::Screen::GetHeight();
 		}
 		m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
 	}
@@ -261,8 +264,8 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 				renderTargetDescriptor.bufferCount = 1;
 				renderTargetDescriptor.pBufferView = textureViews.data();
 				renderTargetDescriptor.renderPass = m_pRenderPass;
-				renderTargetDescriptor.width = Window::cur_window->GetWidth();
-				renderTargetDescriptor.height = Window::cur_window->GetHeight();
+				renderTargetDescriptor.width = WEngine::Screen::GetWidth();
+				renderTargetDescriptor.height = WEngine::Screen::GetHeight();
 			}
 			m_pRenderTargets[i]->~RHIRenderTarget();
 			WEngine::Allocator::Get()->Deallocate(m_pRenderTargets[i]);
@@ -310,19 +313,6 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[RHIContext::g_currentFrame];
 		}
 		encoder->BeginPass(&renderPassBeginDescriptor);
-		//TextureBarrier textureBarriers[] =
-		//{
-		//	//{ context->GetTexture(ScriptableRenderPipeline::g_currentImage), AttachmentLayout::Undefined, AttachmentLayout::ColorBuffer, 0, ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE },
-		//	{ m_pDepthTextures[ScriptableRenderPipeline::g_currentImage], AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE }
-		//};
-		//RHIBarrierDescriptor barrierDescriptor = {};
-		//{
-		//	barrierDescriptor.textureCount = 1;
-		//	barrierDescriptor.pTextureBarriers = textureBarriers;
-		//	barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
-		//	barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
-		//}
-		//encoder->ResourceBarrier(&barrierDescriptor);
 		encoder->SetPipeline(m_pPSO);
 		encoder->SetViewport(nullptr);
 		encoder->SetScissor(nullptr);

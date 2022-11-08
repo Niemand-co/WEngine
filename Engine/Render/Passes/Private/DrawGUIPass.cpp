@@ -15,15 +15,6 @@
 
 DrawGUIPass::DrawGUIPass()
 {
-
-}
-
-DrawGUIPass::~DrawGUIPass()
-{
-}
-
-void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
-{
 	RHIAttachmentDescriptor attachmentDescriptors[] =
 	{
 		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::Present },
@@ -45,6 +36,16 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 		renderPassDescriptor.pSubPassDescriptors = &subpassDescriptors;
 	}
 	m_pRenderPass = m_pDevice->CreateRenderPass(&renderPassDescriptor);
+	Gui::g_pGui->BindRenderPass(m_pRenderPass);
+}
+
+DrawGUIPass::~DrawGUIPass()
+{
+}
+
+void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
+{
+
 
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
@@ -61,7 +62,6 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 		m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
 	}
 
-	Gui::g_pGui->BindRenderPass(m_pRenderPass);
 
 	RHICommandBuffer* cmd = context->GetCommandBuffer(false);
 	cmd->BeginScopePass("BindFont");
@@ -89,12 +89,6 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 
 void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 {
-	int currentImage = context->GetNextImage();
-	if (currentImage < 0)
-	{
-		return;
-	}
-
 	RHICommandBuffer* cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
 	cmd->BeginScopePass("Test");
@@ -103,7 +97,7 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 		RHIRenderPassBeginDescriptor renderPassBeginDescriptor = {};
 		{
 			renderPassBeginDescriptor.renderPass = m_pRenderPass;
-			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[currentImage];
+			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[RHIContext::g_currentImage];
 		}
 		encoder->BeginPass(&renderPassBeginDescriptor);
 
@@ -116,12 +110,24 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 	cmd->EndScopePass();
 	context->ExecuteCommandBuffer(cmd);
 
+	RHISemaphore *signals[] = { context->GetPresentVailableSemaphore() };
+	std::vector<WEngine::Trigger*> waitingSemaphores = WEngine::Synchronizer::GetTrigger("Gui");
+	std::vector<RHISemaphore*> waits;
+	waits.resize(waitingSemaphores.size());
+	for(int i = 0; i < waitingSemaphores.size(); ++i)
+	{
+		waits[i] = waitingSemaphores[i]->signal;
+	}
+
 	RHISubmitDescriptor submitDescriptor = {};
 	{
-		submitDescriptor.waitSemaphoreCount = 1;
+		submitDescriptor.waitSemaphoreCount = waits.size();
+		submitDescriptor.pWaitSemaphores = waits.data();
 		submitDescriptor.signalSemaphoreCount = 1;
+		submitDescriptor.pSignalSemaphores = signals;
 		submitDescriptor.waitStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
+		submitDescriptor.pFence = context->GetFence();
 	}
 	context->Submit(&submitDescriptor);
-	context->Present(currentImage);
+	context->Present(RHIContext::g_currentImage);
 }

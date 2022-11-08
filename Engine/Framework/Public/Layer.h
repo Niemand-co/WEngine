@@ -1,5 +1,7 @@
 #pragma once
 
+class ScriptableRenderPipeline;
+
 namespace WEngine
 {
 
@@ -38,9 +40,11 @@ namespace WEngine
 
 		virtual ~Layer() = default;
 
-	private:
+	protected:
 
 		std::string_view m_debugName;
+
+		ScriptableRenderPipeline *m_pPipeline;
 
 	};
 

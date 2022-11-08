@@ -41,6 +41,8 @@ public:
 
 	virtual ComponentType GetType() { return m_type; }
 
+	inline GameObject* GetGameObject() { return m_pGameObject; } ;
+
 	virtual bool IsType(ComponentType type) 
 	{
 		return type == m_type; 
