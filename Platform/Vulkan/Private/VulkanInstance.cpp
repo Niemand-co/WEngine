@@ -105,7 +105,7 @@ namespace Vulkan
 
 	void VulkanInstance::UpdateSurface()
 	{
-		vkDestroySurfaceKHR(*m_pInstance, *m_pSurface, nullptr);
+		vkDestroySurfaceKHR(*m_pInstance, *m_pSurface, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
 
 		VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
 		surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;

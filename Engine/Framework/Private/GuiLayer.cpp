@@ -9,6 +9,7 @@
 #include "Scene/Components/Public/Camera.h"
 #include "Event/Public/Event.h"
 #include "Event/Public/WindowEvent.h"
+#include "Event/Public/MouseButtonEvent.h"
 
 namespace WEngine
 {
@@ -58,7 +59,7 @@ namespace WEngine
 			uvd.imageAspect = IMAGE_ASPECT_COLOR;
 		}
 
-		m_imageID = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(RHIContext::g_currentFrame).pColorTexture, m_pSampler);
+		
 	}
 
 	GuiLayer::~GuiLayer()
@@ -77,7 +78,17 @@ namespace WEngine
 
 	void GuiLayer::OnEvent(WEngine::Event* pEvent)
 	{
-		WEngine::EventDispatcher dispather(pEvent);
+		WEngine::EventDispatcher dispatcher(pEvent);
+
+		dispatcher.Dispatch<WEngine::MouseButtonPressedEvent>([this](WEngine::MouseButtonPressedEvent* pEvent) -> bool
+		{
+			return false;
+		});
+
+		dispatcher.Dispatch<WEngine::MouseButtonReleasedEvent>([this](WEngine::MouseButtonReleasedEvent* pEvent) -> bool
+		{
+			return false;
+		});
 	}
 
 	void GuiLayer::OnUpdate(WEngine::TimeStep timeStep)
@@ -104,6 +115,7 @@ namespace WEngine
 			ImGui::End();
 
 			ImGui::Begin("Display");
+			m_imageID = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(RHIContext::g_currentFrame).pColorTexture, m_pSampler);
 			ImGui::Image(m_imageID, ImVec2(Screen::GetWidth(), Screen::GetHeight()));
 			ImGui::End();
 

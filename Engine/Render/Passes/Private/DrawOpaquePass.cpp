@@ -25,8 +25,8 @@ DrawOpaquePass::DrawOpaquePass()
 {
 	RHIAttachmentDescriptor attachmentDescriptors[] =
 	{
-		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::DontCare, AttachmentLayout::Undefined, AttachmentLayout::ColorBuffer },
-		{ Format::D16_Unorm, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::DontCare, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer }
+		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::ColorBuffer },
+		{ Format::D16_Unorm, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer }
 	};
 	SubPassAttachment subpassColorAttachment = { 0, AttachmentLayout::ColorBuffer };
 	SubPassAttachment subpassDepthAttachment = { 1, AttachmentLayout::DepthBuffer };

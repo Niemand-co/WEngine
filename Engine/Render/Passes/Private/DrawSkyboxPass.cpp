@@ -17,8 +17,8 @@ DrawSkyboxPass::DrawSkyboxPass()
 {
 	RHIAttachmentDescriptor attachmentDescriptors[] =
 	{
-		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::DontCare, AttachmentStoreOP::DontCare, AttachmentLayout::ColorBuffer, AttachmentLayout::ColorBuffer },
-		{ Format::D16_Unorm, 1, AttachmentLoadOP::DontCare, AttachmentStoreOP::DontCare, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::DepthBuffer, AttachmentLayout::DepthBuffer }
+		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::ColorBuffer, AttachmentLayout::ColorBuffer },
+		{ Format::D16_Unorm, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::DepthBuffer, AttachmentLayout::DepthBuffer }
 	};
 
 	SubPassAttachment colorAttachments[] = { { 0, AttachmentLayout::ColorBuffer } };
@@ -31,8 +31,8 @@ DrawSkyboxPass::DrawSkyboxPass()
 		subpassDescriptor.pDepthStencilAttachment = &depthStencilAttachment;
 		subpassDescriptor.dependedPass = -1;
 		subpassDescriptor.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		subpassDescriptor.waitingStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT | PIPELINE_STAGE_FRAGMENT_SHADER;
-		subpassDescriptor.waitingAccess = ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE;
+		subpassDescriptor.waitingStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS | PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT | PIPELINE_STAGE_FRAGMENT_SHADER;
+		subpassDescriptor.waitingAccess = ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE;
 	}
 
 	RHIRenderPassDescriptor renderpassDescriptor = {};
@@ -269,7 +269,8 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
-		std::vector<RHITextureView*> textureViews = { context->GetTextureView(i), context->GetDepthView(i) };
+		RenderTarget& target = cameraData->camera->GetRenderTarget(i);
+		std::vector<RHITextureView*> textureViews = { target.pColorTexture, target.pDepthTexture };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
 			renderTargetDescriptor.bufferCount = 2;

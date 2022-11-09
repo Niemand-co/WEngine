@@ -50,6 +50,7 @@ namespace WEngine
 		{
 			m_pLayers[i]->OnUpdate(timeStep);
 		}
+		RHIContext::GetContext()->Present(RHIContext::g_currentImage);
 	}
 
 }

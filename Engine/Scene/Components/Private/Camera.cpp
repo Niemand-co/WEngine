@@ -21,7 +21,7 @@ Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, c
 		RHITextureDescriptor descriptor = {};
 		{
 			descriptor.format = Format::A16R16G16B16_SFloat;
-			descriptor.usage = IMAGE_USAGE_COLOR_ATTACHMENT;
+			descriptor.usage = IMAGE_USAGE_COLOR_ATTACHMENT | IMAGE_USAGE_SAMPLED;
 			descriptor.width = WEngine::Screen::GetWidth();
 			descriptor.height = WEngine::Screen::GetHeight();
 			descriptor.layout = AttachmentLayout::Undefined;

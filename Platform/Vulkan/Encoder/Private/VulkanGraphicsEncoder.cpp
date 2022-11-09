@@ -4,6 +4,7 @@
 #include "Render/Descriptor/Public/RHIRenderPassBeginDescriptor.h"
 #include "Render/Descriptor/Public/RHIBarrierDescriptor.h"
 #include "Utils/Public/Window.h"
+#include "Editor/Public/Screen.h"
 
 namespace Vulkan
 {
@@ -42,8 +43,8 @@ namespace Vulkan
 	void VulkanGraphicsEncoder::SetViewport(RHIViewport* viewports)
 	{
 		VkViewport viewport = {};
-		viewport.width = Window::cur_window->GetWidth();
-		viewport.height = Window::cur_window->GetHeight();
+		viewport.width = WEngine::Screen::GetWidth();
+		viewport.height = WEngine::Screen::GetHeight();
 		viewport.x = 0.0f;
 		viewport.y = 0.0f;
 		viewport.minDepth = 0.0f;
@@ -55,7 +56,7 @@ namespace Vulkan
 	{
 		VkRect2D rect = {};
 		rect.offset = { 0, 0 };
-		rect.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
+		rect.extent = { WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight() };
 		vkCmdSetScissor(*m_cmd, 0, 1, &rect);
 	}
 

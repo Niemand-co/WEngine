@@ -8,11 +8,11 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanCommandBuffer(VkCommandBuffer *commandBuffer,VkCommandPool *pCommandPool, VkDevice *pDevice);
+		VulkanCommandBuffer(VkCommandBuffer *commandBuffer,VkCommandPool *pCommandPool, bool isSecondary, VkDevice *pDevice);
 
 		virtual ~VulkanCommandBuffer();
 
-		virtual void BeginScopePass(std::string passName) override;
+		virtual void BeginScopePass(std::string passName, RHIRenderPass* pRenderPass = nullptr, unsigned int subpass = 0, RHIRenderTarget* pRenderTarget = nullptr) override;
 
 		virtual void EndScopePass() override;
 
@@ -33,6 +33,8 @@ namespace Vulkan
 		VkCommandPool *m_pCommandPool;
 
 		VkDevice *m_pDevice;
+
+		bool m_isSecondary;
 
 	};
 

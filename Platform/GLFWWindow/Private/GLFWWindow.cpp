@@ -4,33 +4,7 @@
 #include "Utils/Public/FileLoader.h"
 #include "Event/Public/KeyEvent.h"
 #include "Event/Public/MouseButtonEvent.h"
-
-static void WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, int bit)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-	{
-		RE_LOG("Window Closed.");
-		glfwWindowShouldClose(window);
-		GLFWWindow* win = reinterpret_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
-		win->SetShouldClose(true);
-	}
-}
-
-static void WindowCloseCallback(GLFWwindow* window)
-{
-	RE_LOG("Window Closed.");
-	GLFWWindow* win = reinterpret_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
-	win->SetShouldClose(true);
-}
-
-static void FramebufferResizeCallback(GLFWwindow* window, int width, int height)
-{
-	GLFWWindow* win = reinterpret_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
-	win->SetWidth((unsigned int)width);
-	win->SetHeight((unsigned int)height);
-	win->SetSizeChanged(true);
-	RE_LOG("Window Size Changed.");
-}
+#include "Event/Public/WindowEvent.h"
 
 GLFWWindow::GLFWWindow(WinProc* pProc)
 {
@@ -57,9 +31,6 @@ void GLFWWindow::Init()
 	m_handle = glfwCreateWindow(m_proc.width, m_proc.height, m_proc.name, nullptr, nullptr);
 	glfwMakeContextCurrent(m_handle);
 	glfwSetWindowUserPointer(m_handle, this);
-	glfwSetFramebufferSizeCallback(m_handle, FramebufferResizeCallback);
-	glfwSetWindowCloseCallback(m_handle, WindowCloseCallback);
-	glfwSetKeyCallback(m_handle, WindowKeyCallback);
 
 	GLFWimage icons[1];
 	ImageData *data = FileLoader::ImageLoad("assets/chino.png");
@@ -114,6 +85,20 @@ void GLFWWindow::Init()
 	{
 		GLFWWindow* win = reinterpret_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
 		win->SetMousePosition(glm::vec2(xpos, ypos));
+	});
+
+	glfwSetWindowCloseCallback(m_handle, [](GLFWwindow *window)
+	{
+		GLFWWindow* win = reinterpret_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
+		WEngine::Event *e = new WEngine::WindowCloseEvent();
+		win->ExecuteEventCallback(e);
+	});
+
+	glfwSetFramebufferSizeCallback(m_handle, [](GLFWwindow *window, int width, int height)
+	{
+		GLFWWindow *win = reinterpret_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
+		WEngine::Event *e = new WEngine::WindowResizeEvent(width, height);
+		win->ExecuteEventCallback(e);
 	});
 }
 

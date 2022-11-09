@@ -145,9 +145,8 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 		submitDescriptor.pWaitSemaphores = waits.data();
 		submitDescriptor.signalSemaphoreCount = 1;
 		submitDescriptor.pSignalSemaphores = signals;
-		submitDescriptor.waitStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
+		submitDescriptor.waitStage = PIPELINE_STAGE_FRAGMENT_SHADER | PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
 		submitDescriptor.pFence = context->GetFence();
 	}
 	context->Submit(&submitDescriptor);
-	context->Present(RHIContext::g_currentImage);
 }
