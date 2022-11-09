@@ -25,7 +25,7 @@ DrawOpaquePass::DrawOpaquePass()
 {
 	RHIAttachmentDescriptor attachmentDescriptors[] =
 	{
-		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::DontCare, AttachmentLayout::Undefined, AttachmentLayout::Present },
+		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::DontCare, AttachmentLayout::Undefined, AttachmentLayout::ColorBuffer },
 		{ Format::D16_Unorm, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::DontCare, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer }
 	};
 	SubPassAttachment subpassColorAttachment = { 0, AttachmentLayout::ColorBuffer };
@@ -37,7 +37,7 @@ DrawOpaquePass::DrawOpaquePass()
 		subpassDescriptors.pColorAttachments = &subpassColorAttachment;
 		subpassDescriptors.pDepthStencilAttachment = &subpassDepthAttachment;
 		subpassDescriptors.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		subpassDescriptors.waitingStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
+		subpassDescriptors.waitingStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
 		subpassDescriptors.waitingAccess = ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE;
 	}
 	RHIRenderPassDescriptor renderPassDescriptor = {};
@@ -56,8 +56,6 @@ DrawOpaquePass::~DrawOpaquePass()
 
 void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 {
-
-
 	ShaderCodeBlob* vertBlob = new ShaderCodeBlob("../assets/vert.spv");
 	RHIShaderDescriptor vertShaderDescriptor = {};
 	{
@@ -102,14 +100,13 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	GameObject *go = GameObject::Find("Cube");
 	m_pMesh = go->GetComponent<MeshFilter>()->GetStaticMesh();
 
-	BindingResource resource[2] = 
+	BindingResource resource[1] = 
 	{
 		{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
-		{1, ResourceType::CombinedImageSampler, 1, SHADER_STAGE_FRAGMENT},
 	};
 	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
 	{
-		groupLayoutDescriptor.bindingCount = 2;
+		groupLayoutDescriptor.bindingCount = 1;
 		groupLayoutDescriptor.pBindingResources = resource;
 	}
 	RHIGroupLayout *groupLayout = context->CreateGroupLayout(&groupLayoutDescriptor);
@@ -189,50 +186,6 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 
-	RHITextureViewDescriptor uvd = {};
-	{
-		uvd.format = Format::A8R8G8B8_UNorm;
-		uvd.arrayLayerCount = 1;
-		uvd.baseArrayLayer = 0;
-		uvd.mipCount = 1;
-		uvd.baseMipLevel = 0;
-		uvd.dimension = Dimension::Texture2D;
-		uvd.imageAspect = IMAGE_ASPECT_COLOR;
-	}
-	
-	RHITextureDescriptor textureDescriptor = {};
-	{
-		textureDescriptor.format = Format::A8R8G8B8_UNorm;
-		textureDescriptor.width = 477;
-		textureDescriptor.height = 377;
-		textureDescriptor.layout = AttachmentLayout::Undefined;
-		textureDescriptor.mipCount = 1;
-		textureDescriptor.usage = IMAGE_USAGE_TRANSFER_DST | IMAGE_USAGE_SAMPLED;
-	}
-	m_pTexture = m_pDevice->CreateTexture(&textureDescriptor);
-	m_pTexture->LoadData("assets/chino.png", context);
-
-	RHISamplerDescriptor samplerDescriptor = {};
-	{
-		samplerDescriptor.minFilter = Filter::Linear;
-		samplerDescriptor.magFilter = Filter::Linear;
-	}
-	m_pSampler = m_pDevice->CreateSampler(&samplerDescriptor);
-
-	TextureResourceInfo textureInfo[] = 
-	{
-		{ m_pTexture->CreateTextureView(&uvd), m_pSampler, AttachmentLayout::ReadOnlyColor },
-	};
-	RHIUpdateResourceDescriptor textureResourceDescriptor = {};
-	{
-		textureResourceDescriptor.bindingCount = 1;
-		textureResourceDescriptor.pBindingResources = resource + 1;
-		textureResourceDescriptor.pGroup = m_pGroup;
-		textureResourceDescriptor.textureResourceCount = 1;
-		textureResourceDescriptor.pTextureInfo = textureInfo;
-	}
-	context->UpdateTextureResourceToGroup(&textureResourceDescriptor);
-
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
@@ -254,25 +207,25 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 
 void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 {
-	if (context->IsDisplayChanged())
-	{
-		for (int i = 0; i < 3; ++i)
-		{
-			std::vector<RHITextureView*> textureViews = { context->GetTextureView(i) };
-			RHIRenderTargetDescriptor renderTargetDescriptor = {};
-			{
-				renderTargetDescriptor.bufferCount = 1;
-				renderTargetDescriptor.pBufferView = textureViews.data();
-				renderTargetDescriptor.renderPass = m_pRenderPass;
-				renderTargetDescriptor.width = WEngine::Screen::GetWidth();
-				renderTargetDescriptor.height = WEngine::Screen::GetHeight();
-			}
-			m_pRenderTargets[i]->~RHIRenderTarget();
-			WEngine::Allocator::Get()->Deallocate(m_pRenderTargets[i]);
-			m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
-		}
-		context->ResetDisplayState();
-	}
+	//if (context->IsDisplayChanged())
+	//{
+	//	for (int i = 0; i < 3; ++i)
+	//	{
+	//		std::vector<RHITextureView*> textureViews = { context->GetTextureView(i) };
+	//		RHIRenderTargetDescriptor renderTargetDescriptor = {};
+	//		{
+	//			renderTargetDescriptor.bufferCount = 1;
+	//			renderTargetDescriptor.pBufferView = textureViews.data();
+	//			renderTargetDescriptor.renderPass = m_pRenderPass;
+	//			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
+	//			renderTargetDescriptor.height = WEngine::Screen::GetHeight();
+	//		}
+	//		m_pRenderTargets[i]->~RHIRenderTarget();
+	//		WEngine::Allocator::Get()->Deallocate(m_pRenderTargets[i]);
+	//		m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
+	//	}
+	//	context->ResetDisplayState();
+	//}
 
 	RHICommandBuffer *cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
@@ -304,7 +257,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 	}
 	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 
-	cmd->BeginScopePass("Test");
+	cmd->BeginScopePass("Test", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentFrame]);
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
 		RHIRenderPassBeginDescriptor renderPassBeginDescriptor = {};

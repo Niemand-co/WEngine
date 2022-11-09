@@ -92,6 +92,8 @@ namespace WEngine
 			return VK_FORMAT_D32_SFLOAT;
 		case Format::D16_Unorm:
 			return VK_FORMAT_D16_UNORM;
+		case Format::B8G8R8A8_UNorm:
+			return VK_FORMAT_B8G8R8A8_UNORM;
 		default:
 			RE_ASSERT(false, "Error Type Format.");
 		}

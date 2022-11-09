@@ -1,6 +1,7 @@
 #pragma once
 #include "Render/Public/RenderContext.h"
 #include "RHI/Public/RHIInstance.h"
+#include "RHI/Public/RHIDevice.h"
 
 class RHIDevice;
 class RHIGPU;
@@ -105,6 +106,8 @@ public:
 	static inline RHIDevice* GetDevice() { return g_pDevice; }
 
 	static inline RHIQueue* GetQueue() { return g_pQueue; }
+
+	static inline void Wait() { g_pDevice->Wait(); }
 
 	template<typename T>
 	static T* CreateRenderPipeline();

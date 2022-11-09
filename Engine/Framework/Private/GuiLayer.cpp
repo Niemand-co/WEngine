@@ -7,6 +7,8 @@
 #include "Editor/Public/Editor.h"
 #include "Editor/Public/Screen.h"
 #include "Scene/Components/Public/Camera.h"
+#include "Event/Public/Event.h"
+#include "Event/Public/WindowEvent.h"
 
 namespace WEngine
 {
@@ -56,7 +58,7 @@ namespace WEngine
 			uvd.imageAspect = IMAGE_ASPECT_COLOR;
 		}
 
-		
+		m_imageID = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(RHIContext::g_currentFrame).pColorTexture, m_pSampler);
 	}
 
 	GuiLayer::~GuiLayer()
@@ -75,12 +77,11 @@ namespace WEngine
 
 	void GuiLayer::OnEvent(WEngine::Event* pEvent)
 	{
+		WEngine::EventDispatcher dispather(pEvent);
 	}
 
 	void GuiLayer::OnUpdate(WEngine::TimeStep timeStep)
 	{
-		m_imageID = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(RHIContext::g_currentFrame).pColorTexture, m_pSampler);
-
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -107,6 +108,8 @@ namespace WEngine
 			ImGui::End();
 
 			ImGui::Begin("Console");
+			ImVec2 xy = ImGui::GetItemRectSize();
+			RE_LOG(xy.y);
 			ImGui::End();
 
 		}

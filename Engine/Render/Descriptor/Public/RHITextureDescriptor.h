@@ -18,6 +18,8 @@ public:
 
 	unsigned int mipCount;
 
+	unsigned int layerCount;
+
 	unsigned int usage;
 
 	AttachmentLayout layout;

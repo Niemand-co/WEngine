@@ -15,6 +15,34 @@ glm::vec4 DrawSkyboxPass::bottomColor = glm::vec4(1.0f);
 
 DrawSkyboxPass::DrawSkyboxPass()
 {
+	RHIAttachmentDescriptor attachmentDescriptors[] =
+	{
+		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::DontCare, AttachmentStoreOP::DontCare, AttachmentLayout::ColorBuffer, AttachmentLayout::ColorBuffer },
+		{ Format::D16_Unorm, 1, AttachmentLoadOP::DontCare, AttachmentStoreOP::DontCare, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::DepthBuffer, AttachmentLayout::DepthBuffer }
+	};
+
+	SubPassAttachment colorAttachments[] = { { 0, AttachmentLayout::ColorBuffer } };
+	SubPassAttachment depthStencilAttachment = { 1, AttachmentLayout::DepthBuffer };
+
+	RHISubPassDescriptor subpassDescriptor = {};
+	{
+		subpassDescriptor.colorAttachmentCount = 1;
+		subpassDescriptor.pColorAttachments = colorAttachments;
+		subpassDescriptor.pDepthStencilAttachment = &depthStencilAttachment;
+		subpassDescriptor.dependedPass = -1;
+		subpassDescriptor.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
+		subpassDescriptor.waitingStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT | PIPELINE_STAGE_FRAGMENT_SHADER;
+		subpassDescriptor.waitingAccess = ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE;
+	}
+
+	RHIRenderPassDescriptor renderpassDescriptor = {};
+	{
+		renderpassDescriptor.attachmentCount = 2;
+		renderpassDescriptor.pAttachmentDescriptors = attachmentDescriptors;
+		renderpassDescriptor.subpassCount = 1;
+		renderpassDescriptor.pSubPassDescriptors = &subpassDescriptor;
+	}
+	m_pRenderPass = m_pDevice->CreateRenderPass(&renderpassDescriptor);
 }
 
 DrawSkyboxPass::~DrawSkyboxPass()
@@ -52,34 +80,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	RHIShader* fragShader = m_pDevice->CreateShader(&fragShaderDescriptor);
 
-	RHIAttachmentDescriptor attachmentDescriptors[] = 
-	{
-		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::DontCare, AttachmentStoreOP::DontCare, AttachmentLayout::ColorBuffer, AttachmentLayout::ColorBuffer },
-		{ Format::D16_Unorm, 1, AttachmentLoadOP::DontCare, AttachmentStoreOP::DontCare, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::DepthBuffer, AttachmentLayout::DepthBuffer }
-	};
 
-	SubPassAttachment colorAttachments[] = { { 0, AttachmentLayout::ColorBuffer } };
-	SubPassAttachment depthStencilAttachment = { 1, AttachmentLayout::DepthBuffer };
-
-	RHISubPassDescriptor subpassDescriptor = {};
-	{
-		subpassDescriptor.colorAttachmentCount = 1;
-		subpassDescriptor.pColorAttachments = colorAttachments;
-		subpassDescriptor.pDepthStencilAttachment = &depthStencilAttachment;
-		subpassDescriptor.dependedPass = -1;
-		subpassDescriptor.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		subpassDescriptor.waitingStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT | PIPELINE_STAGE_FRAGMENT_SHADER;
-		subpassDescriptor.waitingAccess = ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE;
-	}
-
-	RHIRenderPassDescriptor renderpassDescriptor = {};
-	{
-		renderpassDescriptor.attachmentCount = 2;
-		renderpassDescriptor.pAttachmentDescriptors = attachmentDescriptors;
-		renderpassDescriptor.subpassCount = 1;
-		renderpassDescriptor.pSubPassDescriptors = &subpassDescriptor;
-	}
-	m_pRenderPass = m_pDevice->CreateRenderPass(&renderpassDescriptor);
 
 	RHIDepthStencilDescriptor depthStencilDescriptor = {};
 	{
@@ -314,7 +315,7 @@ void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 	}
 	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 
-	cmd->BeginScopePass("Skybox");
+	cmd->BeginScopePass("Skybox", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentImage]);
 	{
 		RHIGraphicsEncoder *encoder = cmd->GetGraphicsEncoder();
 

@@ -3,4 +3,6 @@
 
 RHITextureDescriptor::RHITextureDescriptor()
 {
+	mipCount = 1;
+	layerCount = 1;
 }

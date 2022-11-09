@@ -24,7 +24,7 @@ Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, c
 			descriptor.usage = IMAGE_USAGE_COLOR_ATTACHMENT;
 			descriptor.width = WEngine::Screen::GetWidth();
 			descriptor.height = WEngine::Screen::GetHeight();
-			descriptor.layout = AttachmentLayout::ColorBuffer;
+			descriptor.layout = AttachmentLayout::Undefined;
 			descriptor.mipCount = 1;
 		}
 		RHITextureViewDescriptor viewDescriptor = {};
@@ -52,7 +52,6 @@ Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, c
 		{
 			descriptor.format = Format::D16_Unorm;
 			descriptor.usage = IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT;
-			descriptor.layout = AttachmentLayout::DepthBuffer;
 		}
 		{
 			viewDescriptor.format = Format::D16_Unorm;

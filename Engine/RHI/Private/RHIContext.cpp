@@ -55,8 +55,8 @@ void RHIContext::Init()
 	RHIInstanceDescriptor descriptor = {};
 	{
 		descriptor.backend = RHIBackend::Vulkan;
-		descriptor.enableDebugLayer = true;
-		descriptor.enableGPUValidator = true;
+		descriptor.enableDebugLayer = false;
+		descriptor.enableGPUValidator = false;
 	}
 	g_pInstance = RHIInstance::CreateInstance(&descriptor);
 
@@ -82,7 +82,7 @@ void RHIContext::Init()
 	RHISwapchainDescriptor swapchainDescriptor = {};
 	{
 		swapchainDescriptor.count = 3;
-		swapchainDescriptor.format = Format::A16R16G16B16_SFloat;
+		swapchainDescriptor.format = Format::B8G8R8A8_UNorm;
 		swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
 		swapchainDescriptor.presenMode = PresentMode::Immediate;
 		swapchainDescriptor.surface = g_pSurface;
@@ -94,22 +94,13 @@ void RHIContext::Init()
 	g_pTextureViews.reserve(3);
 	RHITextureViewDescriptor textureViewDescriptor = {};
 	{
-		textureViewDescriptor.format = Format::A16R16G16B16_SFloat;
+		textureViewDescriptor.format = Format::B8G8R8A8_UNorm;
 		textureViewDescriptor.imageAspect = IMAGE_ASPECT_COLOR;
 		textureViewDescriptor.mipCount = 1;
 		textureViewDescriptor.baseMipLevel = 0;
 		textureViewDescriptor.arrayLayerCount = 1;
 		textureViewDescriptor.baseArrayLayer = 0;
 		textureViewDescriptor.dimension = Dimension::Texture2D;
-	}
-	RHITextureDescriptor textureDescriptor = {};
-	{
-		textureDescriptor.format = Format::A16R16G16B16_SFloat;
-		textureDescriptor.width = 1920;
-		textureDescriptor.height = 1080;
-		textureDescriptor.usage = IMAGE_USAGE_COLOR_ATTACHMENT;
-		textureDescriptor.mipCount = 1;
-		textureDescriptor.layout = AttachmentLayout::ColorBuffer;
 	}
 	g_pTextureViews.push_back(g_pSwapchain->GetTexture(0)->CreateTextureView(&textureViewDescriptor));
 	g_pTextureViews.push_back(g_pSwapchain->GetTexture(1)->CreateTextureView(&textureViewDescriptor));
@@ -170,10 +161,12 @@ void RHIContext::RecreateSwapchain()
 	g_pSwapchain->~RHISwapchain();
 	WEngine::Allocator::Get()->Deallocate(g_pSwapchain);
 
+	g_pInstance->UpdateSurface();
+
 	RHISwapchainDescriptor swapchainDescriptor = {};
 	{
 		swapchainDescriptor.count = 3;
-		swapchainDescriptor.format = Format::A16R16G16B16_SFloat;
+		swapchainDescriptor.format = Format::B8G8R8A8_UNorm;
 		swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
 		swapchainDescriptor.presenMode = PresentMode::Immediate;
 		swapchainDescriptor.surface = g_pSurface;
@@ -184,12 +177,13 @@ void RHIContext::RecreateSwapchain()
 
 	RHITextureViewDescriptor textureViewDescriptor = {};
 	{
-		textureViewDescriptor.format = Format::A16R16G16B16_SFloat;
+		textureViewDescriptor.format = Format::B8G8R8A8_UNorm;
 		textureViewDescriptor.mipCount = 1;
 		textureViewDescriptor.baseMipLevel = 0;
 		textureViewDescriptor.arrayLayerCount = 1;
 		textureViewDescriptor.baseArrayLayer = 0;
 		textureViewDescriptor.dimension = Dimension::Texture2D;
+		textureViewDescriptor.imageAspect = IMAGE_ASPECT_COLOR;
 	}
 	for (int i = 0; i < 3; ++i)
 	{
@@ -259,7 +253,6 @@ int RHIContext::GetNextImage()
 	g_currentImage = GetNextImage(g_pImageAvailibleSemaphores[g_currentFrame]);
 	if (g_currentImage < 0)
 	{
-		g_pInstance->UpdateSurface();
 		g_pContext->RecreateSwapchain();
 		return -1;
 	}
@@ -272,7 +265,6 @@ void RHIContext::Present(unsigned int imageIndex)
 {
 	if (!g_pQueue->Present(g_pSwapchain, imageIndex, g_pPresentAVailibleSemaphores[g_currentFrame]))
 	{
-		g_pInstance->UpdateSurface();
 		g_pContext->RecreateSwapchain();
 	}
 
@@ -345,7 +337,7 @@ RHIBuffer* RHIContext::CreateTextureBuffer(RHIBufferDescriptor* descriptor)
 void RHIContext::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height)
 {
 
-	RHICommandBuffer *cmd = GetCommandBuffer(false);
+	RHICommandBuffer *cmd = GetCommandBuffer(true);
 	cmd->BeginScopePass("Copy Buffer");
 	{
 		RHIGraphicsEncoder *encoder = cmd->GetGraphicsEncoder();

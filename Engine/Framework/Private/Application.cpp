@@ -2,6 +2,7 @@
 #include "Framework/Public/Application.h"
 #include "Utils/Public/Window.h"
 #include "Event/Public/KeyEvent.h"
+#include "Event/Public/WindowEvent.h"
 #include "FrameWork/Public/LayerStack.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Event/Public/WindowInput.h"
@@ -66,13 +67,28 @@ namespace WEngine
 			if (e->GetKeycode() == GLFW_KEY_ESCAPE)
 			{
 				this->m_isQuit = true;
-				this->m_window->Destroy();
+				RHIContext::Wait();
 				return true;
 			}
 			else
 			{
 				return false;
 			}
+		});
+
+		dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent *e) -> bool
+		{
+			this->m_isQuit = true;
+
+			return true;
+		});
+
+		dispatcher.Dispatch<WindowResizeEvent>([this](WindowResizeEvent *e) -> bool
+		{
+			m_window->SetWidth(e->GetWidth());
+			m_window->SetHeight(e->GetHeight());
+			RHIContext::GetContext()->RecreateSwapchain();
+			return false;
 		});
 
 		m_pLayerStack->OnEvent(pEvent);
@@ -85,6 +101,7 @@ namespace WEngine
 
 	void Application::Finalize()
 	{
+		m_window->Destroy();
 		exit(0);
 	}
 

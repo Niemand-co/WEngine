@@ -17,7 +17,7 @@ DrawGUIPass::DrawGUIPass()
 {
 	RHIAttachmentDescriptor attachmentDescriptors[] =
 	{
-		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::Present },
+		{ Format::B8G8R8A8_UNorm, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::Present },
 	};
 	SubPassAttachment subpassColorAttachment = { 0, AttachmentLayout::ColorBuffer };
 	RHISubPassDescriptor subpassDescriptors = {};
@@ -26,7 +26,7 @@ DrawGUIPass::DrawGUIPass()
 		subpassDescriptors.pColorAttachments = &subpassColorAttachment;
 		subpassDescriptors.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
 		subpassDescriptors.waitingStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		subpassDescriptors.waitingAccess = ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE;
+		subpassDescriptors.waitingAccess = ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE;
 	}
 	RHIRenderPassDescriptor renderPassDescriptor = {};
 	{
@@ -89,9 +89,28 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 
 void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 {
+	if (context->IsDisplayChanged())
+	{
+		for (int i = 0; i < 3; ++i)
+		{
+			std::vector<RHITextureView*> textureViews = { context->GetTextureView(i) };
+			RHIRenderTargetDescriptor renderTargetDescriptor = {};
+			{
+				renderTargetDescriptor.bufferCount = 1;
+				renderTargetDescriptor.pBufferView = textureViews.data();
+				renderTargetDescriptor.renderPass = m_pRenderPass;
+				renderTargetDescriptor.width = Window::cur_window->GetWidth();
+				renderTargetDescriptor.height = Window::cur_window->GetHeight();
+			}
+			delete m_pRenderTargets[i];
+			m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
+		}
+		context->ResetDisplayState();
+	}
+
 	RHICommandBuffer* cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
-	cmd->BeginScopePass("Test");
+	cmd->BeginScopePass("Test", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentImage]);
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
 		RHIRenderPassBeginDescriptor renderPassBeginDescriptor = {};
@@ -118,6 +137,7 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 	{
 		waits[i] = waitingSemaphores[i]->signal;
 	}
+	waits.push_back(context->GetImageVailableSemaphore());
 
 	RHISubmitDescriptor submitDescriptor = {};
 	{
