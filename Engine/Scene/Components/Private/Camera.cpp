@@ -2,6 +2,7 @@
 #include "Scene/Components/Public/Camera.h"
 #include "Scene/Public/GameObject.h"
 #include "RHI/Public/RHITexture.h"
+#include "RHI/Public/RHITextureView.h"
 #include "RHI/Public/RHIContext.h"
 #include "RHI/Public/RHIDevice.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
@@ -16,8 +17,12 @@ Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, c
 	World::GetWorld()->AddCamera(this);
 	UpdateProjectionMatrix();
 	m_rendertargets.resize(RHIContext::g_maxFrames);
+	m_textureResources.resize(RHIContext::g_maxFrames * 2u);
+
 	for(unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{
+		m_rendertargets[i].isChanged = false;
+
 		RHITextureDescriptor descriptor = {};
 		{
 			descriptor.format = Format::A16R16G16B16_SFloat;
@@ -37,8 +42,8 @@ Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, c
 			viewDescriptor.dimension = Dimension::Texture2D;
 			viewDescriptor.imageAspect = IMAGE_ASPECT_COLOR;
 		}
-		RHITexture *pTexture = RHIContext::GetDevice()->CreateTexture(&descriptor);
-		TextureBarrier textureBarrier = { pTexture, AttachmentLayout::Undefined, AttachmentLayout::ColorBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE, IMAGE_ASPECT_COLOR };
+		m_textureResources[i * 2u] = RHIContext::GetDevice()->CreateTexture(&descriptor);
+		TextureBarrier textureBarrier = { m_textureResources[i * 2u], AttachmentLayout::Undefined, AttachmentLayout::ColorBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE, IMAGE_ASPECT_COLOR };
 		RHIBarrierDescriptor barrierDescriptor = {};
 		{
 			barrierDescriptor.textureCount = 1;
@@ -47,7 +52,7 @@ Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, c
 			barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
 		}
 		RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
-		m_rendertargets[i].pColorTexture = pTexture->CreateTextureView(&viewDescriptor);
+		m_rendertargets[i].pColorTexture = m_textureResources[i * 2u]->CreateTextureView(&viewDescriptor);
 
 		{
 			descriptor.format = Format::D16_Unorm;
@@ -57,14 +62,14 @@ Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, c
 			viewDescriptor.format = Format::D16_Unorm;
 			viewDescriptor.imageAspect = IMAGE_ASPECT_DEPTH;
 		}
-		pTexture = RHIContext::GetDevice()->CreateTexture(&descriptor);
+		m_textureResources[i * 2u + 1] = RHIContext::GetDevice()->CreateTexture(&descriptor);
 		{
-			textureBarrier.pTexture = pTexture;
+			textureBarrier.pTexture = m_textureResources[i * 2u + 1];
 			textureBarrier.imageAspect = IMAGE_ASPECT_DEPTH;
 			textureBarrier.newLayout = AttachmentLayout::DepthBuffer;
 		}
 		RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
-		m_rendertargets[i].pDepthTexture = pTexture->CreateTextureView(&viewDescriptor);
+		m_rendertargets[i].pDepthTexture = m_textureResources[i * 2u + 1]->CreateTextureView(&viewDescriptor);
 	}
 }
 
@@ -115,6 +120,67 @@ void Camera::Rotate(RotateDirection dir, float dis)
 {
 	Transformer* transformer = m_pGameObject->GetComponent<Transformer>();
 	transformer->Rotate(dir, dis);
+}
+
+void Camera::RecreateRenderTarget(unsigned int width, unsigned int height)
+{
+	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
+	{
+		m_rendertargets[i].SetupInformer(2);
+
+		delete m_rendertargets[i].pColorTexture;
+		delete m_rendertargets[i].pDepthTexture;
+		delete m_textureResources[i * 2u];
+		delete m_textureResources[i * 2u + 1];
+
+		RHITextureDescriptor descriptor = {};
+		{
+			descriptor.format = Format::A16R16G16B16_SFloat;
+			descriptor.usage = IMAGE_USAGE_COLOR_ATTACHMENT | IMAGE_USAGE_SAMPLED;
+			descriptor.width = WEngine::Screen::GetWidth();
+			descriptor.height = WEngine::Screen::GetHeight();
+			descriptor.layout = AttachmentLayout::Undefined;
+			descriptor.mipCount = 1;
+		}
+		RHITextureViewDescriptor viewDescriptor = {};
+		{
+			viewDescriptor.format = Format::A16R16G16B16_SFloat;
+			viewDescriptor.arrayLayerCount = 1;
+			viewDescriptor.baseArrayLayer = 0;
+			viewDescriptor.mipCount = 1;
+			viewDescriptor.baseMipLevel = 0;
+			viewDescriptor.dimension = Dimension::Texture2D;
+			viewDescriptor.imageAspect = IMAGE_ASPECT_COLOR;
+		}
+		m_textureResources[i * 2u] = RHIContext::GetDevice()->CreateTexture(&descriptor);
+		TextureBarrier textureBarrier = { m_textureResources[i * 2u], AttachmentLayout::Undefined, AttachmentLayout::ColorBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE, IMAGE_ASPECT_COLOR };
+		RHIBarrierDescriptor barrierDescriptor = {};
+		{
+			barrierDescriptor.textureCount = 1;
+			barrierDescriptor.pTextureBarriers = &textureBarrier;
+			barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
+			barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
+		}
+		RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
+		m_rendertargets[i].pColorTexture = m_textureResources[i * 2u]->CreateTextureView(&viewDescriptor);
+
+		{
+			descriptor.format = Format::D16_Unorm;
+			descriptor.usage = IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT;
+		}
+		{
+			viewDescriptor.format = Format::D16_Unorm;
+			viewDescriptor.imageAspect = IMAGE_ASPECT_DEPTH;
+		}
+		m_textureResources[i * 2u + 1] = RHIContext::GetDevice()->CreateTexture(&descriptor);
+		{
+			textureBarrier.pTexture = m_textureResources[i * 2u + 1];
+			textureBarrier.imageAspect = IMAGE_ASPECT_DEPTH;
+			textureBarrier.newLayout = AttachmentLayout::DepthBuffer;
+		}
+		RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
+		m_rendertargets[i].pDepthTexture = m_textureResources[i * 2 + 1]->CreateTextureView(&viewDescriptor);
+	}
 }
 
 void Camera::UpdateViewMatrix()

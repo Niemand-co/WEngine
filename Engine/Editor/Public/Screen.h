@@ -1,5 +1,7 @@
 #pragma once
 
+class Camera;
+
 namespace WEngine
 {
 
@@ -19,11 +21,23 @@ namespace WEngine
 
 		static unsigned int GetHeight();
 
+		static bool SizeChanged();
+
+		static void ResetState();
+
+		static void SetDisplayCamera(Camera *pCamera);
+
+	public:
+
+		static Camera *g_displayingCamera;
+
 	private:
 
-		static unsigned int m_width;
+		static unsigned int g_width;
 
-		static unsigned int m_height;
+		static unsigned int g_height;
+
+		static bool g_isSizeChanged;
 
 	};
 

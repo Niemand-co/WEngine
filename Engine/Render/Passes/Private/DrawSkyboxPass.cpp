@@ -287,6 +287,25 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 
 void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 {
+	if (cameraData->camera->GetRenderTarget(RHIContext::g_currentImage).Informing())
+	{
+		//for (int i = 0; i < 3; ++i)
+		//{
+			std::vector<RHITextureView*> textureViews = { context->GetTextureView(RHIContext::g_currentImage) };
+			RHIRenderTargetDescriptor renderTargetDescriptor = {};
+			{
+				renderTargetDescriptor.bufferCount = 1;
+				renderTargetDescriptor.pBufferView = textureViews.data();
+				renderTargetDescriptor.renderPass = m_pRenderPass;
+				renderTargetDescriptor.width = WEngine::Screen::GetWidth();
+				renderTargetDescriptor.height = WEngine::Screen::GetHeight();
+			}
+			delete m_pRenderTargets[RHIContext::g_currentImage];
+			m_pRenderTargets[RHIContext::g_currentImage] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
+		//}
+		//return;
+	}
+
 	RHICommandBuffer *cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
 	UniformData data =

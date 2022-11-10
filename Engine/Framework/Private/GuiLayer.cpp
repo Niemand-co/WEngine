@@ -10,6 +10,7 @@
 #include "Event/Public/Event.h"
 #include "Event/Public/WindowEvent.h"
 #include "Event/Public/MouseButtonEvent.h"
+#include "Scene/Components/Public/Camera.h"
 
 namespace WEngine
 {
@@ -59,7 +60,9 @@ namespace WEngine
 			uvd.imageAspect = IMAGE_ASPECT_COLOR;
 		}
 
-		
+		m_imageID.resize(RHIContext::g_maxFrames);
+		for(unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
+			m_imageID[i] = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(i).pColorTexture, m_pSampler);
 	}
 
 	GuiLayer::~GuiLayer()
@@ -82,11 +85,26 @@ namespace WEngine
 
 		dispatcher.Dispatch<WEngine::MouseButtonPressedEvent>([this](WEngine::MouseButtonPressedEvent* pEvent) -> bool
 		{
-			return false;
+			if (pEvent->GetMouseCode() == GLFW_MOUSE_BUTTON_2)
+			{
+				ImVec2 mousePos = ImGui::GetMousePos();
+				if(mousePos.x > m_displayArea.first.x && mousePos.x < m_displayArea.second.x && mousePos.y > m_displayArea.first.y && mousePos.y < m_displayArea.second.y)
+					return false;
+			}
+			return true;
 		});
 
 		dispatcher.Dispatch<WEngine::MouseButtonReleasedEvent>([this](WEngine::MouseButtonReleasedEvent* pEvent) -> bool
 		{
+			return false;
+		});
+
+		dispatcher.Dispatch<WEngine::WindowResizeEvent>([this](WEngine::WindowResizeEvent* pEvent) -> bool
+		{
+			//m_displayArea.first = ImGui::GetItemRectMin();
+			//m_displayArea.second = ImGui::GetItemRectMax();
+			//Screen::SetWidth(m_displayArea.second.x - m_displayArea.first.x);
+			//Screen::SetHeight(m_displayArea.second.y - m_displayArea.first.y);
 			return false;
 		});
 	}
@@ -115,13 +133,20 @@ namespace WEngine
 			ImGui::End();
 
 			ImGui::Begin("Display");
-			m_imageID = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(RHIContext::g_currentFrame).pColorTexture, m_pSampler);
-			ImGui::Image(m_imageID, ImVec2(Screen::GetWidth(), Screen::GetHeight()));
+			m_displayArea.first = ImGui::GetItemRectMin();
+			m_displayArea.second = ImGui::GetWindowSize();
+			Screen::SetWidth(m_displayArea.second.x);
+			Screen::SetHeight(m_displayArea.second.y);
+			if (Screen::SizeChanged())
+			{
+				Screen::g_displayingCamera->RecreateRenderTarget(Screen::GetWidth(), Screen::GetHeight());
+				for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
+					m_imageID[i] = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(i).pColorTexture, m_pSampler);
+			}
+			ImGui::Image(m_imageID[RHIContext::g_currentFrame], ImVec2(Screen::GetWidth(), Screen::GetHeight()));
 			ImGui::End();
 
 			ImGui::Begin("Console");
-			ImVec2 xy = ImGui::GetItemRectSize();
-			RE_LOG(xy.y);
 			ImGui::End();
 
 		}

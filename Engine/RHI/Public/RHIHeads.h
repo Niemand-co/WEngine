@@ -24,3 +24,5 @@
 #include "RHI/Public/RHISwapchain.h"
 #include "RHI/Public/RHITexture.h"
 #include "RHI/Public/RHITextureView.h"
+#include "RHI/Public/RHIScissor.h"
+#include "RHI/Public/RHIViewport.h"

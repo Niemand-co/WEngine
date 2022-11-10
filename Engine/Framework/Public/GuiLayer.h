@@ -32,7 +32,9 @@ namespace WEngine
 
 		RHITexture *m_pTexture;
 
-		ImTextureID m_imageID;
+		std::vector<ImTextureID> m_imageID;
+
+		std::pair<ImVec2, ImVec2> m_displayArea;
 
 	};
 

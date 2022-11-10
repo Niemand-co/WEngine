@@ -5,6 +5,7 @@
 #include "Event/Public/MouseEvent.h"
 #include "Event/Public/MouseButtonEvent.h"
 #include "Event/Public/KeyEvent.h"
+#include "Event/Public/WindowEvent.h"
 #include "Event/Public/Input.h"
 
 #include "Scene/Public/World.h"
@@ -27,6 +28,7 @@
 #include "Utils/ImGui/Public/Gui.h"
 
 #include "Editor/Public/Editor.h"
+#include "Editor/Public/Screen.h"
 
 #include "Framework/Public/Application.h"
 

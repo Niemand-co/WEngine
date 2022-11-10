@@ -10,6 +10,7 @@ GameScene::GameScene(std::string_view name)
 	m_sceneCamera = WEngine::Editor::g_pEditorCamera;
 	m_sceneCamera->m_aspect = (float)Window::cur_window->GetWidth() / (float)Window::cur_window->GetHeight();
 	m_sceneCamera->GetGameObject()->GetComponent<Transformer>()->SetPosition(glm::vec3(2.0f, 2.0f, 2.0f));
+	WEngine::Screen::SetDisplayCamera(m_sceneCamera);
 	
 }
 
@@ -42,6 +43,12 @@ void GameScene::OnEvent(WEngine::Event* pEvent)
 	{
 		if(pEvent->GetMouseCode() == GLFW_MOUSE_BUTTON_2)
 			this->m_isMoving = false;
+		return true;
+	});
+
+	dispatcher.Dispatch<WEngine::WindowResizeEvent>([this](WEngine::WindowResizeEvent *pEvent)
+	{
+		
 		return true;
 	});
 }

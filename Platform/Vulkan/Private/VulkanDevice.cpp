@@ -405,10 +405,7 @@ namespace Vulkan
 
 		vkBindImageMemory(*m_pDevice, *image, *pMemory, 0);
 
-		RHITexture *pTexture = (RHITexture*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanTexture));
-		::new (pTexture) VulkanTexture(image, memoryRequirements, pMemory, m_pDevice);
-
-		return pTexture;
+		return new VulkanTexture(image, memoryRequirements, pMemory, m_pDevice);
 	}
 
 	RHISampler* VulkanDevice::CreateSampler(RHISamplerDescriptor* descriptor)

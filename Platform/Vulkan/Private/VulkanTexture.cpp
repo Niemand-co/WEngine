@@ -18,8 +18,7 @@ namespace Vulkan
 
 	VulkanTexture::~VulkanTexture()
 	{
-		if(!m_isDisplayTexture)
-			vkDestroyImage(*m_pDevice, *m_pImage, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
+		vkDestroyImage(*m_pDevice, *m_pImage, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
 	}
 
 	RHITextureView* VulkanTexture::CreateTextureView(RHITextureViewDescriptor* descriptor)
@@ -42,10 +41,7 @@ namespace Vulkan
 		VkImageView* imageView = (VkImageView*)WEngine::Allocator::Get()->Allocate(sizeof(VkImageView));
 		RE_ASSERT(vkCreateImageView(*m_pDevice, &imageViewCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), imageView) == VK_SUCCESS, "Failed to Create Image View.");
 
-		RHITextureView *textureView = (RHITextureView*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanTextureView));
-		::new (textureView) VulkanTextureView(imageView, m_pDevice, descriptor);
-
-		return textureView;
+		return new VulkanTextureView(imageView, m_pDevice, descriptor);
 	}
 
 	void VulkanTexture::LoadData(std::string path, RHIContext* context)

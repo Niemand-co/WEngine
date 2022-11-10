@@ -4,12 +4,17 @@
 class GameObject;
 class ScriptableRenderer;
 class RHITextureView;
+class RHITexture;
 struct CameraData;
 
 struct RenderTarget
 {
 	RHITextureView *pColorTexture;
 	RHITextureView *pDepthTexture;
+	bool isChanged;
+	unsigned int leftCount = 0;
+	void SetupInformer(unsigned int count) { leftCount += count; }
+	bool Informing() { if(leftCount == 0) return false; else { --leftCount; return true; } }
 };
 
 class Camera : public Component
@@ -40,6 +45,8 @@ public:
 
 	void Rotate(RotateDirection dir, float dis);
 
+	void RecreateRenderTarget(unsigned int width, unsigned int height);
+
 private:
 
 	void UpdateViewMatrix();
@@ -67,6 +74,8 @@ private:
 	ScriptableRenderer *m_renderer;
 
 	std::vector<RenderTarget> m_rendertargets;
+
+	std::vector<RHITexture*> m_textureResources;
 
 };
 
