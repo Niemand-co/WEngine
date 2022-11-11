@@ -3,6 +3,8 @@
 #include "Platform/Vulkan/Public/VulkanHeads.h"
 #include "Render/Descriptor/Public/RHIRenderPassBeginDescriptor.h"
 #include "Render/Descriptor/Public/RHIBarrierDescriptor.h"
+#include "RHI/Public/RHIScissor.h"
+#include "RHI/Public/RHIViewport.h"
 #include "Utils/Public/Window.h"
 #include "Editor/Public/Screen.h"
 
@@ -40,23 +42,23 @@ namespace Vulkan
 		vkCmdBindPipeline(*m_cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, *static_cast<VulkanPipelineStateObject*>(pso)->GetHandle());
 	}
 
-	void VulkanGraphicsEncoder::SetViewport(RHIViewport* viewports)
+	void VulkanGraphicsEncoder::SetViewport(const RHIViewport& pViewport)
 	{
 		VkViewport viewport = {};
-		viewport.width = WEngine::Screen::GetWidth();
-		viewport.height = WEngine::Screen::GetHeight();
-		viewport.x = 0.0f;
-		viewport.y = 0.0f;
+		viewport.width = pViewport.width;
+		viewport.height = pViewport.height;
+		viewport.x = pViewport.posX;
+		viewport.y = pViewport.posY;
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 		vkCmdSetViewport(*m_cmd, 0, 1, &viewport);
 	}
 
-	void VulkanGraphicsEncoder::SetScissor(RHIScissor* scissor)
+	void VulkanGraphicsEncoder::SetScissor(const RHIScissor& scissor)
 	{
 		VkRect2D rect = {};
-		rect.offset = { 0, 0 };
-		rect.extent = { WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight() };
+		rect.offset = { scissor.offsetX, scissor.offsetY };
+		rect.extent = { scissor.width, scissor.height };
 		vkCmdSetScissor(*m_cmd, 0, 1, &rect);
 	}
 

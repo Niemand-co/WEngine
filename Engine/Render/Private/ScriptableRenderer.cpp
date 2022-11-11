@@ -60,3 +60,11 @@ void ScriptableRenderer::EnqueRenderPass(ScriptableRenderPass *renderPass)
 {
 	m_passes.push_back(renderPass);
 }
+
+void ScriptableRenderer::UpdateRenderTarget(CameraData* cameraData)
+{
+	for (ScriptableRenderPass* pass : m_passes)
+	{
+		pass->UpdateRenderTarget(cameraData);
+	}
+}

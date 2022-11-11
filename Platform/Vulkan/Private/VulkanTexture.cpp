@@ -18,7 +18,8 @@ namespace Vulkan
 
 	VulkanTexture::~VulkanTexture()
 	{
-		vkDestroyImage(*m_pDevice, *m_pImage, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
+		if(!m_isDisplayTexture)
+			vkDestroyImage(*m_pDevice, *m_pImage, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
 	}
 
 	RHITextureView* VulkanTexture::CreateTextureView(RHITextureViewDescriptor* descriptor)

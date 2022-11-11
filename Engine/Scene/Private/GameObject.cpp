@@ -18,6 +18,11 @@ bool GameObject::IsName(std::string name)
 	return name == m_name;
 }
 
+void GameObject::AddGameObject(GameObject* pGameObject)
+{
+	m_sonGameObjects.push_back(pGameObject);
+}
+
 GameObject* GameObject::Find(std::string name)
 {
 	for (GameObject* gameObject : World::GetWorld()->GetGameObjects())

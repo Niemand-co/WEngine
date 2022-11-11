@@ -7,6 +7,8 @@
 namespace WEngine
 {
 
+	int Editor::g_selectedID = 0;
+
 	std::vector<GameObject*> Editor::g_selectedObjects = std::vector<GameObject*>();
 
 	Camera* Editor::g_pEditorCamera = nullptr;

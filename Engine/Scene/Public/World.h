@@ -20,11 +20,15 @@ public:
 
 	static World* GetWorld();
 
-	std::vector<GameObject*>& GetGameObjects();
+	const std::vector<GameObject*>& GetGameObjects() const;
+
+	const std::vector<char*>& GetObjectNames() const;
 
 private:
 
 	std::vector<GameObject*> m_pEntities;
+
+	std::vector<char*> m_pNames;
 
 	std::vector<Camera*> m_pCameras;
 

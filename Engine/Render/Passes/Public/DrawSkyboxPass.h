@@ -2,7 +2,6 @@
 #include "Render/Passes/Public/ScriptableRenderPass.h"
 
 class Mesh;
-class RHIRenderTarget;
 class RHIBuffer;
 class RHITexture;
 class RHIGroup;
@@ -24,9 +23,9 @@ public:
 
 	virtual void Execute(RHIContext *context, CameraData* cameraData) override;
 
-private:
+	virtual void UpdateRenderTarget(CameraData *cameraData) override;
 
-	std::vector<RHIRenderTarget*> m_pRenderTargets;
+private:
 
 	std::vector<RHICommandBuffer*> m_pCommandBuffers;
 

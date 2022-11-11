@@ -44,6 +44,8 @@ public:
 
 	virtual ImTextureID LoadTexture(RHITextureView *pTextureView, RHISampler* pSampler) = 0;
 
+	virtual void RemoveTexture(ImTextureID& ID) = 0;
+
 	virtual void RenderGUI(RHICommandBuffer* pCommandBuffer) = 0;
 
 	virtual void ShowInspector() = 0;

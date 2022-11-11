@@ -18,6 +18,7 @@ GameObject* World::CreateGameObject(std::string name)
 {
 	GameObject* gameObject = new GameObject(name);
 	g_pInstance->m_pEntities.push_back(std::move(gameObject));
+	g_pInstance->m_pNames.push_back(name.data());
 	gameObject->AddComponent<Transformer>();
 	return gameObject;
 }
@@ -47,9 +48,14 @@ World* World::GetWorld()
 	return g_pInstance;
 }
 
-std::vector<GameObject*>& World::GetGameObjects()
+const std::vector<GameObject*>& World::GetGameObjects() const
 {
 	return m_pEntities;
+}
+
+const std::vector<char*>& World::GetObjectNames() const
+{
+	return m_pNames;
 }
 
 std::vector<Camera*>& World::GetCameras()

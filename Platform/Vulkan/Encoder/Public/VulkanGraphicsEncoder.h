@@ -16,9 +16,9 @@ namespace Vulkan
 
 		virtual void SetPipeline(RHIPipelineStateObject *pso) override;
 
-		virtual void SetViewport(RHIViewport *viewports) override;
+		virtual void SetViewport(const RHIViewport& viewports) override;
 
-		virtual void SetScissor(RHIScissor* scissor) override;
+		virtual void SetScissor(const RHIScissor& scissor) override;
 
 		virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth /* = 0.0f */) override;
 

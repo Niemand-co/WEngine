@@ -287,25 +287,6 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 
 void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 {
-	if (cameraData->camera->GetRenderTarget(RHIContext::g_currentImage).Informing())
-	{
-		//for (int i = 0; i < 3; ++i)
-		//{
-			std::vector<RHITextureView*> textureViews = { context->GetTextureView(RHIContext::g_currentImage) };
-			RHIRenderTargetDescriptor renderTargetDescriptor = {};
-			{
-				renderTargetDescriptor.bufferCount = 1;
-				renderTargetDescriptor.pBufferView = textureViews.data();
-				renderTargetDescriptor.renderPass = m_pRenderPass;
-				renderTargetDescriptor.width = WEngine::Screen::GetWidth();
-				renderTargetDescriptor.height = WEngine::Screen::GetHeight();
-			}
-			delete m_pRenderTargets[RHIContext::g_currentImage];
-			m_pRenderTargets[RHIContext::g_currentImage] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
-		//}
-		//return;
-	}
-
 	RHICommandBuffer *cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
 	UniformData data =
@@ -346,8 +327,8 @@ void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 		}
 		encoder->BeginPass(&renderpassBeginDescriptor);
 		encoder->SetPipeline(m_pPSO);
-		encoder->SetViewport(nullptr);
-		encoder->SetScissor(nullptr);
+		encoder->SetViewport({ (float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0 });
+		encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
 		encoder->BindVertexBuffer(m_pVertexBuffer);
 		encoder->BindIndexBuffer(m_pIndexBuffer);
 		encoder->BindGroups(1, m_pGroup, m_pPipelineLayout);
@@ -358,4 +339,22 @@ void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 	}
 	cmd->EndScopePass();
 	context->ExecuteCommandBuffer(cmd);
+}
+
+void DrawSkyboxPass::UpdateRenderTarget(CameraData *cameraData)
+{
+	for (int i = 0; i < 3; ++i)
+	{
+		std::vector<RHITextureView*> textureViews = { cameraData->camera->GetRenderTarget(i).pColorTexture, cameraData->camera->GetRenderTarget(i).pDepthTexture };
+		RHIRenderTargetDescriptor renderTargetDescriptor = {};
+		{
+			renderTargetDescriptor.bufferCount = 2;
+			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.renderPass = m_pRenderPass;
+			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
+			renderTargetDescriptor.height = WEngine::Screen::GetHeight();
+		}
+		delete m_pRenderTargets[i];
+		m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
+	}
 }

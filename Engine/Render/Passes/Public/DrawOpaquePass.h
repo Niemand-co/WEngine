@@ -1,7 +1,6 @@
 #pragma once
 #include "Render/Passes/Public/ScriptableRenderPass.h"
 
-class RHIRenderTarget;
 class RHITexture;
 class RHISampler;
 class Mesh;
@@ -21,9 +20,9 @@ public:
 
 	virtual void Execute(RHIContext *context, CameraData* cameraData) override;
 
-private:
+	virtual void UpdateRenderTarget(CameraData *cameraData) override;
 
-	std::vector<RHIRenderTarget*> m_pRenderTargets;
+private:
 
 	RHITexture *m_pTexture;
 

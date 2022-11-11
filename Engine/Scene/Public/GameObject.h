@@ -17,6 +17,10 @@ public:
 
 	bool IsName(std::string name);
 
+	inline const char* const GetName() const { return m_name.c_str(); }
+
+	void AddGameObject(GameObject *pGameObject);
+
 	template<typename T>
 	T* AddComponent();
 
@@ -30,6 +34,8 @@ public:
 private:
 
 	std::string m_name;
+
+	std::vector<GameObject*> m_sonGameObjects;
 
 	std::vector<Component*> m_components;
 

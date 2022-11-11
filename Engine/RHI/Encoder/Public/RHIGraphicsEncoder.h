@@ -25,9 +25,9 @@ public:
 
 	virtual void SetPipeline(RHIPipelineStateObject *pso) = 0;
 
-	virtual void SetViewport(RHIViewport *viewports) = 0;
+	virtual void SetViewport(const RHIViewport& viewports) = 0;
 
-	virtual void SetScissor(RHIScissor* scissor) = 0;
+	virtual void SetScissor(const RHIScissor& scissor) = 0;
 
 	virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth = 0.0f) = 0;
 

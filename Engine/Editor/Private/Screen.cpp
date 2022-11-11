@@ -19,13 +19,13 @@ namespace WEngine
 
 	void Screen::SetWidth(unsigned int width)
 	{
-		g_isSizeChanged = (width != g_width);
+		g_isSizeChanged = g_isSizeChanged || (width != g_width);
 		g_width = width;
 	}
 
 	void Screen::SetHeight(unsigned int height)
 	{
-		g_isSizeChanged = (height != g_height);
+		g_isSizeChanged = g_isSizeChanged || (height != g_height);
 		g_height = height;
 	}
 

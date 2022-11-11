@@ -7,6 +7,7 @@ class RHIRenderPass;
 class RHIGroup;
 class RHICommandBuffer;
 class RHISemaphore;
+class RHIRenderTarget;
 struct CameraData;
 
 class ScriptableRenderPass
@@ -21,6 +22,8 @@ public:
 
 	virtual void Execute(RHIContext *context, CameraData* cameraData) = 0;
 
+	virtual void UpdateRenderTarget(CameraData *cameraData) = 0;
+
 	virtual RHIGroup* GetResourceGroup();
 
 	void* operator new(size_t size)
@@ -34,6 +37,8 @@ public:
 	}
 
 protected:
+
+	std::vector<RHIRenderTarget*> m_pRenderTargets;
 
 	RHIDevice *m_pDevice;
 

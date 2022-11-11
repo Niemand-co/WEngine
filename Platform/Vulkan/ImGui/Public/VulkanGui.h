@@ -16,7 +16,9 @@ namespace Vulkan
 
 		virtual void BindRenderPass(RHIRenderPass *pRenderPass, unsigned int subpass) override;
 		
-		virtual ImTextureID LoadTexture(RHITextureView *pTextureView, RHISampler *pSampler) override;
+		virtual ImTextureID LoadTexture(RHITextureView* pTextureView, RHISampler* pSampler) override;
+
+		virtual void RemoveTexture(ImTextureID& ID) override;
 
 		virtual void RenderGUI(RHICommandBuffer* pCommandBuffer) override;
 

@@ -21,8 +21,6 @@ Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, c
 
 	for(unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{
-		m_rendertargets[i].isChanged = false;
-
 		RHITextureDescriptor descriptor = {};
 		{
 			descriptor.format = Format::A16R16G16B16_SFloat;
@@ -71,6 +69,9 @@ Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, c
 		RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
 		m_rendertargets[i].pDepthTexture = m_textureResources[i * 2u + 1]->CreateTextureView(&viewDescriptor);
 	}
+
+	m_pData = (CameraData*)WEngine::Allocator::Get()->Allocate(sizeof(CameraData));
+	::new (m_pData) CameraData();
 }
 
 glm::mat4x4 Camera::GetViewMatrix()
@@ -97,17 +98,14 @@ ScriptableRenderer* Camera::GetRenderer()
 
 CameraData* Camera::GetData()
 {
-	CameraData *data = (CameraData*)WEngine::Allocator::Get()->Allocate(sizeof(CameraData));
-	::new (data) CameraData();
+	m_pData->camera = this;
+	m_pData->Position = m_pGameObject->GetComponent<Transformer>()->GetPosition();
+	m_pData->MatrixV = this->GetViewMatrix();
+	m_pData->MatrixP = this->GetProjectionMatrix();
+	m_pData->MatrixVP = m_pData->MatrixP * m_pData->MatrixV;
+	m_pData->pRenderTarget = &m_rendertargets[RHIContext::g_currentFrame];
 
-	data->camera = this;
-	data->Position = m_pGameObject->GetComponent<Transformer>()->GetPosition();
-	data->MatrixV = this->GetViewMatrix();
-	data->MatrixP = this->GetProjectionMatrix();
-	data->MatrixVP = data->MatrixP * data->MatrixV;
-	data->pRenderTarget = &m_rendertargets[RHIContext::g_currentFrame];
-
-	return data;
+	return m_pData;
 }
 
 void Camera::Move(Direction dir, float dis)
@@ -126,8 +124,6 @@ void Camera::RecreateRenderTarget(unsigned int width, unsigned int height)
 {
 	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{
-		m_rendertargets[i].SetupInformer(2);
-
 		delete m_rendertargets[i].pColorTexture;
 		delete m_rendertargets[i].pDepthTexture;
 		delete m_textureResources[i * 2u];
@@ -181,6 +177,10 @@ void Camera::RecreateRenderTarget(unsigned int width, unsigned int height)
 		RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
 		m_rendertargets[i].pDepthTexture = m_textureResources[i * 2 + 1]->CreateTextureView(&viewDescriptor);
 	}
+
+	m_renderer->UpdateRenderTarget(GetData());
+
+	//m_aspect = (float)width / (float)height;
 }
 
 void Camera::UpdateViewMatrix()

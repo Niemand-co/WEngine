@@ -1,7 +1,6 @@
 #pragma once
 #include "Render/Passes/Public/ScriptableRenderPass.h"
 
-class RHIRenderTarget;
 class RHIPipelineStateObject;
 class RHISampler;
 class GameObject;
@@ -18,11 +17,9 @@ public:
 
 	virtual void Execute(RHIContext *context, CameraData* cameraData) override;
 
+	virtual void UpdateRenderTarget(CameraData *cameraData) override;
+
 private:
-
-	std::vector<RHIRenderTarget*> m_pRenderTargets;
-
-	RHIPipelineStateObject *m_pPSO;
 
 	GameObject *m_currentGo;
 

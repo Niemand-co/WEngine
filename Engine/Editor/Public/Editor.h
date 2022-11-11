@@ -26,6 +26,8 @@ namespace WEngine
 
 	public:
 
+		static int g_selectedID;
+
 		static std::vector<GameObject*> g_selectedObjects;
 
 		static Camera *g_pEditorCamera;

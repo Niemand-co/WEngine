@@ -11,10 +11,6 @@ struct RenderTarget
 {
 	RHITextureView *pColorTexture;
 	RHITextureView *pDepthTexture;
-	bool isChanged;
-	unsigned int leftCount = 0;
-	void SetupInformer(unsigned int count) { leftCount += count; }
-	bool Informing() { if(leftCount == 0) return false; else { --leftCount; return true; } }
 };
 
 class Camera : public Component
@@ -76,6 +72,8 @@ private:
 	std::vector<RenderTarget> m_rendertargets;
 
 	std::vector<RHITexture*> m_textureResources;
+
+	CameraData *m_pData;
 
 };
 

@@ -11,6 +11,8 @@
 #include "Event/Public/WindowEvent.h"
 #include "Event/Public/MouseButtonEvent.h"
 #include "Scene/Components/Public/Camera.h"
+#include "Scene/Public/World.h"
+#include "Scene/Public/GameObject.h"
 
 namespace WEngine
 {
@@ -88,7 +90,7 @@ namespace WEngine
 			if (pEvent->GetMouseCode() == GLFW_MOUSE_BUTTON_2)
 			{
 				ImVec2 mousePos = ImGui::GetMousePos();
-				if(mousePos.x > m_displayArea.first.x && mousePos.x < m_displayArea.second.x && mousePos.y > m_displayArea.first.y && mousePos.y < m_displayArea.second.y)
+				if(mousePos.x > m_displayArea.first.x && mousePos.x < (m_displayArea.first.x + m_displayArea.second.x) && mousePos.y > (m_displayArea.first.y + 75) && mousePos.y < (m_displayArea.first.y + m_displayArea.second.y + 75))
 					return false;
 			}
 			return true;
@@ -96,15 +98,38 @@ namespace WEngine
 
 		dispatcher.Dispatch<WEngine::MouseButtonReleasedEvent>([this](WEngine::MouseButtonReleasedEvent* pEvent) -> bool
 		{
+			if (pEvent->GetMouseCode() == GLFW_MOUSE_BUTTON_1)
+			{
+				Screen::SetWidth(m_displayArea.second.x);
+				Screen::SetHeight(m_displayArea.second.y);
+				if (Screen::SizeChanged())
+				{
+					Screen::g_displayingCamera->RecreateRenderTarget(Screen::GetWidth(), Screen::GetHeight());
+					for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
+					{
+						Gui::g_pGui->RemoveTexture(m_imageID[i]);
+						m_imageID[i] = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(i).pColorTexture, m_pSampler);
+					}
+					Screen::ResetState();
+				}
+			}
 			return false;
 		});
 
 		dispatcher.Dispatch<WEngine::WindowResizeEvent>([this](WEngine::WindowResizeEvent* pEvent) -> bool
 		{
-			//m_displayArea.first = ImGui::GetItemRectMin();
-			//m_displayArea.second = ImGui::GetItemRectMax();
-			//Screen::SetWidth(m_displayArea.second.x - m_displayArea.first.x);
-			//Screen::SetHeight(m_displayArea.second.y - m_displayArea.first.y);
+			Screen::SetWidth(m_displayArea.second.x);
+			Screen::SetHeight(m_displayArea.second.y);
+			if (Screen::SizeChanged())
+			{
+				Screen::g_displayingCamera->RecreateRenderTarget(Screen::GetWidth(), Screen::GetHeight());
+				for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
+				{
+					Gui::g_pGui->RemoveTexture(m_imageID[i]);
+					m_imageID[i] = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(i).pColorTexture, m_pSampler);
+				}
+				Screen::ResetState();
+			}
 			return false;
 		});
 	}
@@ -129,25 +154,35 @@ namespace WEngine
 				ImGui::EndMainMenuBar();
 			}
 
-			ImGui::Begin("Inspector");
-			ImGui::End();
-
-			ImGui::Begin("Display");
-			m_displayArea.first = ImGui::GetItemRectMin();
-			m_displayArea.second = ImGui::GetWindowSize();
-			Screen::SetWidth(m_displayArea.second.x);
-			Screen::SetHeight(m_displayArea.second.y);
-			if (Screen::SizeChanged())
+			if (ImGui::Begin("Inspector"))
 			{
-				Screen::g_displayingCamera->RecreateRenderTarget(Screen::GetWidth(), Screen::GetHeight());
-				for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
-					m_imageID[i] = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(i).pColorTexture, m_pSampler);
+				ImGui::End();
 			}
-			ImGui::Image(m_imageID[RHIContext::g_currentFrame], ImVec2(Screen::GetWidth(), Screen::GetHeight()));
-			ImGui::End();
 
-			ImGui::Begin("Console");
-			ImGui::End();
+			if(ImGui::Begin("Display"))
+			{
+				m_displayArea.first = ImGui::GetItemRectMin();
+				m_displayArea.second = ImGui::GetWindowSize();
+				m_displayArea.second.y -= 75;
+
+				ImGui::ImageButton(m_imageID[0], ImVec2(25, 25));
+				ImGui::Image(m_imageID[RHIContext::g_currentFrame], ImVec2(Screen::GetWidth(), Screen::GetHeight()));
+				ImGui::End();
+			}
+
+			if (ImGui::Begin("Hierarchy"))
+			{
+				std::vector<GameObject*> gameObjects = World::GetWorld()->GetGameObjects();
+				int count = gameObjects.size();
+				const char* const names[10] = { gameObjects[0]->GetName(), gameObjects[1]->GetName() };
+				ImGui::ListBox("GameScene", &Editor::g_selectedID, names, (int)gameObjects.size());
+				ImGui::End();
+			}
+
+			if (ImGui::Begin("Console"))
+			{
+				ImGui::End();
+			}
 
 		}
 		ImGui::EndFrame();

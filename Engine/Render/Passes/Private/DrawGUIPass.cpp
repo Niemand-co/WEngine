@@ -150,3 +150,21 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 	}
 	context->Submit(&submitDescriptor);
 }
+
+void DrawGUIPass::UpdateRenderTarget(CameraData* cameraData)
+{
+	for (int i = 0; i < 3; ++i)
+	{
+		std::vector<RHITextureView*> textureViews = { RHIContext::GetContext()->GetTextureView(i) };
+		RHIRenderTargetDescriptor renderTargetDescriptor = {};
+		{
+			renderTargetDescriptor.bufferCount = 1;
+			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.renderPass = m_pRenderPass;
+			renderTargetDescriptor.width = Window::cur_window->GetWidth();
+			renderTargetDescriptor.height = Window::cur_window->GetHeight();
+		}
+		delete m_pRenderTargets[i];
+		m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
+	}
+}

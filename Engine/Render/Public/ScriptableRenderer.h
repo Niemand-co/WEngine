@@ -23,6 +23,8 @@ public:
 
 	virtual void EnqueRenderPass(ScriptableRenderPass* renderPass);
 
+	virtual void UpdateRenderTarget(CameraData* cameraData);
+
 	void* operator new(size_t size)
 	{
 		return WEngine::Allocator::Get()->Allocate(size);
