@@ -40,10 +40,12 @@ void Material::SetRoughness(float roughness)
 
 void Material::ShowInInspector()
 {
+	if (ImGui::CollapsingHeader("Material"))
+	{
+		Gui::DrawSlider("Roughness", &roughness, 0.01f, 1.0f);
 
-	//Gui::DrawSlider("Roughness", &(this->*(e.value)), 0.01f, 1.0f);
+		Gui::DrawSlider("Metallic", &metallic, 0.0f, 1.0f);
 
-	//Gui::DrawSlider("Metallic", &metallic, 0.0f, 1.0f);
-
-	//Gui::DrawColorEdit("Albedo", &albedo[0], false);
+		Gui::DrawColorEdit("Albedo", &albedo[0], false);
+	}
 }

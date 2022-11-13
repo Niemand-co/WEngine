@@ -17,6 +17,8 @@ class Camera : public Component
 {
 	ENABLE_REFLECTION
 
+	friend class GameObject;
+
 public:
 
 	typedef Camera type;
@@ -24,6 +26,8 @@ public:
 	Camera(GameObject* pGameObject, const float& fov = 3.1415926535f / 2.0f, const float& aspect = 1.0f, const float& nearPlane = 0.1f, const float& farPlane = 1000.0f);
 
 	~Camera() = default;
+
+	virtual void ShowInInspector() override;
 
 	glm::mat4x4 GetViewMatrix();
 

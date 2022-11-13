@@ -5,6 +5,9 @@ class Mesh;
 
 class MeshFilter : public Component
 {
+	
+	friend class GameObject;
+
 public:
 
 	typedef MeshFilter type;
@@ -12,6 +15,8 @@ public:
 	MeshFilter(GameObject* pGameObject);
 
 	~MeshFilter() = default;
+
+	virtual void ShowInInspector() override;
 
 	void SetStaticMesh(Mesh *pStaticMesh);
 

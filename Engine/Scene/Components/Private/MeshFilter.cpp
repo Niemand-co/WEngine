@@ -8,6 +8,10 @@ MeshFilter::MeshFilter(GameObject* pGameObject)
 	m_type = Component::ComponentType::MeshFilter;
 }
 
+void MeshFilter::ShowInInspector()
+{
+}
+
 void MeshFilter::SetStaticMesh(Mesh* pStaticMesh)
 {
 	m_pStaticMesh = pStaticMesh;

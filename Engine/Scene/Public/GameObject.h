@@ -9,6 +9,8 @@ class World;
 
 class GameObject : public Object
 {
+	friend class World;
+
 public:
 
 	GameObject(std::string name = "GameObject");
@@ -20,6 +22,12 @@ public:
 	inline const char* const GetName() const { return m_name.c_str(); }
 
 	void AddGameObject(GameObject *pGameObject);
+
+	const std::vector<GameObject*>& GetChildGameObjects() const;
+
+	void ShowInInspector() const;
+
+	bool HasChild() const;
 
 	template<typename T>
 	T* AddComponent();

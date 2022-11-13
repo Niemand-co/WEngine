@@ -74,6 +74,10 @@ Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, c
 	::new (m_pData) CameraData();
 }
 
+void Camera::ShowInInspector()
+{
+}
+
 glm::mat4x4 Camera::GetViewMatrix()
 {
 	UpdateViewMatrix();
@@ -180,7 +184,7 @@ void Camera::RecreateRenderTarget(unsigned int width, unsigned int height)
 
 	m_renderer->UpdateRenderTarget(GetData());
 
-	//m_aspect = (float)width / (float)height;
+	m_aspect = (float)width / (float)height;
 }
 
 void Camera::UpdateViewMatrix()

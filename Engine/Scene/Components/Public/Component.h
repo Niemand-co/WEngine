@@ -24,6 +24,8 @@ class Component : public Object
 {
 	ENABLE_REFLECTION
 
+	friend class GameObject;
+
 public:
 	enum class ComponentType
 	{
@@ -42,6 +44,8 @@ public:
 	virtual ComponentType GetType() { return m_type; }
 
 	inline GameObject* GetGameObject() { return m_pGameObject; } ;
+
+	virtual void ShowInInspector() = 0;
 
 	virtual bool IsType(ComponentType type) 
 	{

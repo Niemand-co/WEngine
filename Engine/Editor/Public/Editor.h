@@ -20,6 +20,8 @@ namespace WEngine
 
 		static void SelectObject(const std::vector<GameObject*>& gameObjects);
 
+		static bool IsSelected(GameObject *pGameObject);
+
 		static std::vector<GameObject*>& GetSelectedObject();
 
 		static size_t GetSelectedObjectCount();

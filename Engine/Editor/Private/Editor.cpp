@@ -36,6 +36,16 @@ namespace WEngine
 		g_selectedObjects = gameObjects;
 	}
 
+	bool Editor::IsSelected(GameObject* pGameObject)
+	{
+		for (GameObject* object : g_selectedObjects)
+		{
+			if(pGameObject == object)
+				return true;
+		}
+		return false;
+	}
+
 	std::vector<GameObject*>& Editor::GetSelectedObject()
 	{
 		return g_selectedObjects;

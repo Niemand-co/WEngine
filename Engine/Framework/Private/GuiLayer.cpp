@@ -13,6 +13,9 @@
 #include "Scene/Components/Public/Camera.h"
 #include "Scene/Public/World.h"
 #include "Scene/Public/GameObject.h"
+#include "Platform/GLFWWindow/Public/GLFWWindow.h"
+#include "Utils/ImGui/Panels/Public/SceneHierarchyPanel.h"
+#include "Utils/ImGui/Panels/Public/InspectorPanel.h"
 
 namespace WEngine
 {
@@ -63,7 +66,7 @@ namespace WEngine
 		}
 
 		m_imageID.resize(RHIContext::g_maxFrames);
-		for(unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
+		for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 			m_imageID[i] = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(i).pColorTexture, m_pSampler);
 	}
 
@@ -75,6 +78,10 @@ namespace WEngine
 	{
 		m_pPipeline->Init();
 		m_pPipeline->Setup();
+
+		m_pHierarchyPanel = new SceneHierarchyPanel();
+
+		m_pInspectorPanel = new InspectorPanel();
 	}
 
 	void GuiLayer::OnDettach()
@@ -90,7 +97,7 @@ namespace WEngine
 			if (pEvent->GetMouseCode() == GLFW_MOUSE_BUTTON_2)
 			{
 				ImVec2 mousePos = ImGui::GetMousePos();
-				if(mousePos.x > m_displayArea.first.x && mousePos.x < (m_displayArea.first.x + m_displayArea.second.x) && mousePos.y > (m_displayArea.first.y + 75) && mousePos.y < (m_displayArea.first.y + m_displayArea.second.y + 75))
+				if(mousePos.x > m_displayArea.first.x && mousePos.x < (m_displayArea.first.x + m_displayArea.second.x) && mousePos.y > (m_displayArea.first.y + 50) && mousePos.y < (m_displayArea.first.y + m_displayArea.second.y + 50))
 					return false;
 			}
 			return true;
@@ -118,18 +125,18 @@ namespace WEngine
 
 		dispatcher.Dispatch<WEngine::WindowResizeEvent>([this](WEngine::WindowResizeEvent* pEvent) -> bool
 		{
-			Screen::SetWidth(m_displayArea.second.x);
-			Screen::SetHeight(m_displayArea.second.y);
-			if (Screen::SizeChanged())
-			{
-				Screen::g_displayingCamera->RecreateRenderTarget(Screen::GetWidth(), Screen::GetHeight());
-				for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
-				{
-					Gui::g_pGui->RemoveTexture(m_imageID[i]);
-					m_imageID[i] = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(i).pColorTexture, m_pSampler);
-				}
-				Screen::ResetState();
-			}
+			//Screen::SetWidth(m_displayArea.second.x);
+			//Screen::SetHeight(m_displayArea.second.y);
+			//if (Screen::SizeChanged())
+			//{
+			//	Screen::g_displayingCamera->RecreateRenderTarget(Screen::GetWidth(), Screen::GetHeight());
+			//	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
+			//	{
+			//		Gui::g_pGui->RemoveTexture(m_imageID[i]);
+			//		m_imageID[i] = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(i).pColorTexture, m_pSampler);
+			//	}
+			//	Screen::ResetState();
+			//}
 			return false;
 		});
 	}
@@ -151,36 +158,59 @@ namespace WEngine
 				{
 					ImGui::EndMenu();
 				}
+				if (ImGui::BeginMenu("View"))
+				{
+					ImGui::MenuItem("Hierarchy", "", &m_isHierarchyShowed);
+					ImGui::MenuItem("Console", "", &m_isConsoleShowed);
+					ImGui::MenuItem("Settings", "", &m_isSettingsShowed);
+					ImGui::EndMenu();
+				}
 				ImGui::EndMainMenuBar();
 			}
 
 			if (ImGui::Begin("Inspector"))
 			{
-				ImGui::End();
+				m_pInspectorPanel->DrawGameObject();
 			}
+			ImGui::End();
 
 			if(ImGui::Begin("Display"))
 			{
 				m_displayArea.first = ImGui::GetItemRectMin();
-				m_displayArea.second = ImGui::GetWindowSize();
-				m_displayArea.second.y -= 75;
+				m_displayArea.second = ImGui::GetContentRegionAvail();
+				m_displayArea.second.y -= 50;
+
+				Screen::SetWidth(m_displayArea.second.x);
+				Screen::SetHeight(m_displayArea.second.y);
 
 				ImGui::ImageButton(m_imageID[0], ImVec2(25, 25));
-				ImGui::Image(m_imageID[RHIContext::g_currentFrame], ImVec2(Screen::GetWidth(), Screen::GetHeight()));
+				ImGui::Image(m_imageID[RHIContext::g_currentFrame], m_displayArea.second);
+			}
+			ImGui::End();
+
+			if (m_isHierarchyShowed)
+			{
+				if (ImGui::Begin("Hierarchy", &m_isHierarchyShowed))
+				{
+					m_pHierarchyPanel->DrawNodes();
+				}
 				ImGui::End();
 			}
 
-			if (ImGui::Begin("Hierarchy"))
+			if (m_isConsoleShowed)
 			{
-				std::vector<GameObject*> gameObjects = World::GetWorld()->GetGameObjects();
-				int count = gameObjects.size();
-				const char* const names[10] = { gameObjects[0]->GetName(), gameObjects[1]->GetName() };
-				ImGui::ListBox("GameScene", &Editor::g_selectedID, names, (int)gameObjects.size());
+				if (ImGui::Begin("Console", &m_isConsoleShowed))
+				{
+				}
 				ImGui::End();
 			}
 
-			if (ImGui::Begin("Console"))
+			if (m_isSettingsShowed)
 			{
+				if (ImGui::Begin("Settings", &m_isSettingsShowed))
+				{
+
+				}
 				ImGui::End();
 			}
 

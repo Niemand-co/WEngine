@@ -10,3 +10,7 @@ Light::Light(GameObject *pGameObject)
 Light::~Light()
 {
 }
+
+void Light::ShowInInspector()
+{
+}

@@ -44,6 +44,8 @@ namespace WEngine
 
 		LayerStack *m_pLayerStack;
 
+		Layer *m_pEditorLayer;
+
 	};
 
 	Application* CreateApplication();

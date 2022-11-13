@@ -13,6 +13,8 @@ class Light : public Component
 		Spot,
 	};
 
+	friend class GameObject;
+
 public:
 	
 	typedef Light type;
@@ -20,6 +22,8 @@ public:
 	Light(GameObject* pGameObject);
 
 	virtual ~Light();
+
+	virtual void ShowInInspector() override;
 
 private:
 

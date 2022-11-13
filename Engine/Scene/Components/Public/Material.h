@@ -33,6 +33,8 @@ class Material : public Component
 
 	friend class VulkanGui;
 
+	friend class GameObject;
+
 public:
 
 	typedef Material type;
@@ -40,6 +42,8 @@ public:
 	Material(GameObject *pGameObject);
 
 	~Material() = default;
+
+	virtual void ShowInInspector() override;
 
 	void SetShader(RHIShader* shader);
 
@@ -50,8 +54,6 @@ public:
 	void SetColor(glm::vec4 color);
 
 	void SetRoughness(float roughness);
-
-	void ShowInInspector();
 
 private:
 

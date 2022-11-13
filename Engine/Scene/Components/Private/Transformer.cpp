@@ -9,6 +9,17 @@ Transformer::Transformer(GameObject* pGameObject)
 	m_rotate = glm::vec3(0.0f);
 	m_position = glm::vec3(0.0f);
 	m_forward = glm::vec3(0.0f, 0.0f, -1.0f);
+	m_scale = glm::vec3(1.f, 1.f, 1.f);
+}
+
+void Transformer::ShowInInspector()
+{
+	if (ImGui::CollapsingHeader("Transformer"))
+	{
+		ImGui::Text("Position X:%.2f Y:%.2f X:%.2f", m_position.x, m_position.y, m_position.z);
+		ImGui::Text("Rotation X:%.2f Y:%.2f X:%.2f", m_rotate.x, m_rotate.y, m_rotate.z);
+		ImGui::Text("Scale X:%.2f Y:%.2f X:%.2f", m_scale.x, m_scale.y, m_scale.z);
+	}
 }
 
 void Transformer::SetScale(glm::vec3 scale)

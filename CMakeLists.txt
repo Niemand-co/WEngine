@@ -33,6 +33,7 @@ file(GLOB LOG_SRC Engine/Log/Private/*.*)
 file(GLOB RHI_SRC Engine/RHI/Private/*.*)
 file(GLOB RHI_ENCODER_SRC Engine/RHI/Encoder/Private/*.*)
 file(GLOB GUI_SRC Engine/Utils/ImGui/Private/*.*)
+file(GLOB PANEL_SRC Engine/Utils/ImGui/Panels/Private/*.*)
 file(GLOB REFLECTION_SRC Engine/Utils/Reflection/Private/*.*)
 file(GLOB GLFW_SRC Platform/GLFWWindow/Private/*.*)
 file(GLOB WIN_SRC Platform/Windows/Private/*.*)
@@ -59,6 +60,7 @@ file(GLOB LOG_INCLUDE Engine/Log/Public/*.h)
 file(GLOB RHI_INCLUDE Engine/RHI/Public/*.h)
 file(GLOB RHI_ENCODER_INCLUDE Engine/RHI/Encoder/Public/*.h)
 file(GLOB GUI_INCLUDE Engine/Utils/ImGui/Public/*.h)
+file(GLOB PANEL_INCLUDE Engine/Utils/ImGui/Panels/Public/*.h)
 file(GLOB REFLECTION_INCLUDE Engine/Utils/Reflection/Public/*.h)
 file(GLOB GLFW_INCLUDE Platform/GLFWWindow/Public/*.h)
 file(GLOB WIN_INCLUDE Platform/Windows/Public/*.h)
@@ -119,6 +121,7 @@ set(WE_SRC
     ${RHI_SRC}
     ${RHI_ENCODER_SRC}
     ${GUI_SRC}
+    ${PANEL_SRC}
     ${REFLECTION_SRC}
     ${GLM_SRC})
 
@@ -142,6 +145,7 @@ set(WE_INCLUDE
     ${RHI_INCLUDE}
     ${RHI_ENCODER_INCLUDE}
     ${GUI_INCLUDE}
+    ${PANEL_INCLUDE}
     ${REFLECTION_INCLUDE})
 
 set(EXA_INCLUDE
@@ -174,6 +178,7 @@ source_group(Engine/Render/Mesh/Private FILES ${MESH_SRC})
 source_group(Engine/RHI/Private FILES ${RHI_SRC})
 source_group(Engine/RHI/Encoder/Private FILES ${RHI_ENCODER_SRC})
 source_group(Engine/Utils/ImGui/Private FILES ${GUI_SRC})
+source_group(Engine/Utils/ImGui/Panels/Private FILES ${PANEL_SRC})
 source_group(Engine/Utils/Reflection/Private FILES ${REFLECTION_SRC})
 source_group(Platform/GLFWWindow/Private FILES ${GLFW_SRC})
 source_group(Platform/Vulkan/Private FILES ${VULKAN_SRC})
@@ -200,6 +205,7 @@ source_group(Engine/Log/Public FILES ${LOG_INCLUDE})
 source_group(Engine/RHI/Public FILES ${RHI_INCLUDE})
 source_group(Engine/RHI/Encoder/Public FILES ${RHI_ENCODER_INCLUDE})
 source_group(Engine/Utils/ImGui/Public FILES ${GUI_INCLUDE})
+source_group(Engine/Utils/ImGui/Panels/Public FILES ${PANEL_INCLUDE})
 source_group(Engine/Utils/Reflection/Public FILES ${REFLECTION_INCLUDE})
 source_group(Platform/GLFWWindow/Public FILES ${GLFW_INCLUDE})
 source_group(Platform/Vulkan/Public FILES ${VULKAN_INCLUDE})

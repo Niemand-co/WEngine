@@ -4,9 +4,13 @@
 
 class Object
 {
+	friend class World;
+
 public:
 
 	virtual ~Object() = default;
+
+protected:
 
 	void* operator new(size_t size)
 	{

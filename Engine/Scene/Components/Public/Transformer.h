@@ -3,6 +3,9 @@
 
 class Transformer : public Component
 {
+
+	friend class GameObject;
+
 public:
 
 	typedef Transformer type;
@@ -10,6 +13,8 @@ public:
 	Transformer(GameObject* pGameObject);
 
 	~Transformer() = default;
+
+	virtual void ShowInInspector() override;
 
 	void SetScale(glm::vec3 scale);
 
