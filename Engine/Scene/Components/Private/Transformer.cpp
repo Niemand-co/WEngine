@@ -101,6 +101,7 @@ void Transformer::Rotate(RotateDirection dir, float dis)
 	{
 	case RotateDirection::Pitch:
 		m_rotate.x += dis;
+		m_rotate.x = m_rotate.x > 89.0f ? 89.0f : (m_rotate.x < -89.0f ? -89.0f : m_rotate.x);
 		break;
 	case RotateDirection::Yaw:
 		m_rotate.y += dis;
@@ -111,6 +112,7 @@ void Transformer::Rotate(RotateDirection dir, float dis)
 	default:
 		break;
 	}
+	
 	glm::mat4 rotateMatrix = glm::mat4(1.0f);
 	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f));
 	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f));

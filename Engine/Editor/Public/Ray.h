@@ -20,6 +20,10 @@ namespace WEngine
 
 		bool IsIntersectWithGameObject(GameObject *pGameObject);
 
+	public:
+
+		static Ray GetClickRay(glm::vec2 ScreenPos, glm::vec3 o, glm::mat4 inverseVP);
+
 	private:
 
 		glm::vec3 O;

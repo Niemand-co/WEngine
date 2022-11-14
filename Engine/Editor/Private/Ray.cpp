@@ -51,4 +51,15 @@ namespace WEngine
 		return false;
 	}
 
+	Ray Ray::GetClickRay(glm::vec2 ScreenPos, glm::vec3 o, glm::mat4 inverseVP)
+	{
+		glm::vec4 pos = glm::vec4(0.0f, 0.0f, -1.0f, 1.0f);
+		pos.x = ScreenPos.x * 2.0f - 1.0f;
+		pos.y = ScreenPos.y * 2.0f - 1.0f;
+		pos = inverseVP * pos;
+		pos /= pos.w;
+		Ray ray(o, glm::normalize(glm::vec3(pos) - o));
+		return std::move(ray);
+	}
+
 }

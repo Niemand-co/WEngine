@@ -83,6 +83,60 @@ namespace WEngine
 		m_pHierarchyPanel = new SceneHierarchyPanel();
 
 		m_pInspectorPanel = new InspectorPanel();
+
+		ImGuiStyle* style = &ImGui::GetStyle();
+		style->WindowPadding = ImVec2(15, 15);
+		style->WindowRounding = 5.0f;
+		style->FramePadding = ImVec2(5, 5);
+		style->FrameRounding = 4.0f;
+		style->ItemSpacing = ImVec2(12, 8);
+		style->ItemInnerSpacing = ImVec2(8, 6);
+		style->IndentSpacing = 25.0f;
+		style->ScrollbarSize = 15.0f;
+		style->ScrollbarRounding = 9.0f;
+		style->GrabMinSize = 5.0f;
+		style->GrabRounding = 3.0f;
+
+		style->Colors[ImGuiCol_Text] = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
+		style->Colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+		style->Colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+		style->Colors[ImGuiCol_ChildBg] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
+		style->Colors[ImGuiCol_PopupBg] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
+		style->Colors[ImGuiCol_Border] = ImVec4(0.80f, 0.80f, 0.83f, 0.88f);
+		style->Colors[ImGuiCol_BorderShadow] = ImVec4(0.92f, 0.91f, 0.88f, 0.00f);
+		style->Colors[ImGuiCol_FrameBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+		style->Colors[ImGuiCol_FrameBgActive] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+		style->Colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f, 0.98f, 0.95f, 0.75f);
+		style->Colors[ImGuiCol_TitleBgActive] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
+		style->Colors[ImGuiCol_MenuBarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+		style->Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+		style->Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+		style->Colors[ImGuiCol_CheckMark] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+		style->Colors[ImGuiCol_SliderGrab] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+		style->Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+		style->Colors[ImGuiCol_Button] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_ButtonHovered] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+		style->Colors[ImGuiCol_ButtonActive] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+		style->Colors[ImGuiCol_Header] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_HeaderHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+		style->Colors[ImGuiCol_HeaderActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+		style->Colors[ImGuiCol_ResizeGrip] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		style->Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+		style->Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+		style->Colors[ImGuiCol_PlotLines] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
+		style->Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+		style->Colors[ImGuiCol_PlotHistogram] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
+		style->Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+		style->Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
+		style->Colors[ImGuiCol_Tab] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
+		style->Colors[ImGuiCol_TabHovered] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+		style->Colors[ImGuiCol_TabActive] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_TabUnfocused] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
+		style->Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
 	}
 
 	void GuiLayer::OnDettach()
@@ -96,7 +150,7 @@ namespace WEngine
 		dispatcher.Dispatch<WEngine::MouseButtonPressedEvent>([this](WEngine::MouseButtonPressedEvent* pEvent) -> bool
 		{
 			ImVec2 mousePos = ImGui::GetMousePos();
-			if (mousePos.x > m_displayArea.first.x && mousePos.x < (m_displayArea.first.x + m_displayArea.second.x) && mousePos.y >(m_displayArea.first.y + 50) && mousePos.y < (m_displayArea.first.y + m_displayArea.second.y + 50))
+			if (mousePos.x > m_displayArea.first.x && mousePos.x < m_displayArea.second.x && mousePos.y >(m_displayArea.first.y + 50) && mousePos.y < (m_displayArea.second.y + 50))
 			{
 				if(pEvent->GetMouseCode() == GLFW_MOUSE_BUTTON_2)
 					return false;
@@ -106,22 +160,19 @@ namespace WEngine
 
 					CameraData* data = Editor::g_pEditorCamera->GetData();
 					ImVec2 mousePos = ImGui::GetMousePos();
-					glm::vec4 ScreenPos = glm::vec4(0.0f, 0.0f, -1.0f, 1.0f);
-					ScreenPos.x = ((mousePos.x - m_displayArea.first.x) / m_displayArea.second.x) * 2.0f - 1.0f;
-					ScreenPos.y = ((mousePos.y - m_displayArea.first.y) / m_displayArea.second.y) * 2.0f - 1.0f;
-					ScreenPos = glm::inverse(data->MatrixVP) * ScreenPos;
-					ScreenPos /= ScreenPos.w;
-					Ray ray(data->Position, glm::normalize(glm::vec3(ScreenPos) - data->Position));
+					glm::vec2 pos = { (mousePos.x - m_displayArea.first.x) / (m_displayArea.second.x - m_displayArea.first.x), 1.0f - (mousePos.y - m_displayArea.first.y) / (m_displayArea.second.y - m_displayArea.first.y) };
+					Ray ray = Ray::GetClickRay(pos, data->Position, glm::inverse(data->MatrixVP));
 					const std::vector<GameObject*>& pGameObjects = World::GetWorld()->GetGameObjects();
 					for (GameObject* pGameObject : pGameObjects)
 					{
 						if (ray.IsIntersectWithGameObject(pGameObject))
 						{
 							Editor::SelectObject(pGameObject);
-							RE_LOG(pGameObject->GetName());
 							return true;
 						}
 					}
+					if(ray.IsIntersectWithTriangle(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f)))
+						RE_LOG("Triangle");
 				}
 			}
 			return true;
@@ -131,8 +182,8 @@ namespace WEngine
 		{
 			if (pEvent->GetMouseCode() == GLFW_MOUSE_BUTTON_1)
 			{
-				Screen::SetWidth(m_displayArea.second.x);
-				Screen::SetHeight(m_displayArea.second.y);
+				Screen::SetWidth(m_displayArea.second.x - m_displayArea.first.x);
+				Screen::SetHeight(m_displayArea.second.y - m_displayArea.first.y);
 				if (Screen::SizeChanged())
 				{
 					Screen::g_displayingCamera->RecreateRenderTarget(Screen::GetWidth(), Screen::GetHeight());
@@ -171,6 +222,8 @@ namespace WEngine
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		{
+
+
 			ImGui::DockSpaceOverViewport();
 			if (ImGui::BeginMainMenuBar())
 			{
@@ -200,15 +253,18 @@ namespace WEngine
 
 			if(ImGui::Begin("Display"))
 			{
-				m_displayArea.first = ImGui::GetItemRectMin();
-				m_displayArea.second = ImGui::GetContentRegionAvail();
+				ImVec2 viewportMin = ImGui::GetWindowContentRegionMin();
+				ImVec2 viewportMax = ImGui::GetWindowContentRegionMax();
+				ImVec2 viewportOffset = ImGui::GetWindowPos();
+				m_displayArea.first = { viewportMin.x + viewportOffset.x, viewportMin.y + viewportOffset.y };
+				m_displayArea.second = { viewportMax.x + viewportOffset.x, viewportMax.y + viewportOffset.y };
 				m_displayArea.second.y -= 50;
 
-				Screen::SetWidth(m_displayArea.second.x);
-				Screen::SetHeight(m_displayArea.second.y);
+				Screen::SetWidth(m_displayArea.second.x - m_displayArea.first.x);
+				Screen::SetHeight(m_displayArea.second.y - m_displayArea.first.y);
 
 				ImGui::ImageButton(m_imageID[0], ImVec2(25, 25));
-				ImGui::Image(m_imageID[RHIContext::g_currentFrame], m_displayArea.second);
+				ImGui::Image(m_imageID[RHIContext::g_currentFrame], { (float)Screen::GetWidth(), (float)Screen::GetHeight() });
 			}
 			ImGui::End();
 

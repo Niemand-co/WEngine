@@ -17,7 +17,6 @@ namespace WEngine
 		GameObject *pCurrentObject = Editor::GetSelectedObject()[0];
 
 		ImGui::Text(pCurrentObject->GetName());
-		ImGui::Separator();
 		if (ImGui::BeginChild("Transformer"))
 		{
 			pCurrentObject->ShowInInspector();
