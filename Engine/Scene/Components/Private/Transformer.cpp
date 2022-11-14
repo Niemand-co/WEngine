@@ -55,7 +55,7 @@ glm::mat4 Transformer::GetLocalToWorldMatrix()
 
 glm::mat4 Transformer::GetWorldToLocalMatrix()
 {
-	return glm::inverse(GetWorldToLocalMatrix());
+	return glm::inverse(GetLocalToWorldMatrix());
 }
 
 glm::vec3 Transformer::GetForward()

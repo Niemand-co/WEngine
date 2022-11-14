@@ -16,6 +16,8 @@ namespace WEngine
 
 		static void Init();
 
+		static void ClearSelection();
+
 		static void SelectObject(GameObject *pGameObject);
 
 		static void SelectObject(const std::vector<GameObject*>& gameObjects);

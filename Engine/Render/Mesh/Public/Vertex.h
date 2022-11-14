@@ -18,18 +18,18 @@ struct Vertex
 {
 public:
 
-	Vertex(Vector3 position = {0, 0, 0}, Vector3 color = {0, 0, 0}, Vector3 normal = {1.0f, 0, 0}, Vector2 uv = {0, 0});
+	Vertex(glm::vec3 position = {0, 0, 0}, glm::vec3 color = {0, 0, 0}, glm::vec3 normal = {1.0f, 0, 0}, glm::vec2 uv = {0, 0});
 
 	~Vertex();
 
 public:
 
-	Vector3 Position;
+	glm::vec3 Position;
 
-	Vector3 Color;
+	glm::vec3 Color;
 
-	Vector3 Normal;
+	glm::vec3 Normal;
 
-	Vector2 UV;
+	glm::vec2 UV;
 	
 };

@@ -16,6 +16,7 @@
 #include "Platform/GLFWWindow/Public/GLFWWindow.h"
 #include "Utils/ImGui/Panels/Public/SceneHierarchyPanel.h"
 #include "Utils/ImGui/Panels/Public/InspectorPanel.h"
+#include "Editor/Public/Ray.h"
 
 namespace WEngine
 {
@@ -94,11 +95,34 @@ namespace WEngine
 
 		dispatcher.Dispatch<WEngine::MouseButtonPressedEvent>([this](WEngine::MouseButtonPressedEvent* pEvent) -> bool
 		{
-			if (pEvent->GetMouseCode() == GLFW_MOUSE_BUTTON_2)
+			ImVec2 mousePos = ImGui::GetMousePos();
+			if (mousePos.x > m_displayArea.first.x && mousePos.x < (m_displayArea.first.x + m_displayArea.second.x) && mousePos.y >(m_displayArea.first.y + 50) && mousePos.y < (m_displayArea.first.y + m_displayArea.second.y + 50))
 			{
-				ImVec2 mousePos = ImGui::GetMousePos();
-				if(mousePos.x > m_displayArea.first.x && mousePos.x < (m_displayArea.first.x + m_displayArea.second.x) && mousePos.y > (m_displayArea.first.y + 50) && mousePos.y < (m_displayArea.first.y + m_displayArea.second.y + 50))
+				if(pEvent->GetMouseCode() == GLFW_MOUSE_BUTTON_2)
 					return false;
+				else if (pEvent->GetMouseCode() == GLFW_MOUSE_BUTTON_1)
+				{
+					Editor::ClearSelection();
+
+					CameraData* data = Editor::g_pEditorCamera->GetData();
+					ImVec2 mousePos = ImGui::GetMousePos();
+					glm::vec4 ScreenPos = glm::vec4(0.0f, 0.0f, -1.0f, 1.0f);
+					ScreenPos.x = ((mousePos.x - m_displayArea.first.x) / m_displayArea.second.x) * 2.0f - 1.0f;
+					ScreenPos.y = ((mousePos.y - m_displayArea.first.y) / m_displayArea.second.y) * 2.0f - 1.0f;
+					ScreenPos = glm::inverse(data->MatrixVP) * ScreenPos;
+					ScreenPos /= ScreenPos.w;
+					Ray ray(data->Position, glm::normalize(glm::vec3(ScreenPos) - data->Position));
+					const std::vector<GameObject*>& pGameObjects = World::GetWorld()->GetGameObjects();
+					for (GameObject* pGameObject : pGameObjects)
+					{
+						if (ray.IsIntersectWithGameObject(pGameObject))
+						{
+							Editor::SelectObject(pGameObject);
+							RE_LOG(pGameObject->GetName());
+							return true;
+						}
+					}
+				}
 			}
 			return true;
 		});

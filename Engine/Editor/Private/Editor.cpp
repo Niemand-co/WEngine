@@ -24,6 +24,11 @@ namespace WEngine
 		pCamera->SetRenderer(ScriptableRenderPipeline::CreateRenderer());
 	}
 
+	void Editor::ClearSelection()
+	{
+		g_selectedObjects.clear();
+	}
+
 	void Editor::SelectObject(GameObject* pGameObject)
 	{
 		g_selectedObjects.clear();
