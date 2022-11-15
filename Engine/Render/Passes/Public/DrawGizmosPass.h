@@ -4,6 +4,8 @@
 class RHIGroup;
 class RHIBuffer;
 class RHIPipelineResourceLayout;
+class RHIBuffer;
+class Mesh;
 
 class DrawGizmosPass : public ScriptableRenderPass
 {
@@ -26,5 +28,11 @@ private:
 	RHIBuffer *m_pBuffer;
 
 	RHIPipelineResourceLayout *m_pResourceLayout;
+
+	RHIBuffer *m_pVertexBuffer;
+
+	RHIBuffer *m_pIndexBuffer;
+
+	Mesh *m_pMesh;
 
 };

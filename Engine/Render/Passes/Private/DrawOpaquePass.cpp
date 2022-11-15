@@ -124,6 +124,8 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 	m_pGroup = context->CreateResourceGroup(&groupDescriptor);
 
+	RHIRasterizationStateDescriptor rasterizationStateDescriptor = {};
+
 	RHIVertexInputDescriptor vertexInputDescriptor = Vertex::GetVertexInputDescriptor();
 	RHIPipelineStateObjectDescriptor psoDescriptor = {};
 	{
@@ -135,6 +137,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		psoDescriptor.shaderCount = shaders.size();
 		psoDescriptor.vertexDescriptor = &vertexInputDescriptor;
 		psoDescriptor.pipelineResourceLayout = m_pPipelineResourceLayout;
+		psoDescriptor.rasterizationStateDescriptor = &rasterizationStateDescriptor;
 	};
 	m_pPSO = context->CreatePSO(&psoDescriptor);
 

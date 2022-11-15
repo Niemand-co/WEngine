@@ -36,12 +36,6 @@ public:
 
 	unsigned int m_indexCount;
 
-private:
-
-	VertexBindingDescription *m_bindingDescription;
-
-	std::vector<VertexAttributeDescription*> m_attributeDescriptions;
-
 };
 
 class MeshLibrary

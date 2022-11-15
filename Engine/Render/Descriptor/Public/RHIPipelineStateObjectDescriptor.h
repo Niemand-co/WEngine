@@ -6,6 +6,7 @@ class RHIDepthStencilDescriptor;
 class RHIShader;
 class RHIRenderPass;
 class RHIPipelineResourceLayout;
+class RHIRasterizationStateDescriptor;
 
 class RHIPipelineStateObjectDescriptor
 {
@@ -32,5 +33,7 @@ public:
 	unsigned int subpass;
 
 	RHIPipelineResourceLayout *pipelineResourceLayout;
+
+	RHIRasterizationStateDescriptor *rasterizationStateDescriptor;
 
 };

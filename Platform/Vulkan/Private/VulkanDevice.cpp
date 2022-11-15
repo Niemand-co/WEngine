@@ -248,7 +248,7 @@ namespace Vulkan
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo = {};
 		{
 			inputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-			inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+			inputAssemblyStateCreateInfo.topology = WEngine::ToVulkan(descriptor->rasterizationStateDescriptor->primitivePology);
 			inputAssemblyStateCreateInfo.primitiveRestartEnable = VK_FALSE;
 		}
 
@@ -262,8 +262,8 @@ namespace Vulkan
 			rasterizationStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 			rasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
 			rasterizationStateCreateInfo.rasterizerDiscardEnable = VK_FALSE;
-			rasterizationStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
-			rasterizationStateCreateInfo.lineWidth = 1.0f;
+			rasterizationStateCreateInfo.polygonMode = WEngine::ToVulkan(descriptor->rasterizationStateDescriptor->polygonMode);
+			rasterizationStateCreateInfo.lineWidth = descriptor->rasterizationStateDescriptor->lineWidth;
 			rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
 			rasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 			rasterizationStateCreateInfo.depthBiasEnable = VK_FALSE;

@@ -9,7 +9,6 @@ Mesh::Mesh()
 	m_vertexCount = 0;
 	m_pIndices = nullptr;
 	m_indexCount = 0;
-	m_bindingDescription = nullptr;
 }
 
 Mesh::~Mesh()

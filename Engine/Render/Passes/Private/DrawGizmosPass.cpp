@@ -4,9 +4,11 @@
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Render/Mesh/Public/Vertex.h"
+#include "Render/Mesh/Public/Mesh.h"
 #include "Scene/Components/Public/Camera.h"
 #include "Editor/Public/Screen.h"
 #include "Editor/Public/Editor.h"
+#include "Scene/Public/GameObject.h"
 
 DrawGizmosPass::DrawGizmosPass()
 {
@@ -98,7 +100,7 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 
 	RHIGroupLayoutDescriptor layoutDescriptor = {};
 	{
-		layoutDescriptor.bindingCount = 0;
+		layoutDescriptor.bindingCount = 1;
 		layoutDescriptor.pBindingResources = resource;
 	}
 	RHIGroupLayout *layout = context->CreateGroupLayout(&layoutDescriptor);
@@ -109,6 +111,12 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 		resourceLayoutDescriptor.pGroupLayout = layout;
 	}
 	m_pResourceLayout = context->CreatePipelineResourceLayout(&resourceLayoutDescriptor);
+
+	RHIRasterizationStateDescriptor rasterizationStateDescriptor = {};
+	{
+		rasterizationStateDescriptor.polygonMode = PolygonMode::Line;
+		rasterizationStateDescriptor.lineWidth = 2.0f;
+	}
 
 	RHIVertexInputDescriptor vertexInputDescriptor = Vertex::GetVertexInputDescriptor();
 
@@ -122,6 +130,7 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 		psoDescriptor.depthStencilDescriptor = &depthStencilDescriptor;
 		psoDescriptor.pipelineResourceLayout = m_pResourceLayout;
 		psoDescriptor.vertexDescriptor = &vertexInputDescriptor;
+		psoDescriptor.rasterizationStateDescriptor = &rasterizationStateDescriptor;
 	}
 	m_pPSO = context->CreatePSO(&psoDescriptor);
 
@@ -139,6 +148,44 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 		bufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	m_pBuffer = context->CreateUniformBuffer(&bufferDescriptor);
+
+	BindingResource bindings[] =
+	{
+		{ 0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX },
+	};
+	BufferResourceInfo info = {};
+	{
+		info.pBuffer = m_pBuffer;
+		info.range = sizeof(data);
+		info.offset = 0;
+	}
+	RHIUpdateResourceDescriptor updateDescriptor = {};
+	{
+		updateDescriptor.bindingCount = 1;
+		updateDescriptor.pBindingResources = bindings;
+		updateDescriptor.bufferResourceCount = 1;
+		updateDescriptor.pBufferInfo = &info;
+		updateDescriptor.pGroup = m_pGroup;
+	}
+	context->UpdateUniformResourceToGroup(&updateDescriptor);
+
+	m_pMesh = GameObject::Find("Cube")->GetComponent<MeshFilter>()->GetStaticMesh();
+
+	RHIBufferDescriptor vertexBufferDescriptor = {};
+	{
+		vertexBufferDescriptor.pData = m_pMesh->m_pVertices;
+		vertexBufferDescriptor.size = m_pMesh->m_vertexCount * sizeof(Vertex);
+		vertexBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
+	}
+	m_pVertexBuffer = context->CreateVertexBuffer(&vertexBufferDescriptor);
+
+	RHIBufferDescriptor indexBufferDescriptor = {};
+	{
+		indexBufferDescriptor.pData = m_pMesh->m_pIndices;
+		indexBufferDescriptor.size = m_pMesh->m_indexCount * sizeof(unsigned int);
+		indexBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
+	}
+	m_pIndexBuffer = context->CreateIndexBuffer(&indexBufferDescriptor);
 
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
@@ -169,6 +216,7 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 	{
 		{ 0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX },
 	};
+	m_pBuffer->LoadData(&data, sizeof(data));
 	BufferResourceInfo info = {};
 	{
 		info.pBuffer = m_pBuffer;

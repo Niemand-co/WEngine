@@ -208,3 +208,19 @@ enum class Filter
 	Nearest,
 	Cube,
 };
+
+enum class PolygonMode
+{
+	Triangle = 0,
+	Line,
+	Point,
+};
+
+enum class PrimitiveTopology
+{
+	TriangleList = 0,
+	TriangleStrip,
+	LineList,
+	LineStrip,
+	PointList,
+};

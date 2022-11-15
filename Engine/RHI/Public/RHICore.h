@@ -338,4 +338,40 @@ namespace WEngine
 		return VK_FILTER_MAX_ENUM;
 	}
 
+	static VkPolygonMode ToVulkan(PolygonMode mode)
+	{
+		switch (mode)
+		{
+		case PolygonMode::Triangle:
+			return VK_POLYGON_MODE_FILL;
+		case PolygonMode::Line:
+			return VK_POLYGON_MODE_LINE;
+		case PolygonMode::Point:
+			return VK_POLYGON_MODE_POINT;
+		default:
+			RE_ASSERT(false, "Error Type Polygon Mode.");
+		}
+		return VK_POLYGON_MODE_MAX_ENUM;
+	}
+
+	static VkPrimitiveTopology ToVulkan(PrimitiveTopology topology)
+	{
+		switch (topology)
+		{
+		case PrimitiveTopology::TriangleList:
+			return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+		case PrimitiveTopology::TriangleStrip:
+			return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+		case PrimitiveTopology::LineList:
+			return VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+		case PrimitiveTopology::LineStrip:
+			return VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+		case PrimitiveTopology::PointList:
+			return VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
+		default:
+			RE_ASSERT(false, "Error Type Primitive Topology.");
+		}
+		return VK_PRIMITIVE_TOPOLOGY_MAX_ENUM;
+	}
+
 }

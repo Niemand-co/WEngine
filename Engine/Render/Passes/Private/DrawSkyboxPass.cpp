@@ -132,6 +132,8 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	m_pPipelineLayout = context->CreatePipelineResourceLayout(&pipelineResourceLayoutDescriptor);
 
+	RHIRasterizationStateDescriptor rasterizationStateDescriptor = {};
+
 	RHIShader *shaders[] = { vertShader, fragShader };
 	RHIPipelineStateObjectDescriptor psoDescriptor = {};
 	{
@@ -143,6 +145,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 		psoDescriptor.depthStencilDescriptor = &depthStencilDescriptor;
 		psoDescriptor.vertexDescriptor = &vertexInputDescriptor;
 		psoDescriptor.pipelineResourceLayout = m_pPipelineLayout;
+		psoDescriptor.rasterizationStateDescriptor = &rasterizationStateDescriptor;
 	}
 	m_pPSO = context->CreatePSO(&psoDescriptor);
 
