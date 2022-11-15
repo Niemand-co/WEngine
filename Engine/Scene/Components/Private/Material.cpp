@@ -40,7 +40,7 @@ void Material::SetRoughness(float roughness)
 
 void Material::ShowInInspector()
 {
-	if (ImGui::CollapsingHeader("Material"))
+	if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		Gui::DrawSlider("Roughness", &roughness, 0.01f, 1.0f);
 

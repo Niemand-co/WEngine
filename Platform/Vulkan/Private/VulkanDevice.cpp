@@ -343,7 +343,7 @@ namespace Vulkan
 			graphicsPipelineCreateInfo.pDynamicState = &dynamicStateCreateInfo;
 			graphicsPipelineCreateInfo.layout = *static_cast<VulkanPipelineResourceLayout*>(descriptor->pipelineResourceLayout)->GetHandle();
 			graphicsPipelineCreateInfo.renderPass = *static_cast<VulkanRenderPass*>(descriptor->renderPass)->GetHandle();
-			graphicsPipelineCreateInfo.subpass = 0;
+			graphicsPipelineCreateInfo.subpass = descriptor->subpass;
 			graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
 			//graphicsPipelineCreateInfo.basePipelineIndex = -1;
 		}

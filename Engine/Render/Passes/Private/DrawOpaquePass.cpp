@@ -124,11 +124,11 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 	m_pGroup = context->CreateResourceGroup(&groupDescriptor);
 
-	m_pMesh->GenerateVertexInputDescription();
-	RHIVertexInputDescriptor vertexInputDescriptor = m_pMesh->GetVertexInputDescriptor();
+	RHIVertexInputDescriptor vertexInputDescriptor = Vertex::GetVertexInputDescriptor();
 	RHIPipelineStateObjectDescriptor psoDescriptor = {};
 	{
 		psoDescriptor.renderPass = m_pRenderPass;
+		psoDescriptor.subpass = 0;
 		psoDescriptor.blendDescriptor = &blendDescriptor;
 		psoDescriptor.depthStencilDescriptor = &depthStencilDescriptor;
 		psoDescriptor.pShader = shaders.data();

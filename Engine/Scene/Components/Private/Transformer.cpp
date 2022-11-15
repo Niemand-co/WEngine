@@ -14,11 +14,22 @@ Transformer::Transformer(GameObject* pGameObject)
 
 void Transformer::ShowInInspector()
 {
-	if (ImGui::CollapsingHeader("Transformer"))
+	if (ImGui::CollapsingHeader("Transformer", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::Text("Position X:%.2f Y:%.2f X:%.2f", m_position.x, m_position.y, m_position.z);
-		ImGui::Text("Rotation X:%.2f Y:%.2f X:%.2f", m_rotate.x, m_rotate.y, m_rotate.z);
-		ImGui::Text("Scale X:%.2f Y:%.2f X:%.2f", m_scale.x, m_scale.y, m_scale.z);
+		ImGui::PushItemWidth(80.0f);
+		ImGui::Text("Position ");
+		ImGui::PushItemWidth(20.0f);
+		ImGui::SameLine();ImGui::Text("X:"); ImGui::SameLine(); ImGui::DragFloat("##PositionX", &m_position.x, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::SameLine(); ImGui::Text("Y:"); ImGui::SameLine(); ImGui::DragFloat("##PositionY", &m_position.y, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::SameLine(); ImGui::Text("Z:"); ImGui::SameLine(); ImGui::DragFloat("##PositionZ", &m_position.z, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+		ImGui::Text("Rotation ");
+		ImGui::PushItemWidth(20.0f);
+		ImGui::SameLine(); ImGui::Text("X:"); ImGui::SameLine(); ImGui::DragFloat("##RotateX", &m_rotate.x, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::SameLine(); ImGui::Text("Y:"); ImGui::SameLine(); ImGui::DragFloat("##RotateY", &m_rotate.y, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::SameLine(); ImGui::Text("Z:"); ImGui::SameLine(); ImGui::DragFloat("##RotateZ", &m_rotate.z, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+		ImGui::Text("Scale    ");
+		ImGui::PushItemWidth(20.0f);
+		ImGui::SameLine(); ImGui::Text("X:"); ImGui::SameLine(); ImGui::DragFloat("##ScaleX", &m_scale.x, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::SameLine(); ImGui::Text("Y:"); ImGui::SameLine(); ImGui::DragFloat("##ScaleY", &m_scale.y, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::SameLine(); ImGui::Text("Z:"); ImGui::SameLine(); ImGui::DragFloat("##ScaleZ", &m_scale.z, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+		ImGui::PopItemWidth();
 	}
 }
 

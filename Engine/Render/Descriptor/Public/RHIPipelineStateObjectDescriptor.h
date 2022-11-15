@@ -29,6 +29,8 @@ public:
 
 	RHIRenderPass *renderPass;
 
+	unsigned int subpass;
+
 	RHIPipelineResourceLayout *pipelineResourceLayout;
 
 };

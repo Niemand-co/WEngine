@@ -61,19 +61,19 @@ void GameScene::OnUpdate(WEngine::TimeStep timeStep)
 	{
 		if (WEngine::Input::IsKeyPressed(GLFW_KEY_W))
 		{
-			m_sceneCamera->Move(Direction::FORWARD, (float)timeStep.GetSeconds() * 1.0f);
+			m_sceneCamera->Move(Direction::FORWARD, (float)timeStep.GetSeconds() * 2.0f);
 		}
 		else if (WEngine::Input::IsKeyPressed(GLFW_KEY_S))
 		{
-			m_sceneCamera->Move(Direction::BACKWARD, (float)timeStep.GetSeconds() * 1.0f);
+			m_sceneCamera->Move(Direction::BACKWARD, (float)timeStep.GetSeconds() * 2.0f);
 		}
 		if (WEngine::Input::IsKeyPressed(GLFW_KEY_A))
 		{
-			m_sceneCamera->Move(Direction::LEFT, (float)timeStep.GetSeconds() * 1.0f);
+			m_sceneCamera->Move(Direction::LEFT, (float)timeStep.GetSeconds() * 2.0f);
 		}
 		else if (WEngine::Input::IsKeyPressed(GLFW_KEY_D))
 		{
-			m_sceneCamera->Move(Direction::RIGHT, (float)timeStep.GetSeconds() * 1.0f);
+			m_sceneCamera->Move(Direction::RIGHT, (float)timeStep.GetSeconds() * 2.0f);
 		}
 		m_sceneCamera->Rotate(RotateDirection::Yaw,  OffsetX * 0.05f);
 		m_sceneCamera->Rotate(RotateDirection::Pitch, OffsetY * 0.05f);

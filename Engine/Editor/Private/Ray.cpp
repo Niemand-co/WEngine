@@ -19,7 +19,7 @@ namespace WEngine
 		glm::mat3 m = glm::inverse(glm::mat3(ab, ac, -D));
 		glm::vec3 result = m * (O - a);
 
-		if(result.x >= 0 && result.x <= 1 && result.y >= 0 && result.y <= 1 && result.z >= 0)
+		if(result.x >= 0 && result.x <= 1.01f && result.y >= 0 && result.y <= 1.01f && result.z >= 0)
 			return true;
 
 		return false;
@@ -40,7 +40,7 @@ namespace WEngine
 		Transformer *transformer = pGameObject->GetComponent<Transformer>();
 
 		glm::vec3 newO = transformer->GetWorldToLocalMatrix() * glm::vec4(O, 1.0f);
-		glm::vec3 newD = transformer->GetWorldToLocalMatrix() * glm::vec4(D, 1.0f);
+		glm::vec3 newD = transformer->GetWorldToLocalMatrix() * glm::vec4(O + D, 1.0f);
 
 		Ray ray(newO, glm::normalize(newD - newO));
 		MeshFilter* staticMesh = pGameObject->GetComponent<MeshFilter>();
@@ -59,7 +59,8 @@ namespace WEngine
 		pos = inverseVP * pos;
 		pos /= pos.w;
 		Ray ray(o, glm::normalize(glm::vec3(pos) - o));
-		return std::move(ray);
+
+		return ray;
 	}
 
 }

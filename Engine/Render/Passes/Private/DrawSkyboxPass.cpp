@@ -104,7 +104,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 
 	m_pMesh = Mesh::GetCube();
-	RHIVertexInputDescriptor vertexInputDescriptor = m_pMesh->GetVertexInputDescriptor();
+	RHIVertexInputDescriptor vertexInputDescriptor = Vertex::GetVertexInputDescriptor();
 
 	BindingResource resource[] = 
 	{
@@ -138,6 +138,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 		psoDescriptor.shaderCount = 2;
 		psoDescriptor.pShader = shaders;
 		psoDescriptor.renderPass = m_pRenderPass;
+		psoDescriptor.subpass = 0;
 		psoDescriptor.blendDescriptor = &blendDescriptor;
 		psoDescriptor.depthStencilDescriptor = &depthStencilDescriptor;
 		psoDescriptor.vertexDescriptor = &vertexInputDescriptor;

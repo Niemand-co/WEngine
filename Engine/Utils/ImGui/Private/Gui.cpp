@@ -22,13 +22,17 @@ Gui* Gui::CreateGui(WEngine::Backend backend)
 	return nullptr;
 }
 
-void Gui::DrawSlider(std::string_view title, float* pValue, float minValue, float maxValue)
+void Gui::DrawSlider(std::string title, float* pValue, float minValue, float maxValue)
 {
+	ImGui::Text(title.c_str());ImGui::SameLine();
+	title = "##" + title;
 	ImGui::SliderFloat(title.data(), pValue, minValue, maxValue);
 }
 
-void Gui::DrawColorEdit(std::string_view title, float* pColor, bool hasAlpha)
+void Gui::DrawColorEdit(std::string title, float* pColor, bool hasAlpha)
 {
+	ImGui::Text(title.c_str()); ImGui::SameLine();
+	title = "##" + title;
 	if (hasAlpha)
 	{
 		ImGui::ColorEdit4(title.data(), pColor);

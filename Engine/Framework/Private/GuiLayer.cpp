@@ -160,8 +160,12 @@ namespace WEngine
 
 					CameraData* data = Editor::g_pEditorCamera->GetData();
 					ImVec2 mousePos = ImGui::GetMousePos();
-					glm::vec2 pos = { (mousePos.x - m_displayArea.first.x) / (m_displayArea.second.x - m_displayArea.first.x), 1.0f - (mousePos.y - m_displayArea.first.y) / (m_displayArea.second.y - m_displayArea.first.y) };
-					Ray ray = Ray::GetClickRay(pos, data->Position, glm::inverse(data->MatrixVP));
+					glm::vec2 pos = { (mousePos.x - m_displayArea.first.x) / (m_displayArea.second.x - m_displayArea.first.x), (m_displayArea.second.y - mousePos.y) / (m_displayArea.second.y - m_displayArea.first.y) };
+					glm::vec4 ray_clip = glm::vec4(pos.x * 2.0f - 1.0f, pos.y * 2.0f - 1.0f, -1.0f, 1.0f);
+					ray_clip = glm::inverse(data->MatrixVP) * ray_clip;
+					glm::vec3 dir = ray_clip / ray_clip.w;
+					//Ray ray = Ray::GetClickRay(pos, data->Position, glm::inverse(data->MatrixVP));
+					Ray ray(data->Position, glm::normalize(dir - data->Position));
 					const std::vector<GameObject*>& pGameObjects = World::GetWorld()->GetGameObjects();
 					for (GameObject* pGameObject : pGameObjects)
 					{
@@ -171,7 +175,7 @@ namespace WEngine
 							return true;
 						}
 					}
-					if(ray.IsIntersectWithTriangle(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f)))
+					if(ray.IsIntersectWithTriangle(glm::vec3(-10.0f, -10.0f, 1.0f), glm::vec3(10.0f, -10.0f, 1.0f), glm::vec3(10.0f, 10.0f, 1.0f)))
 						RE_LOG("Triangle");
 				}
 			}

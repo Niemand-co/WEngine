@@ -58,9 +58,9 @@ public:
 
 	static Gui* CreateGui(WEngine::Backend backend);
 
-	static void DrawSlider(std::string_view title, float *pValue, float minValue, float maxValue);
+	static void DrawSlider(std::string title, float *pValue, float minValue, float maxValue);
 
-	static void DrawColorEdit(std::string_view title, float *pColor, bool hasAlpha = false);
+	static void DrawColorEdit(std::string title, float *pColor, bool hasAlpha = false);
 
 	template<typename T, typename ...Args>
 	static void ShowElement(std::string_view title, T &value, Args ...args);

@@ -1,9 +1,6 @@
 #pragma once
 
 struct Vertex;
-struct VertexBindingDescription;
-struct VertexAttributeDescription;
-class RHIVertexInputDescriptor;
 
 class Mesh
 {
@@ -12,10 +9,6 @@ public:
 	Mesh();
 
 	~Mesh();
-
-	void GenerateVertexInputDescription();
-
-	RHIVertexInputDescriptor GetVertexInputDescriptor();
 
 	void* operator new(size_t size)
 	{
