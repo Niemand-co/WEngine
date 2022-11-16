@@ -15,6 +15,8 @@ namespace WEngine
 
 	Camera* Editor::g_pEditorCamera = nullptr;
 
+	ray_line Editor::g_ray = {  };
+
 	Editor::Editor()
 	{
 	}

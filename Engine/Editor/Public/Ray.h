@@ -22,7 +22,7 @@ namespace WEngine
 
 	public:
 
-		static Ray GetClickRay(glm::vec2 ScreenPos, glm::vec3 o, glm::mat4 inverseVP);
+		static Ray GetClickRay(glm::vec2 ScreenPos, glm::vec3 o, glm::mat4 inverseV, glm::mat4 inverseP);
 
 	private:
 

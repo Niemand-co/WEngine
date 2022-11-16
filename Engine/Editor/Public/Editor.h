@@ -1,7 +1,14 @@
 #pragma once
+#include "Render/Mesh/Public/Vertex.h"
 
 class GameObject;
 class Camera;
+
+struct ray_line
+{
+	Vertex O;
+	Vertex D;
+};
 
 namespace WEngine
 {
@@ -35,6 +42,8 @@ namespace WEngine
 		static std::vector<GameObject*> g_selectedObjects;
 
 		static Camera *g_pEditorCamera;
+
+		static ray_line g_ray;
 
 	};
 

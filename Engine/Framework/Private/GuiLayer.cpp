@@ -150,7 +150,7 @@ namespace WEngine
 		dispatcher.Dispatch<WEngine::MouseButtonPressedEvent>([this](WEngine::MouseButtonPressedEvent* pEvent) -> bool
 		{
 			ImVec2 mousePos = ImGui::GetMousePos();
-			if (mousePos.x > m_displayArea.first.x && mousePos.x < m_displayArea.second.x && mousePos.y >(m_displayArea.first.y + 50) && mousePos.y < (m_displayArea.second.y + 50))
+			if (mousePos.x > m_displayArea.first.x && mousePos.x < m_displayArea.second.x && mousePos.y >(m_displayArea.first.y) && mousePos.y < (m_displayArea.second.y))
 			{
 				if(pEvent->GetMouseCode() == GLFW_MOUSE_BUTTON_2)
 					return false;
@@ -161,7 +161,8 @@ namespace WEngine
 					CameraData* data = Editor::g_pEditorCamera->GetData();
 					ImVec2 mousePos = ImGui::GetMousePos();
 					glm::vec2 pos = { (mousePos.x - m_displayArea.first.x) / (m_displayArea.second.x - m_displayArea.first.x), (m_displayArea.second.y - mousePos.y) / (m_displayArea.second.y - m_displayArea.first.y) };
-					Ray ray = Ray::GetClickRay(pos, data->Position, glm::inverse(data->MatrixVP));
+					std::cout << "(" << pos.x << "," << pos.y << ")" << std::endl;
+					Ray ray = Ray::GetClickRay(pos, data->Position, glm::inverse(data->MatrixV), glm::inverse(data->MatrixP));
 					const std::vector<GameObject*>& pGameObjects = World::GetWorld()->GetGameObjects();
 					for (GameObject* pGameObject : pGameObjects)
 					{
@@ -171,8 +172,6 @@ namespace WEngine
 							return true;
 						}
 					}
-					if(ray.IsIntersectWithTriangle(glm::vec3(-10.0f, -10.0f, 1.0f), glm::vec3(10.0f, -10.0f, 1.0f), glm::vec3(10.0f, 10.0f, 1.0f)))
-						RE_LOG("Triangle");
 				}
 			}
 			return true;
@@ -258,12 +257,11 @@ namespace WEngine
 				ImVec2 viewportOffset = ImGui::GetWindowPos();
 				m_displayArea.first = { viewportMin.x + viewportOffset.x, viewportMin.y + viewportOffset.y };
 				m_displayArea.second = { viewportMax.x + viewportOffset.x, viewportMax.y + viewportOffset.y };
-				m_displayArea.second.y -= 50;
-
+				//m_displayArea.second.y -= 50;
 				Screen::SetWidth(m_displayArea.second.x - m_displayArea.first.x);
 				Screen::SetHeight(m_displayArea.second.y - m_displayArea.first.y);
 
-				ImGui::ImageButton(m_imageID[0], ImVec2(25, 25));
+				//ImGui::ImageButton(m_imageID[0], ImVec2(25, 25));
 				ImGui::Image(m_imageID[RHIContext::g_currentFrame], { (float)Screen::GetWidth(), (float)Screen::GetHeight() });
 			}
 			ImGui::End();

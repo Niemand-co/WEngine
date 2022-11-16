@@ -115,7 +115,8 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	RHIRasterizationStateDescriptor rasterizationStateDescriptor = {};
 	{
 		rasterizationStateDescriptor.polygonMode = PolygonMode::Line;
-		rasterizationStateDescriptor.lineWidth = 2.0f;
+		rasterizationStateDescriptor.lineWidth = 5.0f;
+		rasterizationStateDescriptor.primitivePology = PrimitiveTopology::LineList;
 	}
 
 	RHIVertexInputDescriptor vertexInputDescriptor = Vertex::GetVertexInputDescriptor();
@@ -187,6 +188,14 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	m_pIndexBuffer = context->CreateIndexBuffer(&indexBufferDescriptor);
 
+	RHIBufferDescriptor rayDescriptor = {};
+	{
+		rayDescriptor.pData = &WEngine::Editor::g_ray;
+		rayDescriptor.size = sizeof(ray_line);
+		rayDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
+	}
+	m_pRayBuffer = context->CreateVertexBuffer(&rayDescriptor);
+
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
@@ -208,8 +217,8 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 
 void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 {
-	if(WEngine::Editor::GetSelectedObjectCount() == 0)
-		return;
+	//if(WEngine::Editor::GetSelectedObjectCount() == 0)
+	//	return;
 
 	UniformData data = { cameraData->MatrixVP };
 	BindingResource bindings[] = 
@@ -233,6 +242,8 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 	}
 	context->UpdateUniformResourceToGroup(&updateDescriptor);
 
+	m_pRayBuffer->LoadData(&WEngine::Editor::g_ray, sizeof(ray_line));
+
 	RHICommandBuffer* cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
 	cmd->BeginScopePass("Skybox", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentImage]);
@@ -248,10 +259,12 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 		encoder->SetPipeline(m_pPSO);
 		encoder->SetViewport({ (float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0 });
 		encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
-		encoder->BindVertexBuffer(m_pVertexBuffer);
-		encoder->BindIndexBuffer(m_pIndexBuffer);
+		//encoder->BindVertexBuffer(m_pVertexBuffer);
+		//encoder->BindIndexBuffer(m_pIndexBuffer);
 		encoder->BindGroups(1, m_pGroup, m_pResourceLayout);
-		encoder->DrawIndexed(m_pMesh->m_indexCount, 0);
+		//encoder->DrawIndexed(m_pMesh->m_indexCount, 0);
+		encoder->BindVertexBuffer(m_pRayBuffer);
+		encoder->DrawVertexArray();
 		encoder->EndPass();
 		encoder->~RHIGraphicsEncoder();
 		WEngine::Allocator::Get()->Deallocate(encoder);

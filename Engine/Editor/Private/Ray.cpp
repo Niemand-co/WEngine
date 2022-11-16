@@ -3,6 +3,7 @@
 #include "Render/Mesh/Public/Mesh.h"
 #include "Render/Mesh/Public/Vertex.h"
 #include "Scene/Public/GameObject.h"
+#include "Editor/Public/Editor.h"
 
 namespace WEngine
 {
@@ -14,29 +15,23 @@ namespace WEngine
 
 	bool Ray::IsIntersectWithTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c)
 	{
-		glm::vec3 ab = glm::normalize(b - a);
-		glm::vec3 ac = glm::normalize(c - a);
-		glm::mat3 m = glm::mat3(ab, ac, -D);
-		glm::vec3 P = glm::cross(D, ac);
-		glm::vec3 T;
-		float det = glm::dot(P, ab);
-		if (det > 0)
-		{
-			T = O - a;
-		}
-		else
-		{
-			T = a - O;
-			det *= -1.0f;
-		}
-		if(det < 0.00001f)
-			return false;
-		glm::vec3 Q = glm::cross(T, ab);
-		float u = glm::dot(T, P);
-		float v = glm::dot(D, Q);
-		float t = glm::dot(ac, Q);
+		glm::vec3 normal = glm::normalize(glm::cross(b - a, c - b));
 
-		if (u >= 0 && v >= 0 && (u + v) <= 1.0f && t >= 0)
+		float isVertical = dot(normal, D);
+		if( isVertical < 0.000001f && isVertical > -0.000001f )
+			return false;
+
+		float t = glm::dot(a - O, normal) / glm::dot(normal, D);
+
+		if(t < 0.0f)
+			return false;
+
+		glm::vec3 p = O + D * t;
+		glm::vec3 abp = glm::cross(b - a, p - a);
+		glm::vec3 bcp = glm::cross(c - b, p - b);
+		glm::vec3 cap = glm::cross(a - c, p - c);
+
+		if (glm::dot(abp, bcp) > 0.0f && glm::dot(bcp, cap) > 0.0f)
 		{
 			return true;
 		}
@@ -70,18 +65,21 @@ namespace WEngine
 		MeshFilter* staticMesh = pGameObject->GetComponent<MeshFilter>();
 		if (staticMesh == nullptr)
 			return false;
-		if (ray.IsIntersectWithMesh(staticMesh->GetStaticMesh()))
+		if (IsIntersectWithMesh(staticMesh->GetStaticMesh()))
 			return true;
 		return false;
 	}
 
-	Ray Ray::GetClickRay(glm::vec2 ScreenPos, glm::vec3 o, glm::mat4 inverseVP)
+	Ray Ray::GetClickRay(glm::vec2 ScreenPos, glm::vec3 o, glm::mat4 inverseV, glm::mat4 inverseP)
 	{
-		glm::vec4 pos = glm::vec4(ScreenPos.x * 2.0f - 1.0f, ScreenPos.y * 2.0f - 1.0f, -1.0f, 1.0f);
-		pos = inverseVP * pos;
+		glm::vec4 pos = glm::vec4(ScreenPos.x * 2.0f - 1.0f, ScreenPos.y * 2.0f - 1.0f, 1.0f, 1.0f);
+		pos = inverseP * pos;
 		pos /= pos.w;
+		pos = inverseV * pos;
 		Ray ray(o, glm::normalize(glm::vec3(pos) - o));
-
+		Editor::g_ray.O.Position = o;
+		Editor::g_ray.D.Position = 10000.0f * glm::normalize(glm::vec3(pos) - o);
+		std::cout<<"("<<Editor::g_ray.D.Position.x<<","<<Editor::g_ray.D.Position.y<<","<<Editor::g_ray.D.Position.z<<")" << std::endl;
 		return ray;
 	}
 

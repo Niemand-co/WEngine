@@ -25,5 +25,5 @@ VSOutput vert(VSInput input)
 
 float4 frag(VSOutput input) : SV_Target
 {
-    return float4(1, 1, 1, 1);
+    return float4(0, 1, 0, 1);
 }

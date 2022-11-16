@@ -33,6 +33,8 @@ private:
 
 	RHIBuffer *m_pIndexBuffer;
 
+	RHIBuffer *m_pRayBuffer;
+
 	Mesh *m_pMesh;
 
 };
