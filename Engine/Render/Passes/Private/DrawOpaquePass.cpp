@@ -240,6 +240,8 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 	}
 	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 
+	m_pVertexBuffer->LoadData(m_pMesh->m_pVertices, m_pMesh->m_vertexCount * sizeof(Vertex));
+
 	cmd->BeginScopePass("Test", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentFrame]);
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();

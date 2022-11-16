@@ -16,11 +16,30 @@ namespace WEngine
 	{
 		glm::vec3 ab = glm::normalize(b - a);
 		glm::vec3 ac = glm::normalize(c - a);
-		glm::mat3 m = glm::inverse(glm::mat3(ab, ac, -D));
-		glm::vec3 result = m * (O - a);
+		glm::mat3 m = glm::mat3(ab, ac, -D);
+		glm::vec3 P = glm::cross(D, ac);
+		glm::vec3 T;
+		float det = glm::dot(P, ab);
+		if (det > 0)
+		{
+			T = O - a;
+		}
+		else
+		{
+			T = a - O;
+			det *= -1.0f;
+		}
+		if(det < 0.00001f)
+			return false;
+		glm::vec3 Q = glm::cross(T, ab);
+		float u = glm::dot(T, P);
+		float v = glm::dot(D, Q);
+		float t = glm::dot(ac, Q);
 
-		if(result.x >= 0 && result.x <= 1.01f && result.y >= 0 && result.y <= 1.01f && result.z >= 0)
+		if (u >= 0 && v >= 0 && (u + v) <= 1.0f && t >= 0)
+		{
 			return true;
+		}
 
 		return false;
 	}
@@ -29,8 +48,13 @@ namespace WEngine
 	{
 		for (unsigned int i = 0; i < pMesh->m_indexCount; i += 3)
 		{
-			if(IsIntersectWithTriangle(pMesh->m_pVertices[pMesh->m_pIndices[i]].Position, pMesh->m_pVertices[pMesh->m_pIndices[i + 1]].Position, pMesh->m_pVertices[pMesh->m_pIndices[i + 2]].Position))
+			if (IsIntersectWithTriangle(pMesh->m_pVertices[pMesh->m_pIndices[i]].Position, pMesh->m_pVertices[pMesh->m_pIndices[i + 1]].Position, pMesh->m_pVertices[pMesh->m_pIndices[i + 2]].Position))
+			{
+				pMesh->m_pVertices[pMesh->m_pIndices[i]].Color = glm::vec3(1, 0, 0);
+				pMesh->m_pVertices[pMesh->m_pIndices[i + 1]].Color = glm::vec3(1, 0, 0);
+				pMesh->m_pVertices[pMesh->m_pIndices[i + 2]].Color = glm::vec3(1, 0, 0);
 				return true;
+			}
 		}
 		return false;
 	}

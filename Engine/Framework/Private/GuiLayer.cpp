@@ -161,9 +161,6 @@ namespace WEngine
 					CameraData* data = Editor::g_pEditorCamera->GetData();
 					ImVec2 mousePos = ImGui::GetMousePos();
 					glm::vec2 pos = { (mousePos.x - m_displayArea.first.x) / (m_displayArea.second.x - m_displayArea.first.x), (m_displayArea.second.y - mousePos.y) / (m_displayArea.second.y - m_displayArea.first.y) };
-					glm::vec4 ray_clip = glm::vec4(pos.x * 2.0f - 1.0f, pos.y * 2.0f - 1.0f, -1.0f, 1.0f);
-					ray_clip = glm::inverse(data->MatrixVP) * ray_clip;
-					glm::vec3 dir = ray_clip / ray_clip.w;
 					Ray ray = Ray::GetClickRay(pos, data->Position, glm::inverse(data->MatrixVP));
 					const std::vector<GameObject*>& pGameObjects = World::GetWorld()->GetGameObjects();
 					for (GameObject* pGameObject : pGameObjects)

@@ -86,7 +86,7 @@ float4 frag(VSOutput pin) : SV_TARGET
     float HoV = saturate(dot(H, V));
 
     //float3 albedo = tex.Sample(testSampler, pin.uv).rgb * data.surfaceData.rgb;
-    float3 albedo = data.surfaceData.rgb;
-
-	return PBRLighting(albedo, NoL, NoH, NoV, HoV, data.surfaceData.w, 0.0f);
+    float3 albedo = pin.Color;//data.surfaceData.rgb;
+    return float4(albedo, 1.0f);
+	// return PBRLighting(albedo, NoL, NoH, NoV, HoV, data.surfaceData.w, 0.0f);
 }

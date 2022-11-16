@@ -3,6 +3,8 @@
 #include "Scene/Public/GameObject.h"
 #include "Scene/Public/World.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
+#include "Render/Mesh/Public/Mesh.h"
+#include "Render/Mesh/Public/Vertex.h"
 
 namespace WEngine
 {
@@ -26,6 +28,12 @@ namespace WEngine
 
 	void Editor::ClearSelection()
 	{
+		for (GameObject* gameobject : g_selectedObjects)
+		{
+			Mesh *pMesh = gameobject->GetComponent<MeshFilter>()->GetStaticMesh();
+			for(int i = 0; i < pMesh->m_vertexCount; ++i)
+				pMesh->m_pVertices[i].Color = glm::vec3(1, 1, 1);
+		}
 		g_selectedObjects.clear();
 	}
 
