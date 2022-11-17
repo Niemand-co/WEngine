@@ -45,6 +45,7 @@ DrawGizmosPass::~DrawGizmosPass()
 
 struct UniformData
 {
+	glm::mat4 M;
 	glm::mat4 VP;
 };
 
@@ -115,8 +116,7 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	RHIRasterizationStateDescriptor rasterizationStateDescriptor = {};
 	{
 		rasterizationStateDescriptor.polygonMode = PolygonMode::Line;
-		rasterizationStateDescriptor.lineWidth = 5.0f;
-		rasterizationStateDescriptor.primitivePology = PrimitiveTopology::LineList;
+		rasterizationStateDescriptor.lineWidth = 10.0f;
 	}
 
 	RHIVertexInputDescriptor vertexInputDescriptor = Vertex::GetVertexInputDescriptor();
@@ -141,7 +141,7 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	m_pGroup = context->CreateResourceGroup(&groupDescriptor);
 
-	UniformData data = { cameraData->MatrixVP };
+	UniformData data = { GameObject::Find("Cube")->GetComponent<Transformer>()->GetLocalToWorldMatrix(), cameraData->MatrixVP};
 	RHIBufferDescriptor bufferDescriptor = {};
 	{
 		bufferDescriptor.pData = &data;
@@ -170,32 +170,6 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	context->UpdateUniformResourceToGroup(&updateDescriptor);
 
-	m_pMesh = GameObject::Find("Cube")->GetComponent<MeshFilter>()->GetStaticMesh();
-
-	RHIBufferDescriptor vertexBufferDescriptor = {};
-	{
-		vertexBufferDescriptor.pData = m_pMesh->m_pVertices;
-		vertexBufferDescriptor.size = m_pMesh->m_vertexCount * sizeof(Vertex);
-		vertexBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
-	}
-	m_pVertexBuffer = context->CreateVertexBuffer(&vertexBufferDescriptor);
-
-	RHIBufferDescriptor indexBufferDescriptor = {};
-	{
-		indexBufferDescriptor.pData = m_pMesh->m_pIndices;
-		indexBufferDescriptor.size = m_pMesh->m_indexCount * sizeof(unsigned int);
-		indexBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
-	}
-	m_pIndexBuffer = context->CreateIndexBuffer(&indexBufferDescriptor);
-
-	RHIBufferDescriptor rayDescriptor = {};
-	{
-		rayDescriptor.pData = &WEngine::Editor::g_ray;
-		rayDescriptor.size = sizeof(ray_line);
-		rayDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
-	}
-	m_pRayBuffer = context->CreateVertexBuffer(&rayDescriptor);
-
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
@@ -217,19 +191,19 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 
 void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 {
-	//if(WEngine::Editor::GetSelectedObjectCount() == 0)
-	//	return;
+	if(WEngine::Editor::GetSelectedObjectCount() == 0)
+		return;
 
-	UniformData data = { cameraData->MatrixVP };
-	BindingResource bindings[] = 
+	std::vector<GameObject*>& selectedObjects = WEngine::Editor::GetSelectedObject();
+
+	BindingResource bindings[] =
 	{
 		{ 0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX },
 	};
-	m_pBuffer->LoadData(&data, sizeof(data));
 	BufferResourceInfo info = {};
 	{
 		info.pBuffer = m_pBuffer;
-		info.range = sizeof(data);
+		info.range = sizeof(UniformData);
 		info.offset = 0;
 	}
 	RHIUpdateResourceDescriptor updateDescriptor = {};
@@ -240,9 +214,7 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 		updateDescriptor.pBufferInfo = &info;
 		updateDescriptor.pGroup = m_pGroup;
 	}
-	context->UpdateUniformResourceToGroup(&updateDescriptor);
-
-	m_pRayBuffer->LoadData(&WEngine::Editor::g_ray, sizeof(ray_line));
+	
 
 	RHICommandBuffer* cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
@@ -259,12 +231,20 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 		encoder->SetPipeline(m_pPSO);
 		encoder->SetViewport({ (float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0 });
 		encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
-		//encoder->BindVertexBuffer(m_pVertexBuffer);
-		//encoder->BindIndexBuffer(m_pIndexBuffer);
-		encoder->BindGroups(1, m_pGroup, m_pResourceLayout);
-		//encoder->DrawIndexed(m_pMesh->m_indexCount, 0);
-		encoder->BindVertexBuffer(m_pRayBuffer);
-		encoder->DrawVertexArray();
+
+		for (unsigned int i = 0; i < selectedObjects.size(); ++i)
+		{
+			UniformData data = { selectedObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix(), cameraData->MatrixVP };
+			m_pBuffer->LoadData(&data, sizeof(data));
+			context->UpdateUniformResourceToGroup(&updateDescriptor);
+
+			Mesh *pMesh = selectedObjects[i]->GetComponent<MeshFilter>()->GetStaticMesh();
+			encoder->BindVertexBuffer(pMesh->GetVertexBuffer());
+			encoder->BindIndexBuffer(pMesh->GetIndexBuffer());
+			encoder->BindGroups(1, m_pGroup, m_pResourceLayout);
+			encoder->DrawIndexed(pMesh->m_indexCount, 0);
+		}
+		
 		encoder->EndPass();
 		encoder->~RHIGraphicsEncoder();
 		WEngine::Allocator::Get()->Deallocate(encoder);

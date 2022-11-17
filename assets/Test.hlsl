@@ -19,7 +19,8 @@ struct VSOutput
 
 struct uniformData
 {
-    float4x4 MVP;
+    float4x4 M;
+    float4x4 VP;
     float4 lightPos;
     float4 cameraPos;
     float4 surfaceData;
@@ -64,9 +65,9 @@ VSOutput vert(VSInput vin)
 {
 	VSOutput vout = (VSOutput)0;
 
-	vout.Position = mul(data.MVP, float4(vin.Position, 1.0));
+    vout.WorldPos = mul(data.M, float4(vin.Position, 1.0)).xyz;
+	vout.Position = mul(data.VP, float4(vout.WorldPos, 1.0));
 	vout.Position.y *= -1.0f;
-    vout.WorldPos = vin.Position;
     vout.Normal = normalize(vin.Normal);
 	vout.Color = vin.Color;
     vout.uv = vin.UV;
@@ -86,7 +87,6 @@ float4 frag(VSOutput pin) : SV_TARGET
     float HoV = saturate(dot(H, V));
 
     //float3 albedo = tex.Sample(testSampler, pin.uv).rgb * data.surfaceData.rgb;
-    float3 albedo = pin.Color;//data.surfaceData.rgb;
-    return float4(albedo, 1.0f);
-	// return PBRLighting(albedo, NoL, NoH, NoV, HoV, data.surfaceData.w, 0.0f);
+    float3 albedo = data.surfaceData.rgb;
+	 return PBRLighting(albedo, NoL, NoH, NoV, HoV, data.surfaceData.w, 0.0f);
 }

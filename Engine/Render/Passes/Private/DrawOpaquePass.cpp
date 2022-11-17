@@ -10,11 +10,13 @@
 #include "Render/Mesh/Public/Mesh.h"
 #include "Render/Mesh/Public/Vertex.h"
 #include "Scene/Public/GameObject.h"
+#include "Scene/Public/World.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 #include "Editor/Public/Screen.h"
 
 struct UniformData
 {
+	glm::mat4 M;
 	glm::mat4 VP;
 	glm::vec4 lightPos;
 	glm::vec4 cameraPos;
@@ -97,9 +99,6 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		depthStencilDescriptor.minDepth = 0.0f;
 	}
 
-	GameObject *go = GameObject::Find("Cube");
-	m_pMesh = go->GetComponent<MeshFilter>()->GetStaticMesh();
-
 	BindingResource resource[1] = 
 	{
 		{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
@@ -141,31 +140,13 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	};
 	m_pPSO = context->CreatePSO(&psoDescriptor);
 
-
-	RHIBufferDescriptor bufferDescriptor = {};
-	{
-		bufferDescriptor.size = m_pMesh->m_vertexCount * sizeof(Vertex);
-		bufferDescriptor.pData = m_pMesh->m_pVertices;
-		bufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
-	}
-	m_pVertexBuffer = context->CreateVertexBuffer(&bufferDescriptor);
-
-	RHIBufferDescriptor indexBufferDescriptor = {};
-	{
-		indexBufferDescriptor.size = m_pMesh->m_indexCount * sizeof(unsigned int);
-		indexBufferDescriptor.pData = m_pMesh->m_pIndices;
-		indexBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
-	}
-	m_pIndexBuffer = context->CreateIndexBuffer(&indexBufferDescriptor);
-
-	SurfaceData surfaceData = go->GetComponent<Material>()->GetSurfaceData();
-
 	UniformData data = 
 	{
+		glm::mat4(1.0f),
 		cameraData->MatrixVP,
 		glm::vec4(-2.0f, 2.0f, -2.0f, 1.0f),
 		glm::vec4(cameraData->Position, 1.0f),
-		glm::vec4(surfaceData.albedo, surfaceData.roughness)
+		glm::vec4()
 	};
 	RHIBufferDescriptor uniformBufferDescriptor = {};
 	{
@@ -212,15 +193,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 {
 	RHICommandBuffer *cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
-	SurfaceData surfaceData = GameObject::Find("Cube")->GetComponent<Material>()->GetSurfaceData();
-	UniformData data =
-	{
-		cameraData->MatrixVP,
-		glm::vec4(-2.0f, 2.0f, -2.0f, 1.0f),
-		glm::vec4(cameraData->Position, 1.0f),
-		glm::vec4(surfaceData.albedo, surfaceData.roughness)
-	};
-	m_pUniformBuffer->LoadData(&data, sizeof(data));
+	const std::vector<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
 
 	BindingResource resource[1] =
 	{
@@ -228,7 +201,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 	};
 	BufferResourceInfo bufferInfo[] =
 	{
-		{ m_pUniformBuffer, 0, sizeof(data) },
+		{ m_pUniformBuffer, 0, sizeof(UniformData) },
 	};
 	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
 	{
@@ -238,9 +211,6 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		updateResourceDescriptor.bufferResourceCount = 1;
 		updateResourceDescriptor.pBufferInfo = bufferInfo;
 	}
-	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
-
-	m_pVertexBuffer->LoadData(m_pMesh->m_pVertices, m_pMesh->m_vertexCount * sizeof(Vertex));
 
 	cmd->BeginScopePass("Test", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentFrame]);
 	{
@@ -254,10 +224,32 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		encoder->SetPipeline(m_pPSO);
 		encoder->SetViewport({(float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0});
 		encoder->SetScissor({WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0});
-		encoder->BindVertexBuffer(m_pVertexBuffer);
-		encoder->BindIndexBuffer(m_pIndexBuffer);
-		encoder->BindGroups(1, m_pGroup, m_pPipelineResourceLayout);
-		encoder->DrawIndexed(m_pMesh->m_indexCount, 0);
+
+		for (unsigned int i = 0; i < gameObjects.size(); ++i)
+		{
+			MeshFilter *filter = gameObjects[i]->GetComponent<MeshFilter>();
+			if(filter == nullptr)
+				continue;
+
+			SurfaceData surfaceData = gameObjects[i]->GetComponent<Material>()->GetSurfaceData();
+			UniformData data =
+			{
+				gameObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix(),
+				cameraData->MatrixVP,
+				glm::vec4(-2.0f, 2.0f, -2.0f, 1.0f),
+				glm::vec4(cameraData->Position, 1.0f),
+				glm::vec4(surfaceData.albedo, surfaceData.roughness)
+			};
+			m_pUniformBuffer->LoadData(&data, sizeof(data));
+			context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
+
+			Mesh *pMesh = filter->GetStaticMesh();
+			encoder->BindVertexBuffer(pMesh->GetVertexBuffer());
+			encoder->BindIndexBuffer(pMesh->GetIndexBuffer());
+			encoder->BindGroups(1, m_pGroup, m_pPipelineResourceLayout);
+			encoder->DrawIndexed(pMesh->m_indexCount, 0);
+		}
+
 		encoder->EndPass();
 		encoder->~RHIGraphicsEncoder();
 		WEngine::Allocator::Get()->Deallocate(encoder);

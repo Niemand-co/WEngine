@@ -28,12 +28,6 @@ private:
 
 	RHISampler *m_pSampler;
 
-	Mesh *m_pMesh;
-
-	RHIBuffer* m_pVertexBuffer;
-
-	RHIBuffer* m_pIndexBuffer;
-
 	RHIBuffer* m_pUniformBuffer;
 
 	RHIBuffer *m_pSurfaceDataBuffer;

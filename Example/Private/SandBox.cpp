@@ -87,6 +87,12 @@ SandBox::SandBox()
 	MeshFilter* filter = go->AddComponent<MeshFilter>();
 	filter->SetStaticMesh(Mesh::GetCube());
 	go->AddComponent<Material>();
+
+	go = m_scene->CreateGameObject("Plane");
+	filter = go->AddComponent<MeshFilter>();
+	filter->SetStaticMesh(Mesh::GetPlane());
+	go->AddComponent<Material>();
+
 	m_pLayerStack->PushLayer(new GameScene("Game Scene"));
 
 }

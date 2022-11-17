@@ -29,12 +29,4 @@ private:
 
 	RHIPipelineResourceLayout *m_pResourceLayout;
 
-	RHIBuffer *m_pVertexBuffer;
-
-	RHIBuffer *m_pIndexBuffer;
-
-	RHIBuffer *m_pRayBuffer;
-
-	Mesh *m_pMesh;
-
 };

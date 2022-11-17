@@ -14,11 +14,13 @@ namespace WEngine
 
 		~Ray() = default;
 
-		bool IsIntersectWithTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c);
+		bool IsIntersectWithTriangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c);
 
 		bool IsIntersectWithMesh(Mesh *pMesh);
 
 		bool IsIntersectWithGameObject(GameObject *pGameObject);
+
+		bool IsIntersectionWithCube(const glm::vec3& cMin, const glm::vec3& cMax);
 
 	public:
 

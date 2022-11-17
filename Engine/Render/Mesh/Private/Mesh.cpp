@@ -2,6 +2,9 @@
 #include "Render/Mesh/Public/Mesh.h"
 #include "Render/Mesh/Public/Vertex.h"
 #include "Render/Descriptor/Public/RHIVertexInputDescriptor.h"
+#include "Render/Descriptor/Public/RHIBufferDescriptor.h"
+#include "RHI/Public/RHIContext.h"
+#include "RHI/Public/RHIBuffer.h"
 
 Mesh::Mesh()
 {
@@ -9,10 +12,44 @@ Mesh::Mesh()
 	m_vertexCount = 0;
 	m_pIndices = nullptr;
 	m_indexCount = 0;
+	m_pVertexBuffer = nullptr;
+	m_pIndexBuffer = nullptr;
 }
 
 Mesh::~Mesh()
 {
+}
+
+RHIBuffer* Mesh::GetVertexBuffer()
+{
+	if(m_pVertexBuffer != nullptr)
+		return m_pVertexBuffer;
+	
+	RHIBufferDescriptor descriptor = {};
+	{
+		descriptor.pData = m_pVertices;
+		descriptor.size = m_vertexCount * sizeof(Vertex);
+		descriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
+	}
+	m_pVertexBuffer = RHIContext::GetContext()->CreateVertexBuffer(&descriptor);
+
+	return m_pVertexBuffer;
+}
+
+RHIBuffer* Mesh::GetIndexBuffer()
+{
+	if(m_pIndexBuffer != nullptr)
+		return m_pIndexBuffer;
+
+	RHIBufferDescriptor descriptor = {};
+	{
+		descriptor.pData = m_pIndices;
+		descriptor.size = m_indexCount * sizeof(unsigned int);
+		descriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
+	}
+	m_pIndexBuffer = RHIContext::GetContext()->CreateIndexBuffer(&descriptor);
+
+	return m_pIndexBuffer;
 }
 
 Mesh* Mesh::GetCube()
@@ -63,6 +100,10 @@ Mesh* Mesh::GetCube()
 	};
 	mesh->m_indexCount = 36;
 	mesh->m_pIndices = pIndices;
+
+	mesh->m_boundingBoxMin = glm::vec3(-1.0f, -1.0f, -1.0f);
+	mesh->m_boundingBoxMax = glm::vec3(1.0f, 1.0f, 1.0f);
+
 	return mesh;
 }
 
@@ -84,6 +125,10 @@ Mesh* Mesh::GetPlane()
 	}
 	mesh->m_indexCount = 6;
 	mesh->m_pIndices = pIndices;
+
+	mesh->m_boundingBoxMin = glm::vec3(-1.0f, 0.0f, -1.0f);
+	mesh->m_boundingBoxMax = glm::vec3(1.0f, 0.0f, 1.0f);
+
 	return mesh;
 }
 

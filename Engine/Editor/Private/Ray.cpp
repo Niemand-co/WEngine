@@ -13,7 +13,7 @@ namespace WEngine
 	{
 	}
 
-	bool Ray::IsIntersectWithTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c)
+	bool Ray::IsIntersectWithTriangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c)
 	{
 		glm::vec3 normal = glm::normalize(glm::cross(b - a, c - b));
 
@@ -21,7 +21,7 @@ namespace WEngine
 		if( isVertical < 0.000001f && isVertical > -0.000001f )
 			return false;
 
-		float t = glm::dot(a - O, normal) / glm::dot(normal, D);
+		float t = glm::dot(a - O, normal) / isVertical;
 
 		if(t < 0.0f)
 			return false;
@@ -65,9 +65,70 @@ namespace WEngine
 		MeshFilter* staticMesh = pGameObject->GetComponent<MeshFilter>();
 		if (staticMesh == nullptr)
 			return false;
-		if (IsIntersectWithMesh(staticMesh->GetStaticMesh()))
+		if(!ray.IsIntersectionWithCube(staticMesh->GetStaticMesh()->m_boundingBoxMin, staticMesh->GetStaticMesh()->m_boundingBoxMax))
+			return false;
+		if (ray.IsIntersectWithMesh(staticMesh->GetStaticMesh()))
 			return true;
 		return false;
+	}
+
+	bool Ray::IsIntersectionWithCube(const glm::vec3& cMin, const glm::vec3& cMax)
+	{
+		if(D.x == 0.0f && (O.x < cMin.x || O.x > cMax.x))
+			return false;
+		float XslabMin = (cMin.x - O.x) / D.x;
+		float XslabMax = (cMax.x - O.x) / D.x;
+		
+		if(XslabMax < 0.0f && XslabMin < 0.0f)
+			return false;
+
+		if (D.y == 0.0f && (O.y < cMin.y || O.y > cMax.y))
+			return false;
+		float YslabMin = (cMin.y - O.y) / D.y;
+		float YslabMax = (cMax.y - O.y) / D.y;
+
+		if (YslabMax < 0.0f && YslabMin < 0.0f)
+			return false;
+
+		if (D.z == 0.0f && (O.z < cMin.z || O.z > cMax.z))
+			return false;
+		float ZslabMin = (cMin.z - O.z) / D.z;
+		float ZslabMax = (cMax.z - O.z) / D.z;
+
+		if (ZslabMax < 0.0f && ZslabMin < 0.0f)
+			return false;
+
+		if (XslabMax < XslabMin)
+		{
+			float tmp = XslabMin;
+			XslabMin = XslabMax;
+			XslabMax = tmp;
+		}
+
+		if (YslabMax < YslabMin)
+		{
+			float tmp = YslabMin;
+			YslabMin = YslabMax;
+			YslabMax = tmp;
+		}
+
+		if (ZslabMax < ZslabMin)
+		{
+			float tmp = ZslabMin;
+			ZslabMin = ZslabMax;
+			ZslabMax = tmp;
+		}
+
+		if(YslabMax < XslabMin || YslabMin > XslabMax)
+			return false;
+
+		if (ZslabMax < XslabMin || ZslabMin > XslabMax)
+			return false;
+
+		if (YslabMax < ZslabMin || YslabMin > ZslabMax)
+			return false;
+			
+		return true;
 	}
 
 	Ray Ray::GetClickRay(glm::vec2 ScreenPos, glm::vec3 o, glm::mat4 inverseV, glm::mat4 inverseP)
@@ -77,9 +138,6 @@ namespace WEngine
 		pos /= pos.w;
 		pos = inverseV * pos;
 		Ray ray(o, glm::normalize(glm::vec3(pos) - o));
-		Editor::g_ray.O.Position = o;
-		Editor::g_ray.D.Position = 10000.0f * glm::normalize(glm::vec3(pos) - o);
-		std::cout<<"("<<Editor::g_ray.D.Position.x<<","<<Editor::g_ray.D.Position.y<<","<<Editor::g_ray.D.Position.z<<")" << std::endl;
 		return ray;
 	}
 

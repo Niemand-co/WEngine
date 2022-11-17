@@ -1,6 +1,7 @@
 #pragma once
 
 struct Vertex;
+class RHIBuffer;
 
 class Mesh
 {
@@ -20,6 +21,10 @@ public:
 		WEngine::Allocator::Get()->Deallocate(pData);
 	}
 
+	RHIBuffer* GetVertexBuffer();
+
+	RHIBuffer* GetIndexBuffer();
+
 public:
 
 	static Mesh* GetCube();
@@ -35,6 +40,16 @@ public:
 	unsigned int *m_pIndices;
 
 	unsigned int m_indexCount;
+
+	glm::vec3 m_boundingBoxMin;
+
+	glm::vec3 m_boundingBoxMax;
+
+private:
+
+	RHIBuffer *m_pVertexBuffer;
+
+	RHIBuffer *m_pIndexBuffer;
 
 };
 
