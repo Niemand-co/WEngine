@@ -149,22 +149,6 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	m_pPSO = context->CreatePSO(&psoDescriptor);
 
-	RHIBufferDescriptor vertexBufferDescriptor = {};
-	{
-		vertexBufferDescriptor.size = m_pMesh->m_vertexCount * sizeof(Vertex);
-		vertexBufferDescriptor.pData = m_pMesh->m_pVertices;
-		vertexBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
-	}
-	m_pVertexBuffer = context->CreateVertexBuffer(&vertexBufferDescriptor);
-
-	RHIBufferDescriptor indexBufferDescriptor = {};
-	{
-		indexBufferDescriptor.size = m_pMesh->m_indexCount * sizeof(unsigned int);
-		indexBufferDescriptor.pData = m_pMesh->m_pIndices;
-		indexBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
-	}
-	m_pIndexBuffer = context->CreateIndexBuffer(&indexBufferDescriptor);
-
 	UniformData data = 
 	{
 		cameraData->MatrixV,
@@ -180,6 +164,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 		uniformBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	m_pUniformBuffer = context->CreateUniformBuffer(&uniformBufferDescriptor);
+	m_pUniformBuffer->LoadData(&data, sizeof(data));
 	
 	BufferResourceInfo bufferInfo[] = 
 	{
@@ -302,23 +287,23 @@ void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 		bottomColor
 	};
 	m_pUniformBuffer->LoadData(&data, sizeof(data));
-	BindingResource resource[1] =
-	{
-		{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
-	};
-	BufferResourceInfo bufferInfo[] = 
-	{
-		{ m_pUniformBuffer, 0, sizeof(UniformData) },
-	};
-	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
-	{
-		updateResourceDescriptor.bindingCount = 1;
-		updateResourceDescriptor.pBindingResources = resource;
-		updateResourceDescriptor.pGroup = m_pGroup;
-		updateResourceDescriptor.bufferResourceCount = 1;
-		updateResourceDescriptor.pBufferInfo = bufferInfo;
-	}
-	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
+	//BindingResource resource[1] =
+	//{
+	//	{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
+	//};
+	//BufferResourceInfo bufferInfo[] = 
+	//{
+	//	{ m_pUniformBuffer, 0, sizeof(UniformData) },
+	//};
+	//RHIUpdateResourceDescriptor updateResourceDescriptor = {};
+	//{
+	//	updateResourceDescriptor.bindingCount = 1;
+	//	updateResourceDescriptor.pBindingResources = resource;
+	//	updateResourceDescriptor.pGroup = m_pGroup;
+	//	updateResourceDescriptor.bufferResourceCount = 1;
+	//	updateResourceDescriptor.pBufferInfo = bufferInfo;q
+	//}
+	//context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 
 	cmd->BeginScopePass("Skybox", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentImage]);
 	{
@@ -333,8 +318,8 @@ void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 		encoder->SetPipeline(m_pPSO);
 		encoder->SetViewport({ (float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0 });
 		encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
-		encoder->BindVertexBuffer(m_pVertexBuffer);
-		encoder->BindIndexBuffer(m_pIndexBuffer);
+		encoder->BindVertexBuffer(m_pMesh->GetVertexBuffer());
+		encoder->BindIndexBuffer(m_pMesh->GetIndexBuffer());
 		encoder->BindGroups(1, m_pGroup, m_pPipelineLayout);
 		encoder->DrawIndexed(m_pMesh->m_indexCount, 0);
 		encoder->EndPass();

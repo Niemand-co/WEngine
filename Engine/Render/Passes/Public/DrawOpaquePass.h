@@ -34,6 +34,6 @@ private:
 
 	RHIPipelineResourceLayout *m_pPipelineResourceLayout;
 
-	RHIGroup *m_pGroup;
+	RHIGroup *m_pGroups;
 
 };

@@ -24,7 +24,7 @@ namespace WEngine
 		for (GameObject* pObject : objects)
 		{
 			ImGuiTreeNodeFlags flags = (Editor::IsSelected(pObject) ? ImGuiTreeNodeFlags_Selected : 0) | (pObject->HasChild() ? ImGuiTreeNodeFlags_OpenOnArrow : ImGuiTreeNodeFlags_Leaf);
-			if (ImGui::TreeNodeEx(pObject, flags, pObject->GetName()))
+			if (ImGui::TreeNodeEx(pObject, flags, pObject->GetNamePtr()))
 			{
 				ImGui::TreePop();
 			}

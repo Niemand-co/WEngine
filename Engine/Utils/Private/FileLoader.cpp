@@ -29,6 +29,7 @@ RHIBuffer* FileLoader::ImageLoad(const char* filePath, RHIContext *pContext, int
 		bufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	RHIBuffer* buffer = pContext->CreateTextureBuffer(&bufferDescriptor);
+	buffer->LoadData(pData, imageSize);
 
 	return buffer;
 }

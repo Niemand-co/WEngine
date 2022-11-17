@@ -2,11 +2,15 @@
 #include "Scene/Components/Public/Material.h"
 #include "RHI/Public/RHIShader.h"
 #include "Utils/ImGui/Public/Gui.h"
+#include "Scene/Public/GameObject.h"
 
 Material::Material(GameObject* pGameObject)
 	: Component(pGameObject), albedo(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)), roughness(0.5f), metallic(0.0f), m_shader(nullptr)
 {
 	m_type = Component::ComponentType::Material;
+	albedoPropertyID = "##" + pGameObject->GetName() + "_Albedo";
+	roughnessPropertyID = "##" + pGameObject->GetName() + "_Roughness";
+	metallicPropertyID = "##" + pGameObject->GetName() + "_Metallic";
 }
 
 void Material::SetShader(RHIShader* shader)
@@ -42,10 +46,13 @@ void Material::ShowInInspector()
 {
 	if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		Gui::DrawSlider("Roughness", &roughness, 0.01f, 1.0f);
+		ImGui::Text("Roughness"); ImGui::SameLine();
+		ImGui::SliderFloat(roughnessPropertyID.c_str(), &roughness, 0.01f, 1.0f);
 
-		Gui::DrawSlider("Metallic", &metallic, 0.0f, 1.0f);
+		ImGui::Text("Metallic"); ImGui::SameLine();
+		ImGui::SliderFloat(metallicPropertyID.c_str(), &metallic, 0.0f, 1.0f);
 
-		Gui::DrawColorEdit("Albedo", &albedo[0], false);
+		ImGui::Text("Albedo"); ImGui::SameLine();
+		ImGui::ColorEdit3(albedoPropertyID.c_str(), &albedo[0]);
 	}
 }

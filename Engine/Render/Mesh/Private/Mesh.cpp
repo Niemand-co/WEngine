@@ -32,6 +32,7 @@ RHIBuffer* Mesh::GetVertexBuffer()
 		descriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	m_pVertexBuffer = RHIContext::GetContext()->CreateVertexBuffer(&descriptor);
+	m_pVertexBuffer->LoadData(m_pVertices, m_vertexCount * sizeof(Vertex));
 
 	return m_pVertexBuffer;
 }
@@ -48,6 +49,7 @@ RHIBuffer* Mesh::GetIndexBuffer()
 		descriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	m_pIndexBuffer = RHIContext::GetContext()->CreateIndexBuffer(&descriptor);
+	m_pIndexBuffer->LoadData(m_pIndices, m_indexCount * sizeof(unsigned int));
 
 	return m_pIndexBuffer;
 }

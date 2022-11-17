@@ -3,4 +3,5 @@
 
 RHIGroupDescriptor::RHIGroupDescriptor()
 {
+	count = 1;
 }

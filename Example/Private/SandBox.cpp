@@ -88,10 +88,10 @@ SandBox::SandBox()
 	filter->SetStaticMesh(Mesh::GetCube());
 	go->AddComponent<Material>();
 
-	go = m_scene->CreateGameObject("Plane");
-	filter = go->AddComponent<MeshFilter>();
-	filter->SetStaticMesh(Mesh::GetPlane());
-	go->AddComponent<Material>();
+	GameObject *plane = m_scene->CreateGameObject("Plane");
+	plane->AddComponent<MeshFilter>()->SetStaticMesh(Mesh::GetPlane());
+	plane->AddComponent<Material>();
+	plane->GetComponent<Transformer>()->SetScale(glm::vec3(50.0f, 50.0f, 50.0f));
 
 	m_pLayerStack->PushLayer(new GameScene("Game Scene"));
 

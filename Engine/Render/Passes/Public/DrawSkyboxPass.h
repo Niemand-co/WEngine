@@ -37,10 +37,6 @@ private:
 
 	RHIPipelineResourceLayout *m_pPipelineLayout;
 
-	RHIBuffer *m_pVertexBuffer;
-
-	RHIBuffer *m_pIndexBuffer;
-
 	RHIBuffer *m_pUniformBuffer;
 
 public:

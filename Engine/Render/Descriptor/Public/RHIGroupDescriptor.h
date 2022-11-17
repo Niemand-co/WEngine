@@ -14,4 +14,6 @@ public:
 
 	RHIGroupLayout *pGroupLayout;
 
+	unsigned int count;
+
 };

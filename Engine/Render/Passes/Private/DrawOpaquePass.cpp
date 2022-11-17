@@ -101,7 +101,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 
 	BindingResource resource[1] = 
 	{
-		{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
+		{0, ResourceType::DynamicUniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
 	};
 	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
 	{
@@ -120,8 +120,9 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	RHIGroupDescriptor groupDescriptor = {};
 	{
 		groupDescriptor.pGroupLayout = groupLayout;
+		groupDescriptor.count = 2;
 	}
-	m_pGroup = context->CreateResourceGroup(&groupDescriptor);
+	m_pGroups = context->CreateResourceGroup(&groupDescriptor);
 
 	RHIRasterizationStateDescriptor rasterizationStateDescriptor = {};
 
@@ -150,7 +151,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	};
 	RHIBufferDescriptor uniformBufferDescriptor = {};
 	{
-		uniformBufferDescriptor.size = sizeof(data);
+		uniformBufferDescriptor.size = sizeof(data) * 2;
 		uniformBufferDescriptor.pData = &data;
 		uniformBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
@@ -159,13 +160,14 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	BufferResourceInfo bufferInfo[] = 
 	{
 		{ m_pUniformBuffer, 0, sizeof(data) },
+		{ m_pUniformBuffer, sizeof(data), sizeof(data) },
 	};
 	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
 	{
-		updateResourceDescriptor.bindingCount = 1;
+		updateResourceDescriptor.bindingCount = 2;
 		updateResourceDescriptor.pBindingResources = resource;
-		updateResourceDescriptor.pGroup = m_pGroup;
-		updateResourceDescriptor.bufferResourceCount = 1;
+		updateResourceDescriptor.pGroup = m_pGroups;
+		updateResourceDescriptor.bufferResourceCount = 2;
 		updateResourceDescriptor.pBufferInfo = bufferInfo;
 	}
 	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
@@ -195,23 +197,6 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 
 	const std::vector<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
 
-	BindingResource resource[1] =
-	{
-		{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
-	};
-	BufferResourceInfo bufferInfo[] =
-	{
-		{ m_pUniformBuffer, 0, sizeof(UniformData) },
-	};
-	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
-	{
-		updateResourceDescriptor.bindingCount = 1;
-		updateResourceDescriptor.pBindingResources = resource;
-		updateResourceDescriptor.pGroup = m_pGroup;
-		updateResourceDescriptor.bufferResourceCount = 1;
-		updateResourceDescriptor.pBufferInfo = bufferInfo;
-	}
-
 	cmd->BeginScopePass("Test", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentFrame]);
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
@@ -225,6 +210,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		encoder->SetViewport({(float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0});
 		encoder->SetScissor({WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0});
 
+		int drawcalls = 0;
 		for (unsigned int i = 0; i < gameObjects.size(); ++i)
 		{
 			MeshFilter *filter = gameObjects[i]->GetComponent<MeshFilter>();
@@ -240,14 +226,15 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 				glm::vec4(cameraData->Position, 1.0f),
 				glm::vec4(surfaceData.albedo, surfaceData.roughness)
 			};
-			m_pUniformBuffer->LoadData(&data, sizeof(data));
-			context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
+			m_pUniformBuffer->LoadData(&data, sizeof(data), sizeof(data) * drawcalls);
+			
 
 			Mesh *pMesh = filter->GetStaticMesh();
 			encoder->BindVertexBuffer(pMesh->GetVertexBuffer());
 			encoder->BindIndexBuffer(pMesh->GetIndexBuffer());
-			encoder->BindGroups(1, m_pGroup, m_pPipelineResourceLayout);
+			encoder->BindGroups(1, m_pGroups + drawcalls, m_pPipelineResourceLayout);
 			encoder->DrawIndexed(pMesh->m_indexCount, 0);
+			drawcalls++;
 		}
 
 		encoder->EndPass();

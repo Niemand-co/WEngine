@@ -12,7 +12,7 @@ namespace Vulkan
 
 		virtual ~VulkanBuffer();
 
-		virtual void LoadData(void *pData, size_t size) override;
+		virtual void LoadData(void *pData, size_t size, size_t offset = 0) override;
 
 		VkBuffer* GetHandle();
 

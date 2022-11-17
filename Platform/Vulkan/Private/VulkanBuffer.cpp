@@ -22,9 +22,9 @@ namespace Vulkan
 
 		vkBindBufferMemory(*m_pDevice, *m_pBuffer, *m_pDeviceMemory, 0);
 
-		RE_ASSERT(vkMapMemory(*m_pDevice, *m_pDeviceMemory, 0, size, 0, &m_pData) == VK_SUCCESS, "Failed to Map Memory To Host.");
-		::memcpy(m_pData, pData, static_cast<size_t>(size));
-		vkUnmapMemory(*m_pDevice, *m_pDeviceMemory);
+		//RE_ASSERT(vkMapMemory(*m_pDevice, *m_pDeviceMemory, 0, size, 0, &m_pData) == VK_SUCCESS, "Failed to Map Memory To Host.");
+		//::memcpy(m_pData, pData, static_cast<size_t>(size));
+		//vkUnmapMemory(*m_pDevice, *m_pDeviceMemory);
 	}
 
 	VulkanBuffer::~VulkanBuffer()
@@ -33,10 +33,10 @@ namespace Vulkan
 		vkFreeMemory(*m_pDevice, *m_pDeviceMemory, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
 	}
 
-	void VulkanBuffer::LoadData(void* pData, size_t size)
+	void VulkanBuffer::LoadData(void* pData, size_t size, size_t offset)
 	{
-		RE_ASSERT(vkMapMemory(*m_pDevice, *m_pDeviceMemory, 0, static_cast<VkDeviceSize>(size), 0, &m_pData) == VK_SUCCESS, "Failed to Map Memory To Host.");
-		std::memcpy(m_pData, pData, static_cast<size_t>(size));
+		RE_ASSERT(vkMapMemory(*m_pDevice, *m_pDeviceMemory, 0, size, 0, &m_pData) == VK_SUCCESS, "Failed to Map Memory To Host.");
+		::memcpy(m_pData, pData, static_cast<size_t>(size));
 		vkUnmapMemory(*m_pDevice, *m_pDeviceMemory);
 	}
 

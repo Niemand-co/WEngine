@@ -19,7 +19,9 @@ public:
 
 	bool IsName(std::string name);
 
-	inline const char* const GetName() const { return m_name.c_str(); }
+	inline const char* const GetNamePtr() const { return m_name.data(); }
+
+	inline std::string const GetName() const { return m_name; }
 
 	void AddGameObject(GameObject *pGameObject);
 

@@ -390,11 +390,11 @@ RHIGroup* RHIContext::CreateResourceGroup(RHIGroupDescriptor* descriptor)
 	RHIGroupPoolDescriptor poolDescriptor = {};
 	{
 		poolDescriptor.pGroupLayout = descriptor->pGroupLayout;
-		poolDescriptor.maxSetCount = 3;
+		poolDescriptor.maxSetCount = 100;
 	}
 	RHIGroupPool *pool = g_pDevice->CreateGroupPool(&poolDescriptor);
 
-	RHIGroup *group = pool->GetGroup();
+	RHIGroup *group = pool->GetGroup(descriptor->count);
 
 	return group;
 }
