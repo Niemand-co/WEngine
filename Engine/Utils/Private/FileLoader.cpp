@@ -24,7 +24,6 @@ RHIBuffer* FileLoader::ImageLoad(const char* filePath, RHIContext *pContext, int
 
 	RHIBufferDescriptor bufferDescriptor = {};
 	{
-		bufferDescriptor.pData = pData;
 		bufferDescriptor.size = imageSize;
 		bufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}

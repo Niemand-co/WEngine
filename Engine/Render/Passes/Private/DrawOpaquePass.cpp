@@ -58,7 +58,7 @@ DrawOpaquePass::~DrawOpaquePass()
 
 void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 {
-	ShaderCodeBlob* vertBlob = new ShaderCodeBlob("../assets/vert.spv");
+	ShaderCodeBlob* vertBlob = new ShaderCodeBlob("../assets/OpaqueVert.spv");
 	RHIShaderDescriptor vertShaderDescriptor = {};
 	{
 		vertShaderDescriptor.entryName = "vert";
@@ -68,7 +68,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 	RHIShader* vertShader = m_pDevice->CreateShader(&vertShaderDescriptor);
 
-	ShaderCodeBlob* fragBlob = new ShaderCodeBlob("../assets/frag.spv");
+	ShaderCodeBlob* fragBlob = new ShaderCodeBlob("../assets/OpaqueFrag.spv");
 	RHIShaderDescriptor fragShaderDescriptor = {};
 	{
 		fragShaderDescriptor.entryName = "frag";
@@ -120,9 +120,9 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	RHIGroupDescriptor groupDescriptor = {};
 	{
 		groupDescriptor.pGroupLayout = groupLayout;
-		groupDescriptor.count = 2;
+		groupDescriptor.count = RHIContext::g_maxFrames;
 	}
-	m_pGroups = context->CreateResourceGroup(&groupDescriptor);
+	m_pGroup = context->CreateResourceGroup(&groupDescriptor);
 
 	RHIRasterizationStateDescriptor rasterizationStateDescriptor = {};
 
@@ -141,36 +141,38 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	};
 	m_pPSO = context->CreatePSO(&psoDescriptor);
 
-	UniformData data = 
-	{
-		glm::mat4(1.0f),
-		cameraData->MatrixVP,
-		glm::vec4(-2.0f, 2.0f, -2.0f, 1.0f),
-		glm::vec4(cameraData->Position, 1.0f),
-		glm::vec4()
-	};
+	dynamicAlignment = sizeof(UniformData);
+	unsigned int minAlignment = RHIContext::GetGPU()->GetFeature().minUBOAlignment;
+	if(minAlignment > 0)
+		dynamicAlignment = (sizeof(UniformData) + minAlignment - 1) & ~(minAlignment - 1);
+
+	m_pUniformBuffers.resize(RHIContext::g_maxFrames);
 	RHIBufferDescriptor uniformBufferDescriptor = {};
 	{
-		uniformBufferDescriptor.size = sizeof(data) * 2;
-		uniformBufferDescriptor.pData = &data;
-		uniformBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
+		uniformBufferDescriptor.size = 2 * dynamicAlignment;
+		uniformBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE;
 	}
-	m_pUniformBuffer = context->CreateUniformBuffer(&uniformBufferDescriptor);
+	m_pUniformBuffers[0] = context->CreateUniformBuffer(&uniformBufferDescriptor);
+	m_pUniformBuffers[1] = context->CreateUniformBuffer(&uniformBufferDescriptor);
+	m_pUniformBuffers[2] = context->CreateUniformBuffer(&uniformBufferDescriptor);
 
-	BufferResourceInfo bufferInfo[] = 
+	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{
-		{ m_pUniformBuffer, 0, sizeof(data) },
-		{ m_pUniformBuffer, sizeof(data), sizeof(data) },
-	};
-	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
-	{
-		updateResourceDescriptor.bindingCount = 2;
-		updateResourceDescriptor.pBindingResources = resource;
-		updateResourceDescriptor.pGroup = m_pGroups;
-		updateResourceDescriptor.bufferResourceCount = 2;
-		updateResourceDescriptor.pBufferInfo = bufferInfo;
+		BufferResourceInfo bufferInfo[] = 
+		{
+			{ m_pUniformBuffers[i], 0, sizeof(UniformData) },
+			{ m_pUniformBuffers[i], dynamicAlignment, sizeof(UniformData)},
+		};
+		RHIUpdateResourceDescriptor updateResourceDescriptor = {};
+		{
+			updateResourceDescriptor.bindingCount = 1;
+			updateResourceDescriptor.pBindingResources = resource;
+			updateResourceDescriptor.pGroup = m_pGroup[i];
+			updateResourceDescriptor.bufferResourceCount = 2;
+			updateResourceDescriptor.pBufferInfo = bufferInfo;
+		}
+		context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 	}
-	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 
 	m_pRenderTargets.resize(3);
 	for (int i = 0; i < 3; ++i)
@@ -213,8 +215,8 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		int drawcalls = 0;
 		for (unsigned int i = 0; i < gameObjects.size(); ++i)
 		{
-			MeshFilter *filter = gameObjects[i]->GetComponent<MeshFilter>();
-			if(filter == nullptr)
+			MeshFilter* filter = gameObjects[i]->GetComponent<MeshFilter>();
+			if (filter == nullptr)
 				continue;
 
 			SurfaceData surfaceData = gameObjects[i]->GetComponent<Material>()->GetSurfaceData();
@@ -222,17 +224,27 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 			{
 				gameObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix(),
 				cameraData->MatrixVP,
-				glm::vec4(-2.0f, 2.0f, -2.0f, 1.0f),
+				World::GetWorld()->GetMainLight()->GetGameObject()->GetComponent<Transformer>()->GetRotateMatrix() * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f),
 				glm::vec4(cameraData->Position, 1.0f),
 				glm::vec4(surfaceData.albedo, surfaceData.roughness)
 			};
-			m_pUniformBuffer->LoadData(&data, sizeof(data), sizeof(data) * drawcalls);
-			
+			m_pUniformBuffers[RHIContext::g_currentFrame]->LoadData(&data, sizeof(data), dynamicAlignment * drawcalls);
+			++drawcalls;
+		}
+		m_pUniformBuffers[RHIContext::g_currentFrame]->Flush(2 * dynamicAlignment);
 
+		drawcalls = 0;
+		for (unsigned int i = 0; i < gameObjects.size(); ++i)
+		{
+			MeshFilter *filter = gameObjects[i]->GetComponent<MeshFilter>();
+			if(filter == nullptr)
+				continue;
+			
+			unsigned int offset = (unsigned int)dynamicAlignment * drawcalls;
 			Mesh *pMesh = filter->GetStaticMesh();
 			encoder->BindVertexBuffer(pMesh->GetVertexBuffer());
 			encoder->BindIndexBuffer(pMesh->GetIndexBuffer());
-			encoder->BindGroups(1, m_pGroups + drawcalls, m_pPipelineResourceLayout);
+			encoder->BindGroups(1, m_pGroup[RHIContext::g_currentFrame], m_pPipelineResourceLayout, 1, &offset);
 			encoder->DrawIndexed(pMesh->m_indexCount, 0);
 			drawcalls++;
 		}

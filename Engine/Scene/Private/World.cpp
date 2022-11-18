@@ -6,7 +6,7 @@ World* World::g_pInstance = nullptr;
 
 World::World()
 {
-	
+	m_pMainLight = nullptr;
 }
 
 World::~World()
@@ -26,6 +26,31 @@ GameObject* World::CreateGameObject(std::string name)
 void World::AddCamera(Camera* pCamera)
 {
 	m_pCameras.push_back(std::move(pCamera));
+}
+
+void World::AddLight(Light* pLight)
+{
+	if (m_pMainLight == nullptr)
+	{
+		m_pMainLight = pLight;
+		pLight->SetMainLight(true);
+	}
+	m_pAdditionalLights.push_back(pLight);
+}
+
+void World::SetMainLight(Light* pLight)
+{
+	for (unsigned int i = 0; i < m_pAdditionalLights.size(); ++i)
+	{
+		if (m_pAdditionalLights[i] == pLight)
+		{
+			m_pMainLight->SetMainLight(false);
+			pLight->SetMainLight(true);
+			m_pAdditionalLights[i] = m_pMainLight;
+			m_pMainLight = pLight;
+			return;
+		}
+	}
 }
 
 World* World::CreateWorld()
@@ -61,4 +86,14 @@ const std::vector<char*>& World::GetObjectNames() const
 std::vector<Camera*>& World::GetCameras()
 {
 	return m_pCameras;
+}
+
+Light* World::GetMainLight() const
+{
+	return m_pMainLight;
+}
+
+const std::vector<Light*>& World::GetAdditionalLights() const
+{
+	return m_pAdditionalLights;
 }

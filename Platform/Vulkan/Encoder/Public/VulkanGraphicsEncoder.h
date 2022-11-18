@@ -26,7 +26,7 @@ namespace Vulkan
 
 		virtual void BindIndexBuffer(RHIBuffer *pBuffer) override;
 
-		virtual void BindGroups(unsigned int groupCount, RHIGroup* pGroup, RHIPipelineResourceLayout *pPipelineResourceLayout) override;
+		virtual void BindGroups(unsigned int groupCount, RHIGroup* pGroup, RHIPipelineResourceLayout *pPipelineResourceLayout, unsigned int offsetCount, unsigned int* offsets) override;
 
 		virtual void DrawVertexArray() override;
 

@@ -9,7 +9,7 @@ public:
 
 	virtual ~VulkanGroupPool();
 
-	virtual RHIGroup* GetGroup(unsigned int count = 1) override;
+	virtual std::vector<RHIGroup*> GetGroup(unsigned int count = 1) override;
 
 private:
 

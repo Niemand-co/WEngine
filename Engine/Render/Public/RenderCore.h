@@ -108,6 +108,7 @@ struct GPUFeature
 	unsigned short SHDAER_SUPPORT;
 	std::vector<MemoryTypeSupport*> memorySupports;
 	std::vector<QueueProperty*> queueProperties;
+	size_t minUBOAlignment;
 };
 
 enum class RHIQueueType

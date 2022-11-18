@@ -83,14 +83,17 @@ void GameScene::OnUpdate(WEngine::TimeStep timeStep)
 
 SandBox::SandBox()
 {
-	GameObject* go = m_scene->CreateGameObject("Cube");
-	MeshFilter* filter = go->AddComponent<MeshFilter>();
-	filter->SetStaticMesh(Mesh::GetCube());
-	go->AddComponent<Material>();
+	GameObject *pLight = m_scene->CreateGameObject("Main Light");
+	pLight->AddComponent<Light>();
 
 	GameObject *plane = m_scene->CreateGameObject("Plane");
 	plane->AddComponent<MeshFilter>()->SetStaticMesh(Mesh::GetPlane());
 	plane->AddComponent<Material>();
+
+	GameObject* go = m_scene->CreateGameObject("Cube");
+	MeshFilter* filter = go->AddComponent<MeshFilter>();
+	filter->SetStaticMesh(Mesh::GetCube());
+	go->AddComponent<Material>();
 	plane->GetComponent<Transformer>()->SetScale(glm::vec3(50.0f, 50.0f, 50.0f));
 
 	m_pLayerStack->PushLayer(new GameScene("Game Scene"));

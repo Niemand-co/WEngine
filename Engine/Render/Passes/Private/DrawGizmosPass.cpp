@@ -141,11 +141,9 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	m_pGroup = context->CreateResourceGroup(&groupDescriptor);
 
-	UniformData data = { GameObject::Find("Cube")->GetComponent<Transformer>()->GetLocalToWorldMatrix(), cameraData->MatrixVP};
 	RHIBufferDescriptor bufferDescriptor = {};
 	{
-		bufferDescriptor.pData = &data;
-		bufferDescriptor.size = sizeof(data);
+		bufferDescriptor.size = sizeof(UniformData);
 		bufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	m_pBuffer = context->CreateUniformBuffer(&bufferDescriptor);
@@ -157,7 +155,7 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	BufferResourceInfo info = {};
 	{
 		info.pBuffer = m_pBuffer;
-		info.range = sizeof(data);
+		info.range = sizeof(UniformData);
 		info.offset = 0;
 	}
 	RHIUpdateResourceDescriptor updateDescriptor = {};
@@ -166,7 +164,7 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 		updateDescriptor.pBindingResources = bindings;
 		updateDescriptor.bufferResourceCount = 1;
 		updateDescriptor.pBufferInfo = &info;
-		updateDescriptor.pGroup = m_pGroup;
+		updateDescriptor.pGroup = m_pGroup[0];
 	}
 	context->UpdateUniformResourceToGroup(&updateDescriptor);
 
@@ -196,26 +194,6 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 
 	std::vector<GameObject*>& selectedObjects = WEngine::Editor::GetSelectedObject();
 
-	BindingResource bindings[] =
-	{
-		{ 0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX },
-	};
-	BufferResourceInfo info = {};
-	{
-		info.pBuffer = m_pBuffer;
-		info.range = sizeof(UniformData);
-		info.offset = 0;
-	}
-	RHIUpdateResourceDescriptor updateDescriptor = {};
-	{
-		updateDescriptor.bindingCount = 1;
-		updateDescriptor.pBindingResources = bindings;
-		updateDescriptor.bufferResourceCount = 1;
-		updateDescriptor.pBufferInfo = &info;
-		updateDescriptor.pGroup = m_pGroup;
-	}
-	
-
 	RHICommandBuffer* cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
 	cmd->BeginScopePass("Skybox", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentImage]);
@@ -234,14 +212,17 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 
 		for (unsigned int i = 0; i < selectedObjects.size(); ++i)
 		{
+			MeshFilter *filter = selectedObjects[i]->GetComponent<MeshFilter>();
+			if(filter == nullptr)
+				continue;
+
+			Mesh *pMesh = filter->GetStaticMesh();
 			UniformData data = { selectedObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix(), cameraData->MatrixVP };
 			m_pBuffer->LoadData(&data, sizeof(data));
-			context->UpdateUniformResourceToGroup(&updateDescriptor);
 
-			Mesh *pMesh = selectedObjects[i]->GetComponent<MeshFilter>()->GetStaticMesh();
 			encoder->BindVertexBuffer(pMesh->GetVertexBuffer());
 			encoder->BindIndexBuffer(pMesh->GetIndexBuffer());
-			encoder->BindGroups(1, m_pGroup, m_pResourceLayout);
+			encoder->BindGroups(1, m_pGroup[0], m_pResourceLayout);
 			encoder->DrawIndexed(pMesh->m_indexCount, 0);
 		}
 		

@@ -149,22 +149,12 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	m_pPSO = context->CreatePSO(&psoDescriptor);
 
-	UniformData data = 
-	{
-		cameraData->MatrixV,
-		cameraData->MatrixP,
-		glm::vec4(cameraData->Position, 1.0f),
-		topColor,
-		bottomColor
-	};
 	RHIBufferDescriptor uniformBufferDescriptor = {};
 	{
 		uniformBufferDescriptor.size = sizeof(UniformData);
-		uniformBufferDescriptor.pData = &data;
 		uniformBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	m_pUniformBuffer = context->CreateUniformBuffer(&uniformBufferDescriptor);
-	m_pUniformBuffer->LoadData(&data, sizeof(data));
 	
 	BufferResourceInfo bufferInfo[] = 
 	{
@@ -174,7 +164,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	{
 		updateResourceDescriptor.bindingCount = 1;
 		updateResourceDescriptor.pBindingResources = resource;
-		updateResourceDescriptor.pGroup = m_pGroup;
+		updateResourceDescriptor.pGroup = m_pGroup[0];
 		updateResourceDescriptor.bufferResourceCount = 1;
 		updateResourceDescriptor.pBufferInfo = bufferInfo;
 	}
@@ -230,7 +220,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	{
 		textureResourceDescriptor.bindingCount = 1;
 		textureResourceDescriptor.pBindingResources = resource + 1;
-		textureResourceDescriptor.pGroup = m_pGroup;
+		textureResourceDescriptor.pGroup = m_pGroup[0];
 		textureResourceDescriptor.textureResourceCount = 1;
 		textureResourceDescriptor.pTextureInfo = samplerInfo;
 	}
@@ -320,7 +310,7 @@ void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 		encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
 		encoder->BindVertexBuffer(m_pMesh->GetVertexBuffer());
 		encoder->BindIndexBuffer(m_pMesh->GetIndexBuffer());
-		encoder->BindGroups(1, m_pGroup, m_pPipelineLayout);
+		encoder->BindGroups(1, m_pGroup[0], m_pPipelineLayout);
 		encoder->DrawIndexed(m_pMesh->m_indexCount, 0);
 		encoder->EndPass();
 		encoder->~RHIGraphicsEncoder();

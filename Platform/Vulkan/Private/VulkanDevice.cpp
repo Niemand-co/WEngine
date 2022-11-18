@@ -488,7 +488,7 @@ namespace Vulkan
 		RE_ASSERT(feature.memorySupports.size() > index, "No Suitable Memory Heap Exists.");
 
 		VulkanBuffer *buffer = (VulkanBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanBuffer));
-		::new (buffer) VulkanBuffer(pBuffer, m_pDevice, index, descriptor->size, descriptor->pData);
+		::new (buffer) VulkanBuffer(pBuffer, m_pDevice, index, descriptor->size);
 
 		return buffer;
 	}

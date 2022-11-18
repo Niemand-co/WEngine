@@ -35,7 +35,7 @@ public:
 
 	virtual void BindIndexBuffer(RHIBuffer *pBuffer) = 0;
 
-	virtual void BindGroups(unsigned int groupCount, RHIGroup *pGroup, RHIPipelineResourceLayout* pPipelineResourceLayout) = 0;
+	virtual void BindGroups(unsigned int groupCount, RHIGroup *pGroup, RHIPipelineResourceLayout* pPipelineResourceLayout, unsigned int offsetCount = 0, unsigned int* offsets = nullptr) = 0;
 
 	virtual void DrawVertexArray() = 0;
 

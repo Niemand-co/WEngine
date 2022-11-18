@@ -385,16 +385,16 @@ RHIGroupLayout* RHIContext::CreateGroupLayout(RHIGroupLayoutDescriptor* descript
 	return g_pDevice->CreateGroupLayout(descriptor);
 }
 
-RHIGroup* RHIContext::CreateResourceGroup(RHIGroupDescriptor* descriptor)
+std::vector<RHIGroup*> RHIContext::CreateResourceGroup(RHIGroupDescriptor* descriptor)
 {
 	RHIGroupPoolDescriptor poolDescriptor = {};
 	{
 		poolDescriptor.pGroupLayout = descriptor->pGroupLayout;
-		poolDescriptor.maxSetCount = 100;
+		poolDescriptor.maxSetCount = RHIContext::g_maxFrames;
 	}
 	RHIGroupPool *pool = g_pDevice->CreateGroupPool(&poolDescriptor);
 
-	RHIGroup *group = pool->GetGroup(descriptor->count);
+	std::vector<RHIGroup*> group = pool->GetGroup(descriptor->count);
 
 	return group;
 }

@@ -4,7 +4,7 @@
 namespace Vulkan
 {
 
-	VulkanBuffer::VulkanBuffer(VkBuffer* buffer, VkDevice *device, unsigned int memoryHeapIndex, VkDeviceSize size, void* pData)
+	VulkanBuffer::VulkanBuffer(VkBuffer* buffer, VkDevice *device, unsigned int memoryHeapIndex, VkDeviceSize size)
 		: m_pBuffer(buffer), m_pDevice(device)
 	{
 		RHIBuffer::size = size;
@@ -35,9 +35,21 @@ namespace Vulkan
 
 	void VulkanBuffer::LoadData(void* pData, size_t size, size_t offset)
 	{
-		RE_ASSERT(vkMapMemory(*m_pDevice, *m_pDeviceMemory, 0, size, 0, &m_pData) == VK_SUCCESS, "Failed to Map Memory To Host.");
+		RE_ASSERT(vkMapMemory(*m_pDevice, *m_pDeviceMemory, offset, size, 0, &m_pData) == VK_SUCCESS, "Failed to Map Memory To Host.");
 		::memcpy(m_pData, pData, static_cast<size_t>(size));
 		vkUnmapMemory(*m_pDevice, *m_pDeviceMemory);
+	}
+
+	void VulkanBuffer::Flush(size_t range)
+	{
+		VkMappedMemoryRange memoryRange = {};
+		{
+			memoryRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+			memoryRange.memory = *m_pDeviceMemory;
+			memoryRange.offset = 0;
+			memoryRange.size = size;
+		}
+		vkFlushMappedMemoryRanges(*m_pDevice, 1, &memoryRange);
 	}
 
 	VkBuffer* VulkanBuffer::GetHandle()

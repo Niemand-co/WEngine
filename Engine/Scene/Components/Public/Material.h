@@ -60,17 +60,11 @@ private:
 	[[Color(1, 1, 1, 1)]]
 	glm::vec4 albedo;
 
-	std::string albedoPropertyID;
-
 	[[Range(0.01, 1)]]
 	float roughness;
 
-	std::string roughnessPropertyID;
-
 	[[Range(0, 1)]]
 	float metallic;
-
-	std::string metallicPropertyID;
 
 	RHIShader* m_shader;
 };

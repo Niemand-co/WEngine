@@ -33,7 +33,7 @@ private:
 
 	Mesh *m_pMesh;
 
-	RHIGroup *m_pGroup;
+	std::vector<RHIGroup*> m_pGroup;
 
 	RHIPipelineResourceLayout *m_pPipelineLayout;
 

@@ -23,11 +23,15 @@ public:
 
 	virtual ~Light();
 
+	void SetMainLight(bool isMainLight);
+
 	virtual void ShowInInspector() override;
 
 private:
 
 	LightType m_type;
+
+	bool m_isMainLight;
 
 	glm::vec3 m_color;
 

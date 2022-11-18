@@ -85,7 +85,7 @@ public:
 
 	virtual RHIGroupLayout* CreateGroupLayout(RHIGroupLayoutDescriptor *descriptor);
 
-	virtual RHIGroup* CreateResourceGroup(RHIGroupDescriptor *descriptor);
+	virtual std::vector<RHIGroup*> CreateResourceGroup(RHIGroupDescriptor *descriptor);
 
 	virtual void UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor *descriptor);
 

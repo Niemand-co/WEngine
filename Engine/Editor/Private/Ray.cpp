@@ -45,9 +45,6 @@ namespace WEngine
 		{
 			if (IsIntersectWithTriangle(pMesh->m_pVertices[pMesh->m_pIndices[i]].Position, pMesh->m_pVertices[pMesh->m_pIndices[i + 1]].Position, pMesh->m_pVertices[pMesh->m_pIndices[i + 2]].Position))
 			{
-				pMesh->m_pVertices[pMesh->m_pIndices[i]].Color = glm::vec3(1, 0, 0);
-				pMesh->m_pVertices[pMesh->m_pIndices[i + 1]].Color = glm::vec3(1, 0, 0);
-				pMesh->m_pVertices[pMesh->m_pIndices[i + 2]].Color = glm::vec3(1, 0, 0);
 				return true;
 			}
 		}

@@ -23,7 +23,7 @@ public:
 
 private:
 
-	RHIGroup *m_pGroup;
+	std::vector<RHIGroup*> m_pGroup;
 
 	RHIBuffer *m_pBuffer;
 

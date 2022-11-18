@@ -21,7 +21,7 @@ struct uniformData
 {
     float4x4 M;
     float4x4 VP;
-    float4 lightPos;
+    float4 lightDir;
     float4 cameraPos;
     float4 surfaceData;
 };
@@ -77,7 +77,7 @@ VSOutput vert(VSInput vin)
 
 float4 frag(VSOutput pin) : SV_TARGET
 {
-    float3 L = normalize(data.lightPos.xyz - pin.WorldPos);
+    float3 L = normalize(-data.lightDir.xyz);
     float3 V = normalize(data.cameraPos.xyz - pin.WorldPos);
     float3 H = normalize(L + V);
     

@@ -21,8 +21,6 @@ public:
 
 	uint64_t size;
 
-	void *pData;
-
 	unsigned short memoryType;
 
 private:

@@ -4,6 +4,7 @@
 #include "Scene/Components/Public/MeshFilter.h"
 #include "Scene/Components/Public/Camera.h"
 #include "Scene/Components/Public/Material.h"
+#include "Scene/Components/Public/Light.h"
 
 class World;
 

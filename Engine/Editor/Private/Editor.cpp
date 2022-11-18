@@ -28,12 +28,6 @@ namespace WEngine
 
 	void Editor::ClearSelection()
 	{
-		for (GameObject* gameobject : g_selectedObjects)
-		{
-			Mesh *pMesh = gameobject->GetComponent<MeshFilter>()->GetStaticMesh();
-			for(int i = 0; i < pMesh->m_vertexCount; ++i)
-				pMesh->m_pVertices[i].Color = glm::vec3(1, 1, 1);
-		}
 		g_selectedObjects.clear();
 	}
 

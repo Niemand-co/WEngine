@@ -27,6 +27,8 @@ namespace Vulkan
 		else
 			m_feature.PHYSICAL_DEVICE_TYPE |= DEVICE_TYPE_OTHER;
 
+		m_feature.minUBOAlignment = properties.limits.minUniformBufferOffsetAlignment;
+
 		VkPhysicalDeviceFeatures features;
 		vkGetPhysicalDeviceFeatures(*m_pPhysicalDevice, &features);
 
@@ -69,6 +71,7 @@ namespace Vulkan
 		{
 			m_feature.memorySupports[memoryProperties.memoryTypes[i].heapIndex]->properties |= memoryProperties.memoryTypes[i].propertyFlags;
 		}
+
 	}
 
 	VulkanGPU::~VulkanGPU()

@@ -91,9 +91,9 @@ namespace Vulkan
 		vkCmdBindIndexBuffer(*m_cmd, *static_cast<VulkanBuffer*>(pBuffer)->GetHandle(), 0, VK_INDEX_TYPE_UINT32);
 	}
 
-	void VulkanGraphicsEncoder::BindGroups(unsigned int groupCount, RHIGroup* pGroup, RHIPipelineResourceLayout* pPipelineResourceLayout)
+	void VulkanGraphicsEncoder::BindGroups(unsigned int groupCount, RHIGroup* pGroup, RHIPipelineResourceLayout* pPipelineResourceLayout, unsigned int offsetCount, unsigned int *offsets)
 	{
-		vkCmdBindDescriptorSets(*m_cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, *static_cast<VulkanPipelineResourceLayout*>(pPipelineResourceLayout)->GetHandle(), 0, groupCount, static_cast<VulkanGroup*>(pGroup)->GetHandle(), 0, nullptr);
+		vkCmdBindDescriptorSets(*m_cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, *static_cast<VulkanPipelineResourceLayout*>(pPipelineResourceLayout)->GetHandle(), 0, groupCount, static_cast<VulkanGroup*>(pGroup)->GetHandle(), offsetCount, offsets);
 	}
 
 	void VulkanGraphicsEncoder::DrawVertexArray()

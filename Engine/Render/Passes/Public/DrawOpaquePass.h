@@ -28,12 +28,14 @@ private:
 
 	RHISampler *m_pSampler;
 
-	RHIBuffer* m_pUniformBuffer;
+	std::vector<RHIBuffer*> m_pUniformBuffers;
 
 	RHIBuffer *m_pSurfaceDataBuffer;
 
 	RHIPipelineResourceLayout *m_pPipelineResourceLayout;
 
-	RHIGroup *m_pGroups;
+	std::vector<RHIGroup*> m_pGroup;
+
+	size_t dynamicAlignment;
 
 };

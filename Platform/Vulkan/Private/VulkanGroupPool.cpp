@@ -14,24 +14,25 @@ VulkanGroupPool::~VulkanGroupPool()
 {
 }
 
-RHIGroup* VulkanGroupPool::GetGroup(unsigned int count)
+std::vector<RHIGroup*> VulkanGroupPool::GetGroup(unsigned int count)
 {
+	std::vector<VkDescriptorSetLayout> layouts(count, *static_cast<VulkanGroupLayout*>(m_pGroupLayout)->GetHandle());
 	VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
 	{
 		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		descriptorSetAllocateInfo.descriptorPool = *m_pDescriptorSetPool;
-		descriptorSetAllocateInfo.descriptorSetCount = 1;
-		descriptorSetAllocateInfo.pSetLayouts = static_cast<VulkanGroupLayout*>(m_pGroupLayout)->GetHandle();
+		descriptorSetAllocateInfo.descriptorSetCount = count;
+		descriptorSetAllocateInfo.pSetLayouts = layouts.data();
 	}
+	VkDescriptorSet *pDescriptorSets = (VkDescriptorSet*)WEngine::Allocator::Get()->Allocate(count * sizeof(VkDescriptorSet));
+	vkAllocateDescriptorSets(*m_pDevice, &descriptorSetAllocateInfo, pDescriptorSets);
 
-	VulkanGroup *group = (VulkanGroup*)WEngine::Allocator::Get()->Allocate(count * sizeof(VulkanGroup));
+	std::vector<RHIGroup*> groups(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		VkDescriptorSet *pDescriptorSets = (VkDescriptorSet*)WEngine::Allocator::Get()->Allocate(sizeof(VkDescriptorSet));
-		vkAllocateDescriptorSets(*m_pDevice, &descriptorSetAllocateInfo, pDescriptorSets);
-
-		::new (group + i) VulkanGroup(pDescriptorSets);
+		groups[i] = (VulkanGroup*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanGroup));
+		::new (groups[i]) VulkanGroup(pDescriptorSets + i);
 	}
 
-	return group;
+	return groups;
 }
