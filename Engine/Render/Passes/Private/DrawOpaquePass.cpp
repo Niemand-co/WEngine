@@ -93,7 +93,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	{
 		depthStencilDescriptor.depthWriteEnabled = true;
 		depthStencilDescriptor.depthTestEnabled = true;
-		depthStencilDescriptor.depthCompareOP = DepthCompareOP::Less;
+		depthStencilDescriptor.depthCompareOP = CompareOP::Less;
 		depthStencilDescriptor.depthBoundsTest = false;
 		depthStencilDescriptor.maxDepth = 1.0f;
 		depthStencilDescriptor.minDepth = 0.0f;
@@ -141,15 +141,12 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	};
 	m_pPSO = context->CreatePSO(&psoDescriptor);
 
-	dynamicAlignment = sizeof(UniformData);
-	unsigned int minAlignment = RHIContext::GetGPU()->GetFeature().minUBOAlignment;
-	if(minAlignment > 0)
-		dynamicAlignment = (sizeof(UniformData) + minAlignment - 1) & ~(minAlignment - 1);
-
 	m_pUniformBuffers.resize(RHIContext::g_maxFrames);
 	RHIBufferDescriptor uniformBufferDescriptor = {};
 	{
-		uniformBufferDescriptor.size = 2 * dynamicAlignment;
+		uniformBufferDescriptor.isDynamic = true;
+		uniformBufferDescriptor.size = sizeof(UniformData);
+		uniformBufferDescriptor.count = 2;
 		uniformBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE;
 	}
 	m_pUniformBuffers[0] = context->CreateUniformBuffer(&uniformBufferDescriptor);
@@ -158,17 +155,19 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 
 	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{
-		BufferResourceInfo bufferInfo[] = 
+		m_pUniformBuffers[i]->SetDataSize(sizeof(UniformData));
+		BufferResourceInfo *bufferInfo[1] = 
 		{
-			{ m_pUniformBuffers[i], 0, sizeof(UniformData) },
-			{ m_pUniformBuffers[i], dynamicAlignment, sizeof(UniformData)},
+			m_pUniformBuffers[i]->GetBufferInfo(),
 		};
+		unsigned int bufferInfoCount[] = { 2 };
 		RHIUpdateResourceDescriptor updateResourceDescriptor = {};
 		{
 			updateResourceDescriptor.bindingCount = 1;
 			updateResourceDescriptor.pBindingResources = resource;
 			updateResourceDescriptor.pGroup = m_pGroup[i];
-			updateResourceDescriptor.bufferResourceCount = 2;
+			updateResourceDescriptor.dynamicBufferCount = 1;
+			updateResourceDescriptor.bufferResourceCount = bufferInfoCount;
 			updateResourceDescriptor.pBufferInfo = bufferInfo;
 		}
 		context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
@@ -202,10 +201,13 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 	cmd->BeginScopePass("Test", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentFrame]);
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
+		ClearValue values[] { {glm::vec4(1.f, 1.f, 1.f, 1.f), 0.0f, 0 }, { glm::vec4(), 1.0f, 0 } };
 		RHIRenderPassBeginDescriptor renderPassBeginDescriptor = {};
 		{
 			renderPassBeginDescriptor.renderPass = m_pRenderPass;
 			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[RHIContext::g_currentFrame];
+			renderPassBeginDescriptor.clearCount = 2;
+			renderPassBeginDescriptor.pClearValues = values;
 		}
 		encoder->BeginPass(&renderPassBeginDescriptor);
 		encoder->SetPipeline(m_pPSO);

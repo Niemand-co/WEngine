@@ -19,9 +19,13 @@ public:
 
 public:
 
-	uint64_t size;
+	size_t size;
+
+	size_t count;
 
 	unsigned short memoryType;
+
+	bool isDynamic;
 
 private:
 

@@ -87,7 +87,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 		depthStencilDescriptor.depthWriteEnabled = true;
 		depthStencilDescriptor.depthTestEnabled = true;
 		depthStencilDescriptor.depthBoundsTest = false;
-		depthStencilDescriptor.depthCompareOP = DepthCompareOP::LE;
+		depthStencilDescriptor.depthCompareOP = CompareOP::LE;
 		depthStencilDescriptor.minDepth = 0.0f;
 		depthStencilDescriptor.maxDepth = 1.0f;
 	}
@@ -299,10 +299,13 @@ void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 	{
 		RHIGraphicsEncoder *encoder = cmd->GetGraphicsEncoder();
 
+		ClearValue values[]{ {glm::vec4(1.f, 1.f, 1.f, 1.f), 0.0f, 0 }, { glm::vec4(), 1.0f, 0 } };
 		RHIRenderPassBeginDescriptor renderpassBeginDescriptor = {};
 		{
 			renderpassBeginDescriptor.renderPass = m_pRenderPass;
 			renderpassBeginDescriptor.renderTarget = m_pRenderTargets[RHIContext::g_currentFrame];
+			renderpassBeginDescriptor.clearCount = 2;
+			renderpassBeginDescriptor.pClearValues = values;
 		}
 		encoder->BeginPass(&renderpassBeginDescriptor);
 		encoder->SetPipeline(m_pPSO);

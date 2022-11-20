@@ -43,13 +43,23 @@ void Material::ShowInInspector()
 {
 	if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::Text("Roughness"); ImGui::SameLine();
-		ImGui::SliderFloat("##Roughness", &roughness, 0.01f, 1.0f);
+		ImGui::Columns(2); ImGui::SetColumnWidth(0, 80.0f);
 
-		ImGui::Text("Metallic"); ImGui::SameLine();
-		ImGui::SliderFloat("##Metallic", &metallic, 0.0f, 1.0f);
+		ImGui::Text("Roughness"); ImGui::SameLine(); ImGui::NextColumn();
+		ImGui::PushItemWidth(ImGui::CalcItemWidth());
+		ImGui::SliderFloat("##Roughness", &roughness, 0.01f, 1.0f); ImGui::NextColumn();
+		ImGui::PopItemWidth();
 
-		ImGui::Text("Albedo"); ImGui::SameLine();
-		ImGui::ColorEdit3("##Albedo", &albedo[0]);
+		ImGui::Text("Metallic"); ImGui::SameLine(); ImGui::NextColumn();
+		ImGui::PushItemWidth(ImGui::CalcItemWidth());
+		ImGui::SliderFloat("##Metallic", &metallic, 0.0f, 1.0f); ImGui::NextColumn();
+		ImGui::PopItemWidth();
+
+		ImGui::Text("Albedo"); ImGui::SameLine(); ImGui::NextColumn();
+		ImGui::PushItemWidth(ImGui::CalcItemWidth());
+		ImGui::ColorEdit3("##Albedo", &albedo[0]); ImGui::NextColumn();
+		ImGui::PopItemWidth();
+
+		ImGui::Columns(1);
 	}
 }

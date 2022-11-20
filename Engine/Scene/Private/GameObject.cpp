@@ -33,7 +33,6 @@ void GameObject::ShowInInspector() const
 	for (Component* pComponent : m_components)
 	{
 		pComponent->ShowInInspector();
-		ImGui::Separator();
 	}
 }
 

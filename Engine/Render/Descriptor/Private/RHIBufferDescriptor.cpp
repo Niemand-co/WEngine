@@ -4,4 +4,5 @@
 
 RHIBufferDescriptor::RHIBufferDescriptor()
 {
+	count = 1;
 }

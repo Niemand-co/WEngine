@@ -4,10 +4,11 @@
 namespace Vulkan
 {
 
-	VulkanBuffer::VulkanBuffer(VkBuffer* buffer, VkDevice *device, unsigned int memoryHeapIndex, VkDeviceSize size)
+	VulkanBuffer::VulkanBuffer(VkBuffer* buffer, VkDevice *device, unsigned int memoryHeapIndex, bool isDynamic, VkDeviceSize size)
 		: m_pBuffer(buffer), m_pDevice(device)
 	{
-		RHIBuffer::size = size;
+		RHIBuffer::m_size = 1;
+		RHIBuffer::m_dynamicAlignment = -1;
 
 		m_pMemoryRequirements = (VkMemoryRequirements*)WEngine::Allocator::Get()->Allocate(sizeof(VkMemoryRequirements));
 		vkGetBufferMemoryRequirements(*device, *buffer, m_pMemoryRequirements);
@@ -21,10 +22,25 @@ namespace Vulkan
 		RE_ASSERT(vkAllocateMemory(*device, &memoryAllocateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), m_pDeviceMemory) == VK_SUCCESS, "Failed to Allocate Memory.");
 
 		vkBindBufferMemory(*m_pDevice, *m_pBuffer, *m_pDeviceMemory, 0);
+	}
 
-		//RE_ASSERT(vkMapMemory(*m_pDevice, *m_pDeviceMemory, 0, size, 0, &m_pData) == VK_SUCCESS, "Failed to Map Memory To Host.");
-		//::memcpy(m_pData, pData, static_cast<size_t>(size));
-		//vkUnmapMemory(*m_pDevice, *m_pDeviceMemory);
+	VulkanBuffer::VulkanBuffer(VkBuffer* buffer, VkDevice* device, unsigned int memoryHeapIndex, bool isDynamic, size_t dynamicAlignment, size_t count)
+	{
+		RHIBuffer::m_size = count;
+		RHIBuffer::m_dynamicAlignment = dynamicAlignment;
+
+		m_pMemoryRequirements = (VkMemoryRequirements*)WEngine::Allocator::Get()->Allocate(sizeof(VkMemoryRequirements));
+		vkGetBufferMemoryRequirements(*device, *buffer, m_pMemoryRequirements);
+
+		VkMemoryAllocateInfo memoryAllocateInfo = {};
+		memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		memoryAllocateInfo.allocationSize = m_pMemoryRequirements->size;
+		memoryAllocateInfo.memoryTypeIndex = memoryHeapIndex;
+
+		m_pDeviceMemory = (VkDeviceMemory*)WEngine::Allocator::Get()->Allocate(sizeof(VkDeviceMemory));
+		RE_ASSERT(vkAllocateMemory(*device, &memoryAllocateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), m_pDeviceMemory) == VK_SUCCESS, "Failed to Allocate Memory.");
+
+		vkBindBufferMemory(*m_pDevice, *m_pBuffer, *m_pDeviceMemory, 0);
 	}
 
 	VulkanBuffer::~VulkanBuffer()
@@ -47,9 +63,19 @@ namespace Vulkan
 			memoryRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
 			memoryRange.memory = *m_pDeviceMemory;
 			memoryRange.offset = 0;
-			memoryRange.size = size;
+			memoryRange.size = m_size;
 		}
 		vkFlushMappedMemoryRanges(*m_pDevice, 1, &memoryRange);
+	}
+
+	void VulkanBuffer::Resize(size_t count)
+	{
+		if (count <= m_capacity)
+		{
+			m_size = count;
+			return;
+		}
+
 	}
 
 	VkBuffer* VulkanBuffer::GetHandle()

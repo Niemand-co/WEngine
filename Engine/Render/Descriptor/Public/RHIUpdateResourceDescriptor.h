@@ -33,15 +33,17 @@ public:
 
 	unsigned int bindingCount;
 
-	unsigned int bufferResourceCount;
+	BindingResource *pBindingResources;
 
-	BufferResourceInfo *pBufferInfo;
+	unsigned int dynamicBufferCount;
+
+	unsigned int *bufferResourceCount;
+
+	BufferResourceInfo **pBufferInfo;
 
 	unsigned int textureResourceCount;
 
 	TextureResourceInfo *pTextureInfo;
-
-	BindingResource *pBindingResources;
 
 	RHIGroup *pGroup;
 

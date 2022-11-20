@@ -14,6 +14,8 @@ namespace Vulkan
 	VulkanGraphicsEncoder::VulkanGraphicsEncoder(VkCommandBuffer *cmd)
 		: m_cmd(cmd)
 	{
+		m_width = 0;
+		m_height = 0;
 	}
 
 	VulkanGraphicsEncoder::~VulkanGraphicsEncoder()
@@ -28,13 +30,19 @@ namespace Vulkan
 		renderPassBeginInfo.renderPass = *static_cast<VulkanRenderPass*>(descriptor->renderPass)->GetHandle();
 		renderPassBeginInfo.renderArea.offset = { 0, 0 };
 		renderPassBeginInfo.renderArea.extent = { descriptor->renderTarget->GetWidth(), descriptor->renderTarget->GetHeight() };
-		renderPassBeginInfo.clearValueCount = 2;
-		VkClearValue clearColor[2];
-		clearColor[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-		clearColor[1].depthStencil = { 1.0f, 0 };
-		renderPassBeginInfo.pClearValues = clearColor;
+		renderPassBeginInfo.clearValueCount = descriptor->clearCount;
+		std::vector<VkClearValue> values(descriptor->clearCount);
+		for (unsigned int i = 0; i < descriptor->clearCount; ++i)
+		{
+			values[i].color = { descriptor->pClearValues[0].color.r, descriptor->pClearValues[0].color.g, descriptor->pClearValues[0].color.b, descriptor->pClearValues[0].color.a };
+			values[i].depthStencil = { descriptor->pClearValues[i].depth, descriptor->pClearValues[i].stencil };
+		}
+		renderPassBeginInfo.pClearValues = values.data();
 
 		vkCmdBeginRenderPass(*m_cmd, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		m_width = descriptor->renderTarget->GetWidth();
+		m_height = descriptor->renderTarget->GetHeight();
 	}
 
 	void VulkanGraphicsEncoder::SetPipeline(RHIPipelineStateObject* pso)
@@ -62,18 +70,23 @@ namespace Vulkan
 		vkCmdSetScissor(*m_cmd, 0, 1, &rect);
 	}
 
-	void VulkanGraphicsEncoder::ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth)
+	void VulkanGraphicsEncoder::SetLineWidth(float width)
+	{
+		vkCmdSetLineWidth(*m_cmd, width);
+	}
+
+	void VulkanGraphicsEncoder::ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth, unsigned int clearStencil)
 	{
 		VkClearAttachment clearAttachment = {};
 		{
-			clearAttachment.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT | VK_IMAGE_ASPECT_DEPTH_BIT;
+			clearAttachment.aspectMask = (isClearColor ? VK_IMAGE_ASPECT_COLOR_BIT : 0) | (isClearDepth ? (VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT) : 0);
 			clearAttachment.colorAttachment = 0;
 			clearAttachment.clearValue.color = { clearColor.x, clearColor.y, clearColor.z, clearColor.w };
-			clearAttachment.clearValue.depthStencil.depth = clearDepth;
+			clearAttachment.clearValue.depthStencil = { clearDepth, clearStencil };
 		}
 		VkClearRect clearRect = {};
 		{
-			clearRect.rect = { 1920, 1080 };
+			clearRect.rect = { (int)m_width, (int)m_height };
 			clearRect.baseArrayLayer = 0;
 			clearRect.layerCount = 1;
 		}

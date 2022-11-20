@@ -10,6 +10,18 @@ public:
 
 public:
 
+	bool stencilTestEnabled;
+
+	CompareOP stencilCompareOP;
+
+	StencilFailedOP stencilFailedOP;
+
+	StencilFailedOP depthFailedOP;
+
+	StencilFailedOP passOP;
+
+	unsigned int stencilRef;
+
 	bool depthTestEnabled;
 
 	bool depthWriteEnabled;
@@ -20,6 +32,6 @@ public:
 
 	float minDepth;
 
-	DepthCompareOP depthCompareOP;
+	CompareOP depthCompareOP;
 
 };

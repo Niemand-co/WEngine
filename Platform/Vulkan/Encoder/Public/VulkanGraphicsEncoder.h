@@ -20,7 +20,9 @@ namespace Vulkan
 
 		virtual void SetScissor(const RHIScissor& scissor) override;
 
-		virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth /* = 0.0f */) override;
+		virtual void SetLineWidth(float width) override;
+
+		virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth /* = 0.0f */, unsigned int clearStencil /* = 1 */) override;
 
 		virtual void BindVertexBuffer(RHIBuffer *pBuffer) override;
 

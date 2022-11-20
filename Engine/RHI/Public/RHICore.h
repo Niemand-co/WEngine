@@ -92,8 +92,16 @@ namespace WEngine
 			return VK_FORMAT_D32_SFLOAT;
 		case Format::D16_Unorm:
 			return VK_FORMAT_D16_UNORM;
+		case Format::S8_UINT:
+			return VK_FORMAT_S8_UINT;
 		case Format::B8G8R8A8_UNorm:
 			return VK_FORMAT_B8G8R8A8_UNORM;
+		case Format::D16_UNORM_S8_UINT:
+			return VK_FORMAT_D16_UNORM_S8_UINT;
+		case Format::D24_UNORM_S8_UINT:
+			return VK_FORMAT_D24_UNORM_S8_UINT;
+		case Format::D32_SFLOAT_S8_UINT:
+			return VK_FORMAT_D32_SFLOAT_S8_UINT;
 		default:
 			RE_ASSERT(false, "Error Type Format.");
 		}
@@ -154,22 +162,46 @@ namespace WEngine
 		return VK_IMAGE_VIEW_TYPE_MAX_ENUM;
 	}
 
-	static VkCompareOp ToVulkan(DepthCompareOP op)
+	static VkCompareOp ToVulkan(CompareOP op)
 	{
 		switch (op)
 		{
-		case DepthCompareOP::Greater:
+		case CompareOP::Greater:
 			return VK_COMPARE_OP_GREATER;
-		case DepthCompareOP::GE:
+		case CompareOP::GE:
 			return VK_COMPARE_OP_GREATER_OR_EQUAL;
-		case DepthCompareOP::Less:
+		case CompareOP::Less:
 			return VK_COMPARE_OP_LESS;
-		case DepthCompareOP::LE:
+		case CompareOP::LE:
 			return VK_COMPARE_OP_LESS_OR_EQUAL;
+		case CompareOP::Euqal:
+			return VK_COMPARE_OP_EQUAL;
+		case CompareOP::NotEqual:
+			return VK_COMPARE_OP_NOT_EQUAL;
+		case CompareOP::Always:
+			return VK_COMPARE_OP_ALWAYS;
+		case CompareOP::Never:
+			return VK_COMPARE_OP_NEVER;
 		default:
 			break;
 		}
 		return VK_COMPARE_OP_MAX_ENUM;
+	}
+
+	static VkStencilOp ToVulkan(StencilFailedOP op)
+	{
+		switch (op)
+		{
+		case StencilFailedOP::Keep:
+			return VK_STENCIL_OP_KEEP;
+		case StencilFailedOP::Replace:
+			return VK_STENCIL_OP_REPLACE;
+		case StencilFailedOP::Zero:
+			return VK_STENCIL_OP_ZERO;
+		default:
+			RE_ASSERT(false, "Error Type Stencil Failed Operation");
+		}
+		return VK_STENCIL_OP_MAX_ENUM;
 	}
 
 	static VkBlendFactor ToVulkan(BlendFactor factor)

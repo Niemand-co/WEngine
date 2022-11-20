@@ -36,6 +36,4 @@ private:
 
 	std::vector<RHIGroup*> m_pGroup;
 
-	size_t dynamicAlignment;
-
 };

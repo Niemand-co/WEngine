@@ -113,10 +113,14 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 	cmd->BeginScopePass("Test", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentImage]);
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
+
+		ClearValue values[]{ {glm::vec4(1.f, 1.f, 1.f, 1.f), 0.0f, 0 } };
 		RHIRenderPassBeginDescriptor renderPassBeginDescriptor = {};
 		{
 			renderPassBeginDescriptor.renderPass = m_pRenderPass;
 			renderPassBeginDescriptor.renderTarget = m_pRenderTargets[RHIContext::g_currentImage];
+			renderPassBeginDescriptor.clearCount = 1;
+			renderPassBeginDescriptor.pClearValues = values;
 		}
 		encoder->BeginPass(&renderPassBeginDescriptor);
 

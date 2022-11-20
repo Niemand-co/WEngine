@@ -6,6 +6,8 @@ class RHIBuffer;
 class RHIPipelineResourceLayout;
 class RHIBuffer;
 class Mesh;
+class RHITexture;
+class RHITextureView;
 
 class DrawGizmosPass : public ScriptableRenderPass
 {
@@ -28,5 +30,15 @@ private:
 	RHIBuffer *m_pBuffer;
 
 	RHIPipelineResourceLayout *m_pResourceLayout;
+
+	RHIRenderPass* m_pStencilRenderPass;
+
+	RHIPipelineStateObject *m_pStencilPSO;
+
+	std::vector<RHITexture*> m_pStencils;
+
+	std::vector<RHITextureView*> m_pStencilViews;
+
+	std::vector<RHIRenderTarget*> m_pStencilRenderTargets;
 
 };

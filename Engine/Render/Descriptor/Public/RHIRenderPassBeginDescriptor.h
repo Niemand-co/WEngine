@@ -3,6 +3,13 @@
 class RHIRenderPass;
 class RHIRenderTarget;
 
+struct ClearValue
+{
+	glm::vec4 color;
+	float depth;
+	unsigned int stencil;
+};
+
 class RHIRenderPassBeginDescriptor
 {
 public:
@@ -17,6 +24,8 @@ public:
 
 	RHIRenderTarget *renderTarget;
 
-	Vector4 clearColor;
+	unsigned int clearCount;
+
+	ClearValue *pClearValues;
 
 };

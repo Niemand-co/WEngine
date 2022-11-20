@@ -29,7 +29,9 @@ public:
 
 	virtual void SetScissor(const RHIScissor& scissor) = 0;
 
-	virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth = 0.0f) = 0;
+	virtual void SetLineWidth(float width) = 0;
+
+	virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth = 0.0f, unsigned int clearStencil = 1) = 0;
 
 	virtual void BindVertexBuffer(RHIBuffer *pBuffer) = 0;
 
@@ -52,5 +54,11 @@ public:
 	virtual void NextSubpass() = 0;
 
 	virtual void EndPass() = 0;
+
+protected:
+
+	unsigned int m_width;
+
+	unsigned int m_height;
 
 };

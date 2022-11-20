@@ -55,7 +55,7 @@ void RHIContext::Init()
 	RHIInstanceDescriptor descriptor = {};
 	{
 		descriptor.backend = RHIBackend::Vulkan;
-		descriptor.enableDebugLayer = false;
+		descriptor.enableDebugLayer = true;
 		descriptor.enableGPUValidator = false;
 	}
 	g_pInstance = RHIInstance::CreateInstance(&descriptor);

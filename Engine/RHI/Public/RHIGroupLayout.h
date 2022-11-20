@@ -6,7 +6,7 @@ class RHIGroupLayout
 {
 public:
 
-	virtual ~RHIGroupLayout() = default;
+	~RHIGroupLayout() = default;
 
 public:
 

@@ -298,7 +298,15 @@ namespace Vulkan
 		VkPipelineDepthStencilStateCreateInfo depthStencilStateCreateInfo = {};
 		{
 			depthStencilStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-			depthStencilStateCreateInfo.stencilTestEnable = false;
+			depthStencilStateCreateInfo.stencilTestEnable = descriptor->depthStencilDescriptor->stencilTestEnabled;
+			depthStencilStateCreateInfo.back.failOp = WEngine::ToVulkan(descriptor->depthStencilDescriptor->stencilFailedOP);
+			depthStencilStateCreateInfo.back.compareMask = 0xFF;
+			depthStencilStateCreateInfo.back.writeMask = 0xFF;
+			depthStencilStateCreateInfo.back.passOp = WEngine::ToVulkan(descriptor->depthStencilDescriptor->passOP);
+			depthStencilStateCreateInfo.back.depthFailOp = WEngine::ToVulkan(descriptor->depthStencilDescriptor->depthFailedOP);
+			depthStencilStateCreateInfo.back.compareOp = WEngine::ToVulkan(descriptor->depthStencilDescriptor->stencilCompareOP);
+			depthStencilStateCreateInfo.back.reference = descriptor->depthStencilDescriptor->stencilRef;
+			depthStencilStateCreateInfo.front = depthStencilStateCreateInfo.back;
 			depthStencilStateCreateInfo.depthTestEnable = descriptor->depthStencilDescriptor->depthTestEnabled;
 			depthStencilStateCreateInfo.depthCompareOp = WEngine::ToVulkan(descriptor->depthStencilDescriptor->depthCompareOP);
 			depthStencilStateCreateInfo.depthWriteEnable = descriptor->depthStencilDescriptor->depthWriteEnabled;
@@ -466,11 +474,18 @@ namespace Vulkan
 
 	RHIBuffer* VulkanDevice::CreateBuffer(RHIBufferDescriptor* descriptor)
 	{
+		size_t bufferSize = descriptor->size;
+		if (descriptor->isDynamic)
+		{
+			size_t minUBOSize = m_pGPU->GetFeature().minUBOAlignment;
+			bufferSize = (bufferSize + minUBOSize - 1) & ~(minUBOSize - 1);
+		}
+
 		VkBufferCreateInfo bufferCreateInfo = {};
 		bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		bufferCreateInfo.usage = descriptor->bufferType;
 		bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		bufferCreateInfo.size = descriptor->size;
+		bufferCreateInfo.size = bufferSize * descriptor->count;
 
 		VkBuffer* pBuffer = (VkBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkBuffer));
 		::new (pBuffer) VkBuffer();
@@ -488,7 +503,10 @@ namespace Vulkan
 		RE_ASSERT(feature.memorySupports.size() > index, "No Suitable Memory Heap Exists.");
 
 		VulkanBuffer *buffer = (VulkanBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanBuffer));
-		::new (buffer) VulkanBuffer(pBuffer, m_pDevice, index, descriptor->size);
+		if(descriptor->isDynamic)
+			::new (buffer) VulkanBuffer(pBuffer, m_pDevice, index, descriptor->isDynamic, bufferSize, descriptor->count);
+		else
+			::new (buffer) VulkanBuffer(pBuffer, m_pDevice, index, descriptor->isDynamic, descriptor->size);
 
 		return buffer;
 	}

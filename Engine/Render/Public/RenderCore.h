@@ -45,7 +45,11 @@ enum class Format
 	A32R32G32B32_UInt,
 	D32_SFloat,
 	D16_Unorm,
+	S8_UINT,
 	B8G8R8A8_UNorm,
+	D16_UNORM_S8_UINT,
+	D24_UNORM_S8_UINT,
+	D32_SFLOAT_S8_UINT
 };
 
 enum class ColorSpace
@@ -138,12 +142,30 @@ enum class EncoderType
 	Compute,
 };
 
-enum class DepthCompareOP
+enum class CompareOP
 {
 	Greater = 0,
 	GE,
 	Less,
 	LE,
+	Euqal,
+	NotEqual,
+	Always,
+	Never
+};
+
+enum class StencilFailedOP
+{
+	Keep = 0,
+	Replace,
+	Zero
+};
+
+enum class DepthFailedOP
+{
+	Keep = 0,
+	Replace,
+	Zero
 };
 
 enum class BlendFactor

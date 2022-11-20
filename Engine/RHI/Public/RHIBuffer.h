@@ -1,8 +1,12 @@
 #pragma once
 
+struct BufferResourceInfo;
+
 class RHIBuffer
 {
 public:
+
+	RHIBuffer();
 
 	virtual ~RHIBuffer() = default;
 
@@ -10,8 +14,26 @@ public:
 
 	virtual void Flush(size_t range) = 0;
 
-public:
+	virtual void Resize(size_t count) = 0;
 
-	unsigned int size;
+	void SetDataSize(size_t size);
+
+	inline bool IsDynamic() { return m_isDynamic; }
+
+	BufferResourceInfo* GetBufferInfo();
+
+protected:
+
+	size_t m_size;
+
+	size_t m_capacity;
+
+	bool m_isDynamic;
+
+	size_t m_dataSize;
+
+	size_t m_dynamicAlignment;
+
+	BufferResourceInfo *m_pInfos;
 
 };
