@@ -9,6 +9,7 @@ namespace Vulkan
 	{
 		RHIBuffer::m_size = 1;
 		RHIBuffer::m_dynamicAlignment = -1;
+		RHIBuffer::m_isDynamic = isDynamic;
 
 		m_pMemoryRequirements = (VkMemoryRequirements*)WEngine::Allocator::Get()->Allocate(sizeof(VkMemoryRequirements));
 		vkGetBufferMemoryRequirements(*device, *buffer, m_pMemoryRequirements);
@@ -29,6 +30,7 @@ namespace Vulkan
 	{
 		RHIBuffer::m_capacity = count;
 		RHIBuffer::m_dynamicAlignment = dynamicAlignment;
+		RHIBuffer::m_isDynamic = isDynamic;
 
 		m_pMemoryRequirements = (VkMemoryRequirements*)WEngine::Allocator::Get()->Allocate(sizeof(VkMemoryRequirements));
 		vkGetBufferMemoryRequirements(*device, *buffer, m_pMemoryRequirements);

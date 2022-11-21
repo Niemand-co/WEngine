@@ -110,7 +110,7 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 
 	RHICommandBuffer* cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
-	cmd->BeginScopePass("Test", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentImage]);
+	cmd->BeginScopePass("Gui", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentImage]);
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
 

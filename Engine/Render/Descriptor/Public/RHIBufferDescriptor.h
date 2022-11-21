@@ -19,7 +19,7 @@ public:
 
 public:
 
-	size_t size;
+	size_t dataSize;
 
 	size_t count;
 

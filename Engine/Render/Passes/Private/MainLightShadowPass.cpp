@@ -150,7 +150,7 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 
 	RHIBufferDescriptor sceneBufferDescriptor = {};
 	{
-		sceneBufferDescriptor.size = sizeof(SceneData);
+		sceneBufferDescriptor.dataSize = sizeof(SceneData);
 		sceneBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	m_pSceneDataBuffers[0] = context->CreateUniformBuffer(&sceneBufferDescriptor);
@@ -164,7 +164,7 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 
 	RHIBufferDescriptor objectBufferDescriptor = {};
 	{
-		objectBufferDescriptor.size = World::GetWorld()->GetGameObjects().size() * dynamicBufferAlignment;
+		objectBufferDescriptor.dataSize = World::GetWorld()->GetGameObjects().size() * dynamicBufferAlignment;
 		objectBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	m_pObjectDataBuffers[0] = context->CreateUniformBuffer(&objectBufferDescriptor);

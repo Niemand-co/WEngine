@@ -216,15 +216,16 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 
 	RHIBufferDescriptor bufferDescriptor = {};
 	{
-		bufferDescriptor.size = sizeof(SceneData);
+		bufferDescriptor.dataSize = sizeof(SceneData);
 		bufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	m_pSceneBuffer = context->CreateUniformBuffer(&bufferDescriptor);
 
 	{
-		bufferDescriptor.size = sizeof(ObjectData);
-		bufferDescriptor.count = 1;
+		bufferDescriptor.dataSize = sizeof(ObjectData);
+		bufferDescriptor.count = 10;
 		bufferDescriptor.isDynamic = true;
+		bufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE;
 	}
 	m_pObjectBuffer = context->CreateUniformBuffer(&bufferDescriptor);
 

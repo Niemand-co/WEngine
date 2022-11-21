@@ -151,7 +151,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 
 	RHIBufferDescriptor uniformBufferDescriptor = {};
 	{
-		uniformBufferDescriptor.size = sizeof(UniformData);
+		uniformBufferDescriptor.dataSize = sizeof(UniformData);
 		uniformBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	m_pUniformBuffer = context->CreateUniformBuffer(&uniformBufferDescriptor);

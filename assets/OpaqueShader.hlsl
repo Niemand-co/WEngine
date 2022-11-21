@@ -30,8 +30,8 @@ struct ObjectData
     float4 surfaceData;
 };
 
-SceneData sceneData : register(b0, space0);
-ObjectData objectData : register(b1, space0);
+SceneData sceneData : register(b0);
+ObjectData objectData : register(b0);
 
 Texture2D tex : register(t1, space0);
 

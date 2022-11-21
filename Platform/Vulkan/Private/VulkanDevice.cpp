@@ -474,7 +474,7 @@ namespace Vulkan
 
 	RHIBuffer* VulkanDevice::CreateBuffer(RHIBufferDescriptor* descriptor)
 	{
-		size_t bufferSize = descriptor->size;
+		size_t bufferSize = descriptor->dataSize;
 		if (descriptor->isDynamic)
 		{
 			size_t minUBOSize = m_pGPU->GetFeature().minUBOAlignment;
@@ -506,7 +506,7 @@ namespace Vulkan
 		if(descriptor->isDynamic)
 			::new (buffer) VulkanBuffer(pBuffer, m_pDevice, index, descriptor->isDynamic, bufferSize, descriptor->count);
 		else
-			::new (buffer) VulkanBuffer(pBuffer, m_pDevice, index, descriptor->isDynamic, descriptor->size);
+			::new (buffer) VulkanBuffer(pBuffer, m_pDevice, index, descriptor->isDynamic, descriptor->dataSize);
 
 		return buffer;
 	}

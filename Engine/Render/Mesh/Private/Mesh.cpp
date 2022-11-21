@@ -27,7 +27,8 @@ RHIBuffer* Mesh::GetVertexBuffer()
 	
 	RHIBufferDescriptor descriptor = {};
 	{
-		descriptor.size = m_vertexCount * sizeof(Vertex);
+		descriptor.dataSize = m_vertexCount * sizeof(Vertex);
+		descriptor.isDynamic = false;
 		descriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	m_pVertexBuffer = RHIContext::GetContext()->CreateVertexBuffer(&descriptor);
@@ -43,7 +44,8 @@ RHIBuffer* Mesh::GetIndexBuffer()
 
 	RHIBufferDescriptor descriptor = {};
 	{
-		descriptor.size = m_indexCount * sizeof(unsigned int);
+		descriptor.dataSize = m_indexCount * sizeof(unsigned int);
+		descriptor.isDynamic = false;
 		descriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	m_pIndexBuffer = RHIContext::GetContext()->CreateIndexBuffer(&descriptor);

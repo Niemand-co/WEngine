@@ -23,7 +23,10 @@ BufferResourceInfo* RHIBuffer::GetBufferInfo()
     {
         if (!m_isDynamic)
         {
-            *m_pInfos = { this, 0, m_dataSize };
+            m_pInfos = (BufferResourceInfo*)WEngine::Allocator::Get()->Allocate(sizeof(BufferResourceInfo));
+            m_pInfos->pBuffer = this;
+            m_pInfos->offset = 0;
+            m_pInfos->range = m_dataSize;
         }
         else
         {

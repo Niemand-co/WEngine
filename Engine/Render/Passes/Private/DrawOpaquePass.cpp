@@ -150,7 +150,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	RHIBufferDescriptor uniformBufferDescriptor = {};
 	{
 		uniformBufferDescriptor.isDynamic = true;
-		uniformBufferDescriptor.size = sizeof(ObjectData);
+		uniformBufferDescriptor.dataSize = sizeof(ObjectData);
 		uniformBufferDescriptor.count = 10;
 		uniformBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE;
 	}
@@ -162,7 +162,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	{
 		uniformBufferDescriptor.isDynamic = false;
 		uniformBufferDescriptor.count = 1;
-		uniformBufferDescriptor.size = sizeof(SceneData);
+		uniformBufferDescriptor.dataSize = sizeof(SceneData);
 		uniformBufferDescriptor.memoryType |= MEMORY_PROPERTY_HOST_COHERENT;
 	}
 	m_pSceneUniformBuffers[0] = context->CreateUniformBuffer(&uniformBufferDescriptor);
@@ -214,7 +214,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 
 	const std::vector<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
 
-	cmd->BeginScopePass("Test", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentFrame]);
+	cmd->BeginScopePass("Opaque", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentFrame]);
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
 		ClearValue values[] { {glm::vec4(1.f, 1.f, 1.f, 1.f), 0.0f, 0 }, { glm::vec4(), 1.0f, 0 } };
@@ -254,7 +254,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 			m_pObjectUniformBuffers[RHIContext::g_currentFrame]->LoadData(&objectData, sizeof(objectData), drawcalls);
 			++drawcalls;
 		}
-		m_pObjectUniformBuffers[RHIContext::g_currentFrame]->Flush(gameObjects.size());
+		m_pObjectUniformBuffers[RHIContext::g_currentFrame]->Flush(drawcalls);
 
 		drawcalls = 0;
 		for (unsigned int i = 0; i < gameObjects.size(); ++i)
