@@ -25,8 +25,9 @@ namespace Vulkan
 	}
 
 	VulkanBuffer::VulkanBuffer(VkBuffer* buffer, VkDevice* device, unsigned int memoryHeapIndex, bool isDynamic, size_t dynamicAlignment, size_t count)
+		: m_pBuffer(buffer), m_pDevice(device)
 	{
-		RHIBuffer::m_size = count;
+		RHIBuffer::m_capacity = count;
 		RHIBuffer::m_dynamicAlignment = dynamicAlignment;
 
 		m_pMemoryRequirements = (VkMemoryRequirements*)WEngine::Allocator::Get()->Allocate(sizeof(VkMemoryRequirements));
@@ -51,7 +52,10 @@ namespace Vulkan
 
 	void VulkanBuffer::LoadData(void* pData, size_t size, size_t offset)
 	{
-		RE_ASSERT(vkMapMemory(*m_pDevice, *m_pDeviceMemory, offset, size, 0, &m_pData) == VK_SUCCESS, "Failed to Map Memory To Host.");
+		if(m_isDynamic)
+			RE_ASSERT(vkMapMemory(*m_pDevice, *m_pDeviceMemory, offset * m_dynamicAlignment, size, 0, &m_pData) == VK_SUCCESS, "Failed to Map Memory To Host.")
+		else
+			RE_ASSERT(vkMapMemory(*m_pDevice, *m_pDeviceMemory, offset, size, 0, &m_pData) == VK_SUCCESS, "Failed to Map Memory To Host.");
 		::memcpy(m_pData, pData, static_cast<size_t>(size));
 		vkUnmapMemory(*m_pDevice, *m_pDeviceMemory);
 	}
@@ -63,7 +67,10 @@ namespace Vulkan
 			memoryRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
 			memoryRange.memory = *m_pDeviceMemory;
 			memoryRange.offset = 0;
-			memoryRange.size = m_size;
+			if(m_isDynamic)
+				memoryRange.size = m_size * m_dynamicAlignment;
+			else
+				memoryRange.size = range;
 		}
 		vkFlushMappedMemoryRanges(*m_pDevice, 1, &memoryRange);
 	}

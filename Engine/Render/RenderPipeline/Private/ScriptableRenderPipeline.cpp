@@ -35,7 +35,7 @@ void ScriptableRenderPipeline::Setup()
 		CameraData *data = camera->GetData();
 		ScriptableRenderer* renderer = camera->GetRenderer();
 		renderer->EnqueRenderPass(new DrawOpaquePass());
-		renderer->EnqueRenderPass(new DrawSkyboxPass());
+		//renderer->EnqueRenderPass(new DrawSkyboxPass());
 		renderer->EnqueRenderPass(new DrawGizmosPass());
 		renderer->Setup(m_pContext, data);
 		m_pCameraDatas.push_back(data);

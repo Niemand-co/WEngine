@@ -4,6 +4,7 @@
 VulkanGroupLayout::VulkanGroupLayout(VkDescriptorSetLayout* pDescriptorSetLayout, unsigned int bindingCount)
 	: m_pDescriptorSetLayout(pDescriptorSetLayout)
 {
+	RHIGroupLayout::bindingCount = bindingCount;
 }
 
 VulkanGroupLayout::~VulkanGroupLayout()

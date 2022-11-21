@@ -14,12 +14,16 @@
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 #include "Editor/Public/Screen.h"
 
-struct UniformData
+struct SceneData
 {
-	glm::mat4 M;
 	glm::mat4 VP;
 	glm::vec4 lightPos;
 	glm::vec4 cameraPos;
+};
+
+struct ObjectData
+{
+	glm::mat4 M;
 	glm::vec4 surfaceData;
 };
 
@@ -99,13 +103,14 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		depthStencilDescriptor.minDepth = 0.0f;
 	}
 
-	BindingResource resource[1] = 
+	BindingResource resource[2] = 
 	{
-		{0, ResourceType::DynamicUniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
+		{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
+		{1, ResourceType::DynamicUniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
 	};
 	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
 	{
-		groupLayoutDescriptor.bindingCount = 1;
+		groupLayoutDescriptor.bindingCount = 2;
 		groupLayoutDescriptor.pBindingResources = resource;
 	}
 	RHIGroupLayout *groupLayout = context->CreateGroupLayout(&groupLayoutDescriptor);
@@ -141,34 +146,45 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	};
 	m_pPSO = context->CreatePSO(&psoDescriptor);
 
-	m_pUniformBuffers.resize(RHIContext::g_maxFrames);
+	m_pObjectUniformBuffers.resize(RHIContext::g_maxFrames);
 	RHIBufferDescriptor uniformBufferDescriptor = {};
 	{
 		uniformBufferDescriptor.isDynamic = true;
-		uniformBufferDescriptor.size = sizeof(UniformData);
-		uniformBufferDescriptor.count = 2;
+		uniformBufferDescriptor.size = sizeof(ObjectData);
+		uniformBufferDescriptor.count = 10;
 		uniformBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE;
 	}
-	m_pUniformBuffers[0] = context->CreateUniformBuffer(&uniformBufferDescriptor);
-	m_pUniformBuffers[1] = context->CreateUniformBuffer(&uniformBufferDescriptor);
-	m_pUniformBuffers[2] = context->CreateUniformBuffer(&uniformBufferDescriptor);
+	m_pObjectUniformBuffers[0] = context->CreateUniformBuffer(&uniformBufferDescriptor);
+	m_pObjectUniformBuffers[1] = context->CreateUniformBuffer(&uniformBufferDescriptor);
+	m_pObjectUniformBuffers[2] = context->CreateUniformBuffer(&uniformBufferDescriptor);
+
+	m_pSceneUniformBuffers.resize(RHIContext::g_maxFrames);
+	{
+		uniformBufferDescriptor.isDynamic = false;
+		uniformBufferDescriptor.count = 1;
+		uniformBufferDescriptor.size = sizeof(SceneData);
+		uniformBufferDescriptor.memoryType |= MEMORY_PROPERTY_HOST_COHERENT;
+	}
+	m_pSceneUniformBuffers[0] = context->CreateUniformBuffer(&uniformBufferDescriptor);
+	m_pSceneUniformBuffers[1] = context->CreateUniformBuffer(&uniformBufferDescriptor);
+	m_pSceneUniformBuffers[2] = context->CreateUniformBuffer(&uniformBufferDescriptor);
 
 	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{
-		m_pUniformBuffers[i]->SetDataSize(sizeof(UniformData));
-		BufferResourceInfo *bufferInfo[1] = 
+		m_pObjectUniformBuffers[i]->SetDataSize(sizeof(ObjectData));
+		m_pObjectUniformBuffers[i]->Resize(2);
+		m_pSceneUniformBuffers[i]->SetDataSize(sizeof(SceneData));
+		RHIBindingDescriptor bindingDescriptors[] = 
 		{
-			m_pUniformBuffers[i]->GetBufferInfo(),
+			{ 1, m_pSceneUniformBuffers[i]->GetBufferInfo() },
+			{ m_pObjectUniformBuffers[i]->Size(), m_pObjectUniformBuffers[i]->GetBufferInfo() },
 		};
-		unsigned int bufferInfoCount[] = { 2 };
 		RHIUpdateResourceDescriptor updateResourceDescriptor = {};
 		{
-			updateResourceDescriptor.bindingCount = 1;
+			updateResourceDescriptor.bindingCount = 2;
 			updateResourceDescriptor.pBindingResources = resource;
+			updateResourceDescriptor.pBindingDescriptors = bindingDescriptors;
 			updateResourceDescriptor.pGroup = m_pGroup[i];
-			updateResourceDescriptor.dynamicBufferCount = 1;
-			updateResourceDescriptor.bufferResourceCount = bufferInfoCount;
-			updateResourceDescriptor.pBufferInfo = bufferInfo;
 		}
 		context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 	}
@@ -214,7 +230,15 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		encoder->SetViewport({(float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0});
 		encoder->SetScissor({WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0});
 
-		int drawcalls = 0;
+		unsigned int drawcalls = 0;
+		SceneData sceneData =
+		{
+			cameraData->MatrixVP,
+			World::GetWorld()->GetMainLight()->GetGameObject()->GetComponent<Transformer>()->GetRotateMatrix() * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f),
+			glm::vec4(cameraData->Position, 1.0f),
+
+		};
+		m_pSceneUniformBuffers[RHIContext::g_currentFrame]->LoadData(&sceneData, sizeof(sceneData));
 		for (unsigned int i = 0; i < gameObjects.size(); ++i)
 		{
 			MeshFilter* filter = gameObjects[i]->GetComponent<MeshFilter>();
@@ -222,18 +246,15 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 				continue;
 
 			SurfaceData surfaceData = gameObjects[i]->GetComponent<Material>()->GetSurfaceData();
-			UniformData data =
+			ObjectData objectData = 
 			{
 				gameObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix(),
-				cameraData->MatrixVP,
-				World::GetWorld()->GetMainLight()->GetGameObject()->GetComponent<Transformer>()->GetRotateMatrix() * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f),
-				glm::vec4(cameraData->Position, 1.0f),
 				glm::vec4(surfaceData.albedo, surfaceData.roughness)
 			};
-			m_pUniformBuffers[RHIContext::g_currentFrame]->LoadData(&data, sizeof(data), dynamicAlignment * drawcalls);
+			m_pObjectUniformBuffers[RHIContext::g_currentFrame]->LoadData(&objectData, sizeof(objectData), drawcalls);
 			++drawcalls;
 		}
-		m_pUniformBuffers[RHIContext::g_currentFrame]->Flush(2 * dynamicAlignment);
+		m_pObjectUniformBuffers[RHIContext::g_currentFrame]->Flush(gameObjects.size());
 
 		drawcalls = 0;
 		for (unsigned int i = 0; i < gameObjects.size(); ++i)
@@ -242,13 +263,12 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 			if(filter == nullptr)
 				continue;
 			
-			unsigned int offset = (unsigned int)dynamicAlignment * drawcalls;
 			Mesh *pMesh = filter->GetStaticMesh();
 			encoder->BindVertexBuffer(pMesh->GetVertexBuffer());
 			encoder->BindIndexBuffer(pMesh->GetIndexBuffer());
-			encoder->BindGroups(1, m_pGroup[RHIContext::g_currentFrame], m_pPipelineResourceLayout, 1, &offset);
+			encoder->BindGroups(1, m_pGroup[RHIContext::g_currentFrame], m_pPipelineResourceLayout, 1, &drawcalls);
 			encoder->DrawIndexed(pMesh->m_indexCount, 0);
-			drawcalls++;
+			drawcalls += m_pObjectUniformBuffers[RHIContext::g_currentFrame]->Alignment();
 		}
 
 		encoder->EndPass();

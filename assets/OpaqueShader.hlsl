@@ -17,16 +17,22 @@ struct VSOutput
     float3 WorldPos : TEXCOORD2;
 };
 
-struct uniformData
+struct SceneData
 {
-    float4x4 M;
     float4x4 VP;
     float4 lightDir;
     float4 cameraPos;
+};
+
+struct ObjectData
+{
+    float4x4 M;
     float4 surfaceData;
 };
 
-uniformData data : register(b0, space0);
+SceneData sceneData : register(b0, space0);
+ObjectData objectData : register(b1, space0);
+
 Texture2D tex : register(t1, space0);
 
 SamplerState testSampler : register(s1, space0);
@@ -65,8 +71,8 @@ VSOutput vert(VSInput vin)
 {
 	VSOutput vout = (VSOutput)0;
 
-    vout.WorldPos = mul(data.M, float4(vin.Position, 1.0)).xyz;
-	vout.Position = mul(data.VP, float4(vout.WorldPos, 1.0));
+    vout.WorldPos = mul(objectData.M, float4(vin.Position, 1.0)).xyz;
+	vout.Position = mul(sceneData.VP, float4(vout.WorldPos, 1.0));
 	vout.Position.y *= -1.0f;
     vout.Normal = normalize(vin.Normal);
 	vout.Color = vin.Color;
@@ -77,8 +83,8 @@ VSOutput vert(VSInput vin)
 
 float4 frag(VSOutput pin) : SV_TARGET
 {
-    float3 L = normalize(-data.lightDir.xyz);
-    float3 V = normalize(data.cameraPos.xyz - pin.WorldPos);
+    float3 L = normalize(-sceneData.lightDir.xyz);
+    float3 V = normalize(sceneData.cameraPos.xyz - pin.WorldPos);
     float3 H = normalize(L + V);
     
     float NoL = saturate(dot(pin.Normal, L));
@@ -87,6 +93,6 @@ float4 frag(VSOutput pin) : SV_TARGET
     float HoV = saturate(dot(H, V));
 
     //float3 albedo = tex.Sample(testSampler, pin.uv).rgb * data.surfaceData.rgb;
-    float3 albedo = data.surfaceData.rgb;
-	 return PBRLighting(albedo, NoL, NoH, NoV, HoV, data.surfaceData.w, 0.0f);
+    float3 albedo = objectData.surfaceData.rgb;
+	 return PBRLighting(albedo, NoL, NoH, NoV, HoV, objectData.surfaceData.w, 0.0f);
 }

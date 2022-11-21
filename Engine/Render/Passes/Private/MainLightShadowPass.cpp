@@ -219,7 +219,6 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 		{
 			updateResourceDescriptor.bindingCount = 2;
 			updateResourceDescriptor.pBindingResources = resource;
-			updateResourceDescriptor.bufferResourceCount = 2;
 			updateResourceDescriptor.pGroup = m_pDataGroup[i];
 		}
 		context->UpdateUniformResourceToGroup(&updateResourceDescriptor);

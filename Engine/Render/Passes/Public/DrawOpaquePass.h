@@ -28,7 +28,9 @@ private:
 
 	RHISampler *m_pSampler;
 
-	std::vector<RHIBuffer*> m_pUniformBuffers;
+	std::vector<RHIBuffer*> m_pObjectUniformBuffers;
+
+	std::vector<RHIBuffer*> m_pSceneUniformBuffers;
 
 	RHIBuffer *m_pSurfaceDataBuffer;
 

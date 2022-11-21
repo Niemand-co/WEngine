@@ -12,9 +12,9 @@ RHIBuffer::RHIBuffer()
 
 void RHIBuffer::SetDataSize(size_t size)
 {
+    RE_ASSERT(size <= m_dynamicAlignment, "Out of Alignment.");
     m_dataSize = size;
-    size_t minUBOSize = RHIContext::GetGPU()->GetFeature().minUBOAlignment;
-    m_dynamicAlignment = (size + minUBOSize - 1) & ~(minUBOSize - 1);
+        
 }
 
 BufferResourceInfo* RHIBuffer::GetBufferInfo()

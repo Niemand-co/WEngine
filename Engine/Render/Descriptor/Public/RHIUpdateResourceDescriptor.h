@@ -21,6 +21,13 @@ struct TextureResourceInfo
 	AttachmentLayout layout;
 };
 
+struct RHIBindingDescriptor
+{
+	unsigned int bufferResourceCount;
+
+	BufferResourceInfo *pBufferResourceInfo;
+};
+
 class RHIUpdateResourceDescriptor
 {
 public:
@@ -35,11 +42,7 @@ public:
 
 	BindingResource *pBindingResources;
 
-	unsigned int dynamicBufferCount;
-
-	unsigned int *bufferResourceCount;
-
-	BufferResourceInfo **pBufferInfo;
+	RHIBindingDescriptor *pBindingDescriptors;
 
 	unsigned int textureResourceCount;
 

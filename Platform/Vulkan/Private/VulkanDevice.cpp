@@ -542,7 +542,7 @@ namespace Vulkan
 		::new (pDescriptorSetLayout) VkDescriptorSetLayout();
 		RE_ASSERT(vkCreateDescriptorSetLayout(*m_pDevice, &descriptorSetLayoutCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pDescriptorSetLayout) == VK_SUCCESS, "Failed to Create Descriptor Set Layout.");
 
-		RHIGroupLayout *groupLayout = (RHIGroupLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanGroupLayout));
+		VulkanGroupLayout *groupLayout = (VulkanGroupLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanGroupLayout));
 		::new (groupLayout) VulkanGroupLayout(pDescriptorSetLayout, descriptor->bindingCount);
 
 		groupLayout->bindingCount = descriptor->bindingCount;
@@ -609,13 +609,13 @@ namespace Vulkan
 		std::vector<VkDescriptorBufferInfo*> pDescriptorBufferInfos(descriptor->bindingCount);
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
-			pDescriptorBufferInfos[i] = (VkDescriptorBufferInfo*)WEngine::Allocator::Get()->Allocate(descriptor->bufferResourceCount * sizeof(VkDescriptorBufferInfo));
-			for (unsigned int j = 0; j < descriptor->bufferResourceCount; ++j)
+			pDescriptorBufferInfos[i] = (VkDescriptorBufferInfo*)WEngine::Allocator::Get()->Allocate(descriptor->pBindingDescriptors[i].bufferResourceCount * sizeof(VkDescriptorBufferInfo));
+			for (unsigned int j = 0; j < descriptor->pBindingDescriptors[i].bufferResourceCount; ++j)
 			{
 				::new (pDescriptorBufferInfos[i] + j) VkDescriptorBufferInfo();
-				pDescriptorBufferInfos[i][j].buffer = *static_cast<VulkanBuffer*>((descriptor->pBufferInfo + j)->pBuffer)->GetHandle();
-				pDescriptorBufferInfos[i][j].offset = (descriptor->pBufferInfo + j)->offset;
-				pDescriptorBufferInfos[i][j].range = (descriptor->pBufferInfo + j)->range;
+				pDescriptorBufferInfos[i][j].buffer = *static_cast<VulkanBuffer*>((descriptor->pBindingDescriptors[i].pBufferResourceInfo + j)->pBuffer)->GetHandle();
+				pDescriptorBufferInfos[i][j].offset = (descriptor->pBindingDescriptors[i].pBufferResourceInfo + j)->offset;
+				pDescriptorBufferInfos[i][j].range = (descriptor->pBindingDescriptors[i].pBufferResourceInfo + j)->range;
 			}
 
 			::new (pWriteDescriptorSets + i) VkWriteDescriptorSet();
@@ -630,7 +630,7 @@ namespace Vulkan
 
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
-			for (unsigned int j = 0; j < descriptor->textureResourceCount; ++j)
+			for (unsigned int j = 0; j < descriptor->pBindingDescriptors[i].bufferResourceCount; ++j)
 			{
 				pDescriptorBufferInfos[i][j].~VkDescriptorBufferInfo();
 			}

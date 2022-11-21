@@ -133,7 +133,7 @@ namespace Vulkan
 			BufferBarrier *pBarrier = pDescriptor->pBufferBarriers + i;
 			pBufferBarriers[i].sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
 			pBufferBarriers[i].buffer = *static_cast<VulkanBuffer*>(pBarrier->pBuffer)->GetHandle();
-			pBufferBarriers[i].size = pBarrier->pBuffer->size;
+			pBufferBarriers[i].size = pBarrier->pBuffer->Size() * pBarrier->pBuffer->Alignment();
 			pBufferBarriers[i].offset = 0;
 			pBufferBarriers[i].srcAccessMask = VK_ACCESS_HOST_READ_BIT;
 			pBufferBarriers[i].dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;

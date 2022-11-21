@@ -5,4 +5,5 @@
 RHIBufferDescriptor::RHIBufferDescriptor()
 {
 	count = 1;
+	isDynamic = false;
 }

@@ -74,10 +74,14 @@ DrawGizmosPass::~DrawGizmosPass()
 {
 }
 
-struct UniformData
+struct SceneData
+{
+	glm::mat4 VP;
+};
+
+struct ObjectData
 {
 	glm::mat4 M;
-	glm::mat4 VP;
 };
 
 void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
@@ -132,11 +136,12 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	BindingResource resource[] = 
 	{
 		{ 0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX },
+		{ 1, ResourceType::DynamicUniformBuffer, 1, SHADER_STAGE_VERTEX },
 	};
 
 	RHIGroupLayoutDescriptor layoutDescriptor = {};
 	{
-		layoutDescriptor.bindingCount = 1;
+		layoutDescriptor.bindingCount = 2;
 		layoutDescriptor.pBindingResources = resource;
 	}
 	RHIGroupLayout *layout = context->CreateGroupLayout(&layoutDescriptor);
@@ -211,27 +216,31 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 
 	RHIBufferDescriptor bufferDescriptor = {};
 	{
-		bufferDescriptor.size = sizeof(UniformData);
+		bufferDescriptor.size = sizeof(SceneData);
 		bufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
-	m_pBuffer = context->CreateUniformBuffer(&bufferDescriptor);
+	m_pSceneBuffer = context->CreateUniformBuffer(&bufferDescriptor);
 
-	BindingResource bindings[] =
 	{
-		{ 0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX },
-	};
-	BufferResourceInfo info = {};
-	{
-		info.pBuffer = m_pBuffer;
-		info.range = sizeof(UniformData);
-		info.offset = 0;
+		bufferDescriptor.size = sizeof(ObjectData);
+		bufferDescriptor.count = 1;
+		bufferDescriptor.isDynamic = true;
 	}
+	m_pObjectBuffer = context->CreateUniformBuffer(&bufferDescriptor);
+
+	m_pObjectBuffer->Resize(1);
+	m_pObjectBuffer->SetDataSize(sizeof(ObjectData));
+	m_pSceneBuffer->SetDataSize(sizeof(SceneData));
+	RHIBindingDescriptor bindingDescriptors[] = 
+	{
+		{ m_pSceneBuffer->Size(), m_pSceneBuffer->GetBufferInfo() },
+		{ m_pObjectBuffer->Size(), m_pObjectBuffer->GetBufferInfo() },
+	};
 	RHIUpdateResourceDescriptor updateDescriptor = {};
 	{
-		updateDescriptor.bindingCount = 1;
-		updateDescriptor.pBindingResources = bindings;
-		updateDescriptor.bufferResourceCount = 1;
-		updateDescriptor.pBufferInfo = &info;
+		updateDescriptor.bindingCount = 2;
+		updateDescriptor.pBindingResources = resource;
+		updateDescriptor.pBindingDescriptors = bindingDescriptors;
 		updateDescriptor.pGroup = m_pGroup[0];
 	}
 	context->UpdateUniformResourceToGroup(&updateDescriptor);
@@ -339,12 +348,15 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 				continue;
 
 			Mesh* pMesh = filter->GetStaticMesh();
-			UniformData data = { selectedObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix(), cameraData->MatrixVP };
-			m_pBuffer->LoadData(&data, sizeof(data));
+			SceneData sceneData = { cameraData->MatrixVP };
+			m_pSceneBuffer->LoadData(&sceneData, sizeof(sceneData));
+			ObjectData objectData = { selectedObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix() };
+			m_pObjectBuffer->LoadData(&objectData, sizeof(objectData), 0 );
 
+			unsigned int offset = 0;
 			encoder->BindVertexBuffer(pMesh->GetVertexBuffer());
 			encoder->BindIndexBuffer(pMesh->GetIndexBuffer());
-			encoder->BindGroups(1, m_pGroup[0], m_pResourceLayout);
+			encoder->BindGroups(1, m_pGroup[0], m_pResourceLayout, 1, &offset);
 			encoder->DrawIndexed(pMesh->m_indexCount, 0);
 		}
 		encoder->EndPass();
@@ -365,12 +377,11 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 				continue;
 
 			Mesh *pMesh = filter->GetStaticMesh();
-			UniformData data = { selectedObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix(), cameraData->MatrixVP };
-			m_pBuffer->LoadData(&data, sizeof(data));
 
+			unsigned int offset = 0;
 			encoder->BindVertexBuffer(pMesh->GetVertexBuffer());
 			encoder->BindIndexBuffer(pMesh->GetIndexBuffer());
-			encoder->BindGroups(1, m_pGroup[0], m_pResourceLayout);
+			encoder->BindGroups(1, m_pGroup[0], m_pResourceLayout, 1, &offset);
 			encoder->SetLineWidth(10.0f);
 			encoder->DrawIndexed(pMesh->m_indexCount, 0);
 		}

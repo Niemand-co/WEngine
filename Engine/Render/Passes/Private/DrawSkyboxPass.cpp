@@ -156,17 +156,16 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	m_pUniformBuffer = context->CreateUniformBuffer(&uniformBufferDescriptor);
 	
-	BufferResourceInfo bufferInfo[] = 
+	RHIBindingDescriptor bindingDescriptors[] =
 	{
-		{ m_pUniformBuffer, 0, sizeof(UniformData) },
+		{ m_pUniformBuffer->Size(), m_pUniformBuffer->GetBufferInfo() },
 	};
 	RHIUpdateResourceDescriptor updateResourceDescriptor = {};
 	{
 		updateResourceDescriptor.bindingCount = 1;
 		updateResourceDescriptor.pBindingResources = resource;
 		updateResourceDescriptor.pGroup = m_pGroup[0];
-		updateResourceDescriptor.bufferResourceCount = 1;
-		updateResourceDescriptor.pBufferInfo = bufferInfo;
+		updateResourceDescriptor.pBindingDescriptors = bindingDescriptors;
 	}
 	context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 

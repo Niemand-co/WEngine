@@ -27,7 +27,9 @@ private:
 
 	std::vector<RHIGroup*> m_pGroup;
 
-	RHIBuffer *m_pBuffer;
+	RHIBuffer* m_pSceneBuffer;
+
+	RHIBuffer *m_pObjectBuffer;
 
 	RHIPipelineResourceLayout *m_pResourceLayout;
 

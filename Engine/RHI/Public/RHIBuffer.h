@@ -1,6 +1,7 @@
 #pragma once
 
 struct BufferResourceInfo;
+struct TextureResourceInfo;
 
 class RHIBuffer
 {
@@ -17,6 +18,10 @@ public:
 	virtual void Resize(size_t count) = 0;
 
 	void SetDataSize(size_t size);
+
+	inline size_t Size() const { return m_size; }
+
+	inline size_t Alignment() const { return m_dynamicAlignment; }
 
 	inline bool IsDynamic() { return m_isDynamic; }
 
