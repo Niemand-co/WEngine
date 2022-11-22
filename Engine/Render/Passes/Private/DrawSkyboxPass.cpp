@@ -276,29 +276,12 @@ void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 		bottomColor
 	};
 	m_pUniformBuffer->LoadData(&data, sizeof(data));
-	//BindingResource resource[1] =
-	//{
-	//	{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
-	//};
-	//BufferResourceInfo bufferInfo[] = 
-	//{
-	//	{ m_pUniformBuffer, 0, sizeof(UniformData) },
-	//};
-	//RHIUpdateResourceDescriptor updateResourceDescriptor = {};
-	//{
-	//	updateResourceDescriptor.bindingCount = 1;
-	//	updateResourceDescriptor.pBindingResources = resource;
-	//	updateResourceDescriptor.pGroup = m_pGroup;
-	//	updateResourceDescriptor.bufferResourceCount = 1;
-	//	updateResourceDescriptor.pBufferInfo = bufferInfo;q
-	//}
-	//context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 
 	cmd->BeginScopePass("Skybox", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentImage]);
 	{
 		RHIGraphicsEncoder *encoder = cmd->GetGraphicsEncoder();
 
-		ClearValue values[]{ {glm::vec4(1.f, 1.f, 1.f, 1.f), 0.0f, 0 }, { glm::vec4(), 1.0f, 0 } };
+		ClearValue values[]{ {glm::vec4(1.f, 1.f, 1.f, 1.f), true }, { glm::vec4(1.f, 0.f, 0.f, 0.f), false } };
 		RHIRenderPassBeginDescriptor renderpassBeginDescriptor = {};
 		{
 			renderpassBeginDescriptor.renderPass = m_pRenderPass;

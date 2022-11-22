@@ -5,6 +5,7 @@ class RHITexture;
 class RHITextureView;
 class RHIBuffer;
 class RHIGroup;
+class RHIPipelineResourceLayout;
 
 class MainLightShadowPass : public ScriptableRenderPass
 {
@@ -30,8 +31,8 @@ private:
 
 	std::vector<RHIBuffer*> m_pObjectDataBuffers;
 
-	unsigned int dynamicBufferAlignment;
-
 	std::vector<RHIGroup*> m_pDataGroup;
+
+	RHIPipelineResourceLayout *m_pPipelineLayout;
 
 };

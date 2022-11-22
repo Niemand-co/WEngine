@@ -5,9 +5,8 @@ class RHIRenderTarget;
 
 struct ClearValue
 {
-	glm::vec4 color;
-	float depth;
-	unsigned int stencil;
+	glm::vec4 value;
+	bool color;
 };
 
 class RHIRenderPassBeginDescriptor

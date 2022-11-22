@@ -128,9 +128,9 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 		depthStencilDescriptor.stencilFailedOP = StencilFailedOP::Keep;
 		depthStencilDescriptor.stencilRef = 1;
 		depthStencilDescriptor.depthTestEnabled = true;
-		depthStencilDescriptor.depthCompareOP = CompareOP::Greater;
-		depthStencilDescriptor.minDepth = 1.0f;
-		depthStencilDescriptor.maxDepth = 0.0f;
+		depthStencilDescriptor.depthCompareOP = CompareOP::Less;
+		depthStencilDescriptor.minDepth = 0.0f;
+		depthStencilDescriptor.maxDepth = 1.0f;
 	}
 
 	BindingResource resource[] = 
@@ -330,7 +330,7 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
 
-		ClearValue values[]{ {glm::vec4(1.f, 1.f, 1.f, 1.f), 0.0f, 0 }, { glm::vec4(), 0.0f, 0 } };
+		ClearValue values[]{ {glm::vec4(1.f, 1.f, 1.f, 1.f), true }, { glm::vec4(1.f, 0.f, 0.f, 0.f), false } };
 		RHIRenderPassBeginDescriptor renderpassBeginDescriptor = {};
 		{
 			renderpassBeginDescriptor.renderPass = m_pStencilRenderPass;

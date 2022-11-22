@@ -18,9 +18,9 @@ struct ObjectData
 	float4x4 M;
 };
 
-SceneData sceneData : register(b0, space0);
+cbuffer sceneData : register(b0) { SceneData sceneData; }
 
-ObjectData objectData : register(b1, space0);
+cbuffer objectData : register(b1) { ObjectData objectData; }
 
 VSOutput vert(VSInput input)
 {

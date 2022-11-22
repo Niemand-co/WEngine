@@ -34,8 +34,10 @@ namespace Vulkan
 		std::vector<VkClearValue> values(descriptor->clearCount);
 		for (unsigned int i = 0; i < descriptor->clearCount; ++i)
 		{
-			values[i].color = { descriptor->pClearValues[0].color.r, descriptor->pClearValues[0].color.g, descriptor->pClearValues[0].color.b, descriptor->pClearValues[0].color.a };
-			values[i].depthStencil = { descriptor->pClearValues[i].depth, descriptor->pClearValues[i].stencil };
+			if(descriptor->pClearValues[i].color)
+				values[i].color = { descriptor->pClearValues[i].value.r, descriptor->pClearValues[i].value.g, descriptor->pClearValues[i].value.b, descriptor->pClearValues[i].value.a };
+			else
+				values[i].depthStencil = { descriptor->pClearValues[i].value.x, (unsigned int)descriptor->pClearValues[i].value.y };
 		}
 		renderPassBeginInfo.pClearValues = values.data();
 

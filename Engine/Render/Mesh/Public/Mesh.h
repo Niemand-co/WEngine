@@ -31,6 +31,8 @@ public:
 
 	static Mesh* GetPlane();
 
+	static Mesh* GetArrow();
+
 public:
 
 	Vertex *m_pVertices;

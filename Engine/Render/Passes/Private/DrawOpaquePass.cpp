@@ -217,7 +217,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 	cmd->BeginScopePass("Opaque", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentFrame]);
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
-		ClearValue values[] { {glm::vec4(1.f, 1.f, 1.f, 1.f), 0.0f, 0 }, { glm::vec4(), 1.0f, 0 } };
+		ClearValue values[] { {glm::vec4(1.f, 1.f, 1.f, 1.f), true }, { glm::vec4(1.f, 0.f, 0.f, 0.f), false } };
 		RHIRenderPassBeginDescriptor renderPassBeginDescriptor = {};
 		{
 			renderPassBeginDescriptor.renderPass = m_pRenderPass;

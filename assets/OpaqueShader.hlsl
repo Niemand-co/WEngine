@@ -30,12 +30,9 @@ struct ObjectData
     float4 surfaceData;
 };
 
-SceneData sceneData : register(b0);
-ObjectData objectData : register(b0);
+cbuffer sceneData : register(b0) { SceneData sceneData; }
 
-Texture2D tex : register(t1, space0);
-
-SamplerState testSampler : register(s1, space0);
+cbuffer objectData : register(b1) { ObjectData objectData; }
 
 float D_GGX(float NoH, float Roughness)
 {
