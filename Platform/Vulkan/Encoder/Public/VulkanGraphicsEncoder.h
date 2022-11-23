@@ -22,6 +22,12 @@ namespace Vulkan
 
 		virtual void SetLineWidth(float width) override;
 
+		virtual void SetDepthTestEnable(bool enable) override;
+
+		virtual void SetPolygonMode(PolygonMode mode) override;
+
+		virtual void SetPolygonTopology(PrimitiveTopology primitive) override;
+
 		virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth /* = 0.0f */, unsigned int clearStencil /* = 1 */) override;
 
 		virtual void BindVertexBuffer(RHIBuffer *pBuffer) override;

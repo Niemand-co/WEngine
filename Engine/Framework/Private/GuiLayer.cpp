@@ -137,6 +137,7 @@ namespace WEngine
 		style->Colors[ImGuiCol_TabActive] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
 		style->Colors[ImGuiCol_TabUnfocused] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
 		style->Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		
 	}
 
 	void GuiLayer::OnDettach()
@@ -286,7 +287,6 @@ namespace WEngine
 			{
 				if (ImGui::Begin("Settings", &m_isSettingsShowed))
 				{
-
 				}
 				ImGui::End();
 			}

@@ -138,41 +138,41 @@ Mesh* Mesh::GetPlane()
 
 Mesh* Mesh::GetArrow()
 {
+	float sqrt2frag2 = std::sin(PI / 4.0f) * 0.02f;
+	float sqrt2 = 2.0f * sqrt2frag2;
 	Mesh *mesh = new Mesh();
 	Vertex *pVertices = (Vertex*)WEngine::Allocator::Get()->Allocate(27 * sizeof(Vertex));
 	{
-		float sqrt2frag2 = std::sin(PI / 4.0f) * 0.1f;
-		float sqrt2 = 2.0f * sqrt2frag2;
-		pVertices[0] = { { 0.0f, 0.0f, 0.1f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
+		pVertices[0] = { { 0.0f, 0.0f, 0.02f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 		pVertices[1] = { { sqrt2frag2, 0.0f, sqrt2frag2 }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
-		pVertices[2] = { { 0.1f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
+		pVertices[2] = { { 0.02f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 		pVertices[3] = { { sqrt2frag2, 0.0f, -sqrt2frag2 }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
-		pVertices[4] = { { 0.0f, 0.0f, -0.1f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
+		pVertices[4] = { { 0.0f, 0.0f, -0.02f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 		pVertices[5] = { { -sqrt2frag2, 0.0f, -sqrt2frag2 }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
-		pVertices[6] = { { -0.1f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
+		pVertices[6] = { { -0.02f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 		pVertices[7] = { { -sqrt2frag2, 0.0f, sqrt2frag2 }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 
-		pVertices[8] = { { 0.0f, 0.8f, 0.1f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
+		pVertices[8] = { { 0.0f, 0.8f, 0.02f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 		pVertices[9] = { { sqrt2frag2, 0.8f, sqrt2frag2 }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
-		pVertices[10] = { { 0.1f, 0.8f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
+		pVertices[10] = { { 0.02f, 0.8f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 		pVertices[11] = { { sqrt2frag2, 0.8f, -sqrt2frag2 }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
-		pVertices[12] = { { 0.0f, 0.8f, -0.1f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
+		pVertices[12] = { { 0.0f, 0.8f, -0.02f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 		pVertices[13] = { { -sqrt2frag2, 0.8f, -sqrt2frag2 }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
-		pVertices[14] = { { -0.1f, 0.8f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
+		pVertices[14] = { { -0.02f, 0.8f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 		pVertices[15] = { { -sqrt2frag2, 0.8f, sqrt2frag2 }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 
-		pVertices[16] = { { 0.0f, 0.8f, 0.1f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
+		pVertices[16] = { { 0.0f, 0.8f, 0.04f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 		pVertices[17] = { { sqrt2, 0.8f, sqrt2 }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
-		pVertices[18] = { { 0.1f, 0.8f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
+		pVertices[18] = { { 0.04f, 0.8f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 		pVertices[19] = { { sqrt2, 0.8f, -sqrt2 }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
-		pVertices[20] = { { 0.0f, 0.8f, -0.1f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
+		pVertices[20] = { { 0.0f, 0.8f, -0.04f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 		pVertices[21] = { { -sqrt2, 0.8f, -sqrt2 }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
-		pVertices[22] = { { -0.1f, 0.8f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
+		pVertices[22] = { { -0.04f, 0.8f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 		pVertices[23] = { { -sqrt2, 0.8f, sqrt2 }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 
 		pVertices[24] = { { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 		pVertices[25] = { { 0.0f, 0.8f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
-		pVertices[26] = { { 0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
+		pVertices[26] = { { 0.0f, 1.1f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 	}
 	mesh->m_vertexCount = 27;
 	mesh->m_pVertices = pVertices;
@@ -181,27 +181,34 @@ Mesh* Mesh::GetArrow()
 		pIndices[0] = 0, pIndices[1] = 1, pIndices[2] = 24, pIndices[3] = 1, pIndices[4] = 2, pIndices[5] = 24,
 		pIndices[6] = 2, pIndices[7] = 3, pIndices[8] = 24, pIndices[9] = 3, pIndices[10] = 4, pIndices[11] = 24,
 		pIndices[12] = 4, pIndices[13] = 5, pIndices[14] = 24, pIndices[15] = 5, pIndices[16] = 6, pIndices[17] = 24,
-		pIndices[18] = 6, pIndices[19] = 7, pIndices[20] = 24, pIndices[18] = 7, pIndices[19] = 0, pIndices[20] = 24,
+		pIndices[18] = 6, pIndices[19] = 7, pIndices[20] = 24, pIndices[21] = 7, pIndices[22] = 0, pIndices[23] = 24,
 
-		pIndices[21] = 0, pIndices[22] = 1, pIndices[23] = 9, pIndices[24] = 9, pIndices[25] = 8, pIndices[26] = 0, 
-		pIndices[27] = 1, pIndices[28] = 2, pIndices[29] = 10, pIndices[30] = 10, pIndices[31] = 9, pIndices[32] = 1,
-		pIndices[33] = 2, pIndices[34] = 3, pIndices[35] = 11, pIndices[36] = 11, pIndices[37] = 10, pIndices[38] = 2,
-		pIndices[39] = 3, pIndices[40] = 4, pIndices[41] = 12, pIndices[42] = 12, pIndices[43] = 11, pIndices[44] = 3,
-		pIndices[45] = 4, pIndices[46] = 5, pIndices[47] = 13, pIndices[48] = 13, pIndices[49] = 12, pIndices[50] = 4,
-		pIndices[51] = 5, pIndices[52] = 6, pIndices[53] = 14, pIndices[54] = 14, pIndices[55] = 13, pIndices[56] = 5,
-		pIndices[57] = 6, pIndices[58] = 7, pIndices[59] = 15, pIndices[60] = 15, pIndices[61] = 14, pIndices[62] = 6,
-		pIndices[63] = 7, pIndices[64] = 0, pIndices[65] = 8, pIndices[66] = 8, pIndices[67] = 15, pIndices[68] = 7,
+		pIndices[24] = 0, pIndices[25] = 1, pIndices[26] = 9, pIndices[27] = 9, pIndices[28] = 8, pIndices[29] = 0, 
+		pIndices[30] = 1, pIndices[31] = 2, pIndices[32] = 10, pIndices[33] = 10, pIndices[34] = 9, pIndices[35] = 1,
+		pIndices[36] = 2, pIndices[37] = 3, pIndices[38] = 11, pIndices[39] = 11, pIndices[40] = 10, pIndices[41] = 2,
+		pIndices[42] = 3, pIndices[43] = 4, pIndices[44] = 12, pIndices[45] = 12, pIndices[46] = 11, pIndices[47] = 3,
+		pIndices[48] = 4, pIndices[49] = 5, pIndices[50] = 13, pIndices[51] = 13, pIndices[52] = 12, pIndices[53] = 4,
+		pIndices[54] = 5, pIndices[55] = 6, pIndices[56] = 14, pIndices[57] = 14, pIndices[58] = 13, pIndices[59] = 5,
+		pIndices[60] = 6, pIndices[61] = 7, pIndices[62] = 15, pIndices[63] = 15, pIndices[64] = 14, pIndices[65] = 6,
+		pIndices[66] = 7, pIndices[67] = 0, pIndices[68] = 8, pIndices[69] = 8, pIndices[70] = 15, pIndices[71] = 7,
 
-		pIndices[0] = 8, pIndices[1] = 9, pIndices[2] = 25, pIndices[3] = 9, pIndices[4] = 10, pIndices[5] = 25,
-		pIndices[6] = 10, pIndices[7] = 11, pIndices[8] = 25, pIndices[9] = 11, pIndices[10] = 12, pIndices[11] = 25,
-		pIndices[12] = 12, pIndices[13] = 13, pIndices[14] = 25, pIndices[15] = 13, pIndices[16] = 14, pIndices[17] = 25,
-		pIndices[18] = 14, pIndices[19] = 15, pIndices[20] = 25, pIndices[18] = 15, pIndices[19] = 8, pIndices[20] = 25,
+		pIndices[72] = 8, pIndices[73] = 9, pIndices[74] = 25, pIndices[75] = 9, pIndices[76] = 10, pIndices[77] = 25,
+		pIndices[78] = 10, pIndices[79] = 11, pIndices[80] = 25, pIndices[81] = 11, pIndices[82] = 12, pIndices[83] = 25,
+		pIndices[84] = 12, pIndices[85] = 13, pIndices[86] = 25, pIndices[87] = 13, pIndices[88] = 14, pIndices[89] = 25,
+		pIndices[90] = 14, pIndices[91] = 15, pIndices[92] = 25, pIndices[93] = 15, pIndices[94] = 8, pIndices[95] = 25,
 
-		pIndices[0] = 16, pIndices[1] = 17, pIndices[2] = 26, pIndices[3] = 17, pIndices[4] = 18, pIndices[5] = 26,
-		pIndices[6] = 18, pIndices[7] = 19, pIndices[8] = 26, pIndices[9] = 19, pIndices[10] = 20, pIndices[11] = 26,
-		pIndices[12] = 20, pIndices[13] = 21, pIndices[14] = 26, pIndices[15] = 21, pIndices[16] = 22, pIndices[17] = 26,
-		pIndices[18] = 22, pIndices[19] = 23, pIndices[20] = 26, pIndices[18] = 23, pIndices[19] = 16, pIndices[20] = 26;
+		pIndices[96] = 16, pIndices[97] = 17, pIndices[98] = 26, pIndices[99] = 17, pIndices[100] = 18, pIndices[101] = 26,
+		pIndices[102] = 18, pIndices[103] = 19, pIndices[104] = 26, pIndices[105] = 19, pIndices[106] = 20, pIndices[107] = 26,
+		pIndices[108] = 20, pIndices[109] = 21, pIndices[110] = 26, pIndices[111] = 21, pIndices[112] = 22, pIndices[113] = 26,
+		pIndices[114] = 22, pIndices[115] = 23, pIndices[116] = 26, pIndices[117] = 23, pIndices[118] = 16, pIndices[119] = 26;
 	}
+	mesh->m_indexCount = 120;
+	mesh->m_pIndices = pIndices;
+
+	mesh->m_boundingBoxMin = glm::vec3(-sqrt2, 0.0f, -sqrt2);
+	mesh->m_boundingBoxMax = glm::vec3(sqrt2, 0.8f, sqrt2);
+
+	return mesh;
 }
 
 MeshLibrary::MeshLibrary()

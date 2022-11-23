@@ -37,10 +37,14 @@ private:
 
 	RHIPipelineStateObject *m_pStencilPSO;
 
+	RHIPipelineStateObject *m_pDebugPSO;
+
 	std::vector<RHITexture*> m_pStencils;
 
 	std::vector<RHITextureView*> m_pStencilViews;
 
 	std::vector<RHIRenderTarget*> m_pStencilRenderTargets;
+
+	Mesh *m_pAxisMesh;
 
 };

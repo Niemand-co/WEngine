@@ -16,6 +16,7 @@ struct SceneData
 struct ObjectData
 {
 	float4x4 M;
+	float4 color;
 };
 
 cbuffer sceneData : register(b0) { SceneData sceneData; }
@@ -32,5 +33,5 @@ VSOutput vert(VSInput input)
 
 float4 frag(VSOutput input) : SV_Target
 {
-    return float4(0, 1, 0, 1);
+    return objectData.color;
 }

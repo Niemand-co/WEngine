@@ -21,6 +21,7 @@ namespace WEngine
 	{
 		const std::vector<GameObject*>& objects = m_pScene->GetGameObjects();
 		
+		ImGui::PushItemWidth(ImGui::CalcItemWidth());
 		for (GameObject* pObject : objects)
 		{
 			ImGuiTreeNodeFlags flags = (Editor::IsSelected(pObject) ? ImGuiTreeNodeFlags_Selected : 0) | (pObject->HasChild() ? ImGuiTreeNodeFlags_OpenOnArrow : ImGuiTreeNodeFlags_Leaf);
@@ -33,7 +34,7 @@ namespace WEngine
 				Editor::SelectObject(pObject);
 			}
 		}
-		
+		ImGui::PopItemWidth();
 	}
 
 }

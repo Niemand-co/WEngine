@@ -229,7 +229,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		encoder->SetPipeline(m_pPSO);
 		encoder->SetViewport({(float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0});
 		encoder->SetScissor({WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0});
-
+		encoder->SetDepthTestEnable(true);
 		unsigned int drawcalls = 0;
 		SceneData sceneData =
 		{

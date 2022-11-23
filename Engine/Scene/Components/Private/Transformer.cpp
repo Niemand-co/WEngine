@@ -25,39 +25,39 @@ void Transformer::ShowInInspector()
 		ImGui::Text("Position"); ImGui::NextColumn();
 		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.1f, 0.15f, 1.0f));ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.2f, 0.2f, 1.0f));ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.8f, 0.1f, 0.15f, 1.0f));
-		ImGui::Button("X:", buttonSize); ImGui::SameLine(); ImGui::DragFloat("##PositionX", &m_position.x, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth(); ImGui::SameLine(); 
+		if(ImGui::Button("X:", buttonSize)) { m_position.x = 0.0f; } ImGui::SameLine(); ImGui::DragFloat("##PositionX", &m_position.x, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth(); ImGui::SameLine(); 
 		ImGui::PopStyleColor(3);
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.3f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.8f, 0.3f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
-		ImGui::Button("Y:", buttonSize); ImGui::SameLine(); ImGui::DragFloat("##PositionY", &m_position.y, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth(); ImGui::SameLine();
+		if(ImGui::Button("Y:", buttonSize)) { m_position.y = 0.0f; } ImGui::SameLine(); ImGui::DragFloat("##PositionY", &m_position.y, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth(); ImGui::SameLine();
 		ImGui::PopStyleColor(3);
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.25f, 0.8f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.35f, 0.9f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.1f, 0.25f, 0.8f, 1.0f));
-		ImGui::Button("Z:", buttonSize); ImGui::SameLine(); ImGui::DragFloat("##PositionZ", &m_position.z, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth();
+		if(ImGui::Button("Z:", buttonSize)) { m_position.z = 0.0f; } ImGui::SameLine(); ImGui::DragFloat("##PositionZ", &m_position.z, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth();
 		ImGui::PopStyleColor(3);
 		ImGui::NextColumn();
 
 		ImGui::Text("Rotation"); ImGui::NextColumn();
 		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.1f, 0.15f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.2f, 0.2f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.8f, 0.1f, 0.15f, 1.0f));
-		ImGui::Button("X:", buttonSize); ImGui::SameLine(); ImGui::DragFloat("##RotateX", &m_rotate.x, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth(); ImGui::SameLine(); 
+		if(ImGui::Button("X:", buttonSize)) { m_rotate.x = 0.0f; } ImGui::SameLine(); ImGui::DragFloat("##RotateX", &m_rotate.x, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth(); ImGui::SameLine();
 		ImGui::PopStyleColor(3);
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.3f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.8f, 0.3f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
-		ImGui::Button("Y:", buttonSize); ImGui::SameLine(); ImGui::DragFloat("##RotateY", &m_rotate.y, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth(); ImGui::SameLine(); 
+		if(ImGui::Button("Y:", buttonSize)) { m_rotate.y = 0.0f; } ImGui::SameLine(); ImGui::DragFloat("##RotateY", &m_rotate.y, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth(); ImGui::SameLine();
 		ImGui::PopStyleColor(3);
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.25f, 0.8f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.35f, 0.9f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.1f, 0.25f, 0.8f, 1.0f));
-		ImGui::Button("Z:", buttonSize); ImGui::SameLine(); ImGui::DragFloat("##RotateZ", &m_rotate.z, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth();
+		if(ImGui::Button("Z:", buttonSize)) { m_rotate.z = 0.0f; } ImGui::SameLine(); ImGui::DragFloat("##RotateZ", &m_rotate.z, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth();
 		ImGui::PopStyleColor(3);
 		ImGui::NextColumn();
 
 		ImGui::Text("Scale"); ImGui::NextColumn();
 		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.1f, 0.15f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.2f, 0.2f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.8f, 0.1f, 0.15f, 1.0f));
-		ImGui::Button("X:", buttonSize); ImGui::SameLine(); ImGui::DragFloat("##ScaleX", &m_scale.x, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth(); ImGui::SameLine(); 
+		if(ImGui::Button("X:", buttonSize)) { m_scale.x = 0.0f; } ImGui::SameLine(); ImGui::DragFloat("##ScaleX", &m_scale.x, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth(); ImGui::SameLine();
 		ImGui::PopStyleColor(3);
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.3f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.8f, 0.3f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
-		ImGui::Button("Y:", buttonSize); ImGui::SameLine(); ImGui::DragFloat("##ScaleY", &m_scale.y, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth(); ImGui::SameLine(); 
+		if(ImGui::Button("Y:", buttonSize)) { m_scale.y = 0.0f; } ImGui::SameLine(); ImGui::DragFloat("##ScaleY", &m_scale.y, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth(); ImGui::SameLine();
 		ImGui::PopStyleColor(3);
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.25f, 0.8f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.35f, 0.9f, 1.0f)); ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.1f, 0.25f, 0.8f, 1.0f));
-		ImGui::Button("Z:", buttonSize); ImGui::SameLine(); ImGui::DragFloat("##ScaleZ", &m_scale.z, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth();
+		if(ImGui::Button("Z:", buttonSize)) { m_scale.z = 0.0f; } ImGui::SameLine(); ImGui::DragFloat("##ScaleZ", &m_scale.z, 0.1f, 0.0f, 0.0f, "%.2f"); ImGui::PopItemWidth();
 		ImGui::PopStyleColor(3);
 
 		ImGui::PopStyleVar();
@@ -97,13 +97,13 @@ glm::mat4 Transformer::GetRotateMatrix()
 
 glm::mat4 Transformer::GetLocalToWorldMatrix()
 {
-	m_localToWorldMatrix = glm::mat4(1.0f);
-	m_localToWorldMatrix = glm::scale(m_localToWorldMatrix, m_scale);
-	m_localToWorldMatrix = glm::rotate(m_localToWorldMatrix, m_rotate.x, glm::vec3(1.0f, 0.0f, 0.0f));
-	m_localToWorldMatrix = glm::rotate(m_localToWorldMatrix, m_rotate.y, glm::vec3(0.0f, 1.0f, 0.0f));
-	m_localToWorldMatrix = glm::rotate(m_localToWorldMatrix, m_rotate.z, glm::vec3(0.0f, 0.0f, 1.0f));
-	m_localToWorldMatrix = glm::translate(m_localToWorldMatrix, m_position);
-	return m_localToWorldMatrix;
+	glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), m_scale);
+	glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0f), m_rotate.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	rotateMatrix = glm::rotate(rotateMatrix, m_rotate.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	rotateMatrix = glm::rotate(rotateMatrix, m_rotate.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::mat4 translateMatrix = glm::translate(glm::mat4(1.0f), m_position);
+	
+	return translateMatrix * rotateMatrix * scaleMatrix;
 }
 
 glm::mat4 Transformer::GetWorldToLocalMatrix()

@@ -328,11 +328,11 @@ namespace Vulkan
 			colorBlendStateCreateInfo.blendConstants[3] = 0.0f;
 		}
 
-		VkDynamicState dynamicStates[2] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_LINE_WIDTH };
+		VkDynamicState dynamicStates[4] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_LINE_WIDTH, VK_DYNAMIC_STATE_DEPTH_TEST_ENABLE, VK_DYNAMIC_STATE_PRIMITIVE_TOPOLOGY };
 		VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo = {};
 		{
 			dynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-			dynamicStateCreateInfo.dynamicStateCount = 2;
+			dynamicStateCreateInfo.dynamicStateCount = 4;
 			dynamicStateCreateInfo.pDynamicStates = dynamicStates;
 		}
 

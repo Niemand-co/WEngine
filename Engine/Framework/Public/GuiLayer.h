@@ -48,6 +48,8 @@ namespace WEngine
 
 		bool m_isSettingsShowed;
 
+		ImFont *m_pOblique;
+
 	};
 
 }

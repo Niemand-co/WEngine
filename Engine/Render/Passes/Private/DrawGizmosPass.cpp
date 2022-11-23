@@ -82,6 +82,7 @@ struct SceneData
 struct ObjectData
 {
 	glm::mat4 M;
+	glm::vec4 color;
 };
 
 void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
@@ -128,6 +129,7 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 		depthStencilDescriptor.stencilFailedOP = StencilFailedOP::Keep;
 		depthStencilDescriptor.stencilRef = 1;
 		depthStencilDescriptor.depthTestEnabled = true;
+		depthStencilDescriptor.depthWriteEnabled = true;
 		depthStencilDescriptor.depthCompareOP = CompareOP::Less;
 		depthStencilDescriptor.minDepth = 0.0f;
 		depthStencilDescriptor.maxDepth = 1.0f;
@@ -136,7 +138,7 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	BindingResource resource[] = 
 	{
 		{ 0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX },
-		{ 1, ResourceType::DynamicUniformBuffer, 1, SHADER_STAGE_VERTEX },
+		{ 1, ResourceType::DynamicUniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT },
 	};
 
 	RHIGroupLayoutDescriptor layoutDescriptor = {};
@@ -197,14 +199,25 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	RHIShader *depthOnlyShaders[] = { depthOnlyVertShader, depthOnlyFragShader };
 
 	{
+		psoDescriptor.rasterizationStateDescriptor->polygonMode = PolygonMode::Triangle;
+		psoDescriptor.depthStencilDescriptor->depthTestEnabled = true;
+		psoDescriptor.depthStencilDescriptor->depthCompareOP = CompareOP::Always;
+		psoDescriptor.depthStencilDescriptor->depthWriteEnabled = false;
+		psoDescriptor.depthStencilDescriptor->stencilTestEnabled = false;
+	}
+	m_pDebugPSO = context->CreatePSO(&psoDescriptor);
+
+	{
 		psoDescriptor.renderPass = m_pStencilRenderPass;
 		psoDescriptor.pShader = depthOnlyShaders;
-		psoDescriptor.subpass = 0;
 		psoDescriptor.rasterizationStateDescriptor->polygonMode = PolygonMode::Triangle;
 		psoDescriptor.depthStencilDescriptor->stencilCompareOP = CompareOP::Always;
 		psoDescriptor.depthStencilDescriptor->passOP = StencilFailedOP::Replace;
 		psoDescriptor.depthStencilDescriptor->stencilFailedOP = StencilFailedOP::Replace;
 		psoDescriptor.depthStencilDescriptor->depthFailedOP = StencilFailedOP::Replace;
+		psoDescriptor.depthStencilDescriptor->depthWriteEnabled = true;
+		psoDescriptor.depthStencilDescriptor->depthCompareOP = CompareOP::Less;
+		psoDescriptor.depthStencilDescriptor->stencilTestEnabled = true;
 	}
 	m_pStencilPSO = context->CreatePSO(&psoDescriptor);
 
@@ -229,7 +242,7 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	m_pObjectBuffer = context->CreateUniformBuffer(&bufferDescriptor);
 
-	m_pObjectBuffer->Resize(1);
+	m_pObjectBuffer->Resize(4);
 	m_pObjectBuffer->SetDataSize(sizeof(ObjectData));
 	m_pSceneBuffer->SetDataSize(sizeof(SceneData));
 	RHIBindingDescriptor bindingDescriptors[] = 
@@ -315,6 +328,8 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 
 	m_pCommandBuffers = context->GetCommandBuffer(RHIContext::g_maxFrames, false);
+
+	m_pAxisMesh = Mesh::GetArrow();
 }
 
 void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
@@ -330,13 +345,26 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
 
+		Transformer* pTransformer = selectedObjects[0]->GetComponent<Transformer>();
+		glm::mat4 objectMatrix = pTransformer->GetLocalToWorldMatrix();
+		ObjectData arrowData[3] =
+		{
+			{ objectMatrix * glm::rotate(glm::mat4(1.0), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)},
+			{ objectMatrix, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) },
+			{ objectMatrix * glm::rotate(glm::mat4(1.0), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f) }
+		};
+		for (unsigned int i = 0; i < 3; ++i)
+		{
+			m_pObjectBuffer->LoadData(arrowData + i, sizeof(ObjectData), i + 1);
+		}
+
 		ClearValue values[]{ {glm::vec4(1.f, 1.f, 1.f, 1.f), true }, { glm::vec4(1.f, 0.f, 0.f, 0.f), false } };
 		RHIRenderPassBeginDescriptor renderpassBeginDescriptor = {};
 		{
 			renderpassBeginDescriptor.renderPass = m_pStencilRenderPass;
 			renderpassBeginDescriptor.renderTarget = m_pStencilRenderTargets[RHIContext::g_currentFrame];
 			renderpassBeginDescriptor.clearCount = 1;
-			renderpassBeginDescriptor.pClearValues = values;
+			renderpassBeginDescriptor.pClearValues = values + 1;
 		}
 		encoder->BeginPass(&renderpassBeginDescriptor);
 		encoder->SetPipeline(m_pStencilPSO);
@@ -351,8 +379,9 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 			Mesh* pMesh = filter->GetStaticMesh();
 			SceneData sceneData = { cameraData->MatrixVP };
 			m_pSceneBuffer->LoadData(&sceneData, sizeof(sceneData));
-			ObjectData objectData = { selectedObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix() };
+			ObjectData objectData = { selectedObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix(), glm::vec4(1.0f, 0.55f, 0.0f, 1.0f) };
 			m_pObjectBuffer->LoadData(&objectData, sizeof(objectData), 0 );
+			m_pObjectBuffer->Flush(4);
 
 			unsigned int offset = 0;
 			encoder->BindVertexBuffer(pMesh->GetVertexBuffer());
@@ -385,6 +414,17 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 			encoder->BindGroups(1, m_pGroup[0], m_pResourceLayout, 1, &offset);
 			encoder->SetLineWidth(10.0f);
 			encoder->DrawIndexed(pMesh->m_indexCount, 0);
+		}
+		
+		encoder->SetPipeline(m_pDebugPSO);
+		encoder->BindVertexBuffer(m_pAxisMesh->GetVertexBuffer());
+		encoder->BindIndexBuffer(m_pAxisMesh->GetIndexBuffer());
+		for (unsigned int i = 0; i < 3; ++i)
+		{
+			unsigned int offset = (i + 1) * m_pObjectBuffer->Alignment();
+			encoder->BindGroups(1, m_pGroup[0], m_pResourceLayout, 1, &offset);
+			encoder->SetLineWidth(1.0f);
+			encoder->DrawIndexed(m_pAxisMesh->m_indexCount, 0);
 		}
 		encoder->EndPass();
 

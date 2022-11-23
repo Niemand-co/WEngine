@@ -77,6 +77,21 @@ namespace Vulkan
 		vkCmdSetLineWidth(*m_cmd, width);
 	}
 
+	void VulkanGraphicsEncoder::SetDepthTestEnable(bool enable)
+	{
+		vkCmdSetDepthTestEnable(*m_cmd, enable);
+	}
+
+	void VulkanGraphicsEncoder::SetPolygonMode(PolygonMode mode)
+	{
+		
+	}
+
+	void VulkanGraphicsEncoder::SetPolygonTopology(PrimitiveTopology primitive)
+	{
+		vkCmdSetPrimitiveTopology(*m_cmd, WEngine::ToVulkan(primitive));
+	}
+
 	void VulkanGraphicsEncoder::ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth, unsigned int clearStencil)
 	{
 		VkClearAttachment clearAttachment = {};
