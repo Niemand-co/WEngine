@@ -23,7 +23,7 @@ public:
 
 	typedef Camera type;
 
-	Camera(GameObject* pGameObject, const float& fov = 3.1415926535f / 2.0f, const float& aspect = 1.0f, const float& nearPlane = 0.1f, const float& farPlane = 1000.0f);
+	Camera(GameObject* pGameObject, const float& fov = 90.0f, const float& aspect = 1.0f, const float& nearPlane = 0.1f, const float& farPlane = 1000.0f);
 
 	~Camera() = default;
 
@@ -89,6 +89,10 @@ struct CameraData
 	glm::mat4x4 MatrixP;
 	glm::mat4x4 MatrixVP;
 	RenderTarget *pRenderTarget;
+	float fov;
+	float farClip;
+	float nearClip;
+	float aspect;
 };
 
 namespace WEngine

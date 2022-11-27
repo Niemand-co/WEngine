@@ -24,6 +24,8 @@ public:
 
 	glm::vec3 GetPosition();
 
+	glm::mat4 GetTranslateMatrix();
+
 	glm::mat4 GetRotateMatrix();
 
 	glm::mat4 GetLocalToWorldMatrix();

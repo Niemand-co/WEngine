@@ -346,10 +346,10 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
 
 		Transformer* pTransformer = selectedObjects[0]->GetComponent<Transformer>();
-		glm::mat4 objectMatrix = pTransformer->GetLocalToWorldMatrix();
+		glm::mat4 objectMatrix = pTransformer->GetTranslateMatrix() * pTransformer->GetRotateMatrix();
 		ObjectData arrowData[3] =
 		{
-			{ objectMatrix * glm::rotate(glm::mat4(1.0), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)},
+			{ objectMatrix * glm::rotate(glm::mat4(1.0), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f) },
 			{ objectMatrix, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) },
 			{ objectMatrix * glm::rotate(glm::mat4(1.0), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f) }
 		};
@@ -357,7 +357,7 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 		{
 			m_pObjectBuffer->LoadData(arrowData + i, sizeof(ObjectData), i + 1);
 		}
-
+		
 		ClearValue values[]{ {glm::vec4(1.f, 1.f, 1.f, 1.f), true }, { glm::vec4(1.f, 0.f, 0.f, 0.f), false } };
 		RHIRenderPassBeginDescriptor renderpassBeginDescriptor = {};
 		{

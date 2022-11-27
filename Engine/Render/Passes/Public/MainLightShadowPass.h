@@ -23,6 +23,10 @@ public:
 
 private:
 
+	std::vector<glm::mat4> GetShadowFrustum(CameraData *cameraData);
+
+private:
+
 	std::vector<RHITexture*> m_pDepthTextures;
 
 	std::vector<RHITextureView*> m_pDepthTextureViews;
@@ -34,5 +38,9 @@ private:
 	std::vector<RHIGroup*> m_pDataGroup;
 
 	RHIPipelineResourceLayout *m_pPipelineLayout;
+
+	unsigned int m_mainLightCascadedShadowMapNum = 4;
+
+	std::vector<float> m_mainLightCascadedShadowMapRange;
 
 };

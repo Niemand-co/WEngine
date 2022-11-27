@@ -86,21 +86,26 @@ glm::vec3 Transformer::GetPosition()
 	return m_position;
 }
 
+glm::mat4 Transformer::GetTranslateMatrix()
+{
+	return glm::translate(glm::mat4(1.0f), m_position);
+}
+
 glm::mat4 Transformer::GetRotateMatrix()
 {
 	glm::mat4 rotateMatrix = glm::mat4(1.0f);
-	rotateMatrix = glm::rotate(rotateMatrix, m_rotate.x, glm::vec3(1.0f, 0.0f, 0.0f));
-	rotateMatrix = glm::rotate(rotateMatrix, m_rotate.y, glm::vec3(0.0f, 1.0f, 0.0f));
-	rotateMatrix = glm::rotate(rotateMatrix, m_rotate.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	return rotateMatrix;
 }
 
 glm::mat4 Transformer::GetLocalToWorldMatrix()
 {
 	glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), m_scale);
-	glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0f), m_rotate.x, glm::vec3(1.0f, 0.0f, 0.0f));
-	rotateMatrix = glm::rotate(rotateMatrix, m_rotate.y, glm::vec3(0.0f, 1.0f, 0.0f));
-	rotateMatrix = glm::rotate(rotateMatrix, m_rotate.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	glm::mat4 translateMatrix = glm::translate(glm::mat4(1.0f), m_position);
 	
 	return translateMatrix * rotateMatrix * scaleMatrix;
@@ -119,7 +124,7 @@ glm::vec3 Transformer::GetForward()
 void Transformer::Move(Direction dir, float dis)
 {
 	glm::vec3 worldUP = glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::vec3 right = glm::cross(m_forward, worldUP);
+	glm::vec3 right = glm::normalize(glm::cross(m_forward, worldUP));
 
 	glm::vec3 displacement = glm::vec3(0.0f);
 	switch (dir)
@@ -170,6 +175,6 @@ void Transformer::Rotate(RotateDirection dir, float dis)
 	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f));
 	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	m_forward = glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 1.0f) * rotateMatrix);
+	m_forward = glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 1.0f) * rotateMatrix));
 }
 

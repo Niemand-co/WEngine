@@ -1,12 +1,11 @@
 #include "pch.h"
-#include "Render/Passes/Public/MainLightShadowPass.h"
+#include "Render/Passes/Public/PrePass.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "RHI/Public/RHIHeads.h"
-#include "Render/Mesh/Public/Mesh.h"
-#include "Render/Mesh/Public/Vertex.h"
-#include "Scene/Public/World.h"
 #include "Scene/Public/GameObject.h"
-#include "Scene/Components/Public/Camera.h"
+#include "Scene/Public/World.h"
+#include "Render/Mesh/Public/Vertex.h"
+#include "Render/Mesh/Public/Mesh.h"
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
 
 struct SceneData
@@ -19,9 +18,9 @@ struct ObjectData
 	glm::mat4 modelMatrix;
 };
 
-MainLightShadowPass::MainLightShadowPass()
+PrePass::PrePass()
 {
-	RHIAttachmentDescriptor attachmentDescriptor[] = 
+	RHIAttachmentDescriptor attachmentDescriptor[] =
 	{
 		{ Format::D16_Unorm, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::DepthBuffer, AttachmentLayout::DepthBuffer },
 	};
@@ -99,20 +98,13 @@ MainLightShadowPass::MainLightShadowPass()
 		}
 		m_pRenderTargets[i] = RHIContext::GetDevice()->CreateRenderTarget(&renderTargetDescriptor);
 	}
-
-	m_mainLightCascadedShadowMapRange.resize(m_mainLightCascadedShadowMapNum + 1);
-	m_mainLightCascadedShadowMapRange[0] = 0.01f;
-	m_mainLightCascadedShadowMapRange[1] = 25.0f;
-	m_mainLightCascadedShadowMapRange[2] = 50.0f;
-	m_mainLightCascadedShadowMapRange[3] = 75.0f;
-	m_mainLightCascadedShadowMapRange[4] = 100.0f;
 }
 
-MainLightShadowPass::~MainLightShadowPass()
+PrePass::~PrePass()
 {
 }
 
-void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
+void PrePass::Setup(RHIContext* context, CameraData* cameraData)
 {
 	ShaderCodeBlob* vertBlob = new ShaderCodeBlob("../assets/DepthOnlyVert.spv");
 	RHIShaderDescriptor vertShaderDescriptor = {};
@@ -181,7 +173,7 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 	m_pObjectDataBuffers[1] = context->CreateUniformBuffer(&objectBufferDescriptor);
 	m_pObjectDataBuffers[2] = context->CreateUniformBuffer(&objectBufferDescriptor);
 
-	BindingResource resource[] = 
+	BindingResource resource[] =
 	{
 		{ 0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX },
 		{ 1, ResourceType::DynamicUniformBuffer, 1, SHADER_STAGE_VERTEX },
@@ -191,7 +183,7 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 		groupLayoutDescriptor.bindingCount = 2;
 		groupLayoutDescriptor.pBindingResources = resource;
 	}
-	RHIGroupLayout *layout = context->CreateGroupLayout(&groupLayoutDescriptor);
+	RHIGroupLayout* layout = context->CreateGroupLayout(&groupLayoutDescriptor);
 
 	RHIPipelineResourceLayoutDescriptor pipelineResourceLayoutDescriptor = {};
 	{
@@ -227,7 +219,7 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 		m_pSceneDataBuffers[i]->SetDataSize(sizeof(SceneData));
 		m_pObjectDataBuffers[i]->SetDataSize(sizeof(ObjectData));
 		m_pObjectDataBuffers[i]->Resize(2);
-		RHIBindingDescriptor bindingDescriptors[] = 
+		RHIBindingDescriptor bindingDescriptors[] =
 		{
 			{ m_pSceneDataBuffers[i]->Size(), m_pSceneDataBuffers[i]->GetBufferInfo() },
 			{ m_pObjectDataBuffers[i]->Size(), m_pObjectDataBuffers[i]->GetBufferInfo() },
@@ -241,11 +233,11 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 		}
 		context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 	}
-	
+
 	m_pRenderTargets.resize(RHIContext::g_maxFrames);
 	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{
-		RHITextureView *views[] = { m_pDepthTextureViews[i] };
+		RHITextureView* views[] = { m_pDepthTextureViews[i] };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
 			renderTargetDescriptor.width = 512;
@@ -260,17 +252,17 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 	m_pCommandBuffers = context->GetCommandBuffer(RHIContext::g_maxFrames, false);
 }
 
-void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
+void PrePass::Execute(RHIContext* context, CameraData* cameraData)
 {
 	RHICommandBuffer* cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
-	std::vector<glm::mat4> frustum = GetShadowFrustum(cameraData);
+
 	SceneData sceneData =
 	{
-		frustum[0] *  World::GetWorld()->GetMainLight()->GetGameObject()->GetComponent<Transformer>()->GetWorldToLocalMatrix()
+		World::GetWorld()->GetMainLight()->GetGameObject()->GetComponent<Transformer>()->GetWorldToLocalMatrix()
 	};
 	m_pSceneDataBuffers[RHIContext::g_currentFrame]->LoadData(&sceneData, sizeof(sceneData));
 
-	cmd->BeginScopePass("MainLightShadow", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentImage]);
+	cmd->BeginScopePass("Skybox", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentImage]);
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
 
@@ -304,8 +296,8 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 		drawcalls = 0;
 		for (unsigned int i = 0; i < gameObjects.size(); ++i)
 		{
-			MeshFilter *filter = gameObjects[i]->GetComponent<MeshFilter>();
-			if(filter == nullptr)
+			MeshFilter* filter = gameObjects[i]->GetComponent<MeshFilter>();
+			if (filter == nullptr)
 				continue;
 
 			Mesh* pMesh = filter->GetStaticMesh();
@@ -323,65 +315,6 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 	context->ExecuteCommandBuffer(cmd);
 }
 
-void MainLightShadowPass::UpdateRenderTarget(CameraData* cameraData)
+void PrePass::UpdateRenderTarget(CameraData* cameraData)
 {
-}
-
-std::vector<glm::mat4> MainLightShadowPass::GetShadowFrustum(CameraData* cameraData)
-{
-	std::vector<glm::mat4> shadowFrustum(m_mainLightCascadedShadowMapNum);
-
-	Transformer *pTransformer = cameraData->camera->GetGameObject()->GetComponent<Transformer>();
-	glm::vec3 center = cameraData->Position;
-	glm::vec3 forward = pTransformer->GetForward();
-	glm::mat4 lightSpaceMatrix = World::GetWorld()->GetMainLight()->GetGameObject()->GetComponent<Transformer>()->GetWorldToLocalMatrix();
-	glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
-	glm::vec3 up = glm::normalize(glm::cross(right, forward));
-
-	for (unsigned int i = 0; i < m_mainLightCascadedShadowMapNum; ++i)
-	{
-		float half_fov = glm::radians(cameraData->fov / 2.0f);
-		float div_aspect = 1.0f / cameraData->aspect;
-
-		float near_height = half_fov * m_mainLightCascadedShadowMapRange[i];
-		float near_width = near_height * div_aspect;
-
-		float far_height = half_fov * m_mainLightCascadedShadowMapRange[i + 1u];
-		float far_width = far_height * div_aspect;
-
-		glm::vec3 near_center = center + m_mainLightCascadedShadowMapRange[i] * forward;
-		glm::vec3 far_center = center + m_mainLightCascadedShadowMapRange[i + 1u] * forward;
-
-		glm::vec3 frustum[8];
-		frustum[0] = near_center + right * near_width + up * near_height;
-		frustum[1] = near_center + right * near_width - up * near_height;
-		frustum[2] = near_center - right * near_width - up * near_height;
-		frustum[3] = near_center - right * near_width + up * near_height;
-
-		frustum[4] = far_center + right * far_width + up * far_height;
-		frustum[5] = far_center + right * far_width - up * far_height;
-		frustum[6] = far_center - right * far_width - up * far_height;
-		frustum[7] = far_center - right * far_width + up * far_height;
-
-		float nearP = (std::numeric_limits<float>::max)();
-		float farP = (std::numeric_limits<float>::min)();
-		float left = (std::numeric_limits<float>::max)();
-		float right = (std::numeric_limits<float>::min)();
-		float bottom = (std::numeric_limits<float>::max)();
-		float top = (std::numeric_limits<float>::min)();
-		for (unsigned int j = 0; j < 8; ++j)
-		{
-			frustum[j] = lightSpaceMatrix * glm::vec4(frustum[j], 1.0f);
-			nearP = frustum[j].z < nearP ? frustum[j].z : nearP;
-			farP = frustum[j].z > farP ? frustum[j].z : farP;
-			left = frustum[j].x < left ? frustum[j].x : left;
-			right = frustum[j].x > right ? frustum[j].x : right;
-			bottom = frustum[j].y < bottom ? frustum[j].y : bottom;
-			top = frustum[j].y > top ? frustum[j].y : top;
-		}
-
-		shadowFrustum[i] = glm::ortho(left, right, bottom, top, nearP, farP);
-	}
-
-	return shadowFrustum;
 }

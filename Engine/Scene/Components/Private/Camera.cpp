@@ -72,6 +72,12 @@ Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, c
 
 	m_pData = (CameraData*)WEngine::Allocator::Get()->Allocate(sizeof(CameraData));
 	::new (m_pData) CameraData();
+	m_pData->camera = this;
+	m_pData->pRenderTarget = &m_rendertargets[RHIContext::g_currentFrame];
+	m_pData->nearClip = m_nearPlane;
+	m_pData->farClip = m_farPlane;
+	m_pData->fov = m_fov;
+	m_pData->aspect = m_aspect;
 }
 
 void Camera::ShowInInspector()
@@ -102,12 +108,10 @@ ScriptableRenderer* Camera::GetRenderer()
 
 CameraData* Camera::GetData()
 {
-	m_pData->camera = this;
 	m_pData->Position = m_pGameObject->GetComponent<Transformer>()->GetPosition();
 	m_pData->MatrixV = this->GetViewMatrix();
 	m_pData->MatrixP = this->GetProjectionMatrix();
 	m_pData->MatrixVP = m_pData->MatrixP * m_pData->MatrixV;
-	m_pData->pRenderTarget = &m_rendertargets[RHIContext::g_currentFrame];
 
 	return m_pData;
 }
@@ -198,5 +202,5 @@ void Camera::UpdateProjectionMatrix()
 {
 	//m_projectionMatrix = Matrix4x4f::GetIdentityMatrix();
 	//PerspectiveProjection(m_projectionMatrix, m_fov, m_aspect, m_nearPlane, m_farPlane);
-	m_projectionMatrix = glm::perspective(m_fov, m_aspect, m_nearPlane, m_farPlane);
+	m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspect, m_nearPlane, m_farPlane);
 }

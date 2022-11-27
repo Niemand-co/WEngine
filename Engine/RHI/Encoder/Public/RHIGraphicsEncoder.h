@@ -33,8 +33,6 @@ public:
 
 	virtual void SetDepthTestEnable(bool enable) = 0;
 
-	virtual void SetPolygonMode(PolygonMode mode) = 0;
-
 	virtual void SetPolygonTopology(PrimitiveTopology primitive) = 0;
 
 	virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth = 0.0f, unsigned int clearStencil = 1) = 0;

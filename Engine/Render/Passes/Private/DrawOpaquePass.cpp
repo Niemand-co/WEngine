@@ -31,27 +31,27 @@ DrawOpaquePass::DrawOpaquePass()
 {
 	RHIAttachmentDescriptor attachmentDescriptors[] =
 	{
-		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::ColorBuffer },
-		{ Format::D16_Unorm, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer }
+		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::ColorBuffer, AttachmentLayout::ColorBuffer },
+		{ Format::D16_Unorm, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::DepthBuffer, AttachmentLayout::DepthBuffer },
 	};
 	SubPassAttachment subpassColorAttachment = { 0, AttachmentLayout::ColorBuffer };
 	SubPassAttachment subpassDepthAttachment = { 1, AttachmentLayout::DepthBuffer };
 
-	RHISubPassDescriptor subpassDescriptors = {};
+	RHISubPassDescriptor subpassDescriptor = {};
 	{
-		subpassDescriptors.colorAttachmentCount = 1;
-		subpassDescriptors.pColorAttachments = &subpassColorAttachment;
-		subpassDescriptors.pDepthStencilAttachment = &subpassDepthAttachment;
-		subpassDescriptors.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		subpassDescriptors.waitingStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
-		subpassDescriptors.waitingAccess = ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE;
+		subpassDescriptor.colorAttachmentCount = 1;
+		subpassDescriptor.pColorAttachments = &subpassColorAttachment;
+		subpassDescriptor.pDepthStencilAttachment = &subpassDepthAttachment;
+		subpassDescriptor.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
+		subpassDescriptor.waitingStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
+		subpassDescriptor.waitingAccess = ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE;
 	}
 	RHIRenderPassDescriptor renderPassDescriptor = {};
 	{
 		renderPassDescriptor.attachmentCount = 2;
 		renderPassDescriptor.pAttachmentDescriptors = attachmentDescriptors;
 		renderPassDescriptor.subpassCount = 1;
-		renderPassDescriptor.pSubPassDescriptors = &subpassDescriptors;
+		renderPassDescriptor.pSubPassDescriptors = &subpassDescriptor;
 	}
 	m_pRenderPass = m_pDevice->CreateRenderPass(&renderPassDescriptor);
 }
@@ -103,14 +103,15 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		depthStencilDescriptor.minDepth = 0.0f;
 	}
 
-	BindingResource resource[2] = 
+	BindingResource resource[3] = 
 	{
 		{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
 		{1, ResourceType::DynamicUniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
+		{0, ResourceType::CombinedImageSampler, 1, SHADER_STAGE_FRAGMENT},
 	};
 	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
 	{
-		groupLayoutDescriptor.bindingCount = 2;
+		groupLayoutDescriptor.bindingCount = 3;
 		groupLayoutDescriptor.pBindingResources = resource;
 	}
 	RHIGroupLayout *groupLayout = context->CreateGroupLayout(&groupLayoutDescriptor);
@@ -187,6 +188,19 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 			updateResourceDescriptor.pGroup = m_pGroup[i];
 		}
 		context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
+
+		TextureResourceInfo textureInfo[] =
+		{
+			{  }
+		};
+		RHIUpdateResourceDescriptor shadowmapResourceDescriptor = {};
+		{
+			shadowmapResourceDescriptor.bindingCount = 2;
+			shadowmapResourceDescriptor.pBindingResources = resource + 2;
+			shadowmapResourceDescriptor.pTextureInfo = textureInfo;
+			shadowmapResourceDescriptor.pGroup = m_pGroup[i];
+		}
+		context->UpdateTextureResourceToGroup(&shadowmapResourceDescriptor);
 	}
 
 	m_pRenderTargets.resize(3);

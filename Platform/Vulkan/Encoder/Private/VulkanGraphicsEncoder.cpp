@@ -82,11 +82,6 @@ namespace Vulkan
 		vkCmdSetDepthTestEnable(*m_cmd, enable);
 	}
 
-	void VulkanGraphicsEncoder::SetPolygonMode(PolygonMode mode)
-	{
-		
-	}
-
 	void VulkanGraphicsEncoder::SetPolygonTopology(PrimitiveTopology primitive)
 	{
 		vkCmdSetPrimitiveTopology(*m_cmd, WEngine::ToVulkan(primitive));
