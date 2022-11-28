@@ -2,6 +2,9 @@
 #include "Scene/Components/Public/Component.h"
 
 class GameObject;
+class RHITexture;
+class RHITextureView;
+struct CameraData;
 
 class Light : public Component
 {
@@ -27,6 +30,10 @@ public:
 
 	virtual void ShowInInspector() override;
 
+	const std::vector<RHITextureView*>& GetDepthTexture() const { return m_pDepthTextureViews; }
+
+	std::vector<glm::mat4> GetShadowFrustum(CameraData* cameraData);
+
 private:
 
 	LightType m_type;
@@ -36,5 +43,15 @@ private:
 	glm::vec3 m_color;
 
 	float m_intensity;
+
+	std::vector<RHITexture*> m_pDepthTextures;
+
+	std::vector<RHITextureView*> m_pDepthTextureViews;
+
+	unsigned int m_mainLightCascadedShadowMapNum = 4;
+
+	std::vector<float> m_mainLightCascadedShadowMapRange;
+
+	std::vector<glm::mat4> m_lightSpaceMatrix;
 
 };

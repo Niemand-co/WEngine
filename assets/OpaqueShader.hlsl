@@ -20,6 +20,7 @@ struct VSOutput
 struct SceneData
 {
     float4x4 VP;
+    float4x4 lightSpaceMatrix;
     float4 lightDir;
     float4 cameraPos;
 };
@@ -33,6 +34,10 @@ struct ObjectData
 cbuffer sceneData : register(b0) { SceneData sceneData; }
 
 cbuffer objectData : register(b1) { ObjectData objectData; }
+
+SamplerState shadowMapSampler : register(s2, space0);
+
+Texture2D shadowMap : register(t2, space0);
 
 float D_GGX(float NoH, float Roughness)
 {
@@ -51,17 +56,17 @@ float G_Smith(float cos, float Roughness)
     return cos / (cos * (1.0 - squareAlpha) + squareAlpha);
 }
 
-float4 PBRLighting(float3 albedo, float NoL, float NoH, float NoV, float HoV, float roughness, float metallic)
+float4 PBRLighting(float3 albedo, float NoL, float NoH, float NoV, float HoV, float roughness, float metallic, float shadow)
 {
-    float F0 = lerp(0.04, albedo, metallic);
-    float ks = F0 + (1.0 - F0) * pow(saturate(1.0 - HoV), 5);
-    float kd = (1.0f - ks) * (1.0f - metallic);
+    float3 F0 = lerp(0.04, albedo, metallic);
+    float3 ks = F0 + (1.0 - F0) * pow(saturate(1.0 - HoV), 5);
+    float3 kd = (1.0f - ks) * (1.0f - metallic);
 
     float3 diffuse = kd * albedo / PI;
     float3 specular = D_GGX(NoH, roughness) * G_Smith(NoV, roughness) * G_Smith(NoL, roughness) / (4.0 * NoV * NoL);
     float3 ambient = float3(0.2f, 0.2f, 0.2f);
 
-    return float4((diffuse + saturate(specular)) * (NoL * float3(1, 1, 1) + ambient), 1.0f);
+    return float4((diffuse + saturate(specular)) * (NoL * float3(1, 1, 1) * shadow + ambient), 1.0f);
 }
 
 VSOutput vert(VSInput vin)
@@ -89,7 +94,10 @@ float4 frag(VSOutput pin) : SV_TARGET
     float NoV = saturate(dot(pin.Normal, V));
     float HoV = saturate(dot(H, V));
 
+    float3 shadowCoord = mul(sceneData.lightSpaceMatrix, float4(pin.WorldPos, 1.0f)).xyz;
+
     //float3 albedo = tex.Sample(testSampler, pin.uv).rgb * data.surfaceData.rgb;
+    float depth = shadowMap.Sample(shadowMapSampler, float2(shadowCoord.xy)).z;
     float3 albedo = objectData.surfaceData.rgb;
-	 return PBRLighting(albedo, NoL, NoH, NoV, HoV, objectData.surfaceData.w, 0.0f);
+	return PBRLighting(albedo, NoL, NoH, NoV, HoV, objectData.surfaceData.w, 0.0f, (float)(depth >= (shadowCoord - 0.01f)));
 }

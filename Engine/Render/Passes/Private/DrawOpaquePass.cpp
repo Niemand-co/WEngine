@@ -18,6 +18,7 @@
 struct SceneData
 {
 	glm::mat4 VP;
+	glm::mat4 lightSpaceMatrix;
 	glm::vec4 lightPos;
 	glm::vec4 cameraPos;
 };
@@ -114,7 +115,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	{
 		{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
 		{1, ResourceType::DynamicUniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
-		{0, ResourceType::CombinedImageSampler, 1, SHADER_STAGE_FRAGMENT},
+		{2, ResourceType::CombinedImageSampler, 1, SHADER_STAGE_FRAGMENT},
 	};
 	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
 	{
@@ -177,7 +178,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	m_pSceneUniformBuffers[1] = context->CreateUniformBuffer(&uniformBufferDescriptor);
 	m_pSceneUniformBuffers[2] = context->CreateUniformBuffer(&uniformBufferDescriptor);
 
-	const std::vector<RHITextureView*>& depthTextures = m_pRenderer->GetGlobalTextures()[0];
+	const std::vector<RHITextureView*>& depthTextures = World::GetWorld()->GetMainLight()->GetDepthTexture();
 	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{
 		m_pObjectUniformBuffers[i]->SetDataSize(sizeof(ObjectData));
@@ -261,10 +262,13 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		encoder->SetScissor({WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0});
 		encoder->SetDepthTestEnable(true);
 		unsigned int drawcalls = 0;
+		Light *mainLight = World::GetWorld()->GetMainLight();
+		std::vector<glm::mat4> frustum = mainLight->GetShadowFrustum(cameraData);
 		SceneData sceneData =
 		{
 			cameraData->MatrixVP,
-			World::GetWorld()->GetMainLight()->GetGameObject()->GetComponent<Transformer>()->GetRotateMatrix() * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f),
+			frustum[0] * mainLight->GetGameObject()->GetComponent<Transformer>()->GetWorldToLocalMatrix(),
+			mainLight->GetGameObject()->GetComponent<Transformer>()->GetRotateMatrix() * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f),
 			glm::vec4(cameraData->Position, 1.0f),
 
 		};
