@@ -8,7 +8,7 @@ namespace WEngine
 	GuiRenderPipeline::GuiRenderPipeline(RHIContext *pContext)
 		: ScriptableRenderPipeline(pContext)
 	{
-		m_pPass = new DrawGUIPass();
+		m_pPass = new DrawGUIPass(nullptr);
 	}
 
 	GuiRenderPipeline::~GuiRenderPipeline()

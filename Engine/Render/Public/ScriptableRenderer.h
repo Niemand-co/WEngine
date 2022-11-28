@@ -7,6 +7,7 @@ class RHIContext;
 class RHISemaphore;
 class RHIFence;
 class RHIEvent;
+class RHITextureView;
 struct CameraData;
 
 class ScriptableRenderer
@@ -24,6 +25,10 @@ public:
 	virtual void EnqueRenderPass(ScriptableRenderPass* renderPass);
 
 	virtual void UpdateRenderTarget(CameraData* cameraData);
+
+	void SetGlobalTexture(std::vector<RHITextureView*>& pTexture) { m_pGlobalTextures.push_back(pTexture); }
+
+	const std::vector<std::vector<RHITextureView*>>& GetGlobalTextures() const { return m_pGlobalTextures; }
 
 	void* operator new(size_t size)
 	{
@@ -48,5 +53,7 @@ private:
 	std::vector<RHISemaphore*> m_pSignalSemaphore;
 
 	std::vector<std::string_view> m_blockSubmission;
+
+	std::vector<std::vector<RHITextureView*>> m_pGlobalTextures;
 
 };

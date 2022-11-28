@@ -2,6 +2,7 @@
 
 class RHIAttachmentDescriptor;
 class RHISubPassDescriptor;
+class RHISubPassDependencyDescriptor;
 
 class RHIRenderPassDescriptor
 {
@@ -20,5 +21,9 @@ public:
 	unsigned int subpassCount;
 
 	RHISubPassDescriptor *pSubPassDescriptors;
+
+	unsigned int dependencyCount;
+
+	RHISubPassDependencyDescriptor *pDependencyDescriptors;
 
 };

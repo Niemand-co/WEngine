@@ -11,7 +11,7 @@ class MainLightShadowPass : public ScriptableRenderPass
 {
 public:
 
-	MainLightShadowPass();
+	MainLightShadowPass(ScriptableRenderer* pRenderer);
 
 	virtual ~MainLightShadowPass();
 

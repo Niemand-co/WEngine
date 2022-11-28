@@ -147,7 +147,7 @@ namespace Vulkan
 		std::vector<VkAttachmentReference*> pColorAttachmentReferences(descriptor->subpassCount);
 		std::vector<VkAttachmentReference*> pDepthAttachmentReferences(descriptor->subpassCount, nullptr);
 		std::vector<VkAttachmentReference*> pInputAttachmentReferences(descriptor->subpassCount);
-		std::vector<VkSubpassDependency> pSubpassDependencies(descriptor->subpassCount);
+
 		for (unsigned int i = 0; i < descriptor->subpassCount; ++i)
 		{
 			RHISubPassDescriptor *pSubpassDescriptor = descriptor->pSubPassDescriptors + i;
@@ -183,12 +183,19 @@ namespace Vulkan
 			pSubpassDescriptions[i].inputAttachmentCount = pSubpassDescriptor->inputAttachmentCount;
 			pSubpassDescriptions[i].pInputAttachments = pInputAttachmentReferences[i];
 
-			pSubpassDependencies[i].srcSubpass = pSubpassDescriptor->dependedPass >= 0 ? pSubpassDescriptor->dependedPass : VK_SUBPASS_EXTERNAL;
+
+		}
+
+		std::vector<VkSubpassDependency> pSubpassDependencies(descriptor->dependencyCount);
+		for (unsigned int i = 0; i < descriptor->dependencyCount; ++i)
+		{
+			RHISubPassDependencyDescriptor *dependencyDescriptor = descriptor->pDependencyDescriptors + i;
+			pSubpassDependencies[i].srcSubpass = dependencyDescriptor->dependedPass >= 0 ? dependencyDescriptor->dependedPass : VK_SUBPASS_EXTERNAL;
 			pSubpassDependencies[i].dstSubpass = i;
-			pSubpassDependencies[i].srcStageMask = pSubpassDescriptor->dependedStage;
-			pSubpassDependencies[i].srcAccessMask = pSubpassDescriptor->dependedAccess;
-			pSubpassDependencies[i].dstStageMask = pSubpassDescriptor->waitingStage;
-			pSubpassDependencies[i].dstAccessMask = pSubpassDescriptor->waitingAccess;
+			pSubpassDependencies[i].srcStageMask = dependencyDescriptor->dependedStage;
+			pSubpassDependencies[i].srcAccessMask = dependencyDescriptor->dependedAccess;
+			pSubpassDependencies[i].dstStageMask = dependencyDescriptor->waitingStage;
+			pSubpassDependencies[i].dstAccessMask = dependencyDescriptor->waitingAccess;
 		}
 
 		VkRenderPassCreateInfo renderPassCreateInfo = {};
@@ -197,7 +204,7 @@ namespace Vulkan
 		renderPassCreateInfo.pAttachments = pAttachmentDescriptions;
 		renderPassCreateInfo.subpassCount = descriptor->subpassCount;
 		renderPassCreateInfo.pSubpasses = pSubpassDescriptions.data();
-		renderPassCreateInfo.dependencyCount = descriptor->subpassCount;
+		renderPassCreateInfo.dependencyCount = descriptor->dependencyCount;
 		renderPassCreateInfo.pDependencies = pSubpassDependencies.data();
 
 		VkRenderPass *pRenderPass = (VkRenderPass*)WEngine::Allocator::Get()->Allocate(sizeof(VkRenderPass));

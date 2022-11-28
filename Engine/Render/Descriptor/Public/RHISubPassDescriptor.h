@@ -27,14 +27,26 @@ public:
 
 	SubPassAttachment *pInputAttachments;
 
+};
+
+class RHISubPassDependencyDescriptor
+{
+public:
+
+	~RHISubPassDependencyDescriptor() = default;
+
+public:
+
 	int dependedPass;
 
-	unsigned int dependedStage;
+	int dependedStage;
 
-	unsigned int dependedAccess;
+	int dependedAccess;
 
-	unsigned int waitingStage;
+	int waitingPass;
 
-	unsigned int waitingAccess;
+	int waitingStage;
 
+	int waitingAccess;
+	
 };

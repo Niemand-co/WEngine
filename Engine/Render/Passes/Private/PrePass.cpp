@@ -18,7 +18,8 @@ struct ObjectData
 	glm::mat4 modelMatrix;
 };
 
-PrePass::PrePass()
+PrePass::PrePass(ScriptableRenderer* pRenderer)
+	: ScriptableRenderPass(pRenderer)
 {
 	RHIAttachmentDescriptor attachmentDescriptor[] =
 	{
@@ -32,11 +33,12 @@ PrePass::PrePass()
 		subpassDescriptor.colorAttachmentCount = 0;
 		subpassDescriptor.pColorAttachments = nullptr;
 		subpassDescriptor.pDepthStencilAttachment = &depthAttachment;
-		subpassDescriptor.dependedPass = -1;
-		subpassDescriptor.dependedStage = 0;
-		subpassDescriptor.dependedAccess = 0;
-		subpassDescriptor.waitingAccess = ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE;
 	}
+
+	RHISubPassDependencyDescriptor dependencyDescriptor[] = 
+	{
+		{ -1, 0, 0, 0, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE }
+	};
 
 	RHIRenderPassDescriptor renderPassDescriptor = {};
 	{
@@ -44,6 +46,8 @@ PrePass::PrePass()
 		renderPassDescriptor.pAttachmentDescriptors = attachmentDescriptor;
 		renderPassDescriptor.subpassCount = 1;
 		renderPassDescriptor.pSubPassDescriptors = &subpassDescriptor;
+		renderPassDescriptor.dependencyCount = 1;
+		renderPassDescriptor.pDependencyDescriptors = dependencyDescriptor;
 	}
 	m_pRenderPass = RHIContext::GetDevice()->CreateRenderPass(&renderPassDescriptor);
 

@@ -13,7 +13,7 @@ class DrawGizmosPass : public ScriptableRenderPass
 {
 public:
 
-	DrawGizmosPass();
+	DrawGizmosPass(ScriptableRenderer* pRenderer);
 
 	~DrawGizmosPass();
 

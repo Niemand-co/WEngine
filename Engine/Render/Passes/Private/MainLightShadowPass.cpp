@@ -8,6 +8,7 @@
 #include "Scene/Public/GameObject.h"
 #include "Scene/Components/Public/Camera.h"
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
+#include "Render/Public/ScriptableRenderer.h"
 
 struct SceneData
 {
@@ -19,7 +20,8 @@ struct ObjectData
 	glm::mat4 modelMatrix;
 };
 
-MainLightShadowPass::MainLightShadowPass()
+MainLightShadowPass::MainLightShadowPass(ScriptableRenderer* pRenderer)
+	: ScriptableRenderPass(pRenderer)
 {
 	RHIAttachmentDescriptor attachmentDescriptor[] = 
 	{
@@ -33,11 +35,13 @@ MainLightShadowPass::MainLightShadowPass()
 		subpassDescriptor.colorAttachmentCount = 0;
 		subpassDescriptor.pColorAttachments = nullptr;
 		subpassDescriptor.pDepthStencilAttachment = &depthAttachment;
-		subpassDescriptor.dependedPass = -1;
-		subpassDescriptor.dependedStage = 0;
-		subpassDescriptor.dependedAccess = 0;
-		subpassDescriptor.waitingAccess = ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE;
 	}
+
+	RHISubPassDependencyDescriptor dependencyDescriptor[] = 
+	{
+		{ -1, 0, 0, 0, 0, 0 },
+		{ 0, PIPELINE_STAGE_EARLY_FRAGMENT_TESTS, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE, -1, PIPELINE_STAGE_FRAGMENT_SHADER, ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE }
+	};
 
 	RHIRenderPassDescriptor renderPassDescriptor = {};
 	{
@@ -45,6 +49,8 @@ MainLightShadowPass::MainLightShadowPass()
 		renderPassDescriptor.pAttachmentDescriptors = attachmentDescriptor;
 		renderPassDescriptor.subpassCount = 1;
 		renderPassDescriptor.pSubPassDescriptors = &subpassDescriptor;
+		renderPassDescriptor.dependencyCount = 2;
+		renderPassDescriptor.pDependencyDescriptors = dependencyDescriptor;
 	}
 	m_pRenderPass = RHIContext::GetDevice()->CreateRenderPass(&renderPassDescriptor);
 
@@ -99,6 +105,8 @@ MainLightShadowPass::MainLightShadowPass()
 		}
 		m_pRenderTargets[i] = RHIContext::GetDevice()->CreateRenderTarget(&renderTargetDescriptor);
 	}
+
+	pRenderer->SetGlobalTexture(m_pDepthTextureViews);
 
 	m_mainLightCascadedShadowMapRange.resize(m_mainLightCascadedShadowMapNum + 1);
 	m_mainLightCascadedShadowMapRange[0] = 0.01f;

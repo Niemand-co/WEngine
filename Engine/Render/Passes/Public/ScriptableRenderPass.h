@@ -8,13 +8,14 @@ class RHIGroup;
 class RHICommandBuffer;
 class RHISemaphore;
 class RHIRenderTarget;
+class ScriptableRenderer;
 struct CameraData;
 
 class ScriptableRenderPass
 {
 public:
 
-	ScriptableRenderPass();
+	ScriptableRenderPass(ScriptableRenderer* pRenderer);
 
 	virtual ~ScriptableRenderPass();
 
@@ -49,5 +50,7 @@ protected:
 	RHIPipelineStateObject *m_pPSO;
 
 	std::vector<RHICommandBuffer*> m_pCommandBuffers;
+
+	ScriptableRenderer *m_pRenderer;
 
 };

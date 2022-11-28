@@ -12,7 +12,7 @@ class DrawOpaquePass : public ScriptableRenderPass
 {
 public:
 
-	DrawOpaquePass();
+	DrawOpaquePass(ScriptableRenderer* pRenderer);
 
 	virtual ~DrawOpaquePass();
 
@@ -23,8 +23,6 @@ public:
 	virtual void UpdateRenderTarget(CameraData *cameraData) override;
 
 private:
-
-	RHITexture *m_pTexture;
 
 	RHISampler *m_pSampler;
 

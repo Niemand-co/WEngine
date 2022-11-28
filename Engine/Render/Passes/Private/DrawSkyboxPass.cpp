@@ -13,7 +13,8 @@
 glm::vec4 DrawSkyboxPass::topColor = glm::vec4(1.0f);
 glm::vec4 DrawSkyboxPass::bottomColor = glm::vec4(1.0f);
 
-DrawSkyboxPass::DrawSkyboxPass()
+DrawSkyboxPass::DrawSkyboxPass(ScriptableRenderer* pRenderer)
+	: ScriptableRenderPass(pRenderer)
 {
 	RHIAttachmentDescriptor attachmentDescriptors[] =
 	{
@@ -29,11 +30,12 @@ DrawSkyboxPass::DrawSkyboxPass()
 		subpassDescriptor.colorAttachmentCount = 1;
 		subpassDescriptor.pColorAttachments = colorAttachments;
 		subpassDescriptor.pDepthStencilAttachment = &depthStencilAttachment;
-		subpassDescriptor.dependedPass = -1;
-		subpassDescriptor.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		subpassDescriptor.waitingStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS | PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT | PIPELINE_STAGE_FRAGMENT_SHADER;
-		subpassDescriptor.waitingAccess = ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE;
 	}
+
+	RHISubPassDependencyDescriptor dependencyDescriptor[] = 
+	{
+		{ -1, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE, 0, PIPELINE_STAGE_EARLY_FRAGMENT_TESTS | PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT | PIPELINE_STAGE_FRAGMENT_SHADER, ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
+	};
 
 	RHIRenderPassDescriptor renderpassDescriptor = {};
 	{
@@ -41,6 +43,8 @@ DrawSkyboxPass::DrawSkyboxPass()
 		renderpassDescriptor.pAttachmentDescriptors = attachmentDescriptors;
 		renderpassDescriptor.subpassCount = 1;
 		renderpassDescriptor.pSubPassDescriptors = &subpassDescriptor;
+		renderpassDescriptor.dependencyCount = 1;
+		renderpassDescriptor.pDependencyDescriptors = dependencyDescriptor;
 	}
 	m_pRenderPass = m_pDevice->CreateRenderPass(&renderpassDescriptor);
 }

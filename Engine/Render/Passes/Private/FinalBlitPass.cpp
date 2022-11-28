@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "Render/Passes/Public/FinalBlitPass.h"
 
-FinalBlitPass::FinalBlitPass()
+FinalBlitPass::FinalBlitPass(ScriptableRenderer* pRenderer)
+	: ScriptableRenderPass(pRenderer)
 {
 }
 

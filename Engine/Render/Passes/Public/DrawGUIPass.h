@@ -9,7 +9,7 @@ class DrawGUIPass : public ScriptableRenderPass
 {
 public:
 
-	DrawGUIPass();
+	DrawGUIPass(ScriptableRenderer* pRenderer);
 
 	virtual ~DrawGUIPass();
 

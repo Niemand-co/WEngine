@@ -10,7 +10,8 @@
 #include "Editor/Public/Editor.h"
 #include "Scene/Public/GameObject.h"
 
-DrawGizmosPass::DrawGizmosPass()
+DrawGizmosPass::DrawGizmosPass(ScriptableRenderer* pRenderer)
+	: ScriptableRenderPass(pRenderer)
 {
 	RHIAttachmentDescriptor attachmentDescriptors[] = 
 	{
@@ -26,11 +27,11 @@ DrawGizmosPass::DrawGizmosPass()
 		subpassDescriptor.colorAttachmentCount = 1;
 		subpassDescriptor.pColorAttachments = colorAttachments;
 		subpassDescriptor.pDepthStencilAttachment = &stencilAttachment;
-		subpassDescriptor.dependedPass = -1;
-		subpassDescriptor.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		subpassDescriptor.waitingAccess = ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE;
-		subpassDescriptor.waitingStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS | PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		subpassDescriptor.waitingAccess = ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE;
+	};
+
+	RHISubPassDependencyDescriptor dependencyDescriptor[] =
+	{
+		{ -1, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE, 0, PIPELINE_STAGE_EARLY_FRAGMENT_TESTS | PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
 	};
 
 	RHIRenderPassDescriptor renderPassDescriptor = {};
@@ -39,6 +40,8 @@ DrawGizmosPass::DrawGizmosPass()
 		renderPassDescriptor.pAttachmentDescriptors = attachmentDescriptors;
 		renderPassDescriptor.subpassCount = 1;
 		renderPassDescriptor.pSubPassDescriptors = &subpassDescriptor;
+		renderPassDescriptor.dependencyCount = 1;
+		renderPassDescriptor.pDependencyDescriptors = dependencyDescriptor;
 	}
 	m_pRenderPass = RHIContext::GetDevice()->CreateRenderPass(&renderPassDescriptor);
 
@@ -53,11 +56,12 @@ DrawGizmosPass::DrawGizmosPass()
 		stencilSubpassDescriptor.colorAttachmentCount = 0;
 		stencilSubpassDescriptor.pColorAttachments = nullptr;
 		stencilSubpassDescriptor.pDepthStencilAttachment = &stencilAttachment;
-		stencilSubpassDescriptor.dependedPass = -1;
-		stencilSubpassDescriptor.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		stencilSubpassDescriptor.waitingStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		stencilSubpassDescriptor.waitingAccess = ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE;
 	}
+
+	RHISubPassDependencyDescriptor stencilDependencyDescriptor[] =
+	{
+		{ -1, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, 0, 0, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
+	};
 
 	RHIRenderPassDescriptor stencilRenderPassDescriptor = {};
 	{
@@ -65,6 +69,8 @@ DrawGizmosPass::DrawGizmosPass()
 		stencilRenderPassDescriptor.pAttachmentDescriptors = stencilAttachmentDescriptor;
 		stencilRenderPassDescriptor.subpassCount = 1;
 		stencilRenderPassDescriptor.pSubPassDescriptors = &stencilSubpassDescriptor;
+		stencilRenderPassDescriptor.dependencyCount = 1;
+		stencilRenderPassDescriptor.pDependencyDescriptors = stencilDependencyDescriptor;
 	}
 	m_pStencilRenderPass = RHIContext::GetDevice()->CreateRenderPass(&stencilRenderPassDescriptor);
 

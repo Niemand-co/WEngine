@@ -5,6 +5,7 @@
 #include "RHI/Encoder/Public/RHIComputeEncoder.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
+#include "Render/Public/ScriptableRenderer.h"
 #include "Utils/Public/Window.h"
 #include "Utils/ImGui/Public/Gui.h"
 #include "Render/Mesh/Public/Mesh.h"
@@ -27,7 +28,8 @@ struct ObjectData
 	glm::vec4 surfaceData;
 };
 
-DrawOpaquePass::DrawOpaquePass()
+DrawOpaquePass::DrawOpaquePass(ScriptableRenderer* pRenderer)
+	: ScriptableRenderPass(pRenderer)
 {
 	RHIAttachmentDescriptor attachmentDescriptors[] =
 	{
@@ -42,16 +44,21 @@ DrawOpaquePass::DrawOpaquePass()
 		subpassDescriptor.colorAttachmentCount = 1;
 		subpassDescriptor.pColorAttachments = &subpassColorAttachment;
 		subpassDescriptor.pDepthStencilAttachment = &subpassDepthAttachment;
-		subpassDescriptor.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		subpassDescriptor.waitingStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
-		subpassDescriptor.waitingAccess = ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE;
 	}
+
+	RHISubPassDependencyDescriptor dependencyDescriptor[] =
+	{
+		{ -1, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE, 0, PIPELINE_STAGE_EARLY_FRAGMENT_TESTS | PIPELINE_STAGE_FRAGMENT_SHADER, ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
+	};
+
 	RHIRenderPassDescriptor renderPassDescriptor = {};
 	{
 		renderPassDescriptor.attachmentCount = 2;
 		renderPassDescriptor.pAttachmentDescriptors = attachmentDescriptors;
 		renderPassDescriptor.subpassCount = 1;
 		renderPassDescriptor.pSubPassDescriptors = &subpassDescriptor;
+		renderPassDescriptor.dependencyCount = 1;
+		renderPassDescriptor.pDependencyDescriptors = dependencyDescriptor;
 	}
 	m_pRenderPass = m_pDevice->CreateRenderPass(&renderPassDescriptor);
 }
@@ -170,6 +177,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	m_pSceneUniformBuffers[1] = context->CreateUniformBuffer(&uniformBufferDescriptor);
 	m_pSceneUniformBuffers[2] = context->CreateUniformBuffer(&uniformBufferDescriptor);
 
+	const std::vector<RHITextureView*>& depthTextures = m_pRenderer->GetGlobalTextures()[0];
 	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{
 		m_pObjectUniformBuffers[i]->SetDataSize(sizeof(ObjectData));
@@ -189,14 +197,22 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		}
 		context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 
+		RHISamplerDescriptor samplerDescriptor = {};
+		{
+			samplerDescriptor.minFilter = Filter::Linear;
+			samplerDescriptor.magFilter = Filter::Linear;
+		}
+		m_pSampler = RHIContext::GetDevice()->CreateSampler(&samplerDescriptor);;
+
 		TextureResourceInfo textureInfo[] =
 		{
-			{  }
+			{ depthTextures[i], m_pSampler, AttachmentLayout::ReadOnlyDepth }
 		};
 		RHIUpdateResourceDescriptor shadowmapResourceDescriptor = {};
 		{
-			shadowmapResourceDescriptor.bindingCount = 2;
+			shadowmapResourceDescriptor.bindingCount = 1;
 			shadowmapResourceDescriptor.pBindingResources = resource + 2;
+			shadowmapResourceDescriptor.textureResourceCount = 1;
 			shadowmapResourceDescriptor.pTextureInfo = textureInfo;
 			shadowmapResourceDescriptor.pGroup = m_pGroup[i];
 		}

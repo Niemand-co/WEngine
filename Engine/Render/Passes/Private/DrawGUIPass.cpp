@@ -13,7 +13,8 @@
 
 #include "deps/imgui/imgui_internal.h"
 
-DrawGUIPass::DrawGUIPass()
+DrawGUIPass::DrawGUIPass(ScriptableRenderer* pRenderer)
+	: ScriptableRenderPass(pRenderer)
 {
 	RHIAttachmentDescriptor attachmentDescriptors[] =
 	{
@@ -24,16 +25,21 @@ DrawGUIPass::DrawGUIPass()
 	{
 		subpassDescriptors.colorAttachmentCount = 1;
 		subpassDescriptors.pColorAttachments = &subpassColorAttachment;
-		subpassDescriptors.dependedStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		subpassDescriptors.waitingStage = PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
-		subpassDescriptors.waitingAccess = ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE;
 	}
+
+	RHISubPassDependencyDescriptor dependencyDescriptor[] =
+	{
+		{ -1, PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT, ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE, 0, PIPELINE_STAGE_EARLY_FRAGMENT_TESTS | PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT | PIPELINE_STAGE_FRAGMENT_SHADER, ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE | ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE },
+	};
+
 	RHIRenderPassDescriptor renderPassDescriptor = {};
 	{
 		renderPassDescriptor.attachmentCount = 1;
 		renderPassDescriptor.pAttachmentDescriptors = attachmentDescriptors;
 		renderPassDescriptor.subpassCount = 1;
 		renderPassDescriptor.pSubPassDescriptors = &subpassDescriptors;
+		renderPassDescriptor.dependencyCount = 1;
+		renderPassDescriptor.pDependencyDescriptors = dependencyDescriptor;
 	}
 	m_pRenderPass = m_pDevice->CreateRenderPass(&renderPassDescriptor);
 	Gui::g_pGui->BindRenderPass(m_pRenderPass);

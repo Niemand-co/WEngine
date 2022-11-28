@@ -15,7 +15,7 @@ class DrawSkyboxPass : public ScriptableRenderPass
 {
 public:
 
-	DrawSkyboxPass();
+	DrawSkyboxPass(ScriptableRenderer* pRenderer);
 
 	virtual ~DrawSkyboxPass();
 
