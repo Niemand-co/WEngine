@@ -30,6 +30,10 @@ public:
 
 	virtual void ShowInInspector() override;
 
+	float GetIntensity() const { return m_intensity; }
+
+	glm::vec3 GetColor() const { return m_color; }
+
 	const std::vector<RHITextureView*>& GetDepthTexture() const { return m_pDepthTextureViews; }
 
 	std::vector<glm::mat4> GetShadowFrustum(CameraData* cameraData);

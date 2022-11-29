@@ -52,11 +52,13 @@ Light::Light(GameObject *pGameObject)
 	}
 
 	m_mainLightCascadedShadowMapRange.resize(m_mainLightCascadedShadowMapNum + 1);
-	m_mainLightCascadedShadowMapRange[0] = 0.01f;
-	m_mainLightCascadedShadowMapRange[1] = 25.0f;
-	m_mainLightCascadedShadowMapRange[2] = 50.0f;
-	m_mainLightCascadedShadowMapRange[3] = 75.0f;
-	m_mainLightCascadedShadowMapRange[4] = 100.0f;
+	for (unsigned int i = 0; i < m_mainLightCascadedShadowMapNum; ++i)
+	{
+		float ratio = (float)(i + 1) / (float)m_mainLightCascadedShadowMapNum;
+		float logC = 0.01 * std::pow(10000.0f, ratio);
+		float uniC = 0.01f + (1000.0f - 0.01f) * ratio;
+		m_mainLightCascadedShadowMapRange[i] = 0.75f * logC + 0.25f * uniC;
+	}
 }
 
 Light::~Light()
@@ -87,7 +89,7 @@ std::vector<glm::mat4> Light::GetShadowFrustum(CameraData* cameraData)
 	Transformer* pTransformer = cameraData->camera->GetGameObject()->GetComponent<Transformer>();
 	glm::vec3 center = cameraData->Position;
 	glm::vec3 forward = pTransformer->GetForward();
-	glm::mat4 lightSpaceMatrix = World::GetWorld()->GetMainLight()->GetGameObject()->GetComponent<Transformer>()->GetWorldToLocalMatrix();
+	glm::mat4 lightSpaceMatrix = m_pGameObject->GetComponent<Transformer>()->GetWorldToLocalMatrix();
 	glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
 	glm::vec3 up = glm::normalize(glm::cross(right, forward));
 
@@ -116,24 +118,41 @@ std::vector<glm::mat4> Light::GetShadowFrustum(CameraData* cameraData)
 		frustum[6] = far_center - right * far_width - up * far_height;
 		frustum[7] = far_center - right * far_width + up * far_height;
 
-		float nearP = (std::numeric_limits<float>::max)();
-		float farP = (std::numeric_limits<float>::min)();
-		float left = (std::numeric_limits<float>::max)();
-		float right = (std::numeric_limits<float>::min)();
-		float bottom = (std::numeric_limits<float>::max)();
-		float top = (std::numeric_limits<float>::min)();
-		for (unsigned int j = 0; j < 8; ++j)
+		glm::vec3 maxBox = frustum[0];
+		glm::vec3 minBox = frustum[0];
+		for (unsigned int j = 1; j < 8; ++j)
 		{
-			frustum[j] = lightSpaceMatrix * glm::vec4(frustum[j], 1.0f);
-			nearP = frustum[j].z < nearP ? frustum[j].z : nearP;
-			farP = frustum[j].z > farP ? frustum[j].z : farP;
-			left = frustum[j].x < left ? frustum[j].x : left;
-			right = frustum[j].x > right ? frustum[j].x : right;
-			bottom = frustum[j].y < bottom ? frustum[j].y : bottom;
-			top = frustum[j].y > top ? frustum[j].y : top;
+			maxBox.x = maxBox.x < frustum[i].x ? frustum[i].x : maxBox.x;
+			maxBox.y = maxBox.y < frustum[i].y ? frustum[i].y : maxBox.y;
+			maxBox.z = maxBox.z < frustum[i].z ? frustum[i].z : maxBox.z;
+			minBox.x = minBox.x > frustum[i].x ? frustum[i].x : minBox.x;
+			minBox.y = minBox.y > frustum[i].y ? frustum[i].y : minBox.y;
+			minBox.z = minBox.z > frustum[i].z ? frustum[i].z : minBox.z;
 		}
 
-		shadowFrustum[i] = glm::ortho(left, right, bottom, top, nearP, farP);
+		frustum[0] = lightSpaceMatrix * glm::vec4(minBox.x, minBox.y, minBox.z, 1.0);
+		frustum[1] = lightSpaceMatrix * glm::vec4(maxBox.x, minBox.y, minBox.z, 1.0);
+		frustum[2] = lightSpaceMatrix * glm::vec4(maxBox.x, minBox.y, maxBox.z, 1.0);
+		frustum[3] = lightSpaceMatrix * glm::vec4(minBox.x, minBox.y, maxBox.z, 1.0);
+		frustum[4] = lightSpaceMatrix * glm::vec4(minBox.x, maxBox.y, minBox.z, 1.0);
+		frustum[5] = lightSpaceMatrix * glm::vec4(maxBox.x, maxBox.y, minBox.z, 1.0);
+		frustum[6] = lightSpaceMatrix * glm::vec4(maxBox.x, maxBox.y, maxBox.z, 1.0);
+		frustum[7] = lightSpaceMatrix * glm::vec4(minBox.x, maxBox.y, maxBox.z, 1.0);
+
+		for (unsigned int j = 1; j < 8; ++j)
+		{
+			maxBox.x = maxBox.x < frustum[i].x ? frustum[i].x : maxBox.x;
+			maxBox.y = maxBox.y < frustum[i].y ? frustum[i].y : maxBox.y;
+			maxBox.z = maxBox.z < frustum[i].z ? frustum[i].z : maxBox.z;
+			minBox.x = minBox.x > frustum[i].x ? frustum[i].x : minBox.x;
+			minBox.y = minBox.y > frustum[i].y ? frustum[i].y : minBox.y;
+			minBox.z = minBox.z > frustum[i].z ? frustum[i].z : minBox.z;
+		}
+
+		//minBox = glm::inverse(lightSpaceMatrix) * glm::vec4(minBox, 1.0f);
+		//maxBox = glm::inverse(lightSpaceMatrix) * glm::vec4(maxBox, 1.0f);
+
+		shadowFrustum[i] = glm::ortho(0.f, maxBox.x - minBox.x, 0.f, maxBox.y - minBox.y, minBox.z - maxBox.z, maxBox.z - minBox.z);
 	}
 
 	return shadowFrustum;

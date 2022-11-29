@@ -22,6 +22,7 @@ struct SceneData
     float4x4 VP;
     float4x4 lightSpaceMatrix;
     float4 lightDir;
+    float4 lightColor;
     float4 cameraPos;
 };
 
@@ -56,7 +57,7 @@ float G_Smith(float cos, float Roughness)
     return cos / (cos * (1.0 - squareAlpha) + squareAlpha);
 }
 
-float4 PBRLighting(float3 albedo, float NoL, float NoH, float NoV, float HoV, float roughness, float metallic, float shadow)
+float4 PBRLighting(float3 light, float3 albedo, float NoL, float NoH, float NoV, float HoV, float roughness, float metallic, float shadow)
 {
     float3 F0 = lerp(0.04, albedo, metallic);
     float3 ks = F0 + (1.0 - F0) * pow(saturate(1.0 - HoV), 5);
@@ -66,7 +67,7 @@ float4 PBRLighting(float3 albedo, float NoL, float NoH, float NoV, float HoV, fl
     float3 specular = D_GGX(NoH, roughness) * G_Smith(NoV, roughness) * G_Smith(NoL, roughness) / (4.0 * NoV * NoL);
     float3 ambient = float3(0.2f, 0.2f, 0.2f);
 
-    return float4((diffuse + saturate(specular)) * (NoL * float3(1, 1, 1) * shadow + ambient), 1.0f);
+    return float4((diffuse + saturate(specular)) * (NoL * light * shadow + ambient), 1.0f);
 }
 
 VSOutput vert(VSInput vin)
@@ -94,10 +95,11 @@ float4 frag(VSOutput pin) : SV_TARGET
     float NoV = saturate(dot(pin.Normal, V));
     float HoV = saturate(dot(H, V));
 
-    float3 shadowCoord = mul(sceneData.lightSpaceMatrix, float4(pin.WorldPos, 1.0f)).xyz;
+    float4 shadowCoord = mul(sceneData.lightSpaceMatrix, float4(pin.WorldPos, 1.0f));
+    shadowCoord.xyz /= shadowCoord.w;
+    float2 shadowUV = float2(shadowCoord.x * 0.5 + 0.5, shadowCoord.y * -0.5 + 0.5);
 
-    //float3 albedo = tex.Sample(testSampler, pin.uv).rgb * data.surfaceData.rgb;
-    float depth = shadowMap.Sample(shadowMapSampler, float2(shadowCoord.xy)).z;
+    float depth = shadowMap.Sample(shadowMapSampler, shadowUV).r;
     float3 albedo = objectData.surfaceData.rgb;
-	return PBRLighting(albedo, NoL, NoH, NoV, HoV, objectData.surfaceData.w, 0.0f, (float)(depth >= (shadowCoord - 0.01f)));
+	return PBRLighting(sceneData.lightColor.rgb, albedo, NoL, NoH, NoV, HoV, objectData.surfaceData.w, 0.0f, (float)((depth + 0.0001) >= (shadowCoord.z)));
 }

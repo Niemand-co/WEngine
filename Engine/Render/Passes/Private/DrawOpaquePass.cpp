@@ -20,6 +20,7 @@ struct SceneData
 	glm::mat4 VP;
 	glm::mat4 lightSpaceMatrix;
 	glm::vec4 lightPos;
+	glm::vec4 light;
 	glm::vec4 cameraPos;
 };
 
@@ -269,8 +270,8 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 			cameraData->MatrixVP,
 			frustum[0] * mainLight->GetGameObject()->GetComponent<Transformer>()->GetWorldToLocalMatrix(),
 			mainLight->GetGameObject()->GetComponent<Transformer>()->GetRotateMatrix() * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f),
+			glm::vec4(mainLight->GetColor() * mainLight->GetIntensity(), 1.0f),
 			glm::vec4(cameraData->Position, 1.0f),
-
 		};
 		m_pSceneUniformBuffers[RHIContext::g_currentFrame]->LoadData(&sceneData, sizeof(sceneData));
 		for (unsigned int i = 0; i < gameObjects.size(); ++i)
