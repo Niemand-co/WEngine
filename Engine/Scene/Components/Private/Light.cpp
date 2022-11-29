@@ -87,36 +87,11 @@ std::vector<glm::mat4> Light::GetShadowFrustum(CameraData* cameraData)
 	std::vector<glm::mat4> shadowFrustum(m_mainLightCascadedShadowMapNum);
 
 	Transformer* pTransformer = cameraData->camera->GetGameObject()->GetComponent<Transformer>();
-	glm::vec3 center = cameraData->Position;
-	glm::vec3 forward = pTransformer->GetForward();
-	glm::mat4 lightSpaceMatrix = m_pGameObject->GetComponent<Transformer>()->GetWorldToLocalMatrix();
-	glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
-	glm::vec3 up = glm::normalize(glm::cross(right, forward));
+
 
 	for (unsigned int i = 0; i < m_mainLightCascadedShadowMapNum; ++i)
 	{
-		float half_fov = glm::radians(cameraData->fov / 2.0f);
-		float div_aspect = 1.0f / cameraData->aspect;
 
-		float near_height = half_fov * m_mainLightCascadedShadowMapRange[i];
-		float near_width = near_height * div_aspect;
-
-		float far_height = half_fov * m_mainLightCascadedShadowMapRange[i + 1u];
-		float far_width = far_height * div_aspect;
-
-		glm::vec3 near_center = center + m_mainLightCascadedShadowMapRange[i] * forward;
-		glm::vec3 far_center = center + m_mainLightCascadedShadowMapRange[i + 1u] * forward;
-
-		glm::vec3 frustum[8];
-		frustum[0] = near_center + right * near_width + up * near_height;
-		frustum[1] = near_center + right * near_width - up * near_height;
-		frustum[2] = near_center - right * near_width - up * near_height;
-		frustum[3] = near_center - right * near_width + up * near_height;
-
-		frustum[4] = far_center + right * far_width + up * far_height;
-		frustum[5] = far_center + right * far_width - up * far_height;
-		frustum[6] = far_center - right * far_width - up * far_height;
-		frustum[7] = far_center - right * far_width + up * far_height;
 
 		glm::vec3 maxBox = frustum[0];
 		glm::vec3 minBox = frustum[0];
