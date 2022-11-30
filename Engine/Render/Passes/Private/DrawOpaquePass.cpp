@@ -264,11 +264,11 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		encoder->SetDepthTestEnable(true);
 		unsigned int drawcalls = 0;
 		Light *mainLight = World::GetWorld()->GetMainLight();
-		std::vector<glm::mat4> frustum = mainLight->GetShadowFrustum(cameraData);
+		std::vector<glm::mat4> frustum = mainLight->GetShadowFrustum();
 		SceneData sceneData =
 		{
 			cameraData->MatrixVP,
-			frustum[0] * mainLight->GetGameObject()->GetComponent<Transformer>()->GetWorldToLocalMatrix(),
+			frustum[0],
 			mainLight->GetGameObject()->GetComponent<Transformer>()->GetRotateMatrix() * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f),
 			glm::vec4(mainLight->GetColor() * mainLight->GetIntensity(), 1.0f),
 			glm::vec4(cameraData->Position, 1.0f),

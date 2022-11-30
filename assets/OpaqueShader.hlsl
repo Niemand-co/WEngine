@@ -67,7 +67,7 @@ float4 PBRLighting(float3 light, float3 albedo, float NoL, float NoH, float NoV,
     float3 specular = D_GGX(NoH, roughness) * G_Smith(NoV, roughness) * G_Smith(NoL, roughness) / (4.0 * NoV * NoL);
     float3 ambient = float3(0.2f, 0.2f, 0.2f);
 
-    return float4((diffuse + saturate(specular)) * (NoL * light * shadow + ambient), 1.0f);
+    return float4((diffuse + saturate(specular)) * (NoL * light * shadow) + ambient * diffuse, 1.0f);
 }
 
 VSOutput vert(VSInput vin)
@@ -95,11 +95,16 @@ float4 frag(VSOutput pin) : SV_TARGET
     float NoV = saturate(dot(pin.Normal, V));
     float HoV = saturate(dot(H, V));
 
+    float distance = length(V);
+
     float4 shadowCoord = mul(sceneData.lightSpaceMatrix, float4(pin.WorldPos, 1.0f));
     shadowCoord.xyz /= shadowCoord.w;
     float2 shadowUV = float2(shadowCoord.x * 0.5 + 0.5, shadowCoord.y * -0.5 + 0.5);
 
-    float depth = shadowMap.Sample(shadowMapSampler, shadowUV).r;
+    float depth = 1.0;
+    if(distance <= 62.0)
+        depth = shadowMap.Sample(shadowMapSampler, shadowUV).r;
+    
     float3 albedo = objectData.surfaceData.rgb;
 	return PBRLighting(sceneData.lightColor.rgb, albedo, NoL, NoH, NoV, HoV, objectData.surfaceData.w, 0.0f, (float)((depth + 0.0001) >= (shadowCoord.z)));
 }

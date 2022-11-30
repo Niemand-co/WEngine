@@ -36,7 +36,9 @@ public:
 
 	const std::vector<RHITextureView*>& GetDepthTexture() const { return m_pDepthTextureViews; }
 
-	std::vector<glm::mat4> GetShadowFrustum(CameraData* cameraData);
+	void UpdateShadowFrustum(CameraData* cameraData);
+
+	std::vector<glm::mat4> GetShadowFrustum();
 
 private:
 

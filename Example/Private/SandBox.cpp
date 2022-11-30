@@ -78,6 +78,7 @@ void GameScene::OnUpdate(WEngine::TimeStep timeStep)
 		m_sceneCamera->Rotate(RotateDirection::Yaw,  OffsetX * 0.1f);
 		m_sceneCamera->Rotate(RotateDirection::Pitch, OffsetY * 0.1f);
 	}
+	GameObject::Find("Main Light")->GetComponent<Light>()->UpdateShadowFrustum(m_sceneCamera->GetData());
 	m_pPipeline->Execute();
 }
 

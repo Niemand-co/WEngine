@@ -56,8 +56,8 @@ MainLightShadowPass::MainLightShadowPass(ScriptableRenderer* pRenderer)
 
 	RHIRenderTargetDescriptor renderTargetDescriptor = {};
 	{
-		renderTargetDescriptor.width = 1024;
-		renderTargetDescriptor.height = 1024;
+		renderTargetDescriptor.width = 2048;
+		renderTargetDescriptor.height = 2048;
 		renderTargetDescriptor.renderPass = m_pRenderPass;
 		renderTargetDescriptor.bufferCount = 1;
 	}
@@ -205,8 +205,8 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 		RHITextureView *views[] = { depthTextureViews[i] };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
-			renderTargetDescriptor.width = 1024;
-			renderTargetDescriptor.height = 1024;
+			renderTargetDescriptor.width = 2048;
+			renderTargetDescriptor.height = 2048;
 			renderTargetDescriptor.pBufferView = views;
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.bufferCount = 1;
@@ -221,7 +221,7 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 {
 	RHICommandBuffer* cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 	Light *mainLight = World::GetWorld()->GetMainLight();
-	std::vector<glm::mat4> frustum = mainLight->GetShadowFrustum(cameraData);
+	std::vector<glm::mat4> frustum = mainLight->GetShadowFrustum();
 	SceneData sceneData =
 	{
 		frustum[0] * mainLight->GetGameObject()->GetComponent<Transformer>()->GetWorldToLocalMatrix()
@@ -242,8 +242,8 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 		}
 		encoder->BeginPass(&renderpassBeginDescriptor);
 		encoder->SetPipeline(m_pPSO);
-		encoder->SetViewport({ 1024, 1024, 0, 0 });
-		encoder->SetScissor({ 1024, 1024, 0, 0 });
+		encoder->SetViewport({ 2048, 2048, 0, 0 });
+		encoder->SetScissor({ 2048, 2048, 0, 0 });
 
 		unsigned int drawcalls = 0;
 		const std::vector<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();

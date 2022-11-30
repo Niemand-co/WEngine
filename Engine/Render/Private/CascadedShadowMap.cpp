@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Render/Public/CascadedShadowMap.h"
+#include "Editor/Public/Debug.h"
 
 namespace WEngine
 {

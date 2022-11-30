@@ -8,6 +8,7 @@
 #include "Scene/Components/Public/Camera.h"
 #include "Editor/Public/Screen.h"
 #include "Editor/Public/Editor.h"
+#include "Editor/Public/Debug.h"
 #include "Scene/Public/GameObject.h"
 
 DrawGizmosPass::DrawGizmosPass(ScriptableRenderer* pRenderer)
@@ -186,22 +187,22 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	ShaderCodeBlob* dephOnlyVertBlob = new ShaderCodeBlob("../assets/DepthOnlyVert.spv");
 	RHIShaderDescriptor depthOnlyVertShaderDescriptor = {};
 	{
-		vertShaderDescriptor.entryName = "vert";
-		vertShaderDescriptor.shaderStage = SHADER_STAGE_VERTEX;
-		vertShaderDescriptor.pCode = dephOnlyVertBlob->GetCode();
-		vertShaderDescriptor.codeSize = dephOnlyVertBlob->GetSize();
+		depthOnlyVertShaderDescriptor.entryName = "vert";
+		depthOnlyVertShaderDescriptor.shaderStage = SHADER_STAGE_VERTEX;
+		depthOnlyVertShaderDescriptor.pCode = dephOnlyVertBlob->GetCode();
+		depthOnlyVertShaderDescriptor.codeSize = dephOnlyVertBlob->GetSize();
 	}
-	RHIShader* depthOnlyVertShader = m_pDevice->CreateShader(&vertShaderDescriptor);
+	RHIShader* depthOnlyVertShader = m_pDevice->CreateShader(&depthOnlyVertShaderDescriptor);
 
 	ShaderCodeBlob* depthOnlyFragBlob = new ShaderCodeBlob("../assets/DepthOnlyFrag.spv");
 	RHIShaderDescriptor depthOnlyFragShaderDescriptor = {};
 	{
-		fragShaderDescriptor.entryName = "frag";
-		fragShaderDescriptor.shaderStage = SHADER_STAGE_FRAGMENT;
-		fragShaderDescriptor.pCode = depthOnlyFragBlob->GetCode();
-		fragShaderDescriptor.codeSize = depthOnlyFragBlob->GetSize();
+		depthOnlyFragShaderDescriptor.entryName = "frag";
+		depthOnlyFragShaderDescriptor.shaderStage = SHADER_STAGE_FRAGMENT;
+		depthOnlyFragShaderDescriptor.pCode = depthOnlyFragBlob->GetCode();
+		depthOnlyFragShaderDescriptor.codeSize = depthOnlyFragBlob->GetSize();
 	}
-	RHIShader* depthOnlyFragShader = m_pDevice->CreateShader(&fragShaderDescriptor);
+	RHIShader* depthOnlyFragShader = m_pDevice->CreateShader(&depthOnlyFragShaderDescriptor);
 	RHIShader *depthOnlyShaders[] = { depthOnlyVertShader, depthOnlyFragShader };
 
 	{
@@ -213,10 +214,39 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	m_pDebugPSO = context->CreatePSO(&psoDescriptor);
 
+	ShaderCodeBlob* debugDrawVertBlob = new ShaderCodeBlob("../assets/DebugDrawVert.spv");
+	RHIShaderDescriptor debugDrawVertShaderDescriptor = {};
+	{
+		debugDrawVertShaderDescriptor.entryName = "vert";
+		debugDrawVertShaderDescriptor.shaderStage = SHADER_STAGE_VERTEX;
+		debugDrawVertShaderDescriptor.pCode = debugDrawVertBlob->GetCode();
+		debugDrawVertShaderDescriptor.codeSize = debugDrawVertBlob->GetSize();
+	}
+	RHIShader* debugDrawVertShader = m_pDevice->CreateShader(&debugDrawVertShaderDescriptor);
+
+	ShaderCodeBlob* debugDrawFragBlob = new ShaderCodeBlob("../assets/DebugDrawFrag.spv");
+	RHIShaderDescriptor debugDrawFragShaderDescriptor = {};
+	{
+		debugDrawFragShaderDescriptor.entryName = "frag";
+		debugDrawFragShaderDescriptor.shaderStage = SHADER_STAGE_FRAGMENT;
+		debugDrawFragShaderDescriptor.pCode = debugDrawFragBlob->GetCode();
+		debugDrawFragShaderDescriptor.codeSize = debugDrawFragBlob->GetSize();
+	}
+	RHIShader* debugDrawFragShader = m_pDevice->CreateShader(&debugDrawFragShaderDescriptor);
+	RHIShader* debugDrawShaders[] = { debugDrawVertShader, debugDrawFragShader };
+
+	{
+		psoDescriptor.pShader = debugDrawShaders;
+		psoDescriptor.rasterizationStateDescriptor->primitivePology = PrimitiveTopology::LineList;
+		psoDescriptor.rasterizationStateDescriptor->polygonMode = PolygonMode::Line;
+	}
+	m_pDebugLinePSO = context->CreatePSO(&psoDescriptor);
+
 	{
 		psoDescriptor.renderPass = m_pStencilRenderPass;
 		psoDescriptor.pShader = depthOnlyShaders;
 		psoDescriptor.rasterizationStateDescriptor->polygonMode = PolygonMode::Triangle;
+		psoDescriptor.rasterizationStateDescriptor->primitivePology = PrimitiveTopology::TriangleList;
 		psoDescriptor.depthStencilDescriptor->stencilCompareOP = CompareOP::Always;
 		psoDescriptor.depthStencilDescriptor->passOP = StencilFailedOP::Replace;
 		psoDescriptor.depthStencilDescriptor->stencilFailedOP = StencilFailedOP::Replace;
@@ -432,6 +462,14 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 			encoder->SetLineWidth(1.0f);
 			encoder->DrawIndexed(m_pAxisMesh->m_indexCount, 0);
 		}
+
+		encoder->SetPipeline(m_pDebugLinePSO);
+		WEngine::Debug::Update();
+		encoder->BindVertexBuffer(WEngine::Debug::GetLineVertexBuffer());
+		encoder->BindIndexBuffer(WEngine::Debug::GetLineIndexBuffer());
+		encoder->SetLineWidth(5.0f);
+		encoder->DrawIndexed(WEngine::Debug::GetIndexCount(), 0);
+
 		encoder->EndPass();
 
 		encoder->~RHIGraphicsEncoder();

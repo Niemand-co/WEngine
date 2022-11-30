@@ -6,4 +6,6 @@ dxc -spirv -T vs_6_0 -E vert OutlineShader.hlsl -Fo OutlineVert.spv
 dxc -spirv -T ps_6_0 -E frag OutlineShader.hlsl -Fo OutlineFrag.spv
 dxc -spirv -T vs_6_0 -E vert DepthOnlyShader.hlsl -Fo DepthOnlyVert.spv
 dxc -spirv -T ps_6_0 -E frag DepthOnlyShader.hlsl -Fo DepthOnlyFrag.spv
+dxc -spirv -T vs_6_0 -E vert DebugDraw.hlsl -Fo DebugDrawVert.spv
+dxc -spirv -T ps_6_0 -E frag DebugDraw.hlsl -Fo DebugDrawFrag.spv
 PAUSE

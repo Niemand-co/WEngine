@@ -18,8 +18,8 @@ Light::Light(GameObject *pGameObject)
 	RHITextureDescriptor textureDescriptor = {};
 	{
 		textureDescriptor.format = Format::D16_Unorm;
-		textureDescriptor.width = 512;
-		textureDescriptor.height = 512;
+		textureDescriptor.width = 2048;
+		textureDescriptor.height = 2048;
 		textureDescriptor.layerCount = 1;
 		textureDescriptor.mipCount = 1;
 		textureDescriptor.usage = IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT | IMAGE_USAGE_SAMPLED;
@@ -83,9 +83,14 @@ void Light::ShowInInspector()
 	}
 }
 
-std::vector<glm::mat4> Light::GetShadowFrustum(CameraData* cameraData)
+void Light::UpdateShadowFrustum(CameraData* cameraData)
 {
 	Transformer* pTransformer = cameraData->camera->GetGameObject()->GetComponent<Transformer>();
 
-	return WEngine::CascadedShadowMap::GetPSSMMatrices(cameraData->Position, pTransformer->GetForward(), -m_pGameObject->GetComponent<Transformer>()->GetForward(), cameraData->fov, cameraData->aspect, m_mainLightCascadedShadowMapRange);
+	m_lightSpaceMatrix = WEngine::CascadedShadowMap::GetPSSMMatrices(cameraData->Position, pTransformer->GetForward(), -m_pGameObject->GetComponent<Transformer>()->GetForward(), cameraData->fov, cameraData->aspect, m_mainLightCascadedShadowMapRange);
+}
+
+std::vector<glm::mat4> Light::GetShadowFrustum()
+{
+	return m_lightSpaceMatrix;
 }

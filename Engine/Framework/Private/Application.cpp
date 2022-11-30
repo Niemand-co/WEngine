@@ -10,6 +10,7 @@
 #include "RHI/Public/RHIContext.h"
 #include "Scene/Public/World.h"
 #include "Editor/Public/Editor.h"
+#include "Editor/Public/Debug.h"
 
 namespace WEngine
 {
@@ -42,6 +43,8 @@ namespace WEngine
 		World::CreateWorld();
 
 		Editor::Init();
+
+		Debug::Init();
 
 		m_pLayerStack = new LayerStack();
 

@@ -37,7 +37,9 @@ private:
 
 	RHIPipelineStateObject *m_pStencilPSO;
 
-	RHIPipelineStateObject *m_pDebugPSO;
+	RHIPipelineStateObject* m_pDebugPSO;
+
+	RHIPipelineStateObject* m_pDebugLinePSO;
 
 	std::vector<RHITexture*> m_pStencils;
 
