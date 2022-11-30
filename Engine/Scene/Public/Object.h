@@ -1,10 +1,15 @@
 #pragma once
-#ifndef WENGINE_OBJECT_H
-#define WENGINE_OBJECT_H
+
+namespace WEngine
+{
+	class Editor;
+}
 
 class Object
 {
 	friend class World;
+
+	friend class WEngine::Editor;
 
 public:
 
@@ -23,5 +28,3 @@ protected:
 	}
 
 };
-
-#endif

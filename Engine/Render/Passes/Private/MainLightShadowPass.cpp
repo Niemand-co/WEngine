@@ -56,8 +56,8 @@ MainLightShadowPass::MainLightShadowPass(ScriptableRenderer* pRenderer)
 
 	RHIRenderTargetDescriptor renderTargetDescriptor = {};
 	{
-		renderTargetDescriptor.width = 512;
-		renderTargetDescriptor.height = 512;
+		renderTargetDescriptor.width = 1024;
+		renderTargetDescriptor.height = 1024;
 		renderTargetDescriptor.renderPass = m_pRenderPass;
 		renderTargetDescriptor.bufferCount = 1;
 	}
@@ -205,8 +205,8 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 		RHITextureView *views[] = { depthTextureViews[i] };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
-			renderTargetDescriptor.width = 512;
-			renderTargetDescriptor.height = 512;
+			renderTargetDescriptor.width = 1024;
+			renderTargetDescriptor.height = 1024;
 			renderTargetDescriptor.pBufferView = views;
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.bufferCount = 1;
@@ -242,8 +242,8 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 		}
 		encoder->BeginPass(&renderpassBeginDescriptor);
 		encoder->SetPipeline(m_pPSO);
-		encoder->SetViewport({ 512, 512, 0, 0 });
-		encoder->SetScissor({ 512, 512, 0, 0 });
+		encoder->SetViewport({ 1024, 1024, 0, 0 });
+		encoder->SetScissor({ 1024, 1024, 0, 0 });
 
 		unsigned int drawcalls = 0;
 		const std::vector<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();

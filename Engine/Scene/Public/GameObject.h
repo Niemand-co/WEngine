@@ -12,6 +12,8 @@ class GameObject : public Object
 {
 	friend class World;
 
+	friend class Editor;
+
 public:
 
 	GameObject(std::string name = "GameObject");

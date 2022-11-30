@@ -363,6 +363,8 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 		{
 			m_pObjectBuffer->LoadData(arrowData + i, sizeof(ObjectData), i + 1);
 		}
+		SceneData sceneData = { cameraData->MatrixVP };
+		m_pSceneBuffer->LoadData(&sceneData, sizeof(sceneData));
 		
 		ClearValue values[]{ {glm::vec4(1.f, 1.f, 1.f, 1.f), true }, { glm::vec4(1.f, 0.f, 0.f, 0.f), false } };
 		RHIRenderPassBeginDescriptor renderpassBeginDescriptor = {};
@@ -383,8 +385,6 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 				continue;
 
 			Mesh* pMesh = filter->GetStaticMesh();
-			SceneData sceneData = { cameraData->MatrixVP };
-			m_pSceneBuffer->LoadData(&sceneData, sizeof(sceneData));
 			ObjectData objectData = { selectedObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix(), glm::vec4(1.0f, 0.55f, 0.0f, 1.0f) };
 			m_pObjectBuffer->LoadData(&objectData, sizeof(objectData), 0 );
 			m_pObjectBuffer->Flush(4);

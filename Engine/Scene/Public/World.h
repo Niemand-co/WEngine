@@ -43,6 +43,8 @@ private:
 
 	std::vector<Light*> m_pAdditionalLights;
 
+	Camera *m_pEditorCamera;
+
 	Light *m_pMainLight;
 
 	static World* g_pInstance;

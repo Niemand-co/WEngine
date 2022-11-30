@@ -5,6 +5,7 @@
 #include "RHI/Public/RHIHeads.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Scene/Components/Public/Camera.h"
+#include "Render/Public/CascadedShadowMap.h"
 
 Light::Light(GameObject *pGameObject)
 	: Component(pGameObject), m_type(LightType::Directional), m_intensity(1.0f), m_color(glm::vec3(1.0f, 1.0f, 1.0f))
@@ -52,9 +53,9 @@ Light::Light(GameObject *pGameObject)
 	}
 
 	m_mainLightCascadedShadowMapRange.resize(m_mainLightCascadedShadowMapNum + 1);
-	for (unsigned int i = 0; i < m_mainLightCascadedShadowMapNum; ++i)
+	for (unsigned int i = 1; i <= m_mainLightCascadedShadowMapNum; ++i)
 	{
-		float ratio = (float)(i + 1) / (float)m_mainLightCascadedShadowMapNum;
+		float ratio = (float)i / (float)m_mainLightCascadedShadowMapNum;
 		float logC = 0.01 * std::pow(10000.0f, ratio);
 		float uniC = 0.01f + (1000.0f - 0.01f) * ratio;
 		m_mainLightCascadedShadowMapRange[i] = 0.75f * logC + 0.25f * uniC;
@@ -84,51 +85,7 @@ void Light::ShowInInspector()
 
 std::vector<glm::mat4> Light::GetShadowFrustum(CameraData* cameraData)
 {
-	std::vector<glm::mat4> shadowFrustum(m_mainLightCascadedShadowMapNum);
-
 	Transformer* pTransformer = cameraData->camera->GetGameObject()->GetComponent<Transformer>();
 
-
-	for (unsigned int i = 0; i < m_mainLightCascadedShadowMapNum; ++i)
-	{
-
-
-		glm::vec3 maxBox = frustum[0];
-		glm::vec3 minBox = frustum[0];
-		for (unsigned int j = 1; j < 8; ++j)
-		{
-			maxBox.x = maxBox.x < frustum[i].x ? frustum[i].x : maxBox.x;
-			maxBox.y = maxBox.y < frustum[i].y ? frustum[i].y : maxBox.y;
-			maxBox.z = maxBox.z < frustum[i].z ? frustum[i].z : maxBox.z;
-			minBox.x = minBox.x > frustum[i].x ? frustum[i].x : minBox.x;
-			minBox.y = minBox.y > frustum[i].y ? frustum[i].y : minBox.y;
-			minBox.z = minBox.z > frustum[i].z ? frustum[i].z : minBox.z;
-		}
-
-		frustum[0] = lightSpaceMatrix * glm::vec4(minBox.x, minBox.y, minBox.z, 1.0);
-		frustum[1] = lightSpaceMatrix * glm::vec4(maxBox.x, minBox.y, minBox.z, 1.0);
-		frustum[2] = lightSpaceMatrix * glm::vec4(maxBox.x, minBox.y, maxBox.z, 1.0);
-		frustum[3] = lightSpaceMatrix * glm::vec4(minBox.x, minBox.y, maxBox.z, 1.0);
-		frustum[4] = lightSpaceMatrix * glm::vec4(minBox.x, maxBox.y, minBox.z, 1.0);
-		frustum[5] = lightSpaceMatrix * glm::vec4(maxBox.x, maxBox.y, minBox.z, 1.0);
-		frustum[6] = lightSpaceMatrix * glm::vec4(maxBox.x, maxBox.y, maxBox.z, 1.0);
-		frustum[7] = lightSpaceMatrix * glm::vec4(minBox.x, maxBox.y, maxBox.z, 1.0);
-
-		for (unsigned int j = 1; j < 8; ++j)
-		{
-			maxBox.x = maxBox.x < frustum[i].x ? frustum[i].x : maxBox.x;
-			maxBox.y = maxBox.y < frustum[i].y ? frustum[i].y : maxBox.y;
-			maxBox.z = maxBox.z < frustum[i].z ? frustum[i].z : maxBox.z;
-			minBox.x = minBox.x > frustum[i].x ? frustum[i].x : minBox.x;
-			minBox.y = minBox.y > frustum[i].y ? frustum[i].y : minBox.y;
-			minBox.z = minBox.z > frustum[i].z ? frustum[i].z : minBox.z;
-		}
-
-		//minBox = glm::inverse(lightSpaceMatrix) * glm::vec4(minBox, 1.0f);
-		//maxBox = glm::inverse(lightSpaceMatrix) * glm::vec4(maxBox, 1.0f);
-
-		shadowFrustum[i] = glm::ortho(0.f, maxBox.x - minBox.x, 0.f, maxBox.y - minBox.y, minBox.z - maxBox.z, maxBox.z - minBox.z);
-	}
-
-	return shadowFrustum;
+	return WEngine::CascadedShadowMap::GetPSSMMatrices(cameraData->Position, pTransformer->GetForward(), -m_pGameObject->GetComponent<Transformer>()->GetForward(), cameraData->fov, cameraData->aspect, m_mainLightCascadedShadowMapRange);
 }
