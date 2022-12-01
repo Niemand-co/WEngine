@@ -118,6 +118,11 @@ glm::mat4 Transformer::GetWorldToLocalMatrix()
 
 glm::vec3 Transformer::GetForward()
 {
+	glm::mat4 rotateMatrix = glm::mat4(1.0f);
+	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	m_forward = glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 1.0f) * rotateMatrix));
 	return m_forward;
 }
 

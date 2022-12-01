@@ -17,9 +17,9 @@ Light::Light(GameObject *pGameObject)
 
 	RHITextureDescriptor textureDescriptor = {};
 	{
-		textureDescriptor.format = Format::D16_Unorm;
-		textureDescriptor.width = 2048;
-		textureDescriptor.height = 2048;
+		textureDescriptor.format = Format::D32_SFloat;
+		textureDescriptor.width = 4096;
+		textureDescriptor.height = 4096;
 		textureDescriptor.layerCount = 1;
 		textureDescriptor.mipCount = 1;
 		textureDescriptor.usage = IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT | IMAGE_USAGE_SAMPLED;
@@ -28,7 +28,7 @@ Light::Light(GameObject *pGameObject)
 
 	RHITextureViewDescriptor textureViewDescriptor = {};
 	{
-		textureViewDescriptor.format = Format::D16_Unorm;
+		textureViewDescriptor.format = Format::D32_SFloat;
 		textureViewDescriptor.dimension = Dimension::Texture2D;
 		textureViewDescriptor.arrayLayerCount = 1;
 		textureViewDescriptor.baseArrayLayer = 0;
@@ -52,14 +52,6 @@ Light::Light(GameObject *pGameObject)
 		m_pDepthTextureViews[i] = m_pDepthTextures[i]->CreateTextureView(&textureViewDescriptor);
 	}
 
-	m_mainLightCascadedShadowMapRange.resize(m_mainLightCascadedShadowMapNum + 1);
-	for (unsigned int i = 1; i <= m_mainLightCascadedShadowMapNum; ++i)
-	{
-		float ratio = (float)i / (float)m_mainLightCascadedShadowMapNum;
-		float logC = 0.01 * std::pow(10000.0f, ratio);
-		float uniC = 0.01f + (1000.0f - 0.01f) * ratio;
-		m_mainLightCascadedShadowMapRange[i] = 0.75f * logC + 0.25f * uniC;
-	}
 }
 
 Light::~Light()
@@ -85,9 +77,7 @@ void Light::ShowInInspector()
 
 void Light::UpdateShadowFrustum(CameraData* cameraData)
 {
-	Transformer* pTransformer = cameraData->camera->GetGameObject()->GetComponent<Transformer>();
-
-	m_lightSpaceMatrix = WEngine::CascadedShadowMap::GetPSSMMatrices(cameraData->Position, pTransformer->GetForward(), -m_pGameObject->GetComponent<Transformer>()->GetForward(), cameraData->fov, cameraData->aspect, m_mainLightCascadedShadowMapRange);
+	m_lightSpaceMatrix = WEngine::CascadedShadowMap::GetPSSMMatrices(glm::inverse(cameraData->MatrixVP), cameraData->nearClip, cameraData->farClip, m_pGameObject->GetComponent<Transformer>()->GetForward());
 }
 
 std::vector<glm::mat4> Light::GetShadowFrustum()

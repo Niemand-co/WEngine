@@ -25,7 +25,7 @@ MainLightShadowPass::MainLightShadowPass(ScriptableRenderer* pRenderer)
 {
 	RHIAttachmentDescriptor attachmentDescriptor[] = 
 	{
-		{ Format::D16_Unorm, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::DepthBuffer, AttachmentLayout::DepthBuffer },
+		{ Format::D32_SFloat, 1, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLoadOP::Clear, AttachmentStoreOP::Store, AttachmentLayout::DepthBuffer, AttachmentLayout::DepthBuffer },
 	};
 
 	SubPassAttachment depthAttachment = { 0, AttachmentLayout::DepthBuffer };
@@ -56,8 +56,8 @@ MainLightShadowPass::MainLightShadowPass(ScriptableRenderer* pRenderer)
 
 	RHIRenderTargetDescriptor renderTargetDescriptor = {};
 	{
-		renderTargetDescriptor.width = 2048;
-		renderTargetDescriptor.height = 2048;
+		renderTargetDescriptor.width = 4096;
+		renderTargetDescriptor.height = 4096;
 		renderTargetDescriptor.renderPass = m_pRenderPass;
 		renderTargetDescriptor.bufferCount = 1;
 	}
@@ -102,12 +102,12 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 
 	RHIDepthStencilDescriptor depthStencilDescriptor = {};
 	{
-		depthStencilDescriptor.stencilTestEnabled = false;
-		depthStencilDescriptor.depthTestEnabled = true;
 		depthStencilDescriptor.depthWriteEnabled = true;
-		depthStencilDescriptor.minDepth = 0.0f;
-		depthStencilDescriptor.maxDepth = 1.0f;
+		depthStencilDescriptor.depthTestEnabled = true;
 		depthStencilDescriptor.depthCompareOP = CompareOP::Less;
+		depthStencilDescriptor.depthBoundsTest = false;
+		depthStencilDescriptor.maxDepth = 1.0f;
+		depthStencilDescriptor.minDepth = 0.0f;
 	}
 
 	RHIBlendDescriptor blendDescriptor = {};
@@ -205,8 +205,8 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 		RHITextureView *views[] = { depthTextureViews[i] };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
-			renderTargetDescriptor.width = 2048;
-			renderTargetDescriptor.height = 2048;
+			renderTargetDescriptor.width = 4096;
+			renderTargetDescriptor.height = 4096;
 			renderTargetDescriptor.pBufferView = views;
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.bufferCount = 1;
@@ -224,7 +224,7 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 	std::vector<glm::mat4> frustum = mainLight->GetShadowFrustum();
 	SceneData sceneData =
 	{
-		frustum[0] * mainLight->GetGameObject()->GetComponent<Transformer>()->GetWorldToLocalMatrix()
+		frustum[0]
 	};
 	m_pSceneDataBuffers[RHIContext::g_currentFrame]->LoadData(&sceneData, sizeof(sceneData));
 
@@ -242,8 +242,8 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 		}
 		encoder->BeginPass(&renderpassBeginDescriptor);
 		encoder->SetPipeline(m_pPSO);
-		encoder->SetViewport({ 2048, 2048, 0, 0 });
-		encoder->SetScissor({ 2048, 2048, 0, 0 });
+		encoder->SetViewport({ 4096, 4096, 0, 0 });
+		encoder->SetScissor({ 4096, 4096, 0, 0 });
 
 		unsigned int drawcalls = 0;
 		const std::vector<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
