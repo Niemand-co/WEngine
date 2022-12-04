@@ -13,6 +13,10 @@
 Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, const float& nearPlane, const float& farPlane)
 	: m_fov(fov), m_aspect(aspect), m_nearPlane(nearPlane), m_farPlane(farPlane), Component(pGameObject)
 {
+	phi = 0.0f;
+	theta = 0.0f;
+	m_forward = glm::vec3(0.0f, 0.0f, -1.0f);
+
 	m_type = Component::ComponentType::Camera;
 	World::GetWorld()->AddCamera(this);
 	UpdateProjectionMatrix();
@@ -118,14 +122,53 @@ CameraData* Camera::GetData()
 
 void Camera::Move(Direction dir, float dis)
 {
-	Transformer *transformer = m_pGameObject->GetComponent<Transformer>();
-	transformer->Move(dir, dis);
+	glm::vec3 right = glm::normalize(glm::cross(m_forward, glm::vec3(0.0f, 1.0f, 0.0f)));
+
+	glm::vec3 displacement = glm::vec3(0.0f);
+	switch (dir)
+	{
+	case Direction::FORWARD:
+		displacement = dis * m_forward;
+		break;
+	case Direction::BACKWARD:
+		displacement = dis * -m_forward;
+		break;
+	case Direction::LEFT:
+		displacement = dis * -right;
+		break;
+	case Direction::RIGHT:
+		displacement = dis * right;
+		break;
+	case Direction::UP:
+		displacement = dis * glm::vec3(0.0f, 1.0f, 0.0f);
+		break;
+	case Direction::DOWN:
+		displacement = dis * glm::vec3(0.0f, -1.0f, 0.0f);
+		break;
+	default:
+		break;
+	}
+
+	m_pGameObject->GetComponent<Transformer>()->Move(displacement);
 }
 
 void Camera::Rotate(RotateDirection dir, float dis)
 {
-	Transformer* transformer = m_pGameObject->GetComponent<Transformer>();
-	transformer->Rotate(dir, dis);
+	switch (dir)
+	{
+	case RotateDirection::Pitch:
+		phi += dis;
+		phi = phi > 89.0f ? 89.0f : (phi < -89.0f ? -89.0f : phi);
+		break;
+	case RotateDirection::Yaw:
+		theta += dis;
+		break;
+	default:
+		break;
+	}
+	m_forward.x = glm::cos(glm::radians(phi)) * glm::cos(glm::radians(theta));
+	m_forward.y = glm::sin(glm::radians(phi));
+	m_forward.z = -glm::cos(glm::radians(phi)) * glm::sin(glm::radians(theta));
 }
 
 void Camera::RecreateRenderTarget(unsigned int width, unsigned int height)
@@ -194,8 +237,7 @@ void Camera::RecreateRenderTarget(unsigned int width, unsigned int height)
 void Camera::UpdateViewMatrix()
 {
 	glm::vec3 position = m_pGameObject->GetComponent<Transformer>()->GetPosition();
-	glm::vec3 forward = m_pGameObject->GetComponent<Transformer>()->GetForward();
-	m_viewMatrix = glm::lookAt(position, position  + forward, glm::vec3(0.0f, 1.0f, 0.0f));
+	m_viewMatrix = glm::lookAt(position, position  + m_forward, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void Camera::UpdateProjectionMatrix()

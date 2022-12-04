@@ -27,6 +27,7 @@ struct SceneData
 struct ObjectData
 {
 	glm::mat4 M;
+	glm::mat4 InvM;
 	glm::vec4 surfaceData;
 };
 
@@ -265,6 +266,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		unsigned int drawcalls = 0;
 		Light *mainLight = World::GetWorld()->GetMainLight();
 		std::vector<glm::mat4> frustum = mainLight->GetShadowFrustum();
+
 		SceneData sceneData =
 		{
 			cameraData->MatrixVP,
@@ -281,9 +283,11 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 				continue;
 
 			SurfaceData surfaceData = gameObjects[i]->GetComponent<Material>()->GetSurfaceData();
+			glm::mat4 M = gameObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix();
 			ObjectData objectData = 
 			{
-				gameObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix(),
+				M,
+				glm::inverse(M),
 				glm::vec4(surfaceData.albedo, surfaceData.roughness)
 			};
 			m_pObjectUniformBuffers[RHIContext::g_currentFrame]->LoadData(&objectData, sizeof(objectData), drawcalls);

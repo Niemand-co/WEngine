@@ -33,6 +33,8 @@ public:
 
 	glm::mat4x4 GetProjectionMatrix();
 
+	glm::vec3 GetForward() const { return m_forward; }
+
 	void SetRenderer(ScriptableRenderer *renderer);
 
 	inline RenderTarget& GetRenderTarget(unsigned int index) { return m_rendertargets[index]; }
@@ -78,6 +80,12 @@ private:
 	std::vector<RHITexture*> m_textureResources;
 
 	CameraData *m_pData;
+
+	glm::vec3 m_forward;
+
+	float phi;
+
+	float theta;
 
 };
 

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Render/Public/CascadedShadowMap.h"
 #include "Editor/Public/Debug.h"
+#include "Scene/Public/GameObject.h"
 
 namespace WEngine
 {
@@ -13,9 +14,10 @@ namespace WEngine
 		for (unsigned int i = 0; i < 4; ++i)
 		{
 			float ratio = (float)(i + 1) / 4.0;
-			float logC = 0.01 * std::pow(10000.0f, ratio);
-			float uniC = 0.01f + (1000.0f - 0.01f) * ratio;
-			splices[i] = 0.75f * logC + 0.25f * uniC;
+			float logC = nearClip * std::pow(farClip / nearClip, ratio);
+			float uniC = 0.01f + (farClip - nearClip) * ratio;
+			float d = 0.95f * logC + 0.05f * uniC;
+			splices[i] = (d - nearClip) / (farClip - nearClip);
 		}
 
 		for (unsigned int i = 0; i < 4; ++i)
@@ -41,7 +43,7 @@ namespace WEngine
 			for (unsigned int j = 0; j < 4; ++j)
 			{
 				glm::vec3 frustumDir = box[j + 4] - box[j];
-				box[j + 4] = splices[j] * glm::normalize(frustumDir) + box[j];
+				box[j + 4] = splices[j] * frustumDir + box[j];
 			}
 
 			glm::vec3 frustumCenter = glm::vec3();
@@ -58,7 +60,7 @@ namespace WEngine
 				float distance = glm::dot(disDir, disDir);
 				radius = radius < distance ? distance : radius;
 			}
-			radius = std::ceil(std::sqrt(radius) * 16.0f) / 16.0f;
+			radius = std::ceil(std::sqrt(radius));
 
 			glm::mat4 lightViewMatrix = glm::lookAt(frustumCenter - radius * lightDir, frustumCenter, glm::vec3(0.0f, 1.0f, 0.0f));
 			glm::mat4 lightProjectionMatrix = glm::ortho(-radius, radius, -radius, radius, 0.0f, 2.0f * radius);

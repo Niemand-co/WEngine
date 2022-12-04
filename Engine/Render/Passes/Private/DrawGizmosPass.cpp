@@ -382,7 +382,7 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
 
 		Transformer* pTransformer = selectedObjects[0]->GetComponent<Transformer>();
-		glm::mat4 objectMatrix = pTransformer->GetTranslateMatrix() * pTransformer->GetRotateMatrix();
+		glm::mat4 objectMatrix = pTransformer->GetTranslateMatrix();
 		ObjectData arrowData[3] =
 		{
 			{ objectMatrix * glm::rotate(glm::mat4(1.0), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f) },

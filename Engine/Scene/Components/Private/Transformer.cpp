@@ -93,19 +93,18 @@ glm::mat4 Transformer::GetTranslateMatrix()
 
 glm::mat4 Transformer::GetRotateMatrix()
 {
-	glm::mat4 rotateMatrix = glm::mat4(1.0f);
-	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f))
+						   * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f))
+						   * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	return rotateMatrix;
 }
 
 glm::mat4 Transformer::GetLocalToWorldMatrix()
 {
 	glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), m_scale);
-	glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f))
+						   * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f))
+						   * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	glm::mat4 translateMatrix = glm::translate(glm::mat4(1.0f), m_position);
 	
 	return translateMatrix * rotateMatrix * scaleMatrix;
@@ -118,11 +117,10 @@ glm::mat4 Transformer::GetWorldToLocalMatrix()
 
 glm::vec3 Transformer::GetForward()
 {
-	glm::mat4 rotateMatrix = glm::mat4(1.0f);
-	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	m_forward = glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 1.0f) * rotateMatrix));
+	glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f))
+		   				   * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f))
+						   * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	m_forward = glm::normalize(glm::vec3(rotateMatrix * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f)));
 	return m_forward;
 }
 
@@ -158,13 +156,17 @@ void Transformer::Move(Direction dir, float dis)
 	m_position += displacement;
 }
 
+void Transformer::Move(glm::vec3 displacement)
+{
+	m_position += displacement;
+}
+
 void Transformer::Rotate(RotateDirection dir, float dis)
 {
 	switch (dir)
 	{
 	case RotateDirection::Pitch:
 		m_rotate.x += dis;
-		m_rotate.x = m_rotate.x > 89.0f ? 89.0f : (m_rotate.x < -89.0f ? -89.0f : m_rotate.x);
 		break;
 	case RotateDirection::Yaw:
 		m_rotate.y += dis;
@@ -175,11 +177,5 @@ void Transformer::Rotate(RotateDirection dir, float dis)
 	default:
 		break;
 	}
-	
-	glm::mat4 rotateMatrix = glm::mat4(1.0f);
-	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	rotateMatrix = glm::rotate(rotateMatrix, glm::radians(m_rotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	m_forward = glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 1.0f) * rotateMatrix));
 }
 

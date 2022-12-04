@@ -36,6 +36,8 @@ public:
 
 	void Move(Direction dir, float dis);
 
+	void Move(glm::vec3 displacement);
+
 	void Rotate(RotateDirection dir, float dis);
 
 private:

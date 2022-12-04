@@ -18,8 +18,8 @@ Light::Light(GameObject *pGameObject)
 	RHITextureDescriptor textureDescriptor = {};
 	{
 		textureDescriptor.format = Format::D32_SFloat;
-		textureDescriptor.width = 4096;
-		textureDescriptor.height = 4096;
+		textureDescriptor.width = 2048;
+		textureDescriptor.height = 2048;
 		textureDescriptor.layerCount = 1;
 		textureDescriptor.mipCount = 1;
 		textureDescriptor.usage = IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT | IMAGE_USAGE_SAMPLED;

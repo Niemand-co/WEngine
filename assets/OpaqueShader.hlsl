@@ -29,6 +29,7 @@ struct SceneData
 struct ObjectData
 {
     float4x4 M;
+    float4x4 InvM;
     float4 surfaceData;
 };
 
@@ -77,7 +78,7 @@ VSOutput vert(VSInput vin)
     vout.WorldPos = mul(objectData.M, float4(vin.Position, 1.0)).xyz;
 	vout.Position = mul(sceneData.VP, float4(vout.WorldPos, 1.0));
 	vout.Position.y *= -1.0f;
-    vout.Normal = normalize(vin.Normal);
+    vout.Normal = normalize(mul(transpose((float3x3)objectData.InvM), vin.Normal));
 	vout.Color = vin.Color;
     vout.uv = vin.UV;
 
