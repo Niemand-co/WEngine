@@ -85,6 +85,12 @@ VSOutput vert(VSInput vin)
 	return vout;
 }
 
+float GetShadowBias(float3 normal, float3 lightDir)
+{
+    float factor = saturate(dot(normal, lightDir));
+    return (1.0 - factor) * 0.0001f;
+}
+
 float4 frag(VSOutput pin) : SV_TARGET
 {
     float3 L = normalize(-sceneData.lightDir.xyz);
@@ -107,5 +113,5 @@ float4 frag(VSOutput pin) : SV_TARGET
         depth = shadowMap.Sample(shadowMapSampler, shadowUV).r;
     
     float3 albedo = objectData.surfaceData.rgb;
-	return PBRLighting(sceneData.lightColor.rgb, albedo, NoL, NoH, NoV, HoV, objectData.surfaceData.w, 0.0f, (float)((depth + 0.0001) >= (shadowCoord.z)));
+	return PBRLighting(sceneData.lightColor.rgb, albedo, NoL, NoH, NoV, HoV, objectData.surfaceData.w, 0.0f, (float)((depth + 0.0001f) >= (shadowCoord.z)));
 }

@@ -46,24 +46,55 @@ namespace WEngine
 				box[j + 4] = splices[j] * frustumDir + box[j];
 			}
 
-			glm::vec3 frustumCenter = glm::vec3();
+			glm::mat4 lightViewMatrix = glm::lookAt(glm::vec3(), lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::mat4 lightViewMatrixInv = glm::inverse(lightViewMatrix);
 			for (unsigned int j = 0; j < 8; ++j)
 			{
-				frustumCenter += box[j];
+				box[j] = lightViewMatrix * glm::vec4(box[j], 1.0f);
 			}
-			frustumCenter *= 0.125f;
 
-			float radius = 0.0f;
+			glm::vec3 MinCorner = box[0];
+			glm::vec3 MaxCorner = box[0];
+			for (unsigned int j = 1; j < 8; ++j)
+			{
+				MinCorner.x = MinCorner.x > box[j].x ? box[j].x : MinCorner.x;
+				MinCorner.y = MinCorner.y > box[j].y ? box[j].y : MinCorner.y;
+				MinCorner.z = MinCorner.z > box[j].z ? box[j].z : MinCorner.z;
+
+				MaxCorner.x = MaxCorner.x < box[j].x ? box[j].x : MaxCorner.x;
+				MaxCorner.y = MaxCorner.y < box[j].y ? box[j].y : MaxCorner.y;
+				MaxCorner.z = MaxCorner.z < box[j].z ? box[j].z : MaxCorner.z;
+			}
+
+			glm::vec3 lightSpaceBox[8];
+			{
+				lightSpaceBox[0] = { MinCorner.x, MinCorner.y, MinCorner.z };
+				lightSpaceBox[1] = { MaxCorner.x, MinCorner.y, MinCorner.z };
+				lightSpaceBox[2] = { MaxCorner.x, MinCorner.y, MaxCorner.z };
+				lightSpaceBox[3] = { MinCorner.x, MinCorner.y, MaxCorner.z };
+				lightSpaceBox[4] = { MinCorner.x, MaxCorner.y, MinCorner.z };
+				lightSpaceBox[5] = { MaxCorner.x, MaxCorner.y, MinCorner.z };
+				lightSpaceBox[6] = { MaxCorner.x, MaxCorner.y, MaxCorner.z };
+				lightSpaceBox[7] = { MinCorner.x, MaxCorner.y, MaxCorner.z };
+			}
+
+			glm::vec3 center = glm::vec3();
 			for (unsigned int j = 0; j < 8; ++j)
 			{
-				glm::vec3 disDir = box[j] - frustumCenter;
-				float distance = glm::dot(disDir, disDir);
-				radius = radius < distance ? distance : radius;
+				lightSpaceBox[j] = lightViewMatrixInv * glm::vec4(lightSpaceBox[j], 1.0f);
+				center += lightSpaceBox[j];
 			}
-			radius = std::ceil(std::sqrt(radius));
+			center *= 0.125f;
 
-			glm::mat4 lightViewMatrix = glm::lookAt(frustumCenter - radius * lightDir, frustumCenter, glm::vec3(0.0f, 1.0f, 0.0f));
-			glm::mat4 lightProjectionMatrix = glm::ortho(-radius, radius, -radius, radius, 0.0f, 2.0f * radius);
+			center = (lightSpaceBox[0] + lightSpaceBox[6]) / 2.0f;
+			float width = glm::length(lightSpaceBox[1] - lightSpaceBox[0]);
+			float height = glm::length(lightSpaceBox[4] - lightSpaceBox[0]);
+			float len = width > height ? width : height;
+			len *= 0.5f;
+			float distance = 500.0f;
+
+			lightViewMatrix = glm::lookAt(center, lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::mat4 lightProjectionMatrix = glm::ortho(-len, len, -len, len, -distance, distance);
 
 			matrices[i] = lightProjectionMatrix * lightViewMatrix;
 		}
