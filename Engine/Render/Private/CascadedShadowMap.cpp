@@ -86,14 +86,17 @@ namespace WEngine
 			}
 			center *= 0.125f;
 
-			center = (lightSpaceBox[0] + lightSpaceBox[6]) / 2.0f;
-			float width = glm::length(lightSpaceBox[1] - lightSpaceBox[0]);
-			float height = glm::length(lightSpaceBox[4] - lightSpaceBox[0]);
-			float len = width > height ? width : height;
-			len *= 0.5f;
+			float len = glm::length(lightSpaceBox[6] - lightSpaceBox[0]);
 			float distance = 500.0f;
+			float disPerPixel = len / 2048.0f;
+			len *= 0.5f;
 
-			lightViewMatrix = glm::lookAt(center, lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
+			center = lightViewMatrix * glm::vec4(center, 1.0f);
+			for(int j = 0; j < 3; ++j)
+				center[j] = std::floor(center[j] / disPerPixel) * disPerPixel;
+			center = lightViewMatrixInv * glm::vec4(center, 1.0f);
+
+			lightViewMatrix = glm::lookAt(center, center + lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
 			glm::mat4 lightProjectionMatrix = glm::ortho(-len, len, -len, len, -distance, distance);
 
 			matrices[i] = lightProjectionMatrix * lightViewMatrix;
