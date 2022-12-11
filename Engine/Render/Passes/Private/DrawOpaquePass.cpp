@@ -18,7 +18,8 @@
 struct SceneData
 {
 	glm::mat4 VP;
-	glm::mat4 lightSpaceMatrix;
+	glm::mat4 lightSpaceMatrix[4];
+	glm::vec4 splices;
 	glm::vec4 lightPos;
 	glm::vec4 light;
 	glm::vec4 cameraPos;
@@ -113,15 +114,16 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		depthStencilDescriptor.minDepth = 0.0f;
 	}
 
-	BindingResource resource[3] = 
+	BindingResource resource[4] = 
 	{
 		{0, ResourceType::UniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
 		{1, ResourceType::DynamicUniformBuffer, 1, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT},
-		{2, ResourceType::CombinedImageSampler, 1, SHADER_STAGE_FRAGMENT},
+		{2, ResourceType::Sampler, 1, SHADER_STAGE_FRAGMENT},
+		{3, ResourceType::Texture, 4, SHADER_STAGE_FRAGMENT},
 	};
 	RHIGroupLayoutDescriptor groupLayoutDescriptor = {};
 	{
-		groupLayoutDescriptor.bindingCount = 3;
+		groupLayoutDescriptor.bindingCount = 4;
 		groupLayoutDescriptor.pBindingResources = resource;
 	}
 	RHIGroupLayout *groupLayout = context->CreateGroupLayout(&groupLayoutDescriptor);
@@ -207,15 +209,31 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		}
 		m_pSampler = RHIContext::GetDevice()->CreateSampler(&samplerDescriptor);;
 
-		TextureResourceInfo textureInfo[] =
+		TextureResourceInfo samplerInfo[] =
 		{
-			{ depthTextures[i], m_pSampler, AttachmentLayout::ReadOnlyDepth }
+			{ nullptr, m_pSampler, AttachmentLayout::ReadOnlyDepth }
 		};
 		RHIUpdateResourceDescriptor shadowmapResourceDescriptor = {};
 		{
 			shadowmapResourceDescriptor.bindingCount = 1;
 			shadowmapResourceDescriptor.pBindingResources = resource + 2;
 			shadowmapResourceDescriptor.textureResourceCount = 1;
+			shadowmapResourceDescriptor.pTextureInfo = samplerInfo;
+			shadowmapResourceDescriptor.pGroup = m_pGroup[i];
+		}
+		context->UpdateTextureResourceToGroup(&shadowmapResourceDescriptor);
+
+		TextureResourceInfo textureInfo[] =
+		{
+			{ depthTextures[0 + i * 4], nullptr, AttachmentLayout::ReadOnlyDepth },
+			{ depthTextures[1 + i * 4], nullptr, AttachmentLayout::ReadOnlyDepth },
+			{ depthTextures[2 + i * 4], nullptr, AttachmentLayout::ReadOnlyDepth },
+			{ depthTextures[3 + i * 4], nullptr, AttachmentLayout::ReadOnlyDepth },
+		};
+		{
+			shadowmapResourceDescriptor.bindingCount = 1;
+			shadowmapResourceDescriptor.pBindingResources = resource + 3;
+			shadowmapResourceDescriptor.textureResourceCount = 4;
 			shadowmapResourceDescriptor.pTextureInfo = textureInfo;
 			shadowmapResourceDescriptor.pGroup = m_pGroup[i];
 		}
@@ -265,12 +283,17 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		encoder->SetDepthTestEnable(true);
 		unsigned int drawcalls = 0;
 		Light *mainLight = World::GetWorld()->GetMainLight();
-		std::vector<glm::mat4> frustum = mainLight->GetShadowFrustum();
+		const std::vector<glm::mat4>& frustum = mainLight->GetShadowFrustum();
+		const std::vector<float>& splices = mainLight->GetSplices();
 
 		SceneData sceneData =
 		{
 			cameraData->MatrixVP,
 			frustum[0],
+			frustum[1],
+			frustum[2],
+			frustum[3],
+			glm::vec4(splices[0], splices[1], splices[2], splices[3]),
 			mainLight->GetGameObject()->GetComponent<Transformer>()->GetRotateMatrix() * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f),
 			glm::vec4(mainLight->GetColor() * mainLight->GetIntensity(), 1.0f),
 			glm::vec4(cameraData->Position, 1.0f),

@@ -390,7 +390,7 @@ std::vector<RHIGroup*> RHIContext::CreateResourceGroup(RHIGroupDescriptor* descr
 	RHIGroupPoolDescriptor poolDescriptor = {};
 	{
 		poolDescriptor.pGroupLayout = descriptor->pGroupLayout;
-		poolDescriptor.maxSetCount = RHIContext::g_maxFrames;
+		poolDescriptor.maxSetCount = descriptor->count;
 	}
 	RHIGroupPool *pool = g_pDevice->CreateGroupPool(&poolDescriptor);
 

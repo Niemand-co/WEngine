@@ -38,7 +38,9 @@ public:
 
 	void UpdateShadowFrustum(CameraData* cameraData);
 
-	std::vector<glm::mat4> GetShadowFrustum();
+	const std::vector<glm::mat4>& GetShadowFrustum();
+
+	const std::vector<float>& GetSplices();
 
 private:
 

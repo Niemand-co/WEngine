@@ -20,7 +20,8 @@ struct VSOutput
 struct SceneData
 {
     float4x4 VP;
-    float4x4 lightSpaceMatrix;
+    float4x4 lightSpaceMatrix[4];
+    float4 splices;
     float4 lightDir;
     float4 lightColor;
     float4 cameraPos;
@@ -39,7 +40,7 @@ cbuffer objectData : register(b1) { ObjectData objectData; }
 
 SamplerState shadowMapSampler : register(s2, space0);
 
-Texture2D shadowMap : register(t2, space0);
+Texture2D shadowMap[4] : register(t3, space0);
 
 float D_GGX(float NoH, float Roughness)
 {
@@ -102,15 +103,39 @@ float4 frag(VSOutput pin) : SV_TARGET
     float NoV = saturate(dot(pin.Normal, V));
     float HoV = saturate(dot(H, V));
 
-    float distance = length(V);
+    float distance = length(sceneData.cameraPos.xyz - pin.WorldPos);
 
-    float4 shadowCoord = mul(sceneData.lightSpaceMatrix, float4(pin.WorldPos, 1.0f));
-    shadowCoord.xyz /= shadowCoord.w;
-    float2 shadowUV = float2(shadowCoord.x * 0.5 + 0.5, shadowCoord.y * -0.5 + 0.5);
 
+    float4 shadowCoord;
     float depth = 1.0;
-    if(distance <= 62.0)
-        depth = shadowMap.Sample(shadowMapSampler, shadowUV).r;
+    if(distance <= sceneData.splices[0] * 1000.0f)
+    {
+        shadowCoord = mul(sceneData.lightSpaceMatrix[0], float4(pin.WorldPos, 1.0f));
+        shadowCoord.xyz /= shadowCoord.w;
+        float2 shadowUV = float2(shadowCoord.x * 0.5 + 0.5, shadowCoord.y * -0.5 + 0.5);
+        depth = shadowMap[0].Sample(shadowMapSampler, shadowUV).r;
+    }
+    else if(distance <= sceneData.splices[1] * 1000.0f)
+    {
+        shadowCoord = mul(sceneData.lightSpaceMatrix[1], float4(pin.WorldPos, 1.0f));
+        shadowCoord.xyz /= shadowCoord.w;
+        float2 shadowUV = float2(shadowCoord.x * 0.5 + 0.5, shadowCoord.y * -0.5 + 0.5);
+        depth = shadowMap[1].Sample(shadowMapSampler, shadowUV).r;
+    }
+    else if(distance <= sceneData.splices[2] * 1000.0f)
+    {
+        shadowCoord = mul(sceneData.lightSpaceMatrix[2], float4(pin.WorldPos, 1.0f));
+        shadowCoord.xyz /= shadowCoord.w;
+        float2 shadowUV = float2(shadowCoord.x * 0.5 + 0.5, shadowCoord.y * -0.5 + 0.5);
+        depth = shadowMap[2].Sample(shadowMapSampler, shadowUV).r;
+    }
+    else if(distance <= sceneData.splices[3] * 1000.0f)
+    {
+        shadowCoord = mul(sceneData.lightSpaceMatrix[3], float4(pin.WorldPos, 1.0f));
+        shadowCoord.xyz /= shadowCoord.w;
+        float2 shadowUV = float2(shadowCoord.x * 0.5 + 0.5, shadowCoord.y * -0.5 + 0.5);
+        depth = shadowMap[3].Sample(shadowMapSampler, shadowUV).r;
+    }
     
     float3 albedo = objectData.surfaceData.rgb;
 	return PBRLighting(sceneData.lightColor.rgb, albedo, NoL, NoH, NoV, HoV, objectData.surfaceData.w, 0.0f, (float)((depth + 0.0001f) >= (shadowCoord.z)));

@@ -56,8 +56,8 @@ MainLightShadowPass::MainLightShadowPass(ScriptableRenderer* pRenderer)
 
 	RHIRenderTargetDescriptor renderTargetDescriptor = {};
 	{
-		renderTargetDescriptor.width = 2048;
-		renderTargetDescriptor.height = 2048;
+		renderTargetDescriptor.width = 1024;
+		renderTargetDescriptor.height = 1024;
 		renderTargetDescriptor.renderPass = m_pRenderPass;
 		renderTargetDescriptor.bufferCount = 1;
 	}
@@ -115,15 +115,16 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 		blendDescriptor.blendEnabled = false;
 	}
 
-	m_pSceneDataBuffers.resize(RHIContext::g_maxFrames);
+	m_pSceneDataBuffers.resize(RHIContext::g_maxFrames * 4);
 	RHIBufferDescriptor sceneBufferDescriptor = {};
 	{
 		sceneBufferDescriptor.dataSize = sizeof(SceneData);
 		sceneBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
-	m_pSceneDataBuffers[0] = context->CreateUniformBuffer(&sceneBufferDescriptor);
-	m_pSceneDataBuffers[1] = context->CreateUniformBuffer(&sceneBufferDescriptor);
-	m_pSceneDataBuffers[2] = context->CreateUniformBuffer(&sceneBufferDescriptor);
+	for (unsigned int i = 0; i < m_pSceneDataBuffers.size(); ++i)
+	{
+		m_pSceneDataBuffers[i] = context->CreateUniformBuffer(&sceneBufferDescriptor);
+	}
 
 	m_pObjectDataBuffers.resize(RHIContext::g_maxFrames);
 	RHIBufferDescriptor objectBufferDescriptor = {};
@@ -173,40 +174,43 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 
 	RHIGroupDescriptor groupDescriptor = {};
 	{
-		groupDescriptor.count = RHIContext::g_maxFrames;
+		groupDescriptor.count = RHIContext::g_maxFrames * 4;
 		groupDescriptor.pGroupLayout = layout;
 	}
 	m_pDataGroup = context->CreateResourceGroup(&groupDescriptor);
 
-	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 	{
-		m_pSceneDataBuffers[i]->SetDataSize(sizeof(SceneData));
-		m_pObjectDataBuffers[i]->SetDataSize(sizeof(ObjectData));
-		m_pObjectDataBuffers[i]->Resize(2);
-		RHIBindingDescriptor bindingDescriptors[] = 
+		for (unsigned int j = 0; j < RHIContext::g_maxFrames; ++j)
 		{
-			{ m_pSceneDataBuffers[i]->Size(), m_pSceneDataBuffers[i]->GetBufferInfo() },
-			{ m_pObjectDataBuffers[i]->Size(), m_pObjectDataBuffers[i]->GetBufferInfo() },
-		};
-		RHIUpdateResourceDescriptor updateResourceDescriptor = {};
-		{
-			updateResourceDescriptor.bindingCount = 2;
-			updateResourceDescriptor.pBindingResources = resource;
-			updateResourceDescriptor.pGroup = m_pDataGroup[i];
-			updateResourceDescriptor.pBindingDescriptors = bindingDescriptors;
+			m_pSceneDataBuffers[i + j * 4]->SetDataSize(sizeof(SceneData));
+			m_pObjectDataBuffers[j]->SetDataSize(sizeof(ObjectData));
+			m_pObjectDataBuffers[j]->Resize(2);
+			RHIBindingDescriptor bindingDescriptors[] = 
+			{
+				{ m_pSceneDataBuffers[i + j * 4]->Size(), m_pSceneDataBuffers[i + j * 4]->GetBufferInfo() },
+				{ m_pObjectDataBuffers[j]->Size(), m_pObjectDataBuffers[j]->GetBufferInfo() },
+			};
+			RHIUpdateResourceDescriptor updateResourceDescriptor = {};
+			{
+				updateResourceDescriptor.bindingCount = 2;
+				updateResourceDescriptor.pBindingResources = resource;
+				updateResourceDescriptor.pGroup = m_pDataGroup[i + j * 4];
+				updateResourceDescriptor.pBindingDescriptors = bindingDescriptors;
+			}
+			context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 		}
-		context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 	}
 	
-	m_pRenderTargets.resize(RHIContext::g_maxFrames);
 	const std::vector<RHITextureView*>& depthTextureViews = World::GetWorld()->GetMainLight()->GetDepthTexture();
-	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
+	m_pRenderTargets.resize(depthTextureViews.size());
+	for (unsigned int i = 0; i < depthTextureViews.size(); ++i)
 	{
 		RHITextureView *views[] = { depthTextureViews[i] };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
-			renderTargetDescriptor.width = 2048;
-			renderTargetDescriptor.height = 2048;
+			renderTargetDescriptor.width = 1024;
+			renderTargetDescriptor.height = 1024;
 			renderTargetDescriptor.pBufferView = views;
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.bufferCount = 1;
@@ -222,56 +226,62 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 	RHICommandBuffer* cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 	Light *mainLight = World::GetWorld()->GetMainLight();
 	std::vector<glm::mat4> frustum = mainLight->GetShadowFrustum();
-	SceneData sceneData =
-	{
-		frustum[0]
-	};
-	m_pSceneDataBuffers[RHIContext::g_currentFrame]->LoadData(&sceneData, sizeof(sceneData));
+	std::vector<float> splices = mainLight->GetSplices();
+
 
 	cmd->BeginScopePass("MainLightShadow", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentImage]);
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
-
 		ClearValue values[]{ {glm::vec4(1.f, 0.f, 0.f, 0.f), false } };
-		RHIRenderPassBeginDescriptor renderpassBeginDescriptor = {};
-		{
-			renderpassBeginDescriptor.renderPass = m_pRenderPass;
-			renderpassBeginDescriptor.renderTarget = m_pRenderTargets[RHIContext::g_currentFrame];
-			renderpassBeginDescriptor.clearCount = 1;
-			renderpassBeginDescriptor.pClearValues = values;
-		}
-		encoder->BeginPass(&renderpassBeginDescriptor);
+
 		encoder->SetPipeline(m_pPSO);
-		encoder->SetViewport({ 2048, 2048, 0, 0 });
-		encoder->SetScissor({ 2048, 2048, 0, 0 });
-
-		unsigned int drawcalls = 0;
-		const std::vector<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
-		for (unsigned int i = 0; i < gameObjects.size(); ++i)
+		encoder->SetViewport({ 1024, 1024, 0, 0 });
+		encoder->SetScissor({ 1024, 1024, 0, 0 });
+		for (unsigned int levelIndex = 0; levelIndex < 4; ++levelIndex)
 		{
-			MeshFilter* filter = gameObjects[i]->GetComponent<MeshFilter>();
-			if (filter == nullptr)
-				continue;
+			SceneData sceneData =
+			{
+				frustum[levelIndex],
+			};
+			m_pSceneDataBuffers[levelIndex + RHIContext::g_currentFrame * 4]->LoadData(&sceneData, sizeof(sceneData));
 
-			ObjectData objectData = { gameObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix() };
-			m_pObjectDataBuffers[RHIContext::g_currentFrame]->LoadData(&objectData, sizeof(objectData), drawcalls);
-			++drawcalls;
-		}
-		m_pObjectDataBuffers[RHIContext::g_currentFrame]->Flush(drawcalls);
+			RHIRenderPassBeginDescriptor renderpassBeginDescriptor = {};
+			{
+				renderpassBeginDescriptor.renderPass = m_pRenderPass;
+				renderpassBeginDescriptor.renderTarget = m_pRenderTargets[RHIContext::g_currentFrame * 4 + levelIndex];
+				renderpassBeginDescriptor.clearCount = 1;
+				renderpassBeginDescriptor.pClearValues = values;
+			}
+			encoder->BeginPass(&renderpassBeginDescriptor);
 
-		drawcalls = 0;
-		for (unsigned int i = 0; i < gameObjects.size(); ++i)
-		{
-			MeshFilter *filter = gameObjects[i]->GetComponent<MeshFilter>();
-			if(filter == nullptr)
-				continue;
+			unsigned int drawcalls = 0;
+			const std::vector<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
+			for (unsigned int i = 0; i < gameObjects.size(); ++i)
+			{
+				MeshFilter* filter = gameObjects[i]->GetComponent<MeshFilter>();
+				if (filter == nullptr)
+					continue;
 
-			Mesh* pMesh = filter->GetStaticMesh();
-			encoder->BindVertexBuffer(pMesh->GetVertexBuffer());
-			encoder->BindIndexBuffer(pMesh->GetIndexBuffer());
-			encoder->BindGroups(1, m_pDataGroup[RHIContext::g_currentFrame], m_pPipelineLayout, 1, &drawcalls);
-			encoder->DrawIndexed(pMesh->m_indexCount, 0);
-			drawcalls += m_pObjectDataBuffers[RHIContext::g_currentFrame]->Alignment();
+				ObjectData objectData = { gameObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix() };
+				m_pObjectDataBuffers[RHIContext::g_currentFrame]->LoadData(&objectData, sizeof(objectData), drawcalls);
+				++drawcalls;
+			}
+			m_pObjectDataBuffers[RHIContext::g_currentFrame]->Flush(drawcalls);
+
+			drawcalls = 0;
+			for (unsigned int i = 0; i < gameObjects.size(); ++i)
+			{
+				MeshFilter *filter = gameObjects[i]->GetComponent<MeshFilter>();
+				if(filter == nullptr)
+					continue;
+
+				Mesh* pMesh = filter->GetStaticMesh();
+				encoder->BindVertexBuffer(pMesh->GetVertexBuffer());
+				encoder->BindIndexBuffer(pMesh->GetIndexBuffer());
+				encoder->BindGroups(1, m_pDataGroup[levelIndex + RHIContext::g_currentFrame * 4], m_pPipelineLayout, 1, &drawcalls);
+				encoder->DrawIndexed(pMesh->m_indexCount, 0);
+				drawcalls += m_pObjectDataBuffers[RHIContext::g_currentFrame]->Alignment();
+			}
 		}
 		encoder->EndPass();
 		encoder->~RHIGraphicsEncoder();

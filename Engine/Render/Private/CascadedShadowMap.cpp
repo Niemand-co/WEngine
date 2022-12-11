@@ -5,12 +5,8 @@
 
 namespace WEngine
 {
-
-	std::vector<glm::mat4> CascadedShadowMap::GetPSSMMatrices(glm::mat4 cameraMatrixInv, float nearClip, float farClip, glm::vec3 lightDir)
+	void CascadedShadowMap::UpdateSplices(float* splices, unsigned int spliceCount, float nearClip, float farClip)
 	{
-		std::vector<glm::mat4> matrices(4);
-
-		float splices[4];
 		for (unsigned int i = 0; i < 4; ++i)
 		{
 			float ratio = (float)(i + 1) / 4.0;
@@ -19,8 +15,12 @@ namespace WEngine
 			float d = 0.95f * logC + 0.05f * uniC;
 			splices[i] = (d - nearClip) / (farClip - nearClip);
 		}
+	}
 
-		for (unsigned int i = 0; i < 4; ++i)
+	void CascadedShadowMap::UpdatePSSMMatrices(std::vector<glm::mat4>& matrices, glm::mat4 cameraMatrixInv, glm::vec3 lightDir, float* splices, unsigned int spliceCount)
+	{
+		float lastSplice = 0.0f;
+		for (unsigned int i = 0; i < spliceCount; ++i)
 		{
 			glm::vec3 box[8];
 			{
@@ -43,8 +43,10 @@ namespace WEngine
 			for (unsigned int j = 0; j < 4; ++j)
 			{
 				glm::vec3 frustumDir = box[j + 4] - box[j];
-				box[j + 4] = splices[j] * frustumDir + box[j];
+				box[j + 4] = splices[i] * frustumDir + box[j];
+				box[j] = lastSplice * frustumDir + box[j];
 			}
+			lastSplice = splices[i];
 
 			glm::mat4 lightViewMatrix = glm::lookAt(glm::vec3(), lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
 			glm::mat4 lightViewMatrixInv = glm::inverse(lightViewMatrix);
@@ -86,7 +88,9 @@ namespace WEngine
 			}
 			center *= 0.125f;
 
-			float len = glm::length(lightSpaceBox[6] - lightSpaceBox[0]);
+			float h = glm::length(lightSpaceBox[4] - lightSpaceBox[0]);
+			float w = glm::length(lightSpaceBox[1] - lightSpaceBox[0]);
+			float len = std::max(h, w);
 			float distance = 500.0f;
 			float disPerPixel = len / 2048.0f;
 			len *= 0.5f;
@@ -101,9 +105,6 @@ namespace WEngine
 
 			matrices[i] = lightProjectionMatrix * lightViewMatrix;
 		}
-
-		return matrices;
-
 	}
 
 }

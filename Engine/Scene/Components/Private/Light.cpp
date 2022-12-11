@@ -12,14 +12,18 @@ Light::Light(GameObject *pGameObject)
 {
 	World::GetWorld()->AddLight(this);
 
-	m_pDepthTextures.resize(RHIContext::g_maxFrames);
-	m_pDepthTextureViews.resize(RHIContext::g_maxFrames);
+	m_mainLightCascadedShadowMapNum = 4;
+
+	m_pDepthTextures.resize(RHIContext::g_maxFrames * m_mainLightCascadedShadowMapNum);
+	m_pDepthTextureViews.resize(RHIContext::g_maxFrames * m_mainLightCascadedShadowMapNum);
+	m_mainLightCascadedShadowMapRange.resize(m_mainLightCascadedShadowMapNum);
+	m_lightSpaceMatrix.resize(m_mainLightCascadedShadowMapNum);
 
 	RHITextureDescriptor textureDescriptor = {};
 	{
 		textureDescriptor.format = Format::D32_SFloat;
-		textureDescriptor.width = 2048;
-		textureDescriptor.height = 2048;
+		textureDescriptor.width = 1024;
+		textureDescriptor.height = 1024;
 		textureDescriptor.layerCount = 1;
 		textureDescriptor.mipCount = 1;
 		textureDescriptor.usage = IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT | IMAGE_USAGE_SAMPLED;
@@ -37,18 +41,24 @@ Light::Light(GameObject *pGameObject)
 		textureViewDescriptor.imageAspect = IMAGE_ASPECT_DEPTH;
 	}
 
-	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
+	std::vector<TextureBarrier> barriers(m_pDepthTextures.size());
+	for (unsigned int i = 0; i < m_pDepthTextures.size(); ++i)
 	{
 		m_pDepthTextures[i] = RHIContext::GetDevice()->CreateTexture(&textureDescriptor);
-		TextureBarrier barrier = { m_pDepthTextures[i], AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE, IMAGE_ASPECT_DEPTH };
-		RHIBarrierDescriptor barrierDescriptor = {};
-		{
-			barrierDescriptor.textureCount = 1;
-			barrierDescriptor.pTextureBarriers = &barrier;
-			barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
-			barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
-		}
-		RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
+		barriers[i] = { m_pDepthTextures[i], AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE, IMAGE_ASPECT_DEPTH };
+	}
+
+	RHIBarrierDescriptor barrierDescriptor = {};
+	{
+		barrierDescriptor.textureCount = barriers.size();
+		barrierDescriptor.pTextureBarriers = barriers.data();
+		barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
+		barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
+	}
+	RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
+
+	for (unsigned int i = 0; i < m_pDepthTextureViews.size(); ++i)
+	{
 		m_pDepthTextureViews[i] = m_pDepthTextures[i]->CreateTextureView(&textureViewDescriptor);
 	}
 
@@ -77,10 +87,16 @@ void Light::ShowInInspector()
 
 void Light::UpdateShadowFrustum(CameraData* cameraData)
 {
-	m_lightSpaceMatrix = WEngine::CascadedShadowMap::GetPSSMMatrices(glm::inverse(cameraData->MatrixVP), cameraData->nearClip, cameraData->farClip, m_pGameObject->GetComponent<Transformer>()->GetForward());
+	WEngine::CascadedShadowMap::UpdateSplices(m_mainLightCascadedShadowMapRange.data(), m_mainLightCascadedShadowMapRange.size(), cameraData->nearClip, cameraData->farClip);
+	WEngine::CascadedShadowMap::UpdatePSSMMatrices(m_lightSpaceMatrix, glm::inverse(cameraData->MatrixVP), m_pGameObject->GetComponent<Transformer>()->GetForward(), m_mainLightCascadedShadowMapRange.data(), m_mainLightCascadedShadowMapNum);
 }
 
-std::vector<glm::mat4> Light::GetShadowFrustum()
+const std::vector<glm::mat4>& Light::GetShadowFrustum()
 {
 	return m_lightSpaceMatrix;
+}
+
+const std::vector<float>& Light::GetSplices()
+{
+	return m_mainLightCascadedShadowMapRange;
 }
