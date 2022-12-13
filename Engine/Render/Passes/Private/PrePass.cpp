@@ -7,6 +7,7 @@
 #include "Render/Mesh/Public/Vertex.h"
 #include "Render/Mesh/Public/Mesh.h"
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
+#include "Editor/Public/Screen.h"
 
 struct SceneData
 {
@@ -75,8 +76,8 @@ PrePass::PrePass(ScriptableRenderer* pRenderer)
 
 	RHIRenderTargetDescriptor renderTargetDescriptor = {};
 	{
-		renderTargetDescriptor.width = 512;
-		renderTargetDescriptor.height = 512;
+		renderTargetDescriptor.width = WEngine::Screen::GetWidth();
+		renderTargetDescriptor.height = WEngine::Screen::GetHeight();
 		renderTargetDescriptor.renderPass = m_pRenderPass;
 		renderTargetDescriptor.bufferCount = 1;
 	}
@@ -244,8 +245,8 @@ void PrePass::Setup(RHIContext* context, CameraData* cameraData)
 		RHITextureView* views[] = { m_pDepthTextureViews[i] };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
-			renderTargetDescriptor.width = 512;
-			renderTargetDescriptor.height = 512;
+			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
+			renderTargetDescriptor.height = WEngine::Screen::GetHeight();
 			renderTargetDescriptor.pBufferView = views;
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.bufferCount = 1;
@@ -280,8 +281,8 @@ void PrePass::Execute(RHIContext* context, CameraData* cameraData)
 		}
 		encoder->BeginPass(&renderpassBeginDescriptor);
 		encoder->SetPipeline(m_pPSO);
-		encoder->SetViewport({ 512, 512, 0, 0 });
-		encoder->SetScissor({ 512, 512, 0, 0 });
+		encoder->SetViewport({ (float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0 });
+		encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
 
 		unsigned int drawcalls = 0;
 		const std::vector<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
@@ -321,4 +322,20 @@ void PrePass::Execute(RHIContext* context, CameraData* cameraData)
 
 void PrePass::UpdateRenderTarget(CameraData* cameraData)
 {
+	for (int i = 0; i < 3; ++i)
+	{
+		delete m_pDepthTextureViews[i];
+
+		std::vector<RHITextureView*> textureViews = { m_pDepthTextureViews[i] };
+		RHIRenderTargetDescriptor renderTargetDescriptor = {};
+		{
+			renderTargetDescriptor.bufferCount = 2;
+			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.renderPass = m_pRenderPass;
+			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
+			renderTargetDescriptor.height = WEngine::Screen::GetHeight();
+		}
+		delete m_pRenderTargets[i];
+		m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
+	}
 }

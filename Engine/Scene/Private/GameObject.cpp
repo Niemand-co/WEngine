@@ -3,7 +3,7 @@
 #include "Scene/Public/World.h"
 
 GameObject::GameObject(std::string name)
-	: m_name(name)
+	: m_name(name), m_id(name)
 {
 	
 }

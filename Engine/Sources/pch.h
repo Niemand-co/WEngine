@@ -61,6 +61,7 @@
 #include "Utils/Public/FileLoader.h"
 #include "Event/Public/TimeStep.h"
 #include "Utils/Reflection/Public/Register.h"
+#include "Utils/Public/WGuid.h"
 
 #define ENABLE_REFLECTION template<typename T> friend struct WEngine::SRefl::TypeInfo;
 

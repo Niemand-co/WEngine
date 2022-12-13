@@ -26,6 +26,8 @@ public:
 
 	inline std::string const GetName() const { return m_name; }
 
+	inline const WEngine::WGuid& GetID() const { return m_id; }
+
 	void AddGameObject(GameObject *pGameObject);
 
 	const std::vector<GameObject*>& GetChildGameObjects() const;
@@ -47,6 +49,8 @@ public:
 private:
 
 	std::string m_name;
+
+	const WEngine::WGuid m_id;
 
 	std::vector<GameObject*> m_sonGameObjects;
 
