@@ -62,6 +62,7 @@
 #include "Event/Public/TimeStep.h"
 #include "Utils/Reflection/Public/Register.h"
 #include "Utils/Public/WGuid.h"
+#include "Utils/Container/Public/WArray.h"
 
 #define ENABLE_REFLECTION template<typename T> friend struct WEngine::SRefl::TypeInfo;
 
