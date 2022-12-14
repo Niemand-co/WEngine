@@ -18,6 +18,18 @@ public:
 
 	void CreateObject();
 
+	/**
+	 * Resize the texture
+	 * 
+	 * @param width
+	 * @param height
+	 */
+	void Resize(unsigned int width, unsigned int height);
+
+	inline unsigned int GetWidth() const { return m_width; }
+
+	inline unsigned int GetHeight() const { return m_height; }
+
 private:
 
 	WEngine::WArray<RHITexture*> m_textures;
@@ -28,7 +40,15 @@ private:
 
 	RHITextureViewDescriptor m_textureViewDescriptor;
 
+	AttachmentLayout m_layout;
+
 	/** Whether the texture has been created. */
 	bool m_bCreated;
+
+	/** The width of the texture */
+	unsigned int m_width;
+
+	/** The height of the texture */
+	unsigned int m_height;
 
 };
