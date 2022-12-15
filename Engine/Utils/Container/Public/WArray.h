@@ -39,6 +39,12 @@ namespace WEngine
 			return *((T*)m_pData + index);
 		}
 
+		const T& operator[](size_t index) const
+		{
+			RE_ASSERT(index < m_size, "Out of Index.");
+			return *((T*)m_pData + index);
+		}
+
 	private:
 
 		size_t m_size;

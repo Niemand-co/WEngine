@@ -7,7 +7,9 @@ class Mesh
 {
 public:
 
-	Mesh();
+	Mesh(const char *name);
+
+	Mesh(const WEngine::WString& name);
 
 	~Mesh();
 
@@ -35,6 +37,8 @@ public:
 
 public:
 
+	const WEngine::WGuid m_id;
+
 	Vertex *m_pVertices;
 
 	unsigned int m_vertexCount;
@@ -48,6 +52,8 @@ public:
 	glm::vec3 m_boundingBoxMax;
 
 private:
+
+	WEngine::WString m_name;
 
 	RHIBuffer *m_pVertexBuffer;
 
@@ -63,8 +69,10 @@ public:
 
 	~MeshLibrary();
 
+	void AddMesh();
+
 private:
 
-	std::vector<Mesh*> m_pMeshes;
+	WEngine::WArray<WEngine::WGuid> m_meshes;
 
 };

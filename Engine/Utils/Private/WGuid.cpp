@@ -76,9 +76,9 @@ namespace WEngine
 		a = b + tmp;
 	}
 
-	void MD5(const std::string_view& data, unsigned int& A, unsigned int& B, unsigned int& C, unsigned int& D)
+	void MD5(const WString& data, unsigned int& A, unsigned int& B, unsigned int& C, unsigned int& D)
 	{
-		size_t byteLength = data.size();
+		size_t byteLength = data.Size();
 		size_t bitLength = byteLength << 3;
 		size_t rest = byteLength % 64;
 		size_t addLength = rest < 56 ? 64 - rest : 128 - rest;
@@ -196,7 +196,7 @@ namespace WEngine
 
 	}
 
-	WGuid::WGuid(const std::string_view& data)
+	WGuid::WGuid(const WString& data)
 	{
 		A = 0x67452301;
 		B = 0xefcdab89;

@@ -3,13 +3,13 @@
 namespace WEngine
 {
 
-	void MD5(const std::string_view& data, unsigned int& A, unsigned int& B, unsigned int& C, unsigned int& D);
+	void MD5(const WString& data, unsigned int& A, unsigned int& B, unsigned int& C, unsigned int& D);
 
 	class WGuid
 	{
 	public:
 
-		WGuid(const std::string_view& data);
+		WGuid(const WString& data);
 
 		WGuid(const WGuid&) = default;
 

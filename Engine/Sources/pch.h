@@ -63,6 +63,8 @@
 #include "Utils/Reflection/Public/Register.h"
 #include "Utils/Public/WGuid.h"
 #include "Utils/Container/Public/WArray.h"
+#include "Utils/Container/Public/WString.h"
+#include "Utils/Container/Public/WPair.h"
 
 #define ENABLE_REFLECTION template<typename T> friend struct WEngine::SRefl::TypeInfo;
 

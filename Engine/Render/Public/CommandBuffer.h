@@ -1,6 +1,7 @@
 #pragma once
 
 class RenderTarget;
+class RHIGraphicsEncoder;
 
 class CommandBuffer
 {
@@ -16,6 +17,6 @@ public:
 
 private:
 
-	
+	RHIGraphicsEncoder *m_encoder;
 
 };

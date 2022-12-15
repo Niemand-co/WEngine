@@ -8,7 +8,20 @@
 
 #define PI 3.1415926535
 
-Mesh::Mesh()
+Mesh::Mesh(const char *name)
+	: m_name(name), m_id(m_name)
+{
+
+	m_pVertices = nullptr;
+	m_vertexCount = 0;
+	m_pIndices = nullptr;
+	m_indexCount = 0;
+	m_pVertexBuffer = nullptr;
+	m_pIndexBuffer = nullptr;
+}
+
+Mesh::Mesh(const WEngine::WString& name)
+	: m_name(name), m_id(name)
 {
 	m_pVertices = nullptr;
 	m_vertexCount = 0;
@@ -58,7 +71,7 @@ RHIBuffer* Mesh::GetIndexBuffer()
 
 Mesh* Mesh::GetCube()
 {
-	Mesh *mesh = new Mesh();
+	Mesh *mesh = new Mesh("Cube");
 	Vertex *pVertices = (Vertex*)WEngine::Allocator::Get()->Allocate(24 * sizeof(Vertex));
 	{
 		pVertices[0] = { { -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f} };
@@ -113,7 +126,7 @@ Mesh* Mesh::GetCube()
 
 Mesh* Mesh::GetPlane()
 {
-	Mesh *mesh = new Mesh();
+	Mesh *mesh = new Mesh("Plane");
 	Vertex* pVertices = (Vertex*)WEngine::Allocator::Get()->Allocate(4 * sizeof(Vertex));
 	{
 		pVertices[0] = { { -1.0f, 0.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f} };
@@ -140,7 +153,7 @@ Mesh* Mesh::GetArrow()
 {
 	float sqrt2frag2 = std::sin(PI / 4.0f) * 0.02f;
 	float sqrt2 = 2.0f * sqrt2frag2;
-	Mesh *mesh = new Mesh();
+	Mesh *mesh = new Mesh("Arrow_Gui");
 	Vertex *pVertices = (Vertex*)WEngine::Allocator::Get()->Allocate(27 * sizeof(Vertex));
 	{
 		pVertices[0] = { { 0.0f, 0.0f, 0.02f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
