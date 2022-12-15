@@ -8,7 +8,7 @@ namespace WEngine
 	{
 	public:
 
-		WPair(k key, v val);
+		WPair(const k& key, const v& val);
 
 		WPair(const WPair&) = default;
 
@@ -16,7 +16,7 @@ namespace WEngine
 
 		const k& First() const { return m_key; }
 
-		const v& First() const { return m_val; }
+		const v& Second() const { return m_val; }
 
 	private:
 
@@ -27,7 +27,7 @@ namespace WEngine
 	};
 
 	template<typename k, typename v>
-	inline WPair<k, v>::WPair(k key, v val)
+	inline WPair<k, v>::WPair(const k& key, const v& val)
 		: m_key(key), m_val(val)
 	{
 		

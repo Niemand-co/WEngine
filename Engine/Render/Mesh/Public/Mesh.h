@@ -69,10 +69,12 @@ public:
 
 	~MeshLibrary();
 
-	void AddMesh();
+	void AddMesh(const WEngine::WGuid& id, Mesh *pMesh);
+
+	Mesh* GetMesh(const WEngine::WGuid& id);
 
 private:
 
-	WEngine::WArray<WEngine::WGuid> m_meshes;
+	WEngine::WArray<WEngine::WPair<WEngine::WGuid, Mesh*>> m_meshes;
 
 };

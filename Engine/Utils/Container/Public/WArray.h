@@ -33,6 +33,14 @@ namespace WEngine
 
 		T* GetData() const;
 
+		T* begin();
+
+		const T* begin() const;
+
+		T* end();
+
+		const T* end() const;
+
 		T& operator[](size_t index)
 		{
 			RE_ASSERT(index < m_size, "Out of Index.");
@@ -170,6 +178,30 @@ namespace WEngine
 	inline T* WArray<T>::GetData() const
 	{
 		return (T*)m_pData;
+	}
+
+	template<typename T>
+	inline T* WArray<T>::begin()
+	{
+		return (T*)m_pData;
+	}
+
+	template<typename T>
+	inline const T* WArray<T>::begin() const
+	{
+		return (const T*)m_pData;
+	}
+
+	template<typename T>
+	inline T* WArray<T>::end()
+	{
+		return (T*)m_pData + m_size - 1;
+	}
+
+	template<typename T>
+	inline const T* WArray<T>::end() const
+	{
+		return (const T*)m_pData + m_size - 1;
 	}
 
 	template<typename T>

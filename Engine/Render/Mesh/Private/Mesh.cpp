@@ -231,3 +231,19 @@ MeshLibrary::MeshLibrary()
 MeshLibrary::~MeshLibrary()
 {
 }
+
+void MeshLibrary::AddMesh(const WEngine::WGuid& id, Mesh* pMesh)
+{
+	m_meshes.Push(id, pMesh);
+}
+
+Mesh* MeshLibrary::GetMesh(const WEngine::WGuid& id)
+{
+	for (auto& p : m_meshes)
+	{
+		if(p.First() == id)
+			return p.Second();
+	}
+
+	return nullptr;
+}

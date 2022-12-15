@@ -15,7 +15,7 @@ namespace WEngine
 
 		~WGuid() = default;
 
-		bool operator==(const WGuid& guid)
+		bool operator==(const WGuid& guid) const
 		{
 			if(A == guid.A && B == guid.B && C == guid.C && D == guid.D)
 				return true;
