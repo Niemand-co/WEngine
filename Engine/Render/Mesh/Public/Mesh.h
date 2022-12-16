@@ -3,7 +3,7 @@
 struct Vertex;
 class RHIBuffer;
 
-class Mesh
+class Mesh : public WEngine::NamingSystem, public RenderResource
 {
 public:
 
@@ -12,16 +12,6 @@ public:
 	Mesh(const WEngine::WString& name);
 
 	~Mesh();
-
-	void* operator new(size_t size)
-	{
-		return WEngine::Allocator::Get()->Allocate(size);
-	}
-
-	void operator delete(void* pData)
-	{
-		WEngine::Allocator::Get()->Deallocate(pData);
-	}
 
 	RHIBuffer* GetVertexBuffer();
 

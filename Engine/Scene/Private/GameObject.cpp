@@ -2,7 +2,7 @@
 #include "Scene/Public/GameObject.h"
 #include "Scene/Public/World.h"
 
-GameObject::GameObject(std::string name)
+GameObject::GameObject(const WEngine::WString& name)
 	: m_name(name), m_id(name)
 {
 	
@@ -13,7 +13,7 @@ GameObject::~GameObject()
 
 }
 
-bool GameObject::IsName(std::string name)
+bool GameObject::IsName(WEngine::WString name)
 {
 	return name == m_name;
 }
@@ -41,7 +41,7 @@ bool GameObject::HasChild() const
 	return m_sonGameObjects.size() != 0;
 }
 
-GameObject* GameObject::Find(std::string name)
+GameObject* GameObject::Find(WEngine::WString name)
 {
 	for (GameObject* gameObject : World::GetWorld()->GetGameObjects())
 	{

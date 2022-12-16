@@ -11,7 +11,7 @@ public:
 
 	~World();
 
-	GameObject* CreateGameObject(std::string name = "GameObject");
+	GameObject* CreateGameObject(const WEngine::WString& name = "GameObject");
 
 	void AddCamera(Camera *pCamera);
 
@@ -31,13 +31,13 @@ public:
 
 	const std::vector<GameObject*>& GetGameObjects() const;
 
-	const std::vector<char*>& GetObjectNames() const;
+	const std::vector<WEngine::WString>& GetObjectNames() const;
 
 private:
 
 	std::vector<GameObject*> m_pEntities;
 
-	std::vector<char*> m_pNames;
+	std::vector<WEngine::WString> m_pNames;
 
 	std::vector<Camera*> m_pCameras;
 

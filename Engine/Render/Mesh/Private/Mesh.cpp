@@ -234,7 +234,8 @@ MeshLibrary::~MeshLibrary()
 
 void MeshLibrary::AddMesh(const WEngine::WGuid& id, Mesh* pMesh)
 {
-	m_meshes.Push(id, pMesh);
+	
+	m_meshes.Push(WEngine::MakePiar(id, pMesh));
 }
 
 Mesh* MeshLibrary::GetMesh(const WEngine::WGuid& id)

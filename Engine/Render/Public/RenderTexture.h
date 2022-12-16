@@ -1,10 +1,10 @@
 #pragma once
 #include "Render/Public/RenderResource.h"
+#include "Render/Descriptor/Public/RHITextureDescriptor.h"
+#include "Render/Descriptor/Public/RHITextureViewDescriptor.h"
 
 class RHITexture;
 class RHITextureView;
-class RHITextureDescriptor;
-class RHITextureViewDescriptor;
 
 class RenderTexture : public RenderResource
 {

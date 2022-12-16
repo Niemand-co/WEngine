@@ -81,6 +81,52 @@ namespace WEngine
 			return true;
 		}
 
+		WString&& operator+(const WString& string)
+		{
+			char *newPtr = (char*)Allocator::Get()->Allocate(string.m_size + m_size + 1);
+			memcpy(newPtr, m_pData, m_size);
+			memcpy(newPtr + m_size, string.m_pData, string.m_size + 1);
+			WString newString = WString();
+			newString.m_pData = newPtr;
+			newString.m_size = m_size + string.m_size;
+			return (WString&&)newString;
+		}
+
+		WString&& operator+(const char *str)
+		{
+			size_t length = strlen(str);
+			char* newPtr = (char*)Allocator::Get()->Allocate(length + m_size + 1);
+			memcpy(newPtr, m_pData, m_size);
+			memcpy(newPtr + m_size, str, length + 1);
+			WString newString = WString();
+			newString.m_pData = newPtr;
+			newString.m_size = m_size + length;
+			return (WString&&)newString;
+		}
+
+		WString& operator+=(const WString& string)
+		{
+			char* newPtr = (char*)Allocator::Get()->Allocate(string.m_size + m_size + 1);
+			memcpy(newPtr, m_pData, m_size);
+			memcpy(newPtr + m_size, string.m_pData, string.m_size + 1);
+			Allocator::Get()->Deallocate(m_pData);
+			m_pData = newPtr;
+			m_size += string.m_size;
+			return *this;
+		}
+
+		WString& operator+=(const char *str)
+		{
+			size_t length = strlen(str);
+			char* newPtr = (char*)Allocator::Get()->Allocate(length + m_size + 1);
+			memcpy(newPtr, m_pData, m_size);
+			memcpy(newPtr + m_size, str, length + 1);
+			Allocator::Get()->Deallocate(m_pData);
+			m_pData = newPtr;
+			m_size += length;
+			return *this;
+		}
+
 	private:
 
 		char *m_pData;

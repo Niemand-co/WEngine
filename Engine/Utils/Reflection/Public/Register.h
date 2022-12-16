@@ -50,6 +50,12 @@ namespace WEngine
 	template<typename T>
 	struct is_function { enum { isFunction = !is_const<const T>::isConst && !is_reference<T>::isRef }; };
 
+	template<typename T>
+	constexpr T&& remove_reference(T&& val)
+	{
+		return static_cast<T&&>(val);
+	}
+
 	template<int Begin, int End, class Func, typename enable_if<Begin == End>::type = 0>
 	void static_for(Func const& func)
 	{

@@ -14,11 +14,11 @@ World::~World()
 
 }
 
-GameObject* World::CreateGameObject(std::string name)
+GameObject* World::CreateGameObject(const WEngine::WString& name)
 {
 	GameObject* gameObject = new GameObject(name);
 	g_pInstance->m_pEntities.push_back(std::move(gameObject));
-	g_pInstance->m_pNames.push_back(name.data());
+	g_pInstance->m_pNames.push_back(name);
 	gameObject->AddComponent<Transformer>();
 	return gameObject;
 }
@@ -78,7 +78,7 @@ const std::vector<GameObject*>& World::GetGameObjects() const
 	return m_pEntities;
 }
 
-const std::vector<char*>& World::GetObjectNames() const
+const std::vector<WEngine::WString>& World::GetObjectNames() const
 {
 	return m_pNames;
 }

@@ -3,8 +3,6 @@
 #include "RHI/Public/RHITexture.h"
 #include "RHI/Public/RHITextureView.h"
 #include "RHI/Public/RHIContext.h"
-#include "Render/Descriptor/Public/RHITextureDescriptor.h"
-#include "Render/Descriptor/Public/RHITextureViewDescriptor.h"
 #include "Render/Descriptor/Public/RHIBarrierDescriptor.h"
 
 RenderTexture::RenderTexture(unsigned int width, unsigned int height, Format format)

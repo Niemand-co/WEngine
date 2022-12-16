@@ -3,6 +3,8 @@
 namespace WEngine
 {
 
+	class WString;
+
 	void MD5(const WString& data, unsigned int& A, unsigned int& B, unsigned int& C, unsigned int& D);
 
 	class WGuid

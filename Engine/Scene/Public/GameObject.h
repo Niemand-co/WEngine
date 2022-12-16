@@ -16,15 +16,15 @@ class GameObject : public Object
 
 public:
 
-	GameObject(std::string name = "GameObject");
+	GameObject(const WEngine::WString& name = "GameObject");
 
 	virtual ~GameObject();
 
-	bool IsName(std::string name);
+	bool IsName(WEngine::WString name);
 
-	inline const char* const GetNamePtr() const { return m_name.data(); }
+	inline const char* const GetNamePtr() const { return m_name.Data(); }
 
-	inline std::string const GetName() const { return m_name; }
+	inline WEngine::WString const GetName() const { return m_name; }
 
 	inline const WEngine::WGuid& GetID() const { return m_id; }
 
@@ -44,11 +44,11 @@ public:
 
 public:
 
-	static GameObject* Find(std::string name);
+	static GameObject* Find(WEngine::WString name);
 
 private:
 
-	std::string m_name;
+	WEngine::WString m_name;
 
 	const WEngine::WGuid m_id;
 

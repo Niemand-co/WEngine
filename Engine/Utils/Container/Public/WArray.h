@@ -20,8 +20,8 @@ namespace WEngine
 
 		void Push(const T& var);
 
-		template<typename... Args>
-		void Push(Args... args);
+		//template<typename... Args>
+		//void Push(Args... args);
 
 		void Resize(size_t size);
 
@@ -102,7 +102,12 @@ namespace WEngine
 	template<typename T>
 	inline void WArray<T>::Push(T& var)
 	{
-		if (m_size == m_capasity)
+		if (m_capasity == 0)
+		{
+			m_capasity = 1;
+			m_pData = Allocator::Get()->Allocate(sizeof(T));
+		}
+		else if (m_size == m_capasity)
 		{
 			void* newPtr = WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
 			memcpy(newPtr, m_pData, sizeof(T) * m_size);
@@ -118,7 +123,12 @@ namespace WEngine
 	template<typename T>
 	inline void WArray<T>::Push(const T& var)
 	{
-		if (m_size == m_capasity)
+		if (m_capasity == 0)
+		{
+			m_capasity = 1;
+			m_pData = Allocator::Get()->Allocate(sizeof(T));
+		}
+		else if (m_size == m_capasity)
 		{
 			void* newPtr = WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
 			memcpy(newPtr, m_pData, sizeof(T) * m_size);
@@ -195,30 +205,30 @@ namespace WEngine
 	template<typename T>
 	inline T* WArray<T>::end()
 	{
-		return (T*)m_pData + m_size - 1;
+		return (T*)m_pData + m_size;
 	}
 
 	template<typename T>
 	inline const T* WArray<T>::end() const
 	{
-		return (const T*)m_pData + m_size - 1;
+		return (const T*)m_pData + m_size;
 	}
 
-	template<typename T>
-	template<typename ...Args>
-	inline void WArray<T>::Push(Args ...args)
-	{
-		if (m_size == m_capasity)
-		{
-			void* newPtr = WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
-			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			WEngine::Allocator::Get()->Deallocate(m_pData);
-			m_pData = newPtr;
-			m_capasity *= 2;
-		}
+	//template<typename T>
+	//template<typename ...Args>
+	//inline void WArray<T>::Push(Args ...args)
+	//{
+	//	if (m_size == m_capasity)
+	//	{
+	//		void* newPtr = WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
+	//		memcpy(newPtr, m_pData, sizeof(T) * m_size);
+	//		WEngine::Allocator::Get()->Deallocate(m_pData);
+	//		m_pData = newPtr;
+	//		m_capasity *= 2;
+	//	}
 
-		::new ((T*)m_pData + m_size) T(args...);
-		m_size++;
-	}
+	//	::new ((T*)m_pData + m_size) T(args...);
+	//	m_size++;
+	//}
 
 }
