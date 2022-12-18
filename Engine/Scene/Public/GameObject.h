@@ -26,11 +26,11 @@ public:
 
 	inline WEngine::WString const GetName() const { return m_name; }
 
-	inline const WEngine::WGuid& GetID() const { return m_id; }
+	inline const WEngine::WGuid<WEngine::WString>& GetID() const { return m_id; }
 
 	void AddGameObject(GameObject *pGameObject);
 
-	const std::vector<GameObject*>& GetChildGameObjects() const;
+	const WEngine::WArray<GameObject*>& GetChildGameObjects() const;
 
 	void ShowInInspector() const;
 
@@ -50,11 +50,11 @@ private:
 
 	WEngine::WString m_name;
 
-	const WEngine::WGuid m_id;
+	const WEngine::WGuid<WEngine::WString> m_id;
 
-	std::vector<GameObject*> m_sonGameObjects;
+	WEngine::WArray<GameObject*> m_sonGameObjects;
 
-	std::vector<Component*> m_components;
+	WEngine::WArray<Component*> m_components;
 
 };
 
@@ -62,7 +62,7 @@ template<typename T>
 inline T* GameObject::AddComponent()
 {
 	T* component = new T(this);
-	m_components.push_back(component);
+	m_components.Push(component);
 	return component;
 }
 
@@ -71,7 +71,7 @@ inline T* GameObject::GetComponent()
 {
 	for (Component* component : m_components)
 	{
-		if (std::strcmp(WEngine::GetTypeName<T>().data(), typeid(*component).name()) == 0)
+		if (typeid(component) == typeid(T))
 			return static_cast<T*>(component);
 	}
 	return nullptr;

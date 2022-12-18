@@ -26,9 +26,9 @@ public:
 
 	virtual void UpdateRenderTarget(CameraData* cameraData);
 
-	void SetGlobalTexture(std::vector<RHITextureView*>& pTexture) { m_pGlobalTextures.push_back(pTexture); }
+	void SetGlobalTexture(WEngine::WArray<RHITextureView*>& pTexture) { m_pGlobalTextures.Push(pTexture); }
 
-	const std::vector<std::vector<RHITextureView*>>& GetGlobalTextures() const { return m_pGlobalTextures; }
+	const WEngine::WArray<WEngine::WArray<RHITextureView*>>& GetGlobalTextures() const { return m_pGlobalTextures; }
 
 	void* operator new(size_t size)
 	{
@@ -42,18 +42,18 @@ public:
 
 private:
 
-	std::vector<ScriptableRenderPass*> m_passes;
+	WEngine::WArray<ScriptableRenderPass*> m_passes;
 
 	RHIContext *m_pContext;
 
 	RHIEvent * m_pEvent;
 
-	std::vector<RHISemaphore*> m_pWaitSemaphore;
+	WEngine::WArray<RHISemaphore*> m_pWaitSemaphore;
 
-	std::vector<RHISemaphore*> m_pSignalSemaphore;
+	WEngine::WArray<RHISemaphore*> m_pSignalSemaphore;
 
-	std::vector<std::string_view> m_blockSubmission;
+	WEngine::WArray<WEngine::WString> m_blockSubmission;
 
-	std::vector<std::vector<RHITextureView*>> m_pGlobalTextures;
+	WEngine::WArray<WEngine::WArray<RHITextureView*>> m_pGlobalTextures;
 
 };

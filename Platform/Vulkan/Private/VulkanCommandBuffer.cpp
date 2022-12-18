@@ -18,7 +18,7 @@ namespace Vulkan
 		vkFreeCommandBuffers(*m_pDevice, *m_pCommandPool, 1, m_commandBuffer);
 	}
 
-	void VulkanCommandBuffer::BeginScopePass(std::string passName, RHIRenderPass* pRenderPass, unsigned int subpass, RHIRenderTarget* pRenderTarget)
+	void VulkanCommandBuffer::BeginScopePass(const WEngine::WString& passName, RHIRenderPass* pRenderPass, unsigned int subpass, RHIRenderTarget* pRenderTarget)
 	{
 		VkCommandBufferBeginInfo commandbufferBeginInfo = {};
 		commandbufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;

@@ -5,7 +5,7 @@ class GameScene : public WEngine::Layer
 {
 public:
 
-	GameScene(std::string_view name);
+	GameScene(const WEngine::WString& name);
 
 	virtual ~GameScene();
 

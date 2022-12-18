@@ -15,13 +15,13 @@ public:
 
 	virtual const GPUFeature& GetFeature() const = 0;
 
-	virtual const std::string& GetGPUName() const = 0;
+	virtual const WEngine::WString& GetGPUName() const = 0;
 
 	virtual RHIDevice* CreateDevice(RHIDeviceDescriptor *descriptor) = 0;
 
 protected:
 	
-	std::string GPUName;
+	WEngine::WString GPUName;
 
 	GPUFeature m_feature;
 	

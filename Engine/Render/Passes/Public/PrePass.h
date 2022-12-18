@@ -23,15 +23,15 @@ public:
 
 private:
 
-	std::vector<RHITexture*> m_pDepthTextures;
+	WEngine::WArray<RHITexture*> m_pDepthTextures;
 
-	std::vector<RHITextureView*> m_pDepthTextureViews;
+	WEngine::WArray<RHITextureView*> m_pDepthTextureViews;
 
-	std::vector<RHIBuffer*> m_pSceneDataBuffers;
+	WEngine::WArray<RHIBuffer*> m_pSceneDataBuffers;
 
-	std::vector<RHIBuffer*> m_pObjectDataBuffers;
+	WEngine::WArray<RHIBuffer*> m_pObjectDataBuffers;
 
-	std::vector<RHIGroup*> m_pDataGroup;
+	WEngine::WArray<RHIGroup*> m_pDataGroup;
 
 	RHIPipelineResourceLayout* m_pPipelineLayout;
 

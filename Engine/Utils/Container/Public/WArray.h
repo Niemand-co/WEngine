@@ -1,4 +1,5 @@
 #pragma once
+#include <initializer_list>
 
 namespace WEngine
 {
@@ -12,6 +13,10 @@ namespace WEngine
 
 		WArray(size_t size, const T& var);
 
+		WArray(const std::initializer_list<T>& list);
+
+		WArray(T *begin, T *end);
+
 		WArray(const WArray&) = default;
 
 		~WArray();
@@ -20,12 +25,18 @@ namespace WEngine
 
 		void Push(const T& var);
 
+		void PushForward(T& var);
+
+		void PushForward(const T& var);
+
 		//template<typename... Args>
 		//void Push(Args... args);
 
 		void Resize(size_t size);
 
 		void Reserve(size_t size);
+
+		void Clear();
 
 		bool Empty();
 
@@ -90,6 +101,21 @@ namespace WEngine
 	}
 
 	template<typename T>
+	inline WArray<T>::WArray(const std::initializer_list<T>& list)
+	{
+		m_capasity = m_size = list.size();
+		m_pData = Allocator::Get()->Allocate(m_size * sizeof(T));
+		memcpy(m_pData, list.begin(), m_size);
+	}
+
+	template<typename T>
+	inline WArray<T>::WArray(T* begin, T* end)
+	{
+		m_capasity = m_size = (end - begin);
+		m_pData = begin;
+	}
+
+	template<typename T>
 	inline WArray<T>::~WArray()
 	{
 		for (size_t i = 0; i < m_size; ++i)
@@ -142,6 +168,62 @@ namespace WEngine
 	}
 
 	template<typename T>
+	inline void WArray<T>::PushForward(T& var)
+	{
+		if (m_capasity == 0)
+		{
+			m_capasity = 1;
+			m_pData = Allocator::Get()->Allocate(sizeof(T));
+		}
+		else if (m_size == m_capasity)
+		{
+			void* newPtr = WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
+			memcpy((T*)newPtr + 1, m_pData, sizeof(T) * m_size);
+			WEngine::Allocator::Get()->Deallocate(m_pData);
+			m_pData = newPtr;
+			m_capasity *= 2;
+		}
+		else
+		{
+			for (size_t index = m_size - 1; index > 0; --index)
+			{
+				((T*)m_pData)[index] = ((T*)m_pData)[index - 1];
+			}
+		}
+
+		memcpy((T*)m_pData, &var, sizeof(var));
+		m_size++;
+	}
+
+	template<typename T>
+	inline void WArray<T>::PushForward(const T& var)
+	{
+		if (m_capasity == 0)
+		{
+			m_capasity = 1;
+			m_pData = Allocator::Get()->Allocate(sizeof(T));
+		}
+		else if (m_size == m_capasity)
+		{
+			void* newPtr = WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
+			memcpy(newPtr + 1, m_pData, sizeof(T) * m_size);
+			WEngine::Allocator::Get()->Deallocate(m_pData);
+			m_pData = newPtr;
+			m_capasity *= 2;
+		}
+		else
+		{
+			for (size_t index = m_size - 1; index > 0; --index)
+			{
+				((T*)m_pData)[index] = ((T*)m_pData)[index - 1];
+			}
+		}
+
+		::new ((T*)m_pData + m_size) T(var);
+		m_size++;
+	}
+
+	template<typename T>
 	inline void WArray<T>::Resize(size_t size)
 	{
 		if (size > m_capasity)
@@ -170,6 +252,16 @@ namespace WEngine
 			m_pData = newPtr;
 			m_capasity = size;
 		}
+	}
+
+	template<typename T>
+	inline void WArray<T>::Clear()
+	{
+		for (size_t i = 0; i < m_size; ++i)
+		{
+			((T*)m_pData + i)->~T();
+		}
+		m_size = 0;
 	}
 
 	template<typename T>

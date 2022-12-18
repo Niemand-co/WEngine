@@ -42,6 +42,6 @@ private:
 
 	static VertexBindingDescription* m_bindingDescription;
 
-	static std::vector<VertexAttributeDescription*> m_attributeDescriptions;
+	static WEngine::WArray<VertexAttributeDescription*> m_attributeDescriptions;
 	
 };

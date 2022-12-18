@@ -32,9 +32,9 @@ namespace Vulkan
 		return commandBuffers;
 	}
 
-	std::vector<RHICommandBuffer*> VulkanCommandPool::GetCommandBuffer(unsigned int count, bool isPrimary)
+	WEngine::WArray<RHICommandBuffer*> VulkanCommandPool::GetCommandBuffer(unsigned int count, bool isPrimary)
 	{
-		std::vector<RHICommandBuffer*> commandBuffers(count);
+		WEngine::WArray<RHICommandBuffer*> commandBuffers(count);
 
 		for(unsigned int i = 0; i < count; ++i)
 		{

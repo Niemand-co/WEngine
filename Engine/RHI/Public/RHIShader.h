@@ -14,6 +14,6 @@ protected:
 
 	unsigned int m_stage;
 
-	std::string m_entryName;
+	WEngine::WString m_entryName;
 
 };

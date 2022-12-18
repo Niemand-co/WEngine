@@ -11,7 +11,7 @@ namespace WEngine
 
 	int Editor::g_selectedID = 0;
 
-	std::vector<GameObject*> Editor::g_selectedObjects = std::vector<GameObject*>();
+	WArray<GameObject*> Editor::g_selectedObjects = WArray<GameObject*>();
 
 	Camera* Editor::g_pEditorCamera = nullptr;
 
@@ -29,18 +29,18 @@ namespace WEngine
 
 	void Editor::ClearSelection()
 	{
-		g_selectedObjects.clear();
+		g_selectedObjects.Clear();
 	}
 
 	void Editor::SelectObject(GameObject* pGameObject)
 	{
-		g_selectedObjects.clear();
-		g_selectedObjects.push_back(std::move(pGameObject));
+		g_selectedObjects.Clear();
+		g_selectedObjects.Push(std::move(pGameObject));
 	}
 
-	void Editor::SelectObject(const std::vector<GameObject*>& gameObjects)
+	void Editor::SelectObject(const WArray<GameObject*>& gameObjects)
 	{
-		g_selectedObjects.clear();
+		g_selectedObjects.Clear();
 		g_selectedObjects = gameObjects;
 	}
 
@@ -54,14 +54,14 @@ namespace WEngine
 		return false;
 	}
 
-	std::vector<GameObject*>& Editor::GetSelectedObject()
+	WArray<GameObject*>& Editor::GetSelectedObject()
 	{
 		return g_selectedObjects;
 	}
 
 	size_t Editor::GetSelectedObjectCount()
 	{
-		return g_selectedObjects.size();
+		return g_selectedObjects.Size();
 	}
 
 }

@@ -28,7 +28,7 @@ void ScriptableRenderPipeline::Init()
 void ScriptableRenderPipeline::Setup()
 {
 	m_pCameras = World::GetWorld()->GetCameras();
-	m_pCameraDatas.reserve(m_pCameras.size());
+	m_pCameraDatas.Reserve(m_pCameras.Size());
 
 	for (Camera *camera : m_pCameras)
 	{
@@ -39,7 +39,7 @@ void ScriptableRenderPipeline::Setup()
 		renderer->EnqueRenderPass(new DrawSkyboxPass(renderer));
 		renderer->EnqueRenderPass(new DrawGizmosPass(renderer));
 		renderer->Setup(m_pContext, data);
-		m_pCameraDatas.push_back(data);
+		m_pCameraDatas.Push(data);
 	}
 }
 

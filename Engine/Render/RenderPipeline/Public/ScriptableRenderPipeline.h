@@ -49,8 +49,8 @@ protected:
 
 	RHIContext *m_pContext;
 
-	std::vector<Camera*> m_pCameras;
+	WEngine::WArray<Camera*> m_pCameras;
 
-	std::vector<CameraData*> m_pCameraDatas;
+	WEngine::WArray<CameraData*> m_pCameraDatas;
 
 };

@@ -26,7 +26,7 @@ namespace WEngine
 
 	void GameRenderPipeline::Execute()
 	{
-		for (unsigned int i = 0; i < m_pCameras.size(); ++i)
+		for (unsigned int i = 0; i < m_pCameras.Size(); ++i)
 		{
 			m_pCameras[i]->GetRenderer()->Execute(m_pContext, m_pCameras[i]->GetData());
 		}

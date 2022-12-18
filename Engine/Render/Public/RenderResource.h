@@ -6,7 +6,7 @@ public:
 
 	void* operator new(size_t size)
 	{
-		WEngine::Allocator::Get()->Allocate(size);
+		return WEngine::Allocator::Get()->Allocate(size);
 	}
 
 	void operator delete(void* pData)

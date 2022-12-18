@@ -27,13 +27,13 @@ public:
 
 private:
 
-	std::vector<RHICommandBuffer*> m_pCommandBuffers;
+	WEngine::WArray<RHICommandBuffer*> m_pCommandBuffers;
 
-	std::vector<RHITexture*> m_pCubemap;
+	WEngine::WArray<RHITexture*> m_pCubemap;
 
 	Mesh *m_pMesh;
 
-	std::vector<RHIGroup*> m_pGroup;
+	WEngine::WArray<RHIGroup*> m_pGroup;
 
 	RHIPipelineResourceLayout *m_pPipelineLayout;
 

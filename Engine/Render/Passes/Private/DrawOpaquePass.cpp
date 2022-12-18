@@ -93,7 +93,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	}
 	RHIShader* fragShader = m_pDevice->CreateShader(&fragShaderDescriptor);
 
-	std::vector<RHIShader*> shaders = { vertShader, fragShader };
+	WEngine::WArray<RHIShader*> shaders = { vertShader, fragShader };
 	RHIBlendDescriptor blendDescriptor = {};
 	{
 		blendDescriptor.blendEnabled = false;
@@ -151,15 +151,15 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		psoDescriptor.subpass = 0;
 		psoDescriptor.blendDescriptor = &blendDescriptor;
 		psoDescriptor.depthStencilDescriptor = &depthStencilDescriptor;
-		psoDescriptor.pShader = shaders.data();
-		psoDescriptor.shaderCount = shaders.size();
+		psoDescriptor.pShader = shaders.GetData();
+		psoDescriptor.shaderCount = shaders.Size();
 		psoDescriptor.vertexDescriptor = &vertexInputDescriptor;
 		psoDescriptor.pipelineResourceLayout = m_pPipelineResourceLayout;
 		psoDescriptor.rasterizationStateDescriptor = &rasterizationStateDescriptor;
 	};
 	m_pPSO = context->CreatePSO(&psoDescriptor);
 
-	m_pObjectUniformBuffers.resize(RHIContext::g_maxFrames);
+	m_pObjectUniformBuffers.Resize(RHIContext::g_maxFrames);
 	RHIBufferDescriptor uniformBufferDescriptor = {};
 	{
 		uniformBufferDescriptor.isDynamic = true;
@@ -171,7 +171,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	m_pObjectUniformBuffers[1] = context->CreateUniformBuffer(&uniformBufferDescriptor);
 	m_pObjectUniformBuffers[2] = context->CreateUniformBuffer(&uniformBufferDescriptor);
 
-	m_pSceneUniformBuffers.resize(RHIContext::g_maxFrames);
+	m_pSceneUniformBuffers.Resize(RHIContext::g_maxFrames);
 	{
 		uniformBufferDescriptor.isDynamic = false;
 		uniformBufferDescriptor.count = 1;
@@ -182,7 +182,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	m_pSceneUniformBuffers[1] = context->CreateUniformBuffer(&uniformBufferDescriptor);
 	m_pSceneUniformBuffers[2] = context->CreateUniformBuffer(&uniformBufferDescriptor);
 
-	const std::vector<RHITextureView*>& depthTextures = World::GetWorld()->GetMainLight()->GetDepthTexture();
+	const WEngine::WArray<RHITextureView*>& depthTextures = World::GetWorld()->GetMainLight()->GetDepthTexture();
 	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{
 		m_pObjectUniformBuffers[i]->SetDataSize(sizeof(ObjectData));
@@ -240,15 +240,15 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		context->UpdateTextureResourceToGroup(&shadowmapResourceDescriptor);
 	}
 
-	m_pRenderTargets.resize(3);
+	m_pRenderTargets.Resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
 		RenderTarget &target = cameraData->camera->GetRenderTarget(i);
-		std::vector<RHITextureView*> textureViews = { target.pColorTexture, target.pDepthTexture };
+		WEngine::WArray<RHITextureView*> textureViews = { target.pColorTexture, target.pDepthTexture };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
 			renderTargetDescriptor.bufferCount = 2;
-			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.pBufferView = textureViews.GetData();
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
 			renderTargetDescriptor.height = WEngine::Screen::GetHeight();
@@ -263,7 +263,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 {
 	RHICommandBuffer *cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
-	const std::vector<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
+	const WEngine::WArray<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
 
 	cmd->BeginScopePass("Opaque", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentFrame]);
 	{
@@ -283,8 +283,8 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		encoder->SetDepthTestEnable(true);
 		unsigned int drawcalls = 0;
 		Light *mainLight = World::GetWorld()->GetMainLight();
-		const std::vector<glm::mat4>& frustum = mainLight->GetShadowFrustum();
-		const std::vector<float>& splices = mainLight->GetSplices();
+		const WEngine::WArray<glm::mat4>& frustum = mainLight->GetShadowFrustum();
+		const WEngine::WArray<float>& splices = mainLight->GetSplices();
 
 		SceneData sceneData =
 		{
@@ -299,7 +299,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 			glm::vec4(cameraData->Position, 1.0f),
 		};
 		m_pSceneUniformBuffers[RHIContext::g_currentFrame]->LoadData(&sceneData, sizeof(sceneData));
-		for (unsigned int i = 0; i < gameObjects.size(); ++i)
+		for (unsigned int i = 0; i < gameObjects.Size(); ++i)
 		{
 			MeshFilter* filter = gameObjects[i]->GetComponent<MeshFilter>();
 			if (filter == nullptr)
@@ -319,7 +319,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		m_pObjectUniformBuffers[RHIContext::g_currentFrame]->Flush(drawcalls);
 
 		drawcalls = 0;
-		for (unsigned int i = 0; i < gameObjects.size(); ++i)
+		for (unsigned int i = 0; i < gameObjects.Size(); ++i)
 		{
 			MeshFilter *filter = gameObjects[i]->GetComponent<MeshFilter>();
 			if(filter == nullptr)
@@ -345,11 +345,11 @@ void DrawOpaquePass::UpdateRenderTarget(CameraData* cameraData)
 {
 	for (int i = 0; i < 3; ++i)
 	{
-		std::vector<RHITextureView*> textureViews = { cameraData->camera->GetRenderTarget(i).pColorTexture, cameraData->camera->GetRenderTarget(i).pDepthTexture };
+		WEngine::WArray<RHITextureView*> textureViews = { cameraData->camera->GetRenderTarget(i).pColorTexture, cameraData->camera->GetRenderTarget(i).pDepthTexture };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
 			renderTargetDescriptor.bufferCount = 2;
-			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.pBufferView = textureViews.GetData();
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
 			renderTargetDescriptor.height = WEngine::Screen::GetHeight();

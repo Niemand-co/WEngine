@@ -67,22 +67,22 @@ protected:
 
 };
 
-namespace WEngine
-{
-	namespace SRefl
-	{
-		template<>
-		struct TypeInfo<Component> : public TypeInfoBase<Component, Object>
-		{
-			static constexpr std::string_view name = "Component";
-
-			static constexpr FieldList lis = 
-			{
-				Field{"m_pGameObject", &Component::m_pGameObject, AttrList{}},
-				Field{"m_type", &Component::m_type, AttrList{}},
-				Field{"GetType", &Component::GetType, AttrList{}},
-				Field{"IsType", &Component::IsType, AttrList{}},
-			};
-		};
-	}
-}
+//namespace WEngine
+//{
+//	namespace SRefl
+//	{
+//		template<>
+//		struct TypeInfo<Component> : public TypeInfoBase<Component, Object>
+//		{
+//			static constexpr WString name = "Component";
+//
+//			static constexpr FieldList lis = 
+//			{
+//				Field{"m_pGameObject", &Component::m_pGameObject, AttrList{}},
+//				Field{"m_type", &Component::m_type, AttrList{}},
+//				Field{"GetType", &Component::GetType, AttrList{}},
+//				Field{"IsType", &Component::IsType, AttrList{}},
+//			};
+//		};
+//	}
+//}

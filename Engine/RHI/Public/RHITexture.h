@@ -13,7 +13,7 @@ public:
 
 	virtual RHITextureView* CreateTextureView(RHITextureViewDescriptor* descriptor) = 0;
 
-	virtual void LoadData(std::string path, RHIContext *context) = 0;
+	virtual void LoadData(const WEngine::WString& path, RHIContext *context) = 0;
 
 	void* operator new(size_t size)
 	{

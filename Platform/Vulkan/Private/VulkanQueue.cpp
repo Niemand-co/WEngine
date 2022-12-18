@@ -46,19 +46,19 @@ namespace Vulkan
 
 	void VulkanQueue::Submit(RHISubmitDescriptor* descriptor)
 	{
-		std::vector<VkCommandBuffer> commandbuffers(descriptor->commandBufferCount);
+		WEngine::WArray<VkCommandBuffer> commandbuffers(descriptor->commandBufferCount);
 		for (unsigned int i = 0; i < descriptor->commandBufferCount; ++i)
 		{
 			commandbuffers[i] = *static_cast<VulkanCommandBuffer*>(descriptor->pCommandBuffers[i])->GetHandle();
 		}
 
-		std::vector<VkSemaphore> waitSemaphores(descriptor->waitSemaphoreCount);
+		WEngine::WArray<VkSemaphore> waitSemaphores(descriptor->waitSemaphoreCount);
 		for (unsigned int i = 0; i < descriptor->waitSemaphoreCount; ++i)
 		{
 			waitSemaphores[i] = *static_cast<VulkanSemaphore*>(descriptor->pWaitSemaphores[i])->GetHandle();
 		}
 
-		std::vector<VkSemaphore> signalSemaphores(descriptor->signalSemaphoreCount);
+		WEngine::WArray<VkSemaphore> signalSemaphores(descriptor->signalSemaphoreCount);
 		for (unsigned int i = 0; i < descriptor->signalSemaphoreCount; ++i)
 		{
 			signalSemaphores[i] = *static_cast<VulkanSemaphore*>(descriptor->pSignalSemaphores[i])->GetHandle();
@@ -67,13 +67,13 @@ namespace Vulkan
 		VkPipelineStageFlags pipelineStateFlags[] = { descriptor->waitStage };
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		submitInfo.commandBufferCount = commandbuffers.size();
-		submitInfo.pCommandBuffers = commandbuffers.data();
-		submitInfo.waitSemaphoreCount = waitSemaphores.size();
-		submitInfo.pWaitSemaphores = waitSemaphores.data();
+		submitInfo.commandBufferCount = commandbuffers.Size();
+		submitInfo.pCommandBuffers = commandbuffers.GetData();
+		submitInfo.waitSemaphoreCount = waitSemaphores.Size();
+		submitInfo.pWaitSemaphores = waitSemaphores.GetData();
 		submitInfo.pWaitDstStageMask = pipelineStateFlags;
-		submitInfo.signalSemaphoreCount = signalSemaphores.size();
-		submitInfo.pSignalSemaphores = signalSemaphores.data();
+		submitInfo.signalSemaphoreCount = signalSemaphores.Size();
+		submitInfo.pSignalSemaphores = signalSemaphores.GetData();
 
 		if(descriptor->pFence != nullptr)
 			vkQueueSubmit(*m_queue, 1, &submitInfo, *static_cast<VulkanFence*>(descriptor->pFence)->GetHandle());

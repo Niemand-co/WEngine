@@ -14,7 +14,7 @@ namespace Vulkan
 	{
 	public:
 	
-		VulkanDevice(VkDevice *device, VulkanGPU *pGPU, std::vector<QueueStack> stacks);
+		VulkanDevice(VkDevice *device, VulkanGPU *pGPU, WEngine::WArray<QueueStack> stacks);
 
 		virtual ~VulkanDevice();
 
@@ -24,7 +24,7 @@ namespace Vulkan
 
 		virtual RHISwapchain* CreateSwapchain(RHISwapchainDescriptor* descriptor) override;
 
-		virtual std::vector<RHIFence*> CreateFence(unsigned int count) override;
+		virtual WEngine::WArray<RHIFence*> CreateFence(unsigned int count) override;
 
 		virtual RHIEvent* GetEvent() override;
 
@@ -54,7 +54,7 @@ namespace Vulkan
 
 		virtual void UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor *descriptor) override;
 
-		virtual std::vector<RHISemaphore*> GetSemaphore(unsigned int count) override;
+		virtual WEngine::WArray<RHISemaphore*> GetSemaphore(unsigned int count) override;
 
 		virtual void WaitForFences(RHIFence* pFences, unsigned int count, bool waitForAll = true) override;
 
@@ -70,7 +70,7 @@ namespace Vulkan
 
 		VkDevice *m_pDevice;
 
-		std::vector<QueueStack> m_queues;
+		WEngine::WArray<QueueStack> m_queues;
 
 		VulkanGPU *m_pGPU;
 

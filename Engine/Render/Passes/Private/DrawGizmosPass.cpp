@@ -295,8 +295,8 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	context->UpdateUniformResourceToGroup(&updateDescriptor);
 
-	m_pStencils.resize(RHIContext::g_maxFrames);
-	m_pStencilViews.resize(RHIContext::g_maxFrames);
+	m_pStencils.Resize(RHIContext::g_maxFrames);
+	m_pStencilViews.Resize(RHIContext::g_maxFrames);
 	RHITextureDescriptor textureDescriptor = {};
 	{
 		textureDescriptor.format = Format::D24_UNORM_S8_UINT;
@@ -332,15 +332,15 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 		m_pStencilViews[i] = m_pStencils[i]->CreateTextureView(&viewDescriptor);
 	}
 
-	m_pRenderTargets.resize(3);
+	m_pRenderTargets.Resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
 		RenderTarget& target = cameraData->camera->GetRenderTarget(i);
-		std::vector<RHITextureView*> textureViews = { target.pColorTexture, m_pStencilViews[i] };
+		WEngine::WArray<RHITextureView*> textureViews = { target.pColorTexture, m_pStencilViews[i] };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
 			renderTargetDescriptor.bufferCount = 2;
-			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.pBufferView = textureViews.GetData();
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
 			renderTargetDescriptor.height = WEngine::Screen::GetHeight();
@@ -348,14 +348,14 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 		m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
 	}
 
-	m_pStencilRenderTargets.resize(3);
+	m_pStencilRenderTargets.Resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
-		std::vector<RHITextureView*> textureViews = { m_pStencilViews[i] };
+		WEngine::WArray<RHITextureView*> textureViews = { m_pStencilViews[i] };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
 			renderTargetDescriptor.bufferCount = 1;
-			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.pBufferView = textureViews.GetData();
 			renderTargetDescriptor.renderPass = m_pStencilRenderPass;
 			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
 			renderTargetDescriptor.height = WEngine::Screen::GetHeight();
@@ -373,7 +373,7 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 	if(WEngine::Editor::GetSelectedObjectCount() == 0)
 		return;
 
-	std::vector<GameObject*>& selectedObjects = WEngine::Editor::GetSelectedObject();
+	WEngine::WArray<GameObject*>& selectedObjects = WEngine::Editor::GetSelectedObject();
 
 	RHICommandBuffer* cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
@@ -408,7 +408,7 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 		encoder->SetPipeline(m_pStencilPSO);
 		encoder->SetViewport({ (float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0 });
 		encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
-		for (unsigned int i = 0; i < selectedObjects.size(); ++i)
+		for (unsigned int i = 0; i < selectedObjects.Size(); ++i)
 		{
 			MeshFilter* filter = selectedObjects[i]->GetComponent<MeshFilter>();
 			if (filter == nullptr)
@@ -436,7 +436,7 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 		encoder->SetPipeline(m_pPSO);
 		encoder->SetViewport({ (float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0 });
 		encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
-		for (unsigned int i = 0; i < selectedObjects.size(); ++i)
+		for (unsigned int i = 0; i < selectedObjects.Size(); ++i)
 		{
 			MeshFilter *filter = selectedObjects[i]->GetComponent<MeshFilter>();
 			if(filter == nullptr)
@@ -509,11 +509,11 @@ void DrawGizmosPass::UpdateRenderTarget(CameraData* cameraData)
 		delete m_pStencils[i];
 		m_pStencils[i] = RHIContext::GetDevice()->CreateTexture(&textureDescriptor);
 		m_pStencilViews[i] = m_pStencils[i]->CreateTextureView(&viewDescriptor);
-		std::vector<RHITextureView*> textureViews = { cameraData->camera->GetRenderTarget(i).pColorTexture, m_pStencilViews[i] };
+		WEngine::WArray<RHITextureView*> textureViews = { cameraData->camera->GetRenderTarget(i).pColorTexture, m_pStencilViews[i] };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
 			renderTargetDescriptor.bufferCount = 2;
-			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.pBufferView = textureViews.GetData();
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
 			renderTargetDescriptor.height = WEngine::Screen::GetHeight();
@@ -522,14 +522,14 @@ void DrawGizmosPass::UpdateRenderTarget(CameraData* cameraData)
 		m_pRenderTargets[i] = m_pDevice->CreateRenderTarget(&renderTargetDescriptor);
 	}
 
-	m_pStencilRenderTargets.resize(3);
+	m_pStencilRenderTargets.Resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
-		std::vector<RHITextureView*> textureViews = { m_pStencilViews[i] };
+		WEngine::WArray<RHITextureView*> textureViews = { m_pStencilViews[i] };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
 			renderTargetDescriptor.bufferCount = 1;
-			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.pBufferView = textureViews.GetData();
 			renderTargetDescriptor.renderPass = m_pStencilRenderPass;
 			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
 			renderTargetDescriptor.height = WEngine::Screen::GetHeight();

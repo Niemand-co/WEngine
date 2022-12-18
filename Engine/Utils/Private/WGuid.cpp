@@ -76,9 +76,8 @@ namespace WEngine
 		a = b + tmp;
 	}
 
-	void MD5(const WString& data, unsigned int& A, unsigned int& B, unsigned int& C, unsigned int& D)
+	void MD5Internal(byte *data, size_t byteLength, unsigned int& A, unsigned int& B, unsigned int& C, unsigned int& D)
 	{
-		size_t byteLength = data.Size();
 		size_t bitLength = byteLength << 3;
 		size_t rest = byteLength % 64;
 		size_t addLength = rest < 56 ? 64 - rest : 128 - rest;
@@ -196,13 +195,16 @@ namespace WEngine
 
 	}
 
-	WGuid::WGuid(const WString& data)
+	template<>
+	void MD5(const WString& data, unsigned int& A, unsigned int& B, unsigned int& C, unsigned int& D)
 	{
-		A = 0x67452301;
-		B = 0xefcdab89;
-		C = 0x98badcfe;
-		D = 0x10325476;
-		MD5(data, A, B, C, D);
+		MD5Internal((byte*)data.Data(), data.Size(), A, B, C, D);
+	}
+
+	template<>
+	void MD5(const char* data, unsigned int& A, unsigned int& B, unsigned int& C, unsigned int& D)
+	{
+		MD5Internal((byte*)data, strlen(data), A, B, C, D);
 	}
 
 }

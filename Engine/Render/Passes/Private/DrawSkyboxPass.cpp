@@ -182,7 +182,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 		textureDescriptor.mipCount = 1;
 		textureDescriptor.usage = IMAGE_USAGE_TRANSFER_DST | IMAGE_USAGE_SAMPLED;
 	}
-	m_pCubemap.resize(6);
+	m_pCubemap.Resize(6);
 	for(unsigned int i = 0; i < 6; ++i)
 		m_pCubemap[i] = m_pDevice->CreateTexture(&textureDescriptor);
 
@@ -248,15 +248,15 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 	}
 	context->UpdateTextureResourceToGroup(&textureResourceDescriptor);
 
-	m_pRenderTargets.resize(3);
+	m_pRenderTargets.Resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
 		RenderTarget& target = cameraData->camera->GetRenderTarget(i);
-		std::vector<RHITextureView*> textureViews = { target.pColorTexture, target.pDepthTexture };
+		WEngine::WArray<RHITextureView*> textureViews = { target.pColorTexture, target.pDepthTexture };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
 			renderTargetDescriptor.bufferCount = 2;
-			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.pBufferView = textureViews.GetData();
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
 			renderTargetDescriptor.height = WEngine::Screen::GetHeight();
@@ -313,11 +313,11 @@ void DrawSkyboxPass::UpdateRenderTarget(CameraData *cameraData)
 {
 	for (int i = 0; i < 3; ++i)
 	{
-		std::vector<RHITextureView*> textureViews = { cameraData->camera->GetRenderTarget(i).pColorTexture, cameraData->camera->GetRenderTarget(i).pDepthTexture };
+		WEngine::WArray<RHITextureView*> textureViews = { cameraData->camera->GetRenderTarget(i).pColorTexture, cameraData->camera->GetRenderTarget(i).pDepthTexture };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
 			renderTargetDescriptor.bufferCount = 2;
-			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.pBufferView = textureViews.GetData();
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
 			renderTargetDescriptor.height = WEngine::Screen::GetHeight();

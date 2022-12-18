@@ -11,7 +11,7 @@ public:
 
 	virtual ~RHICommandBuffer() = default;
 
-	virtual void BeginScopePass(std::string passName, RHIRenderPass* pRenderPass = nullptr, unsigned int subpass = 0, RHIRenderTarget* pRenderTarget = nullptr) = 0;
+	virtual void BeginScopePass(const WEngine::WString& passName, RHIRenderPass* pRenderPass = nullptr, unsigned int subpass = 0, RHIRenderTarget* pRenderTarget = nullptr) = 0;
 
 	virtual void EndScopePass() = 0;
 

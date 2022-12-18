@@ -21,11 +21,11 @@ namespace WEngine
 
 		static void SelectObject(GameObject *pGameObject);
 
-		static void SelectObject(const std::vector<GameObject*>& gameObjects);
+		static void SelectObject(const WArray<GameObject*>& gameObjects);
 
 		static bool IsSelected(GameObject *pGameObject);
 
-		static std::vector<GameObject*>& GetSelectedObject();
+		static WArray<GameObject*>& GetSelectedObject();
 
 		static size_t GetSelectedObjectCount();
 
@@ -33,7 +33,7 @@ namespace WEngine
 
 		static int g_selectedID;
 
-		static std::vector<GameObject*> g_selectedObjects;
+		static WArray<GameObject*> g_selectedObjects;
 
 		static Camera *g_pEditorCamera;
 

@@ -17,7 +17,7 @@ namespace WEngine
 		}
 	}
 
-	void CascadedShadowMap::UpdatePSSMMatrices(std::vector<glm::mat4>& matrices, glm::mat4 cameraMatrixInv, glm::vec3 lightDir, float* splices, unsigned int spliceCount)
+	void CascadedShadowMap::UpdatePSSMMatrices(WEngine::WArray<glm::mat4>& matrices, glm::mat4 cameraMatrixInv, glm::vec3 lightDir, float* splices, unsigned int spliceCount)
 	{
 		float lastSplice = 0.0f;
 		for (unsigned int i = 0; i < spliceCount; ++i)

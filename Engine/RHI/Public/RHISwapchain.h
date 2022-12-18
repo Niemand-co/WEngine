@@ -12,6 +12,6 @@ public:
 
 protected:
 
-	std::vector<RHITexture*> m_textures;
+	WEngine::WArray<RHITexture*> m_textures;
 
 };

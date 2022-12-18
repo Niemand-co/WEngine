@@ -31,7 +31,8 @@ namespace Vulkan
 		renderPassBeginInfo.renderArea.offset = { 0, 0 };
 		renderPassBeginInfo.renderArea.extent = { descriptor->renderTarget->GetWidth(), descriptor->renderTarget->GetHeight() };
 		renderPassBeginInfo.clearValueCount = descriptor->clearCount;
-		std::vector<VkClearValue> values(descriptor->clearCount);
+		
+		WEngine::WArray<VkClearValue> values(descriptor->clearCount);
 		for (unsigned int i = 0; i < descriptor->clearCount; ++i)
 		{
 			if(descriptor->pClearValues[i].color)
@@ -39,7 +40,7 @@ namespace Vulkan
 			else
 				values[i].depthStencil = { descriptor->pClearValues[i].value.x, (unsigned int)descriptor->pClearValues[i].value.y };
 		}
-		renderPassBeginInfo.pClearValues = values.data();
+		renderPassBeginInfo.pClearValues = values.GetData();
 
 		vkCmdBeginRenderPass(*m_cmd, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 

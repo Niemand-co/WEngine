@@ -58,12 +58,12 @@ public:
 
 	static Gui* CreateGui(WEngine::Backend backend);
 
-	static void DrawSlider(std::string title, float *pValue, float minValue, float maxValue);
+	static void DrawSlider(WEngine::WString title, float *pValue, float minValue, float maxValue);
 
-	static void DrawColorEdit(std::string title, float *pColor, bool hasAlpha = false);
+	static void DrawColorEdit(WEngine::WString title, float *pColor, bool hasAlpha = false);
 
 	template<typename T, typename ...Args>
-	static void ShowElement(std::string_view title, T &value, Args ...args);
+	static void ShowElement(WEngine::WString title, T &value, Args ...args);
 
 public:
 	
@@ -76,7 +76,7 @@ protected:
 };
 
 template<typename T, typename ...Args>
-inline void Gui::ShowElement(std::string_view title, T &value, Args ...args)
+inline void Gui::ShowElement(WEngine::WString title, T &value, Args ...args)
 {
 	if (WEngine::is_same<T, float>::isSame)
 	{

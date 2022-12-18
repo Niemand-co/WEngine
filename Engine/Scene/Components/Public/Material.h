@@ -70,28 +70,28 @@ private:
 };
 
 
-namespace WEngine
-{
-	namespace SRefl
-	{
-		template<>
-		struct TypeInfo<Material> : public TypeInfoBase<Material, Component>
-		{
-			static constexpr std::string_view name = "Material";
-
-			static constexpr FieldList fields = 
-			{
-				Field("albedo", &Material::albedo, AttrList{ Color, 1, 1, 1, 1 }),
-				Field("roughness", &Material::roughness, AttrList{ Range,  0.01f, 1.0f }),
-				Field("metallic", &Material::metallic, AttrList{ Range, 0.0f, 1.0f }),
-				Field("m_shader", &Material::m_shader, AttrList{ Shader }),
-				Field("SetShader", &Material::SetShader, AttrList{}),
-				Field("GetShader", &Material::GetShader, AttrList{}),
-				Field("GetSurfaceData", &Material::GetSurfaceData, AttrList{}),
-				Field("SetColor", &Material::SetColor, AttrList{}),
-				Field("SetRoughness", &Material::SetRoughness, AttrList{}),
-				Field("ShowInInspector", &Material::ShowInInspector, AttrList{}),
-			};
-		};
-	}
-}
+//namespace WEngine
+//{
+//	namespace SRefl
+//	{
+//		template<>
+//		struct TypeInfo<Material> : public TypeInfoBase<Material, Component>
+//		{
+//			static constexpr WString name = "Material";
+//
+//			static constexpr FieldList fields = 
+//			{
+//				Field("albedo", &Material::albedo, AttrList{ Color, 1, 1, 1, 1 }),
+//				Field("roughness", &Material::roughness, AttrList{ Range,  0.01f, 1.0f }),
+//				Field("metallic", &Material::metallic, AttrList{ Range, 0.0f, 1.0f }),
+//				Field("m_shader", &Material::m_shader, AttrList{ Shader }),
+//				Field("SetShader", &Material::SetShader, AttrList{}),
+//				Field("GetShader", &Material::GetShader, AttrList{}),
+//				Field("GetSurfaceData", &Material::GetSurfaceData, AttrList{}),
+//				Field("SetColor", &Material::SetColor, AttrList{}),
+//				Field("SetRoughness", &Material::SetRoughness, AttrList{}),
+//				Field("ShowInInspector", &Material::ShowInInspector, AttrList{}),
+//			};
+//		};
+//	}
+//}

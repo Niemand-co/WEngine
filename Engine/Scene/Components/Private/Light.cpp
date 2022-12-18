@@ -14,10 +14,10 @@ Light::Light(GameObject *pGameObject)
 
 	m_mainLightCascadedShadowMapNum = 4;
 
-	m_pDepthTextures.resize(RHIContext::g_maxFrames * m_mainLightCascadedShadowMapNum);
-	m_pDepthTextureViews.resize(RHIContext::g_maxFrames * m_mainLightCascadedShadowMapNum);
-	m_mainLightCascadedShadowMapRange.resize(m_mainLightCascadedShadowMapNum);
-	m_lightSpaceMatrix.resize(m_mainLightCascadedShadowMapNum);
+	m_pDepthTextures.Resize(RHIContext::g_maxFrames * m_mainLightCascadedShadowMapNum);
+	m_pDepthTextureViews.Resize(RHIContext::g_maxFrames * m_mainLightCascadedShadowMapNum);
+	m_mainLightCascadedShadowMapRange.Resize(m_mainLightCascadedShadowMapNum);
+	m_lightSpaceMatrix.Resize(m_mainLightCascadedShadowMapNum);
 
 	RHITextureDescriptor textureDescriptor = {};
 	{
@@ -41,8 +41,8 @@ Light::Light(GameObject *pGameObject)
 		textureViewDescriptor.imageAspect = IMAGE_ASPECT_DEPTH;
 	}
 
-	std::vector<TextureBarrier> barriers(m_pDepthTextures.size());
-	for (unsigned int i = 0; i < m_pDepthTextures.size(); ++i)
+	WEngine::WArray<TextureBarrier> barriers(m_pDepthTextures.Size());
+	for (unsigned int i = 0; i < m_pDepthTextures.Size(); ++i)
 	{
 		m_pDepthTextures[i] = RHIContext::GetDevice()->CreateTexture(&textureDescriptor);
 		barriers[i] = { m_pDepthTextures[i], AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE, IMAGE_ASPECT_DEPTH };
@@ -50,14 +50,14 @@ Light::Light(GameObject *pGameObject)
 
 	RHIBarrierDescriptor barrierDescriptor = {};
 	{
-		barrierDescriptor.textureCount = barriers.size();
-		barrierDescriptor.pTextureBarriers = barriers.data();
+		barrierDescriptor.textureCount = barriers.Size();
+		barrierDescriptor.pTextureBarriers = barriers.GetData();
 		barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
 		barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
 	}
 	RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
 
-	for (unsigned int i = 0; i < m_pDepthTextureViews.size(); ++i)
+	for (unsigned int i = 0; i < m_pDepthTextureViews.Size(); ++i)
 	{
 		m_pDepthTextureViews[i] = m_pDepthTextures[i]->CreateTextureView(&textureViewDescriptor);
 	}
@@ -87,16 +87,16 @@ void Light::ShowInInspector()
 
 void Light::UpdateShadowFrustum(CameraData* cameraData)
 {
-	WEngine::CascadedShadowMap::UpdateSplices(m_mainLightCascadedShadowMapRange.data(), m_mainLightCascadedShadowMapRange.size(), cameraData->nearClip, cameraData->farClip);
-	WEngine::CascadedShadowMap::UpdatePSSMMatrices(m_lightSpaceMatrix, glm::inverse(cameraData->MatrixVP), m_pGameObject->GetComponent<Transformer>()->GetForward(), m_mainLightCascadedShadowMapRange.data(), m_mainLightCascadedShadowMapNum);
+	WEngine::CascadedShadowMap::UpdateSplices(m_mainLightCascadedShadowMapRange.GetData(), m_mainLightCascadedShadowMapRange.Size(), cameraData->nearClip, cameraData->farClip);
+	WEngine::CascadedShadowMap::UpdatePSSMMatrices(m_lightSpaceMatrix, glm::inverse(cameraData->MatrixVP), m_pGameObject->GetComponent<Transformer>()->GetForward(), m_mainLightCascadedShadowMapRange.GetData(), m_mainLightCascadedShadowMapNum);
 }
 
-const std::vector<glm::mat4>& Light::GetShadowFrustum()
+const WEngine::WArray<glm::mat4>&Light::GetShadowFrustum()
 {
 	return m_lightSpaceMatrix;
 }
 
-const std::vector<float>& Light::GetSplices()
+const WEngine::WArray<float>& Light::GetSplices()
 {
 	return m_mainLightCascadedShadowMapRange;
 }

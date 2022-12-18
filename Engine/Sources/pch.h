@@ -1,12 +1,6 @@
 #pragma once
 #ifndef NOT_INCLUDE
 
-#include <algorithm>
-#include <vector>
-#include <unordered_map>
-#include <set>
-#include <thread>
-#include <string>
 #include <iostream>
 #include <stdint.h>
 #include <sstream>
@@ -14,7 +8,6 @@
 #include <math.h>
 #include <float.h>
 #include <functional>
-#include <tuple>
 
 //------------------------OS SDK-------------------------------
 #if defined(WIN32) || defined(_WIN32)
@@ -53,7 +46,6 @@
 #include "Math/Matrix.h"
 #include "Log/Public/Logger.h"
 #include "Platform/Vulkan/Allocator/Public/VulkanAllocator.h"
-#include "Utils/Public/Synchronizer.h"
 #include "Platform/Vulkan/Public/VulkanMacro.h"
 #include "Render/Public/RenderCore.h"
 #include "Render/Public/RenderResource.h"
@@ -62,10 +54,11 @@
 #include "Utils/Public/FileLoader.h"
 #include "Event/Public/TimeStep.h"
 #include "Utils/Reflection/Public/Register.h"
-#include "Utils/Container/Public/WString.h"
 #include "Utils/Public/WGuid.h"
+#include "Utils/Container/Public/WString.h"
 #include "Utils/Container/Public/WArray.h"
 #include "Utils/Container/Public/WPair.h"
+#include "Utils/Container/Public/WHashMap.h"
 #include "Utils/Public/NamingSystem.h"
 
 #define ENABLE_REFLECTION template<typename T> friend struct WEngine::SRefl::TypeInfo;

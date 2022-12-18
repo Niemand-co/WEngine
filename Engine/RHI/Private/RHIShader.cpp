@@ -8,5 +8,5 @@ unsigned int RHIShader::GetStage()
 
 const char* RHIShader::GetEntry()
 {
-	return m_entryName.c_str();
+	return m_entryName.Data();
 }

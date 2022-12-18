@@ -26,14 +26,14 @@ private:
 
 	RHISampler *m_pSampler;
 
-	std::vector<RHIBuffer*> m_pObjectUniformBuffers;
+	WEngine::WArray<RHIBuffer*> m_pObjectUniformBuffers;
 
-	std::vector<RHIBuffer*> m_pSceneUniformBuffers;
+	WEngine::WArray<RHIBuffer*> m_pSceneUniformBuffers;
 
 	RHIBuffer *m_pSurfaceDataBuffer;
 
 	RHIPipelineResourceLayout *m_pPipelineResourceLayout;
 
-	std::vector<RHIGroup*> m_pGroup;
+	WEngine::WArray<RHIGroup*> m_pGroup;
 
 };

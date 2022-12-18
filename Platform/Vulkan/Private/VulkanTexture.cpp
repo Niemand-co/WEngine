@@ -45,10 +45,10 @@ namespace Vulkan
 		return new VulkanTextureView(imageView, m_pDevice, descriptor);
 	}
 
-	void VulkanTexture::LoadData(std::string path, RHIContext* context)
+	void VulkanTexture::LoadData(const WEngine::WString& path, RHIContext* context)
 	{
 		int width, height;
-		RHIBuffer *pBuffer = FileLoader::ImageLoad(path.c_str(), context, &width, &height);
+		RHIBuffer *pBuffer = FileLoader::ImageLoad(path.Data(), context, &width, &height);
 	
 		context->CopyBufferToImage(this, pBuffer, (unsigned int)width, (unsigned int)height);
 	}

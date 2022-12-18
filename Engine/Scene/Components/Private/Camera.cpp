@@ -20,8 +20,8 @@ Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, c
 	m_type = Component::ComponentType::Camera;
 	World::GetWorld()->AddCamera(this);
 	UpdateProjectionMatrix();
-	m_rendertargets.resize(RHIContext::g_maxFrames);
-	m_textureResources.resize(RHIContext::g_maxFrames * 2u);
+	m_rendertargets.Resize(RHIContext::g_maxFrames);
+	m_textureResources.Resize(RHIContext::g_maxFrames * 2u);
 
 	for(unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{

@@ -8,7 +8,7 @@ namespace WEngine
 
 	struct Trigger
 	{
-		bool IsNameIn(std::string_view name)
+		bool IsNameIn(WString name)
 		{
 			for(unsigned int i = 0; i < waitingSubmissionCount; ++i)
 				if(*(pSubmissionNames + i) == name)
@@ -18,7 +18,7 @@ namespace WEngine
 
 		RHISemaphore *signal;
 		unsigned int waitingSubmissionCount;
-		std::string_view *pSubmissionNames;
+		WString *pSubmissionNames;
 	};
 
 	class Synchronizer
@@ -45,13 +45,13 @@ namespace WEngine
 
 		static void RegisterTrigger(Trigger *pTrigger);
 
-		static std::vector<Trigger*> GetTrigger(std::string_view submissionName);
+		static WArray<Trigger*> GetTrigger(WString submissionName);
 
 	private:
 
 		static Synchronizer *g_pSynchronizer;
 
-		static std::vector<Trigger*> g_pTriggers;
+		static WArray<Trigger*> g_pTriggers;
 
 	};
 

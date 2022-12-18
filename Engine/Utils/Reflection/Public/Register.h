@@ -1,21 +1,22 @@
 #pragma once
+#include "Utils/Container/Public/WString.h"
 
 namespace WEngine
 {
 
-	template<typename T>
-	std::string GetTypeName()
-	{
-#if defined(_MSC_VER)
-		std::string s = __FUNCSIG__;
-		std::string functionName = __FUNCTION__;
-		size_t start = s.find(functionName + '<') + functionName.length() + 1;
-		size_t end = s.find_last_of('>');
-#elif defined(__GNUC__) ||defined(__clang__)
-		std::string s = __PRETTY_FUNCTION__;
-#endif
-		return s.substr(start, end - start);
-	}
+//	template<typename T>
+//	WString GetTypeName()
+//	{
+//#if defined(_MSC_VER)
+//		WString s = __FUNCSIG__;
+//		WString functionName = __FUNCTION__;
+//		size_t start = s.find(functionName + '<') + functionName.length() + 1;
+//		size_t end = s.find_last_of('>');
+//#elif defined(__GNUC__) ||defined(__clang__)
+//		WString s = __PRETTY_FUNCTION__;
+//#endif
+//		return s.Substr(start, end - start);
+//	}
 
 	template<bool>
 	struct enable_if { };
@@ -51,10 +52,37 @@ namespace WEngine
 	struct is_function { enum { isFunction = !is_const<const T>::isConst && !is_reference<T>::isRef }; };
 
 	template<typename T>
-	constexpr T&& remove_reference(T&& val)
-	{
-		return static_cast<T&&>(val);
-	}
+	struct remove_reference { typedef T type; };
+
+	template<typename T>
+	struct remove_reference<T&> { typedef T type; };
+
+	template<typename T>
+	struct remove_reference<T&&> { typedef T type; };
+
+	template<typename T>
+	struct remove_const { typedef T type; };
+
+	template<typename T>
+	struct remove_const<const T> { typedef T type; };
+
+	template<typename T>
+	struct remove_const_and_referencet { typedef T type; };
+
+	template<typename T>
+	struct remove_const_and_referencet<const T> { typedef T type; };
+
+	template<typename T>
+	struct remove_const_and_referencet<const T&> { typedef T type; };
+
+	template<typename T>
+	struct remove_const_and_referencet<const T&&> { typedef T type; };
+
+	template<typename T>
+	struct remove_const_and_referencet<T&> { typedef T type; };
+
+	template<typename T>
+	struct remove_const_and_referencet<T&&> { typedef T type; };
 
 	template<int Begin, int End, class Func, typename enable_if<Begin == End>::type = 0>
 	void static_for(Func const& func)
@@ -85,47 +113,47 @@ namespace WEngine
 		foo(args...);
 	}
 
-	template<typename T, T N>
-	std::string GetIntName()
-	{
-#if defined(_MSC_VER)
-		std::string s = __FUNCSIG__;
-		std::string functionName = __FUNCTION__;
-		size_t start = s.find(functionName + '<') + functionName.length() + 1;
-		size_t end = s.find_last_of('>');
-#elif defined(__GNUC__) ||defined(__clang__)
-		std::string s = __PRETTY_FUNCTION__;
-		size_t start = s.find("T = ") + 4;
-		size_t end = s.find_first_of(';');
-#endif
-		return s.substr(start, end - start);
-	}
-
-	template<typename T, int Begin = 0, int End = 256>
-	std::string GetEnumName(T N)
-	{
-		std::string s = "";
-		static_for<Begin, End>([&](auto val)
-		{
-			if (N == (T)val.value)
-			{
-				s = GetIntName<T, T(val.value)>();
-				return;
-			}
-		});
-		size_t start = s.find("::") + 2;
-		return s.substr(start);
-	}
-
-	template<typename T, int Begin = 0, int End = 256>
-	T GetEnumFromName(std::string name)
-	{
-		for (int i = Begin; i < End; ++i)
-		{
-			if(name == GetEnumName((T)i));
-				return (T)i;
-		}
-	}
+//	template<typename T, T N>
+//	WEngine::WString GetIntName()
+//	{
+//#if defined(_MSC_VER)
+//		WEngine::WString s = __FUNCSIG__;
+//		WEngine::WString functionName = __FUNCTION__;
+//		size_t start = s.find(functionName + '<') + functionName.Size() + 1;
+//		size_t end = s.find_last_of('>');
+//#elif defined(__GNUC__) ||defined(__clang__)
+//		WEngine::WString s = __PRETTY_FUNCTION__;
+//		size_t start = s.find("T = ") + 4;
+//		size_t end = s.find_first_of(';');
+//#endif
+//		return s.Substr(start, end - start);
+//	}
+//
+//	template<typename T, int Begin = 0, int End = 256>
+//	WEngine::WString GetEnumName(T N)
+//	{
+//		WEngine::WString s = "";
+//		static_for<Begin, End>([&](auto val)
+//		{
+//			if (N == (T)val.value)
+//			{
+//				s = GetIntName<T, T(val.value)>();
+//				return;
+//			}
+//		});
+//		size_t start = s.find("::") + 2;
+//		return s.Substr(start);
+//	}
+//
+//	template<typename T, int Begin = 0, int End = 256>
+//	T GetEnumFromName(WString name)
+//	{
+//		for (int i = Begin; i < End; ++i)
+//		{
+//			if(name == GetEnumName((T)i));
+//				return (T)i;
+//		}
+//	}
 
 	template<typename ...T>
 	struct TypeList
@@ -231,7 +259,7 @@ namespace WEngine
 		template<typename T>
 		struct BaseValue
 		{
-			std::string_view name;
+			WString name;
 			T value;
 			enum { hasValue = true };
 			
@@ -245,7 +273,7 @@ namespace WEngine
 		template<>
 		struct BaseValue<void>
 		{
-			std::string_view name;
+			WString name;
 			enum { hasValue = false };
 
 			template<typename U>
@@ -263,7 +291,7 @@ namespace WEngine
 
 			constexpr ElementList(Es ...elems) : elements{ elems... } {}
 
-			constexpr size_t Find(std::string_view name) const
+			constexpr size_t Find(WEngine::WString name) const
 			{
 				return FindIf([&](auto e) -> bool { return Get<e.val>().name == name; }, index_sequence<count>());
 			}
@@ -318,7 +346,7 @@ namespace WEngine
 		{
 			AList alist;
 
-			constexpr Field(std::string_view name, T val, AList as = {}) : BaseValue<T>(name, val), alist{ as } {  }
+			constexpr Field(WEngine::WString name, T val, AList as = {}) : BaseValue<T>(name, val), alist{ as } {  }
 		};
 
 		template<typename ...Fields>

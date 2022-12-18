@@ -20,7 +20,7 @@
 
 namespace WEngine
 {
-	GuiLayer::GuiLayer(std::string_view name)
+	GuiLayer::GuiLayer(const WString& name)
 		: Layer(name)
 	{
 		GuiConfigure guiConfigure = {};
@@ -66,7 +66,7 @@ namespace WEngine
 			uvd.imageAspect = IMAGE_ASPECT_COLOR;
 		}
 
-		m_imageID.resize(RHIContext::g_maxFrames);
+		m_imageID.Resize(RHIContext::g_maxFrames);
 		for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 			m_imageID[i] = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(i).pColorTexture, m_pSampler);
 	}
@@ -151,7 +151,7 @@ namespace WEngine
 		dispatcher.Dispatch<WEngine::MouseButtonPressedEvent>([this](WEngine::MouseButtonPressedEvent* pEvent) -> bool
 		{
 			ImVec2 mousePos = ImGui::GetMousePos();
-			if (mousePos.x > m_displayArea.first.x && mousePos.x < m_displayArea.second.x && mousePos.y >(m_displayArea.first.y) && mousePos.y < (m_displayArea.second.y))
+			if (mousePos.x > m_displayArea.First().x && mousePos.x < m_displayArea.Second().x && mousePos.y >(m_displayArea.First().y) && mousePos.y < (m_displayArea.Second().y))
 			{
 				if(pEvent->GetMouseCode() == GLFW_MOUSE_BUTTON_2)
 					return false;
@@ -161,9 +161,9 @@ namespace WEngine
 
 					CameraData* data = Editor::g_pEditorCamera->GetData();
 					ImVec2 mousePos = ImGui::GetMousePos();
-					glm::vec2 pos = { (mousePos.x - m_displayArea.first.x) / (m_displayArea.second.x - m_displayArea.first.x), (m_displayArea.second.y - mousePos.y) / (m_displayArea.second.y - m_displayArea.first.y) };
+					glm::vec2 pos = { (mousePos.x - m_displayArea.First().x) / (m_displayArea.Second().x - m_displayArea.First().x), (m_displayArea.Second().y - mousePos.y) / (m_displayArea.Second().y - m_displayArea.First().y) };
 					Ray ray = Ray::GetClickRay(pos, data->Position, glm::inverse(data->MatrixV), glm::inverse(data->MatrixP));
-					const std::vector<GameObject*>& pGameObjects = World::GetWorld()->GetGameObjects();
+					const WArray<GameObject*>& pGameObjects = World::GetWorld()->GetGameObjects();
 					for (GameObject* pGameObject : pGameObjects)
 					{
 						if (ray.IsIntersectWithGameObject(pGameObject))
@@ -181,8 +181,8 @@ namespace WEngine
 		{
 			if (pEvent->GetMouseCode() == GLFW_MOUSE_BUTTON_1)
 			{
-				Screen::SetWidth(m_displayArea.second.x - m_displayArea.first.x);
-				Screen::SetHeight(m_displayArea.second.y - m_displayArea.first.y);
+				Screen::SetWidth(m_displayArea.Second().x - m_displayArea.First().x);
+				Screen::SetHeight(m_displayArea.Second().y - m_displayArea.First().y);
 				if (Screen::SizeChanged())
 				{
 					Screen::g_displayingCamera->RecreateRenderTarget(Screen::GetWidth(), Screen::GetHeight());
@@ -255,11 +255,11 @@ namespace WEngine
 				ImVec2 viewportMin = ImGui::GetWindowContentRegionMin();
 				ImVec2 viewportMax = ImGui::GetWindowContentRegionMax();
 				ImVec2 viewportOffset = ImGui::GetWindowPos();
-				m_displayArea.first = { viewportMin.x + viewportOffset.x, viewportMin.y + viewportOffset.y };
-				m_displayArea.second = { viewportMax.x + viewportOffset.x, viewportMax.y + viewportOffset.y };
+				m_displayArea.First() = { viewportMin.x + viewportOffset.x, viewportMin.y + viewportOffset.y };
+				m_displayArea.Second() = { viewportMax.x + viewportOffset.x, viewportMax.y + viewportOffset.y };
 				//m_displayArea.second.y -= 50;
-				Screen::SetWidth(m_displayArea.second.x - m_displayArea.first.x);
-				Screen::SetHeight(m_displayArea.second.y - m_displayArea.first.y);
+				Screen::SetWidth(m_displayArea.Second().x - m_displayArea.Second().x);
+				Screen::SetHeight(m_displayArea.Second().y - m_displayArea.Second().y);
 
 				//ImGui::ImageButton(m_imageID[0], ImVec2(25, 25));
 				ImGui::Image(m_imageID[RHIContext::g_currentFrame], { (float)Screen::GetWidth(), (float)Screen::GetHeight() });

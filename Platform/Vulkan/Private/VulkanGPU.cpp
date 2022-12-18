@@ -39,8 +39,8 @@ namespace Vulkan
 
 		unsigned int queueFamilyPropertyCount = 0;
 		vkGetPhysicalDeviceQueueFamilyProperties(*m_pPhysicalDevice, &queueFamilyPropertyCount, nullptr);
-		std::vector<VkQueueFamilyProperties> queueFamilyProperties(queueFamilyPropertyCount);
-		vkGetPhysicalDeviceQueueFamilyProperties(*m_pPhysicalDevice, &queueFamilyPropertyCount, queueFamilyProperties.data());
+		WEngine::WArray<VkQueueFamilyProperties> queueFamilyProperties(queueFamilyPropertyCount);
+		vkGetPhysicalDeviceQueueFamilyProperties(*m_pPhysicalDevice, &queueFamilyPropertyCount, queueFamilyProperties.GetData());
 
 		VkBool32 isPresentSupported;
 		for (unsigned int i = 0; i < queueFamilyPropertyCount; ++i)
@@ -52,12 +52,12 @@ namespace Vulkan
 			queueProperty->QUEUE_SUPPORT = properties.queueFlags;
 			if (isPresentSupported)
 				queueProperty->QUEUE_SUPPORT |= QUEUE_PROPERTY_PRESENT;
-			m_feature.queueProperties.push_back(queueProperty);
+			m_feature.queueProperties.Push(queueProperty);
 		}
 
 		VkPhysicalDeviceMemoryProperties memoryProperties;
 		vkGetPhysicalDeviceMemoryProperties(*m_pPhysicalDevice, &memoryProperties);
-		m_feature.memorySupports.resize(memoryProperties.memoryHeapCount);
+		m_feature.memorySupports.Resize(memoryProperties.memoryHeapCount);
 		for (unsigned int i = 0; i < memoryProperties.memoryHeapCount; ++i)
 		{
 			m_feature.memorySupports[i] = new MemoryTypeSupport();
@@ -83,16 +83,16 @@ namespace Vulkan
 		return RHIGPU::m_feature;
 	}
 
-	const std::string& VulkanGPU::GetGPUName() const
+	const WEngine::WString& VulkanGPU::GetGPUName() const
 	{
 		return RHIGPU::GPUName;
 	}
 
 	RHIDevice* VulkanGPU::CreateDevice(RHIDeviceDescriptor *descriptor)
 	{
-		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos(descriptor->queueInfoCount);
-		std::vector<QueueStack> queueStack;
-		queueStack.reserve(descriptor->queueInfoCount);
+		WEngine::WArray<VkDeviceQueueCreateInfo> queueCreateInfos(descriptor->queueInfoCount);
+		WEngine::WArray<QueueStack> queueStack;
+		queueStack.Reserve(descriptor->queueInfoCount);
 		unsigned int size = 0;
 		for (unsigned int i = 0; i < descriptor->queueInfoCount; ++i)
 		{
@@ -114,17 +114,17 @@ namespace Vulkan
 					flag |= QUEUE_PROPERTY_PRESENT;
 					break;
 			}
-			for (; queueFamilyIndex < m_feature.queueProperties.size(); ++queueFamilyIndex)
+			for (; queueFamilyIndex < m_feature.queueProperties.Size(); ++queueFamilyIndex)
 			{
 				QueueProperty *queueProperty = m_feature.queueProperties[queueFamilyIndex];
 				if ((queueProperty->QUEUE_SUPPORT & flag) > 0 && queueDescriptor.count <= queueProperty->count)
 					break;
 			}
-			if(queueFamilyIndex >= m_feature.queueProperties.size())
+			if(queueFamilyIndex >= m_feature.queueProperties.Size())
 				RE_ASSERT(false, "GPU does not support queue specified.")
 			else
 			{
-				queueStack.push_back({queueDescriptor.count, queueFamilyIndex, queueDescriptor.type});
+				queueStack.Push({queueDescriptor.count, queueFamilyIndex, queueDescriptor.type});
 				size += queueDescriptor.count;
 			}
 
@@ -140,17 +140,17 @@ namespace Vulkan
 		VkPhysicalDeviceFeatures deviceFeatures = {};
 
 		VkDeviceCreateInfo deviceCreateInfo = {};
-		std::vector<const char*> extensionNames = { "VK_KHR_swapchain" };
+		WEngine::WArray<const char*> extensionNames = { "VK_KHR_swapchain" };
 		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-		deviceCreateInfo.queueCreateInfoCount = queueCreateInfos.size();
+		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.GetData();
+		deviceCreateInfo.queueCreateInfoCount = queueCreateInfos.Size();
 		deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
-		deviceCreateInfo.ppEnabledExtensionNames = extensionNames.data();
-		deviceCreateInfo.enabledExtensionCount = extensionNames.size();
+		deviceCreateInfo.ppEnabledExtensionNames = extensionNames.GetData();
+		deviceCreateInfo.enabledExtensionCount = extensionNames.Size();
 		if (descriptor->enableDebugLayer)
 		{
-			deviceCreateInfo.enabledLayerCount = static_cast<unsigned int>(VulkanInstance::g_validationLayers.size());
-			deviceCreateInfo.ppEnabledLayerNames = VulkanInstance::g_validationLayers.data();
+			deviceCreateInfo.enabledLayerCount = static_cast<unsigned int>(VulkanInstance::g_validationLayers.Size());
+			deviceCreateInfo.ppEnabledLayerNames = VulkanInstance::g_validationLayers.GetData();
 		}
 		else
 		{

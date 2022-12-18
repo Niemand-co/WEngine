@@ -7,7 +7,7 @@ namespace WEngine
 
 	Synchronizer* Synchronizer::g_pSynchronizer = nullptr;
 
-	std::vector<Trigger*> Synchronizer::g_pTriggers = std::vector<Trigger*>();
+	WArray<Trigger*> Synchronizer::g_pTriggers = WArray<Trigger*>();
 
 	void Synchronizer::Init(Backend backend)
 	{
@@ -33,16 +33,16 @@ namespace WEngine
 
 	void Synchronizer::RegisterTrigger(Trigger* pTrigger)
 	{
-		g_pTriggers.push_back(pTrigger);
+		g_pTriggers.Push(pTrigger);
 	}
 
-	std::vector<Trigger*> Synchronizer::GetTrigger(std::string_view submissionName)
+	WArray<Trigger*> Synchronizer::GetTrigger(WString submissionName)
 	{
-		std::vector<Trigger*> triggers;
+		WArray<Trigger*> triggers;
 		for (Trigger* pTrigger : g_pTriggers)
 		{
 			if(pTrigger->IsNameIn(submissionName))
-				triggers.push_back(pTrigger);
+				triggers.Push(pTrigger);
 		}
 		return triggers;
 	}
