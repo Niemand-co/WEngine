@@ -25,7 +25,7 @@ public:
 
 private:
 
-	std::vector<RHIGroup*> m_pGroup;
+	WEngine::WArray<RHIGroup*> m_pGroup;
 
 	RHIBuffer* m_pSceneBuffer;
 
@@ -41,11 +41,11 @@ private:
 
 	RHIPipelineStateObject* m_pDebugLinePSO;
 
-	std::vector<RHITexture*> m_pStencils;
+	WEngine::WArray<RHITexture*> m_pStencils;
 
-	std::vector<RHITextureView*> m_pStencilViews;
+	WEngine::WArray<RHITextureView*> m_pStencilViews;
 
-	std::vector<RHIRenderTarget*> m_pStencilRenderTargets;
+	WEngine::WArray<RHIRenderTarget*> m_pStencilRenderTargets;
 
 	Mesh *m_pAxisMesh;
 

@@ -12,7 +12,7 @@ namespace WEngine
 
 	void InspectorPanel::DrawGameObject()
 	{
-		if(Editor::GetSelectedObject().size() == 0)
+		if(Editor::GetSelectedObject().Size() == 0)
 			return;
 		GameObject *pCurrentObject = Editor::GetSelectedObject()[0];
 

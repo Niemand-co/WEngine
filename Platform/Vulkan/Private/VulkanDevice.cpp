@@ -7,7 +7,7 @@
 namespace Vulkan
 {
 
-	VulkanDevice::VulkanDevice(VkDevice *device, VulkanGPU *pGPU, std::vector<QueueStack> stacks)
+	VulkanDevice::VulkanDevice(VkDevice *device, VulkanGPU *pGPU, WEngine::WArray<QueueStack> stacks)
 	{
 		m_pDevice = device;
 		m_queues = stacks;
@@ -21,7 +21,7 @@ namespace Vulkan
 
 	unsigned int VulkanDevice::GetQueueCount(RHIQueueType type)
 	{
-		for(unsigned int i = 0; i < m_queues.size(); ++i)
+		for(unsigned int i = 0; i < m_queues.Size(); ++i)
 			if(m_queues[i].type == type)
 				return m_queues[i].count;
 		return 0;
@@ -32,7 +32,7 @@ namespace Vulkan
 		VkQueue *pQueue = (VkQueue*)WEngine::Allocator::Get()->Allocate(sizeof(VkQueue));
 		::new (pQueue) VkQueue();
 		unsigned int queueFamilyID = 0;
-		for(; queueFamilyID < m_queues.size(); ++queueFamilyID)
+		for(; queueFamilyID < m_queues.Size(); ++queueFamilyID)
 			if(m_queues[queueFamilyID].type == type)
 				break;
 		vkGetDeviceQueue(*m_pDevice, m_queues[queueFamilyID].index, 0, pQueue);
@@ -73,10 +73,10 @@ namespace Vulkan
 		return swapchain;
 	}
 
-	std::vector<RHIFence*> VulkanDevice::CreateFence(unsigned int count)
+	WEngine::WArray<RHIFence*> VulkanDevice::CreateFence(unsigned int count)
 	{
 		VulkanFence *pFences = (VulkanFence*)WEngine::Allocator::Get()->Allocate(count * sizeof(VulkanFence));
-		std::vector<RHIFence*> fences(count);
+		WEngine::WArray<RHIFence*> fences(count);
 
 		VkFenceCreateInfo fenceCreateInfo = {};
 		fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -143,10 +143,10 @@ namespace Vulkan
 			pAttachmentDescriptions[i].finalLayout = WEngine::ToVulkan(pAttachmentDescriptor->finalLayout);
 		}
 
-		std::vector<VkSubpassDescription> pSubpassDescriptions(descriptor->subpassCount);
-		std::vector<VkAttachmentReference*> pColorAttachmentReferences(descriptor->subpassCount);
-		std::vector<VkAttachmentReference*> pDepthAttachmentReferences(descriptor->subpassCount, nullptr);
-		std::vector<VkAttachmentReference*> pInputAttachmentReferences(descriptor->subpassCount);
+		WEngine::WArray<VkSubpassDescription> pSubpassDescriptions(descriptor->subpassCount);
+		WEngine::WArray<VkAttachmentReference*> pColorAttachmentReferences(descriptor->subpassCount);
+		WEngine::WArray<VkAttachmentReference*> pDepthAttachmentReferences(descriptor->subpassCount, nullptr);
+		WEngine::WArray<VkAttachmentReference*> pInputAttachmentReferences(descriptor->subpassCount);
 
 		for (unsigned int i = 0; i < descriptor->subpassCount; ++i)
 		{
@@ -186,7 +186,7 @@ namespace Vulkan
 
 		}
 
-		std::vector<VkSubpassDependency> pSubpassDependencies(descriptor->dependencyCount);
+		WEngine::WArray<VkSubpassDependency> pSubpassDependencies(descriptor->dependencyCount);
 		for (unsigned int i = 0; i < descriptor->dependencyCount; ++i)
 		{
 			RHISubPassDependencyDescriptor *dependencyDescriptor = descriptor->pDependencyDescriptors + i;
@@ -203,9 +203,9 @@ namespace Vulkan
 		renderPassCreateInfo.attachmentCount = descriptor->attachmentCount;
 		renderPassCreateInfo.pAttachments = pAttachmentDescriptions;
 		renderPassCreateInfo.subpassCount = descriptor->subpassCount;
-		renderPassCreateInfo.pSubpasses = pSubpassDescriptions.data();
+		renderPassCreateInfo.pSubpasses = pSubpassDescriptions.GetData();
 		renderPassCreateInfo.dependencyCount = descriptor->dependencyCount;
-		renderPassCreateInfo.pDependencies = pSubpassDependencies.data();
+		renderPassCreateInfo.pDependencies = pSubpassDependencies.GetData();
 
 		VkRenderPass *pRenderPass = (VkRenderPass*)WEngine::Allocator::Get()->Allocate(sizeof(VkRenderPass));
    		RE_ASSERT(vkCreateRenderPass(*m_pDevice, &renderPassCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pRenderPass) == VK_SUCCESS, "Failed to Create Render Pass.");
@@ -219,7 +219,7 @@ namespace Vulkan
 	RHIPipelineStateObject* VulkanDevice::CreatePipelineStateObject(RHIPipelineStateObjectDescriptor* descriptor)
 	{
 
-		std::vector<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos(descriptor->shaderCount);
+		WEngine::WArray<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos(descriptor->shaderCount);
 		for (unsigned int i = 0; i < descriptor->shaderCount; ++i)
 		{
 			RHIShader* shader = descriptor->pShader[i];
@@ -346,8 +346,8 @@ namespace Vulkan
 		VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {};
 		{
 			graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-			graphicsPipelineCreateInfo.stageCount = shaderStageCreateInfos.size();
-			graphicsPipelineCreateInfo.pStages = shaderStageCreateInfos.data();
+			graphicsPipelineCreateInfo.stageCount = shaderStageCreateInfos.Size();
+			graphicsPipelineCreateInfo.pStages = shaderStageCreateInfos.GetData();
 			graphicsPipelineCreateInfo.pVertexInputState = &vertexInputStateCreateInfo;
 			graphicsPipelineCreateInfo.pInputAssemblyState = &inputAssemblyStateCreateInfo;
 			graphicsPipelineCreateInfo.pViewportState = &viewportStateCreateInfo;
@@ -402,7 +402,7 @@ namespace Vulkan
 
 		unsigned int index = 0;
 		GPUFeature feature = m_pGPU->GetFeature();
-		for (; index < feature.memorySupports.size(); ++index)
+		for (; index < feature.memorySupports.Size(); ++index)
 		{
 			if((memoryRequirements->memoryTypeBits & 1) && (feature.memorySupports[index]->properties & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) == VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT )
 				break;
@@ -455,16 +455,16 @@ namespace Vulkan
 
 	RHIRenderTarget* VulkanDevice::CreateRenderTarget(RHIRenderTargetDescriptor* descriptor)
 	{
-		std::vector<VkImageView> views(descriptor->bufferCount);
-		for (unsigned int i = 0; i < views.size(); ++i)
+		WEngine::WArray<VkImageView> views(descriptor->bufferCount);
+		for (unsigned int i = 0; i < views.Size(); ++i)
 		{
 			views[i] = *(static_cast<VulkanTextureView*>(descriptor->pBufferView[i])->GetHandle());
 		}
 
 		VkFramebufferCreateInfo framebufferCreateInfo = {};
 		framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferCreateInfo.attachmentCount = views.size();
-		framebufferCreateInfo.pAttachments = views.data();
+		framebufferCreateInfo.attachmentCount = views.Size();
+		framebufferCreateInfo.pAttachments = views.GetData();
 		framebufferCreateInfo.renderPass = *static_cast<VulkanRenderPass*>(descriptor->renderPass)->GetHandle();
 		framebufferCreateInfo.width = descriptor->width;
 		framebufferCreateInfo.height = descriptor->height;
@@ -500,14 +500,14 @@ namespace Vulkan
 
 		unsigned int index = 0;
 		GPUFeature feature = m_pGPU->GetFeature();
-		for (; index < feature.memorySupports.size(); ++index)
+		for (; index < feature.memorySupports.Size(); ++index)
 		{
 			if (feature.memorySupports[index]->type == MemoryType::LocalMemory && (feature.memorySupports[index]->properties & descriptor->memoryType) == descriptor->memoryType )
 			{
 				break;
 			}
 		}
-		RE_ASSERT(feature.memorySupports.size() > index, "No Suitable Memory Heap Exists.");
+		RE_ASSERT(feature.memorySupports.Size() > index, "No Suitable Memory Heap Exists.");
 
 		VulkanBuffer *buffer = (VulkanBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanBuffer));
 		if(descriptor->isDynamic)
@@ -613,7 +613,7 @@ namespace Vulkan
 	void VulkanDevice::UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
 	{
 		VkWriteDescriptorSet *pWriteDescriptorSets = (VkWriteDescriptorSet*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkWriteDescriptorSet));
-		std::vector<VkDescriptorBufferInfo*> pDescriptorBufferInfos(descriptor->bindingCount);
+		WEngine::WArray<VkDescriptorBufferInfo*> pDescriptorBufferInfos(descriptor->bindingCount);
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
 			pDescriptorBufferInfos[i] = (VkDescriptorBufferInfo*)WEngine::Allocator::Get()->Allocate(descriptor->pBindingDescriptors[i].bufferResourceCount * sizeof(VkDescriptorBufferInfo));
@@ -651,7 +651,7 @@ namespace Vulkan
 	void VulkanDevice::UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
 	{
 		VkWriteDescriptorSet *pWriteDescriptorSets = (VkWriteDescriptorSet*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkWriteDescriptorSet));
-		std::vector<VkDescriptorImageInfo*> pDescriptorImageInfos(descriptor->bindingCount, nullptr);
+		WEngine::WArray<VkDescriptorImageInfo*> pDescriptorImageInfos(descriptor->bindingCount, nullptr);
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
 			pDescriptorImageInfos[i] = (VkDescriptorImageInfo*)WEngine::Allocator::Get()->Allocate(descriptor->textureResourceCount * sizeof(VkDescriptorImageInfo));
@@ -687,11 +687,11 @@ namespace Vulkan
 		WEngine::Allocator::Get()->Deallocate(pWriteDescriptorSets);
 	}
 
-	std::vector<RHISemaphore*> VulkanDevice::GetSemaphore(unsigned int count)
+	WEngine::WArray<RHISemaphore*> VulkanDevice::GetSemaphore(unsigned int count)
 	{
 		VkSemaphore *pSemaphore = (VkSemaphore*)WEngine::Allocator::Get()->Allocate(count * sizeof(VkSemaphore));
 		VulkanSemaphore *semaphore = (VulkanSemaphore*)WEngine::Allocator::Get()->Allocate(count * sizeof(VulkanSemaphore));
-		std::vector<RHISemaphore*> semaphores(count);
+		WEngine::WArray<RHISemaphore*> semaphores(count);
 		
 		VkSemaphoreCreateInfo semaphoreCreateInfo = {};
 		semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -707,26 +707,26 @@ namespace Vulkan
 
 	void VulkanDevice::WaitForFences(RHIFence* pFences, unsigned int count, bool waitForAll)
 	{
-		std::vector<VkFence> fences;
-		fences.reserve(count);
+		WEngine::WArray<VkFence> fences;
+		fences.Reserve(count);
 		for (unsigned int i = 0; i < count; ++i)
 		{
-			fences.push_back(*static_cast<VulkanFence*>(pFences + i)->GetHandle());
+			fences.Push(*static_cast<VulkanFence*>(pFences + i)->GetHandle());
 		}
 
-		vkWaitForFences(*m_pDevice, count, fences.data(), waitForAll, (std::numeric_limits<uint64_t>::max)());
+		vkWaitForFences(*m_pDevice, count, fences.GetData(), waitForAll, (std::numeric_limits<uint64_t>::max)());
 	}
 
 	void VulkanDevice::ResetFences(RHIFence* pFences, unsigned int count)
 	{
-		std::vector<VkFence> fences;
-		fences.reserve(count);
+		WEngine::WArray<VkFence> fences;
+		fences.Reserve(count);
 		for (unsigned int i = 0; i < count; ++i)
 		{
-			fences.push_back(*static_cast<VulkanFence*>(pFences + i)->GetHandle());
+			fences.Push(*static_cast<VulkanFence*>(pFences + i)->GetHandle());
 		}
 
-		RE_ASSERT(vkResetFences(*m_pDevice, count, fences.data()) == VK_SUCCESS, "Failed to Reset Fences.");
+		RE_ASSERT(vkResetFences(*m_pDevice, count, fences.GetData()) == VK_SUCCESS, "Failed to Reset Fences.");
 	}
 
 	int VulkanDevice::GetNextImage(RHISwapchain *swapchain, RHISemaphore *semaphore)

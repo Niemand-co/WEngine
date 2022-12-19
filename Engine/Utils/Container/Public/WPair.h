@@ -8,15 +8,17 @@ namespace WEngine
 	{
 	public:
 
+		WPair() = default;
+
 		WPair(const k& key, const v& val);
 
 		WPair(const WPair&) = default;
 
 		~WPair() = default;
 
-		const k& First() const { return m_key; }
+		k& First() { return m_key; }
 
-		const v& Second() const { return m_val; }
+		v& Second() { return m_val; }
 
 	private:
 

@@ -1,10 +1,12 @@
 #pragma once
+#include "Utils/Container/Public/WArray.h"
+#include "Utils/Container/Public/WString.h"
 
 class ShaderCodeBlob
 {
 public:
 
-	ShaderCodeBlob(std::string path);
+	ShaderCodeBlob(const WEngine::WString& path);
 
 	~ShaderCodeBlob();
 
@@ -16,10 +18,10 @@ public:
 
 private:
 
-	void ReadShaderFromPath(std::string path);
+	void ReadShaderFromPath(const WEngine::WString& path);
 	
 private:
 
-	std::vector<char> m_buffer;
+	WEngine::WArray<char> m_buffer;
 
 };

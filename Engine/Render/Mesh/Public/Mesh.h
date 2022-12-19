@@ -27,7 +27,7 @@ public:
 
 public:
 
-	const WEngine::WGuid m_id;
+	const WEngine::WGuid<WEngine::WString> m_id;
 
 	Vertex *m_pVertices;
 
@@ -59,12 +59,12 @@ public:
 
 	~MeshLibrary();
 
-	void AddMesh(const WEngine::WGuid& id, Mesh *pMesh);
+	void AddMesh(const WEngine::WGuid<WEngine::WString>& id, Mesh *pMesh);
 
-	Mesh* GetMesh(const WEngine::WGuid& id);
+	Mesh* GetMesh(const WEngine::WGuid<WEngine::WString>& id);
 
 private:
 
-	WEngine::WArray<WEngine::WPair<WEngine::WGuid, Mesh*>> m_meshes;
+	WEngine::WArray<WEngine::WPair<WEngine::WGuid<WEngine::WString>, Mesh*>> m_meshes;
 
 };

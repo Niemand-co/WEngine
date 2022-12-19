@@ -16,7 +16,7 @@ namespace WEngine
 
 		static void Update();
 		
-		static unsigned int GetIndexCount() { return g_lineIndices.size(); }
+		static unsigned int GetIndexCount() { return g_lineIndices.Size(); }
 
 		static RHIBuffer* GetLineVertexBuffer() { return g_pLineVertexBuffer; }
 
@@ -24,9 +24,9 @@ namespace WEngine
 
 	private:
 
-		static std::vector<Vertex> g_lineVertices;
+		static WArray<Vertex> g_lineVertices;
 
-		static std::vector<unsigned int> g_lineIndices;
+		static WArray<unsigned int> g_lineIndices;
 
 		static RHIBuffer* g_pLineVertexBuffer;
 

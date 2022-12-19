@@ -16,6 +16,6 @@ public:
 
 	size_t codeSize;
 
-	std::string entryName;
+	WEngine::WString entryName;
 
 };

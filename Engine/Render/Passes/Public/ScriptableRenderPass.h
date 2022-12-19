@@ -39,7 +39,7 @@ public:
 
 protected:
 
-	std::vector<RHIRenderTarget*> m_pRenderTargets;
+	WEngine::WArray<RHIRenderTarget*> m_pRenderTargets;
 
 	RHIDevice *m_pDevice;
 
@@ -49,7 +49,7 @@ protected:
 
 	RHIPipelineStateObject *m_pPSO;
 
-	std::vector<RHICommandBuffer*> m_pCommandBuffers;
+	WEngine::WArray<RHICommandBuffer*> m_pCommandBuffers;
 
 	ScriptableRenderer *m_pRenderer;
 

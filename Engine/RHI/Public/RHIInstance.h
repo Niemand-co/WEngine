@@ -30,7 +30,7 @@ public:
 
 protected:
 	
-	std::vector<RHIGPU*> m_gpus;
+	WEngine::WArray<RHIGPU*> m_gpus;
 
 	RHISurface* m_surface;
 

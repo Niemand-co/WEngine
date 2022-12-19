@@ -12,9 +12,9 @@ namespace WEngine
 
 	RHIBuffer* Debug::g_pLineIndexBuffer = nullptr;
 
-	std::vector<Vertex> Debug::g_lineVertices = std::vector<Vertex>();
+	WArray<Vertex> Debug::g_lineVertices = WArray<Vertex>();
 
-	std::vector<unsigned int> Debug::g_lineIndices = std::vector<unsigned int>();
+	WArray<unsigned int> Debug::g_lineIndices = WArray<unsigned int>();
 
 	void Debug::Init()
 	{
@@ -37,20 +37,20 @@ namespace WEngine
 
 	void Debug::DrawLine(glm::vec3 a, glm::vec3 b, glm::vec4 color)
 	{
-		g_lineVertices.emplace_back(Vertex(a, color));
-		g_lineVertices.emplace_back(Vertex(b, color));
+		g_lineVertices.Push(Vertex(a, color));
+		g_lineVertices.Push(Vertex(b, color));
 
-		g_lineIndices.emplace_back(g_lineIndices.size());
-		g_lineIndices.emplace_back(g_lineIndices.size());
+		g_lineIndices.Push(g_lineIndices.Size());
+		g_lineIndices.Push(g_lineIndices.Size());
 	}
 
 	void Debug::Update()
 	{
-		g_pLineVertexBuffer->LoadData(g_lineVertices.data(), g_lineVertices.size() * sizeof(Vertex), 0);
-		g_pLineIndexBuffer->LoadData(g_lineIndices.data(), g_lineIndices.size() * sizeof(unsigned int), 0);
+		g_pLineVertexBuffer->LoadData(g_lineVertices.GetData(), g_lineVertices.Size() * sizeof(Vertex), 0);
+		g_pLineIndexBuffer->LoadData(g_lineIndices.GetData(), g_lineIndices.Size() * sizeof(unsigned int), 0);
 
-		g_lineVertices.clear();
-		g_lineIndices.clear();
+		g_lineVertices.Clear();
+		g_lineIndices.Clear();
 	}
 
 }

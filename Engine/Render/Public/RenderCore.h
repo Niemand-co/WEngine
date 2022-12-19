@@ -1,4 +1,5 @@
 #pragma once
+#include "Utils/Container/Public/WArray.h"
 
 enum class Format
 {
@@ -110,8 +111,8 @@ struct GPUFeature
 		struct { char PHYSICAL_DEVICE_TYPE, QUEUE_SUPPORT; };
 	};
 	unsigned short SHDAER_SUPPORT;
-	std::vector<MemoryTypeSupport*> memorySupports;
-	std::vector<QueueProperty*> queueProperties;
+	WEngine::WArray<MemoryTypeSupport*> memorySupports;
+	WEngine::WArray<QueueProperty*> queueProperties;
 	size_t minUBOAlignment;
 };
 

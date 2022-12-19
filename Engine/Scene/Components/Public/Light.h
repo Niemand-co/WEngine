@@ -34,13 +34,13 @@ public:
 
 	glm::vec3 GetColor() const { return m_color; }
 
-	const std::vector<RHITextureView*>& GetDepthTexture() const { return m_pDepthTextureViews; }
+	const WEngine::WArray<RHITextureView*>& GetDepthTexture() const { return m_pDepthTextureViews; }
 
 	void UpdateShadowFrustum(CameraData* cameraData);
 
-	const std::vector<glm::mat4>& GetShadowFrustum();
+	const WEngine::WArray<glm::mat4>& GetShadowFrustum();
 
-	const std::vector<float>& GetSplices();
+	const WEngine::WArray<float>& GetSplices();
 
 private:
 
@@ -52,14 +52,14 @@ private:
 
 	float m_intensity;
 
-	std::vector<RHITexture*> m_pDepthTextures;
+	WEngine::WArray<RHITexture*> m_pDepthTextures;
 
-	std::vector<RHITextureView*> m_pDepthTextureViews;
+	WEngine::WArray<RHITextureView*> m_pDepthTextureViews;
 
 	unsigned int m_mainLightCascadedShadowMapNum = 4;
 
-	std::vector<float> m_mainLightCascadedShadowMapRange;
+	WEngine::WArray<float> m_mainLightCascadedShadowMapRange;
 
-	std::vector<glm::mat4> m_lightSpaceMatrix;
+	WEngine::WArray<glm::mat4> m_lightSpaceMatrix;
 
 };

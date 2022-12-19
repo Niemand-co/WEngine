@@ -4,7 +4,7 @@
 namespace Vulkan
 {
 
-	VulkanShader::VulkanShader(VkShaderModule* shaderModule, unsigned int stage, std::string entryName)
+	VulkanShader::VulkanShader(VkShaderModule* shaderModule, unsigned int stage, const WEngine::WString& entryName)
 		: m_shaderModule(shaderModule)
 	{
 		m_stage = stage;

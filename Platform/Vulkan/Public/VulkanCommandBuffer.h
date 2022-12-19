@@ -12,7 +12,7 @@ namespace Vulkan
 
 		virtual ~VulkanCommandBuffer();
 
-		virtual void BeginScopePass(std::string passName, RHIRenderPass* pRenderPass = nullptr, unsigned int subpass = 0, RHIRenderTarget* pRenderTarget = nullptr) override;
+		virtual void BeginScopePass(const WEngine::WString& passName, RHIRenderPass* pRenderPass = nullptr, unsigned int subpass = 0, RHIRenderTarget* pRenderTarget = nullptr) override;
 
 		virtual void EndScopePass() override;
 

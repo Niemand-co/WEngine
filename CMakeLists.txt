@@ -36,6 +36,7 @@ file(GLOB GUI_SRC Engine/Utils/ImGui/Private/*.*)
 file(GLOB PANEL_SRC Engine/Utils/ImGui/Panels/Private/*.*)
 file(GLOB REFLECTION_SRC Engine/Utils/Reflection/Private/*.*)
 file(GLOB CONTAINER_SRC Engine/Utils/Container/Private/*.*)
+file(GLOB HAL_SRC Engine/HAL/Private/*.*)
 file(GLOB GLFW_SRC Platform/GLFWWindow/Private/*.*)
 file(GLOB WIN_SRC Platform/Windows/Private/*.*)
 file(GLOB VULKAN_SRC Platform/Vulkan/Private/*.*)
@@ -64,6 +65,7 @@ file(GLOB GUI_INCLUDE Engine/Utils/ImGui/Public/*.h)
 file(GLOB PANEL_INCLUDE Engine/Utils/ImGui/Panels/Public/*.h)
 file(GLOB REFLECTION_INCLUDE Engine/Utils/Reflection/Public/*.h)
 file(GLOB CONTAINER_INCLUDE Engine/Utils/Container/Public/*.h)
+file(GLOB HAL_INCLUDE Engine/HAL/Public/*.h)
 file(GLOB GLFW_INCLUDE Platform/GLFWWindow/Public/*.h)
 file(GLOB WIN_INCLUDE Platform/Windows/Public/*.h)
 file(GLOB VULKAN_INCLUDE Platform/Vulkan/Public/*.h)
@@ -90,6 +92,7 @@ endmacro(use_precompiled_header)
 
 set(PLATFORM_SRC
     ${GLFW_SRC}
+    ${WIN_SRC}
     ${VULKAN_SRC}
     ${VULKAN_ENCODER_SRC}
     ${VULKAN_ALLOC_SRC}
@@ -123,6 +126,7 @@ set(WE_SRC
     ${RHI_SRC}
     ${RHI_ENCODER_SRC}
     ${GUI_SRC}
+    ${HAL_SRC}
     ${PANEL_SRC}
     ${REFLECTION_SRC}
     ${CONTAINER_SRC}
@@ -148,6 +152,7 @@ set(WE_INCLUDE
     ${RHI_INCLUDE}
     ${RHI_ENCODER_INCLUDE}
     ${GUI_INCLUDE}
+    ${HAL_INCLUDE}
     ${PANEL_INCLUDE}
     ${REFLECTION_INCLUDE}
     ${CONTAINER_INCLUDE})
@@ -183,9 +188,11 @@ source_group(Engine/RHI/Private FILES ${RHI_SRC})
 source_group(Engine/RHI/Encoder/Private FILES ${RHI_ENCODER_SRC})
 source_group(Engine/Utils/ImGui/Private FILES ${GUI_SRC})
 source_group(Engine/Utils/ImGui/Panels/Private FILES ${PANEL_SRC})
+source_group(Engine/HAL/Private FILES ${HAL_SRC})
 source_group(Engine/Utils/Reflection/Private FILES ${REFLECTION_SRC})
 source_group(Engine/Utils/Container/Private FILES ${CONTAINER_SRC})
 source_group(Platform/GLFWWindow/Private FILES ${GLFW_SRC})
+source_group(Platform/Windows/Private FILES ${WIN_SRC})
 source_group(Platform/Vulkan/Private FILES ${VULKAN_SRC})
 source_group(Platform/Vulkan/Encoder/Private FILES ${VULKAN_ENCODER_SRC})
 source_group(Platform/Vulkan/Allocator/Private FILES ${VULKAN_ALLOC_SRC})
@@ -213,7 +220,9 @@ source_group(Engine/Utils/ImGui/Public FILES ${GUI_INCLUDE})
 source_group(Engine/Utils/ImGui/Panels/Public FILES ${PANEL_INCLUDE})
 source_group(Engine/Utils/Reflection/Public FILES ${REFLECTION_INCLUDE})
 source_group(Engine/Utils/Container/Public FILES ${CONTAINER_INCLUDE})
+source_group(Engine/HAL/Public FILES ${HAL_INCLUDE})
 source_group(Platform/GLFWWindow/Public FILES ${GLFW_INCLUDE})
+source_group(Platform/Windows/Public FILES ${WIN_INCLUDE})
 source_group(Platform/Vulkan/Public FILES ${VULKAN_INCLUDE})
 source_group(Platform/Vulkan/Encoder/Public FILES ${VULKAN_ENCODER_INCLUDE})
 source_group(Platform/Vulkan/Allocator/Public FILES ${VULKAN_ALLOC_INCLUDE})

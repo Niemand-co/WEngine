@@ -14,7 +14,7 @@ public:
 
 public:
 
-	std::string_view submissionName;
+	WEngine::WString submissionName;
 
 	RHISemaphore **pWaitSemaphores;
 

@@ -44,7 +44,7 @@ public:
 
 	virtual RHISwapchain* CreateSwapchain(RHISwapchainDescriptor *descriptor) = 0;
 
-	virtual std::vector<RHIFence*> CreateFence(unsigned int count) = 0;
+	virtual WEngine::WArray<RHIFence*> CreateFence(unsigned int count) = 0;
 
 	virtual RHIEvent* GetEvent() = 0;
 
@@ -74,7 +74,7 @@ public:
 
 	virtual void UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor *descriptor) = 0;
 
-	virtual std::vector<RHISemaphore*> GetSemaphore(unsigned int count) = 0;
+	virtual WEngine::WArray<RHISemaphore*> GetSemaphore(unsigned int count) = 0;
 
 	virtual void WaitForFences(RHIFence *pFences, unsigned int count, bool waitForAll = true) = 0;
 

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Example/Public/SandBox.h"
 
-GameScene::GameScene(std::string_view name)
+GameScene::GameScene(const WEngine::WString& name)
 	: Layer(name)
 {
 	m_pPipeline = RHIContext::CreateRenderPipeline<ScriptableRenderPipeline>();

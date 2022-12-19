@@ -115,18 +115,18 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 		blendDescriptor.blendEnabled = false;
 	}
 
-	m_pSceneDataBuffers.resize(RHIContext::g_maxFrames * 4);
+	m_pSceneDataBuffers.Resize(RHIContext::g_maxFrames * 4);
 	RHIBufferDescriptor sceneBufferDescriptor = {};
 	{
 		sceneBufferDescriptor.dataSize = sizeof(SceneData);
 		sceneBufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
 	}
-	for (unsigned int i = 0; i < m_pSceneDataBuffers.size(); ++i)
+	for (unsigned int i = 0; i < m_pSceneDataBuffers.Size(); ++i)
 	{
 		m_pSceneDataBuffers[i] = context->CreateUniformBuffer(&sceneBufferDescriptor);
 	}
 
-	m_pObjectDataBuffers.resize(RHIContext::g_maxFrames);
+	m_pObjectDataBuffers.Resize(RHIContext::g_maxFrames);
 	RHIBufferDescriptor objectBufferDescriptor = {};
 	{
 		objectBufferDescriptor.dataSize = sizeof(ObjectData);
@@ -202,9 +202,9 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 		}
 	}
 	
-	const std::vector<RHITextureView*>& depthTextureViews = World::GetWorld()->GetMainLight()->GetDepthTexture();
-	m_pRenderTargets.resize(depthTextureViews.size());
-	for (unsigned int i = 0; i < depthTextureViews.size(); ++i)
+	const WEngine::WArray<RHITextureView*>& depthTextureViews = World::GetWorld()->GetMainLight()->GetDepthTexture();
+	m_pRenderTargets.Resize(depthTextureViews.Size());
+	for (unsigned int i = 0; i < depthTextureViews.Size(); ++i)
 	{
 		RHITextureView *views[] = { depthTextureViews[i] };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
@@ -225,8 +225,8 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 {
 	RHICommandBuffer* cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 	Light *mainLight = World::GetWorld()->GetMainLight();
-	std::vector<glm::mat4> frustum = mainLight->GetShadowFrustum();
-	std::vector<float> splices = mainLight->GetSplices();
+	WEngine::WArray<glm::mat4> frustum = mainLight->GetShadowFrustum();
+	WEngine::WArray<float> splices = mainLight->GetSplices();
 
 
 	cmd->BeginScopePass("MainLightShadow", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentImage]);
@@ -255,8 +255,8 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 			encoder->BeginPass(&renderpassBeginDescriptor);
 
 			unsigned int drawcalls = 0;
-			const std::vector<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
-			for (unsigned int i = 0; i < gameObjects.size(); ++i)
+			const WEngine::WArray<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
+			for (unsigned int i = 0; i < gameObjects.Size(); ++i)
 			{
 				MeshFilter* filter = gameObjects[i]->GetComponent<MeshFilter>();
 				if (filter == nullptr)
@@ -269,7 +269,7 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 			m_pObjectDataBuffers[RHIContext::g_currentFrame]->Flush(drawcalls);
 
 			drawcalls = 0;
-			for (unsigned int i = 0; i < gameObjects.size(); ++i)
+			for (unsigned int i = 0; i < gameObjects.Size(); ++i)
 			{
 				MeshFilter *filter = gameObjects[i]->GetComponent<MeshFilter>();
 				if(filter == nullptr)

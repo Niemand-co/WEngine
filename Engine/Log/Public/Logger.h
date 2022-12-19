@@ -1,18 +1,19 @@
 #pragma once
+#include "Utils/Container/Public/WString.h"
 
 class Logger
 {
 public:
-	static void Warn(std::string exp = "");
+	static void Warn(const WEngine::WString& exp = "");
 	template<typename T>
 	static void Log(T exp = T(0));
-	static void Debugger(std::string exp = "");
-	static void Loading(std::string exp = "");
-	static void Success(std::string exp = "");
-	static void Error(std::string exp = "");
-	static void AssertFail(bool judge, std::string exp = "");
+	static void Debugger(const WEngine::WString& exp = "");
+	static void Loading(const WEngine::WString& exp = "");
+	static void Success(const WEngine::WString& exp = "");
+	static void Error(const WEngine::WString& exp = "");
+	static void AssertFail(bool judge, const WEngine::WString& exp = "");
 private:
-	static std::string GetTime()
+	static WEngine::WString GetTime()
 	{
 		time_t timer;
 		time(&timer);
@@ -21,7 +22,7 @@ private:
 		date.tm_hour = (date.tm_hour + 8) % 24;
 		char sDate[32];
 		strftime(sDate, sizeof(sDate), "[%F %T]", &date);
-		std::string s = sDate;
+		WEngine::WString s = sDate;
 		return s;
 	}
 };

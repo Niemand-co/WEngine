@@ -22,6 +22,9 @@
 #include "RHI/Public/RHIHeads.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 
+#include "HAL/Public/WThread.h"
+#include "HAL/Public/WThreadManager.h"
+
 #include "Render/Mesh/Public/Mesh.h"
 
 #include "Utils/Public/Window.h"

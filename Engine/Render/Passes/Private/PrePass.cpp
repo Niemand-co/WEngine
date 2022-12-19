@@ -82,9 +82,9 @@ PrePass::PrePass(ScriptableRenderer* pRenderer)
 		renderTargetDescriptor.bufferCount = 1;
 	}
 
-	m_pDepthTextures.resize(RHIContext::g_maxFrames);
-	m_pDepthTextureViews.resize(RHIContext::g_maxFrames);
-	m_pRenderTargets.resize(RHIContext::g_maxFrames);
+	m_pDepthTextures.Resize(RHIContext::g_maxFrames);
+	m_pDepthTextureViews.Resize(RHIContext::g_maxFrames);
+	m_pRenderTargets.Resize(RHIContext::g_maxFrames);
 	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{
 		m_pDepthTextures[i] = RHIContext::GetDevice()->CreateTexture(&textureDescriptor);
@@ -156,7 +156,7 @@ void PrePass::Setup(RHIContext* context, CameraData* cameraData)
 		blendDescriptor.blendEnabled = false;
 	}
 
-	m_pSceneDataBuffers.resize(RHIContext::g_maxFrames);
+	m_pSceneDataBuffers.Resize(RHIContext::g_maxFrames);
 	RHIBufferDescriptor sceneBufferDescriptor = {};
 	{
 		sceneBufferDescriptor.dataSize = sizeof(SceneData);
@@ -166,7 +166,7 @@ void PrePass::Setup(RHIContext* context, CameraData* cameraData)
 	m_pSceneDataBuffers[1] = context->CreateUniformBuffer(&sceneBufferDescriptor);
 	m_pSceneDataBuffers[2] = context->CreateUniformBuffer(&sceneBufferDescriptor);
 
-	m_pObjectDataBuffers.resize(RHIContext::g_maxFrames);
+	m_pObjectDataBuffers.Resize(RHIContext::g_maxFrames);
 	RHIBufferDescriptor objectBufferDescriptor = {};
 	{
 		objectBufferDescriptor.dataSize = sizeof(ObjectData);
@@ -239,7 +239,7 @@ void PrePass::Setup(RHIContext* context, CameraData* cameraData)
 		context->UpdateUniformResourceToGroup(&updateResourceDescriptor);
 	}
 
-	m_pRenderTargets.resize(RHIContext::g_maxFrames);
+	m_pRenderTargets.Resize(RHIContext::g_maxFrames);
 	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{
 		RHITextureView* views[] = { m_pDepthTextureViews[i] };
@@ -285,8 +285,8 @@ void PrePass::Execute(RHIContext* context, CameraData* cameraData)
 		encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
 
 		unsigned int drawcalls = 0;
-		const std::vector<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
-		for (unsigned int i = 0; i < gameObjects.size(); ++i)
+		const WEngine::WArray<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
+		for (unsigned int i = 0; i < gameObjects.Size(); ++i)
 		{
 			MeshFilter* filter = gameObjects[i]->GetComponent<MeshFilter>();
 			if (filter == nullptr)
@@ -299,7 +299,7 @@ void PrePass::Execute(RHIContext* context, CameraData* cameraData)
 		m_pObjectDataBuffers[RHIContext::g_currentFrame]->Flush(drawcalls);
 
 		drawcalls = 0;
-		for (unsigned int i = 0; i < gameObjects.size(); ++i)
+		for (unsigned int i = 0; i < gameObjects.Size(); ++i)
 		{
 			MeshFilter* filter = gameObjects[i]->GetComponent<MeshFilter>();
 			if (filter == nullptr)
@@ -326,11 +326,11 @@ void PrePass::UpdateRenderTarget(CameraData* cameraData)
 	{
 		delete m_pDepthTextureViews[i];
 
-		std::vector<RHITextureView*> textureViews = { m_pDepthTextureViews[i] };
+		WEngine::WArray<RHITextureView*> textureViews = { m_pDepthTextureViews[i] };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
 			renderTargetDescriptor.bufferCount = 2;
-			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.pBufferView = textureViews.GetData();
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.width = WEngine::Screen::GetWidth();
 			renderTargetDescriptor.height = WEngine::Screen::GetHeight();

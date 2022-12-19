@@ -17,15 +17,15 @@ World::~World()
 GameObject* World::CreateGameObject(const WEngine::WString& name)
 {
 	GameObject* gameObject = new GameObject(name);
-	g_pInstance->m_pEntities.push_back(std::move(gameObject));
-	g_pInstance->m_pNames.push_back(name);
+	g_pInstance->m_pEntities.Push(std::move(gameObject));
+	g_pInstance->m_pNames.Push(name);
 	gameObject->AddComponent<Transformer>();
 	return gameObject;
 }
 
 void World::AddCamera(Camera* pCamera)
 {
-	m_pCameras.push_back(std::move(pCamera));
+	m_pCameras.Push(std::move(pCamera));
 }
 
 void World::AddLight(Light* pLight)
@@ -35,12 +35,12 @@ void World::AddLight(Light* pLight)
 		m_pMainLight = pLight;
 		pLight->SetMainLight(true);
 	}
-	m_pAdditionalLights.push_back(pLight);
+	m_pAdditionalLights.Push(pLight);
 }
 
 void World::SetMainLight(Light* pLight)
 {
-	for (unsigned int i = 0; i < m_pAdditionalLights.size(); ++i)
+	for (unsigned int i = 0; i < m_pAdditionalLights.Size(); ++i)
 	{
 		if (m_pAdditionalLights[i] == pLight)
 		{
@@ -73,17 +73,17 @@ World* World::GetWorld()
 	return g_pInstance;
 }
 
-const std::vector<GameObject*>& World::GetGameObjects() const
+const WEngine::WArray<GameObject*>& World::GetGameObjects() const
 {
 	return m_pEntities;
 }
 
-const std::vector<WEngine::WString>& World::GetObjectNames() const
+const WEngine::WArray<WEngine::WString>& World::GetObjectNames() const
 {
 	return m_pNames;
 }
 
-std::vector<Camera*>& World::GetCameras()
+WEngine::WArray<Camera*>& World::GetCameras()
 {
 	return m_pCameras;
 }
@@ -93,7 +93,7 @@ Light* World::GetMainLight() const
 	return m_pMainLight;
 }
 
-const std::vector<Light*>& World::GetAdditionalLights() const
+const WEngine::WArray<Light*>& World::GetAdditionalLights() const
 {
 	return m_pAdditionalLights;
 }

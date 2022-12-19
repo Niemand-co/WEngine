@@ -22,23 +22,23 @@ Gui* Gui::CreateGui(WEngine::Backend backend)
 	return nullptr;
 }
 
-void Gui::DrawSlider(std::string title, float* pValue, float minValue, float maxValue)
+void Gui::DrawSlider(WEngine::WString title, float* pValue, float minValue, float maxValue)
 {
-	ImGui::Text(title.c_str());ImGui::SameLine();
+	ImGui::Text(title.Data());ImGui::SameLine();
 	title = "##" + title;
-	ImGui::SliderFloat(title.data(), pValue, minValue, maxValue);
+	ImGui::SliderFloat(title.Data(), pValue, minValue, maxValue);
 }
 
-void Gui::DrawColorEdit(std::string title, float* pColor, bool hasAlpha)
+void Gui::DrawColorEdit(WEngine::WString title, float* pColor, bool hasAlpha)
 {
-	ImGui::Text(title.c_str()); ImGui::SameLine();
+	ImGui::Text(title.Data()); ImGui::SameLine();
 	title = "##" + title;
 	if (hasAlpha)
 	{
-		ImGui::ColorEdit4(title.data(), pColor);
+		ImGui::ColorEdit4(title.Data(), pColor);
 	}
 	else
 	{
-		ImGui::ColorEdit3(title.data(), pColor);
+		ImGui::ColorEdit3(title.Data(), pColor);
 	}
 }

@@ -29,7 +29,7 @@ namespace Vulkan
 
 	private:
 
-		bool CheckLayerAvailability(const std::vector<const char*>& layers);
+		bool CheckLayerAvailability(const WEngine::WArray<const char*>& layers);
 
 		VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* createInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* callback);
 
@@ -37,7 +37,7 @@ namespace Vulkan
 
 	public:
 
-		static std::vector<const char*> g_validationLayers;
+		static WEngine::WArray<const char*> g_validationLayers;
 
 	private:
 

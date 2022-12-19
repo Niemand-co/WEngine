@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Utils/Public/ShaderCodeBlob.h"
 
-ShaderCodeBlob::ShaderCodeBlob(std::string path)
+ShaderCodeBlob::ShaderCodeBlob(const WEngine::WString& path)
 {
 	ReadShaderFromPath(path);
 }
@@ -12,24 +12,24 @@ ShaderCodeBlob::~ShaderCodeBlob()
 
 unsigned int ShaderCodeBlob::GetSize()
 {
-	return m_buffer.size();
+	return m_buffer.Size();
 }
 
 unsigned int* ShaderCodeBlob::GetCode()
 {
-	return reinterpret_cast<unsigned int*>(m_buffer.data());
+	return reinterpret_cast<unsigned int*>(m_buffer.GetData());
 }
 
-void ShaderCodeBlob::ReadShaderFromPath(std::string path)
+void ShaderCodeBlob::ReadShaderFromPath(const WEngine::WString& path)
 {
-	std::ifstream file(path, std::ios::ate | std::ios::binary);
+	std::ifstream file(path.Data(), std::ios::ate | std::ios::binary);
 	RE_ASSERT(file.is_open(), "Failed to Open Shader File.");
 
 	size_t fileSize = (size_t)file.tellg();
-	m_buffer.resize(fileSize);
+	m_buffer.Resize(fileSize);
 
 	file.seekg(0);
-	file.read(m_buffer.data(), fileSize);
+	file.read(m_buffer.GetData(), fileSize);
 
 	file.close();
 }

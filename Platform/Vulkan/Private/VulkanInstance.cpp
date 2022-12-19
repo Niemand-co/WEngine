@@ -8,7 +8,7 @@
 namespace Vulkan
 {
 
-	std::vector<const char*> VulkanInstance::g_validationLayers = { "VK_LAYER_KHRONOS_validation" };
+	WEngine::WArray<const char*> VulkanInstance::g_validationLayers = { "VK_LAYER_KHRONOS_validation" };
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 		const VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -51,20 +51,20 @@ namespace Vulkan
 		{
 			if (CheckLayerAvailability(g_validationLayers))
 			{
-				instanceCreateInfo.enabledLayerCount = g_validationLayers.size();
-				instanceCreateInfo.ppEnabledLayerNames = g_validationLayers.data();
+				instanceCreateInfo.enabledLayerCount = g_validationLayers.Size();
+				instanceCreateInfo.ppEnabledLayerNames = g_validationLayers.GetData();
 			}
 		}
 
 		unsigned int glfwExtensionCount = 0;
 		const char** glfwExtensionName = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-		std::vector<const char*> extensions(glfwExtensionName, glfwExtensionName + glfwExtensionCount);
+		WEngine::WArray<const char*> extensions(glfwExtensionName, glfwExtensionName + glfwExtensionCount);
 		if (enableDebugLayer)
 		{
-			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+			extensions.Push(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 		}
-		instanceCreateInfo.ppEnabledExtensionNames = extensions.data();
-		instanceCreateInfo.enabledExtensionCount = extensions.size();
+		instanceCreateInfo.ppEnabledExtensionNames = extensions.GetData();
+		instanceCreateInfo.enabledExtensionCount = extensions.Size();
 		instanceCreateInfo.enabledLayerCount = 0;
 
 		m_pInstance = (VkInstance*)WEngine::Allocator::Get()->Allocate(sizeof(VkInstance));
@@ -95,7 +95,7 @@ namespace Vulkan
 		VkPhysicalDevice *pPhysicalDevices = (VkPhysicalDevice*)WEngine::Allocator::Get()->Allocate(physicalDeviceCount * sizeof(VkPhysicalDevice));
 		vkEnumeratePhysicalDevices(*m_pInstance, &physicalDeviceCount, pPhysicalDevices);
 
-		m_gpus.resize(physicalDeviceCount);
+		m_gpus.Resize(physicalDeviceCount);
 
 		for (unsigned int i = 0; i < physicalDeviceCount; ++i)
 		{
@@ -155,12 +155,12 @@ namespace Vulkan
 		RHIInstance::m_surface = new VulkanSurface(m_pSurface);
 	}
 
-	bool VulkanInstance::CheckLayerAvailability(const std::vector<const char*>& layers)
+	bool VulkanInstance::CheckLayerAvailability(const WEngine::WArray<const char*>& layers)
 	{
 		unsigned int layerCount = 0;
 		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-		std::vector<VkLayerProperties> validateLayers(layerCount);
-		vkEnumerateInstanceLayerProperties(&layerCount, validateLayers.data());
+		WEngine::WArray<VkLayerProperties> validateLayers(layerCount);
+		vkEnumerateInstanceLayerProperties(&layerCount, validateLayers.GetData());
 
 		for (const char* layerName : layers)
 		{

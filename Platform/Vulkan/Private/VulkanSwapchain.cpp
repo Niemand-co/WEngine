@@ -13,7 +13,7 @@ namespace Vulkan
 		VkImage *pImages = (VkImage*)WEngine::Allocator::Get()->Allocate(imageCount * sizeof(VkImage));
 		vkGetSwapchainImagesKHR(*m_pDevice, *m_pSwapchain, &imageCount, pImages);
 
-		m_textures.resize(imageCount);
+		m_textures.Resize(imageCount);
 		for (unsigned int i = 0; i < imageCount; ++i)
 		{
 			m_textures[i] = (RHITexture*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanAllocator));
@@ -24,7 +24,7 @@ namespace Vulkan
 	VulkanSwapchain::~VulkanSwapchain()
 	{
 		vkDestroySwapchainKHR(*m_pDevice, *m_pSwapchain, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
-		for (int i = 0; i < m_textures.size(); ++i)
+		for (int i = 0; i < m_textures.Size(); ++i)
 		{
 			m_textures[i]->~RHITexture();
 			WEngine::Allocator::Get()->Deallocate(m_textures[i]);

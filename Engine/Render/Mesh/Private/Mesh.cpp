@@ -232,13 +232,13 @@ MeshLibrary::~MeshLibrary()
 {
 }
 
-void MeshLibrary::AddMesh(const WEngine::WGuid& id, Mesh* pMesh)
+void MeshLibrary::AddMesh(const WEngine::WGuid<WEngine::WString>& id, Mesh* pMesh)
 {
 	
 	m_meshes.Push(WEngine::MakePiar(id, pMesh));
 }
 
-Mesh* MeshLibrary::GetMesh(const WEngine::WGuid& id)
+Mesh* MeshLibrary::GetMesh(const WEngine::WGuid<WEngine::WString>& id)
 {
 	for (auto& p : m_meshes)
 	{

@@ -18,20 +18,20 @@ namespace WEngine
 	void LayerStack::PushLayer(Layer* pLayer)
 	{
 		pLayer->OnAttach();
-		if(m_pLayers.empty())
-			m_pLayers.emplace_back(pLayer);
+		if(m_pLayers.Empty())
+			m_pLayers.Push(pLayer);
 		else
-			m_pLayers.emplace(m_pLayers.begin(), pLayer);
+			m_pLayers.PushForward(pLayer);
 	}
 
 	void LayerStack::PushOverLayer(Layer* pLayer)
 	{
-		m_pLayers.emplace_back(pLayer);
+		m_pLayers.Push(pLayer);
 	}
 
 	void LayerStack::OnEvent(Event *e)
 	{
-		for (int i = m_pLayers.size() - 1; i >= 0; --i)
+		for (int i = m_pLayers.Size() - 1; i >= 0; --i)
 		{
 			m_pLayers[i]->OnEvent(e);
 			if(e->m_handled)
@@ -46,7 +46,7 @@ namespace WEngine
 		{
 			return;
 		}
-		for (unsigned int i = 0; i < m_pLayers.size(); ++i)
+		for (unsigned int i = 0; i < m_pLayers.Size(); ++i)
 		{
 			m_pLayers[i]->OnUpdate(timeStep);
 		}

@@ -27,11 +27,11 @@ private:
 
 private:
 
-	std::vector<RHIBuffer*> m_pSceneDataBuffers;
+	WEngine::WArray<RHIBuffer*> m_pSceneDataBuffers;
 
-	std::vector<RHIBuffer*> m_pObjectDataBuffers;
+	WEngine::WArray<RHIBuffer*> m_pObjectDataBuffers;
 
-	std::vector<RHIGroup*> m_pDataGroup;
+	WEngine::WArray<RHIGroup*> m_pDataGroup;
 
 	RHIPipelineResourceLayout *m_pPipelineLayout;
 

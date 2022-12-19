@@ -16,7 +16,7 @@ namespace WEngine
 	{
 	public:
 
-		GuiLayer(std::string_view name);
+		GuiLayer(const WString& name);
 
 		virtual ~GuiLayer();
 
@@ -34,9 +34,9 @@ namespace WEngine
 
 		RHITexture *m_pTexture;
 
-		std::vector<ImTextureID> m_imageID;
+		WArray<ImTextureID> m_imageID;
 
-		std::pair<ImVec2, ImVec2> m_displayArea;
+		WPair<ImVec2, ImVec2> m_displayArea;
 
 		InspectorPanel *m_pInspectorPanel;
 

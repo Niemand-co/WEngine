@@ -20,10 +20,10 @@ bool GameObject::IsName(WEngine::WString name)
 
 void GameObject::AddGameObject(GameObject* pGameObject)
 {
-	m_sonGameObjects.push_back(pGameObject);
+	m_sonGameObjects.Push(pGameObject);
 }
 
-const std::vector<GameObject*>& GameObject::GetChildGameObjects() const
+const WEngine::WArray<GameObject*>& GameObject::GetChildGameObjects() const
 {
 	return m_sonGameObjects;
 }
@@ -38,7 +38,7 @@ void GameObject::ShowInInspector() const
 
 bool GameObject::HasChild() const
 {
-	return m_sonGameObjects.size() != 0;
+	return m_sonGameObjects.Size() != 0;
 }
 
 GameObject* GameObject::Find(WEngine::WString name)

@@ -4,7 +4,7 @@
 
 VertexBindingDescription* Vertex::m_bindingDescription = nullptr;
 
-std::vector<VertexAttributeDescription*> Vertex::m_attributeDescriptions = std::vector<VertexAttributeDescription*>();
+WEngine::WArray<VertexAttributeDescription*> Vertex::m_attributeDescriptions = WEngine::WArray<VertexAttributeDescription*>();
 
 Vertex::Vertex(glm::vec3 position, glm::vec3 color, glm::vec3 normal, glm::vec2 uv)
 	: Position(position), Color(color), Normal(normal), UV(uv)
@@ -21,7 +21,7 @@ void Vertex::GenerateVertexInputDescription()
 {
 	m_bindingDescription = (VertexBindingDescription*)WEngine::Allocator::Get()->Allocate(sizeof(VertexBindingDescription));
 	VertexAttributeDescription* attributeDescription = (VertexAttributeDescription*)WEngine::Allocator::Get()->Allocate(4 * sizeof(VertexAttributeDescription));
-	m_attributeDescriptions.resize(4);
+	m_attributeDescriptions.Resize(4);
 	for (int i = 0; i < 4; ++i)
 	{
 		m_attributeDescriptions[i] = attributeDescription + i;
@@ -53,7 +53,7 @@ void Vertex::GenerateVertexInputDescription()
 
 RHIVertexInputDescriptor Vertex::GetVertexInputDescriptor()
 {
-	if (m_bindingDescription == nullptr || m_attributeDescriptions.size() == 0)
+	if (m_bindingDescription == nullptr || m_attributeDescriptions.Size() == 0)
 	{
 		GenerateVertexInputDescription();
 	}
@@ -61,8 +61,8 @@ RHIVertexInputDescriptor Vertex::GetVertexInputDescriptor()
 	RHIVertexInputDescriptor vertexInputDescriptor = {};
 	{
 		vertexInputDescriptor.bindingDescription = m_bindingDescription;
-		vertexInputDescriptor.attributeDescriptionCount = m_attributeDescriptions.size();
-		vertexInputDescriptor.pAttributeDescription = m_attributeDescriptions.data();
+		vertexInputDescriptor.attributeDescriptionCount = m_attributeDescriptions.Size();
+		vertexInputDescriptor.pAttributeDescription = m_attributeDescriptions.GetData();
 	}
 
 	return vertexInputDescriptor;

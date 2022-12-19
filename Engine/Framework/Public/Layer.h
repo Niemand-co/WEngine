@@ -19,7 +19,7 @@ namespace WEngine
 
 		virtual void OnUpdate(TimeStep timeStep) = 0;
 
-		virtual const std::string_view GetName() const
+		virtual const WString& GetName() const
 		{
 			return m_debugName;
 		}
@@ -36,13 +36,13 @@ namespace WEngine
 
 	protected:
 
-		Layer(std::string_view name);
+		Layer(const WString& name);
 
 		virtual ~Layer() = default;
 
 	protected:
 
-		std::string_view m_debugName;
+		WString m_debugName;
 
 		ScriptableRenderPipeline *m_pPipeline;
 

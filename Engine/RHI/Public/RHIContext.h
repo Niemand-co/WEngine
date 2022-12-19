@@ -49,7 +49,7 @@ public:
 
 	virtual RHICommandBuffer* GetCommandBuffer(bool isPrimary = true);
 
-	virtual std::vector<RHICommandBuffer*> GetCommandBuffer(unsigned int count, bool isPrimary);
+	virtual WEngine::WArray<RHICommandBuffer*> GetCommandBuffer(unsigned int count, bool isPrimary);
 
 	virtual int GetNextImage(RHISemaphore* pSignalSemaphore);
 
@@ -85,7 +85,7 @@ public:
 
 	virtual RHIGroupLayout* CreateGroupLayout(RHIGroupLayoutDescriptor *descriptor);
 
-	virtual std::vector<RHIGroup*> CreateResourceGroup(RHIGroupDescriptor *descriptor);
+	virtual WEngine::WArray<RHIGroup*> CreateResourceGroup(RHIGroupDescriptor *descriptor);
 
 	virtual void UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor *descriptor);
 
@@ -136,21 +136,21 @@ private:
 
 	static RHICommandPool *g_pPool;
 
-	static std::vector<RHISemaphore*> g_pImageAvailibleSemaphores;
+	static WEngine::WArray<RHISemaphore*> g_pImageAvailibleSemaphores;
 
-	static std::vector<RHISemaphore*> g_pPresentAVailibleSemaphores;
+	static WEngine::WArray<RHISemaphore*> g_pPresentAVailibleSemaphores;
 
-	static std::vector<RHIFence*> g_pFences;
+	static WEngine::WArray<RHIFence*> g_pFences;
 
-	static std::vector<RHITextureView*> g_pTextureViews;
+	static WEngine::WArray<RHITextureView*> g_pTextureViews;
 
-	static std::vector<RHITexture*> g_pDepthTextures;
+	static WEngine::WArray<RHITexture*> g_pDepthTextures;
 
-	static std::vector<RHITextureView*> g_pDepthTextureViews;
+	static WEngine::WArray<RHITextureView*> g_pDepthTextureViews;
 
-	static std::vector<RHICommandBuffer*> g_pCommandBuffers;
+	static WEngine::WArray<RHICommandBuffer*> g_pCommandBuffers;
 
-	static std::vector<RHICommandBuffer*> g_pPrimaryCommandBuffers;
+	static WEngine::WArray<RHICommandBuffer*> g_pPrimaryCommandBuffers;
 
 	static bool m_isDisplayChagned;
 

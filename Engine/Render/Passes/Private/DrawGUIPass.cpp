@@ -7,6 +7,7 @@
 #include "RHI/Public/RHIHeads.h"
 #include "Utils/Public/Window.h"
 #include "Utils/ImGui/Public/Gui.h"
+#include "Utils/Public/Synchronizer.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
 #include "Scene/Public/GameObject.h"
@@ -53,14 +54,14 @@ void DrawGUIPass::Setup(RHIContext* context, CameraData* cameraData)
 {
 
 
-	m_pRenderTargets.resize(3);
+	m_pRenderTargets.Resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
-		std::vector<RHITextureView*> textureViews = { context->GetTextureView(i) };
+		WEngine::WArray<RHITextureView*> textureViews = { context->GetTextureView(i) };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
 			renderTargetDescriptor.bufferCount = 1;
-			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.pBufferView = textureViews.GetData();
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.width = Window::cur_window->GetWidth();
 			renderTargetDescriptor.height = Window::cur_window->GetHeight();
@@ -99,11 +100,11 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 	{
 		for (int i = 0; i < 3; ++i)
 		{
-			std::vector<RHITextureView*> textureViews = { context->GetTextureView(i) };
+			WEngine::WArray<RHITextureView*> textureViews = { context->GetTextureView(i) };
 			RHIRenderTargetDescriptor renderTargetDescriptor = {};
 			{
 				renderTargetDescriptor.bufferCount = 1;
-				renderTargetDescriptor.pBufferView = textureViews.data();
+				renderTargetDescriptor.pBufferView = textureViews.GetData();
 				renderTargetDescriptor.renderPass = m_pRenderPass;
 				renderTargetDescriptor.width = Window::cur_window->GetWidth();
 				renderTargetDescriptor.height = Window::cur_window->GetHeight();
@@ -140,19 +141,19 @@ void DrawGUIPass::Execute(RHIContext* context, CameraData* cameraData)
 	context->ExecuteCommandBuffer(cmd);
 
 	RHISemaphore *signals[] = { context->GetPresentVailableSemaphore() };
-	std::vector<WEngine::Trigger*> waitingSemaphores = WEngine::Synchronizer::GetTrigger("Gui");
-	std::vector<RHISemaphore*> waits;
-	waits.resize(waitingSemaphores.size());
-	for(int i = 0; i < waitingSemaphores.size(); ++i)
+	WEngine::WArray<WEngine::Trigger*> waitingSemaphores = WEngine::Synchronizer::GetTrigger("Gui");
+	WEngine::WArray<RHISemaphore*> waits;
+	waits.Resize(waitingSemaphores.Size());
+	for(int i = 0; i < waitingSemaphores.Size(); ++i)
 	{
 		waits[i] = waitingSemaphores[i]->signal;
 	}
-	waits.push_back(context->GetImageVailableSemaphore());
+	waits.Push(context->GetImageVailableSemaphore());
 
 	RHISubmitDescriptor submitDescriptor = {};
 	{
-		submitDescriptor.waitSemaphoreCount = waits.size();
-		submitDescriptor.pWaitSemaphores = waits.data();
+		submitDescriptor.waitSemaphoreCount = waits.Size();
+		submitDescriptor.pWaitSemaphores = waits.GetData();
 		submitDescriptor.signalSemaphoreCount = 1;
 		submitDescriptor.pSignalSemaphores = signals;
 		submitDescriptor.waitStage = PIPELINE_STAGE_FRAGMENT_SHADER | PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT;
@@ -165,11 +166,11 @@ void DrawGUIPass::UpdateRenderTarget(CameraData* cameraData)
 {
 	for (int i = 0; i < 3; ++i)
 	{
-		std::vector<RHITextureView*> textureViews = { RHIContext::GetContext()->GetTextureView(i) };
+		WEngine::WArray<RHITextureView*> textureViews = { RHIContext::GetContext()->GetTextureView(i) };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
 			renderTargetDescriptor.bufferCount = 1;
-			renderTargetDescriptor.pBufferView = textureViews.data();
+			renderTargetDescriptor.pBufferView = textureViews.GetData();
 			renderTargetDescriptor.renderPass = m_pRenderPass;
 			renderTargetDescriptor.width = Window::cur_window->GetWidth();
 			renderTargetDescriptor.height = Window::cur_window->GetHeight();

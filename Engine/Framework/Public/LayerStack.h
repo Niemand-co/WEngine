@@ -34,7 +34,7 @@ namespace WEngine
 
 	private:
 
-		std::vector<Layer*> m_pLayers;
+		WArray<Layer*> m_pLayers;
 
 	};
 

@@ -19,7 +19,7 @@ namespace WEngine
 
 	void SceneHierarchyPanel::DrawNodes()
 	{
-		const std::vector<GameObject*>& objects = m_pScene->GetGameObjects();
+		const WEngine::WArray<GameObject*>& objects = m_pScene->GetGameObjects();
 		
 		ImGui::PushItemWidth(ImGui::CalcItemWidth());
 		for (GameObject* pObject : objects)

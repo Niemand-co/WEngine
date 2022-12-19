@@ -9,7 +9,7 @@ public:
 
 	virtual ~RHIGroupPool() = default;
 
-	virtual std::vector<RHIGroup*> GetGroup(unsigned int count = 1) = 0;
+	virtual WEngine::WArray<RHIGroup*> GetGroup(unsigned int count = 1) = 0;
 
 protected:
 

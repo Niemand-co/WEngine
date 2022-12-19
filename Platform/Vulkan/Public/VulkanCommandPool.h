@@ -14,7 +14,7 @@ namespace Vulkan
 
 		virtual RHICommandBuffer* GetCommandBuffer(bool isPrimary = true) override;
 
-		virtual std::vector<RHICommandBuffer*> GetCommandBuffer(unsigned int count, bool isPrimary = true) override;
+		virtual WEngine::WArray<RHICommandBuffer*> GetCommandBuffer(unsigned int count, bool isPrimary = true) override;
 
 	private:
 
