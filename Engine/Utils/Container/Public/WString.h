@@ -13,7 +13,7 @@ namespace WEngine
 
 		WString(const char* str);
 
-		WString(const WString&) = default;
+		WString(const WString& string);
 
 		~WString();
 

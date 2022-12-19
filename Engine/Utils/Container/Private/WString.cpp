@@ -17,6 +17,13 @@ namespace WEngine
 		memcpy(m_pData, str, m_size + 1);
 	}
 
+	WString::WString(const WString& string)
+	{
+		m_size = string.m_size;
+		m_pData = (char*)Allocator::Get()->Allocate(m_size + 1);
+		memcpy(m_pData, string.m_pData, m_size + 1);
+	}
+
 	WString::~WString()
 	{
 		Allocator::Get()->Deallocate(m_pData);

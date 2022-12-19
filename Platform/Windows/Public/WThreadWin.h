@@ -8,11 +8,17 @@ namespace WEngine
 	{
 	public:
 
-		WThreadWin();
+		WThreadWin(WRunnable* pRunnable, const WString& name, size_t threadStackSize, ThreadPriority priority);
 
 		virtual ~WThreadWin();
 
-		size_t GetPid();
+		virtual void Setup() override;
+
+		virtual bool CreateInternal() override;
+
+	private:
+
+		HANDLE m_pThread;
 
 	};
 
