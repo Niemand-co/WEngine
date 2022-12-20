@@ -8,13 +8,15 @@ namespace WEngine
 	{
 	public:
 
-		WThreadWin(WRunnable* pRunnable, const WString& name, size_t threadStackSize, ThreadPriority priority);
+		WThreadWin();
 
 		virtual ~WThreadWin();
 
+		virtual bool IsValid() const override;
+
 		virtual void Setup() override;
 
-		virtual bool CreateInternal() override;
+		virtual bool CreateInternal(WRunnable* pRunnable, const WString& name, size_t threadStackSize, WThread::ThreadPriority priority) override;
 
 	private:
 

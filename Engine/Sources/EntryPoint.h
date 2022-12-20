@@ -18,9 +18,12 @@ public:
 
 	virtual unsigned int Run() override
 	{
-		WaitForSingleObject(mutex, INFINITE);
-		RE_LOG("New Thread");
-		ReleaseMutex(mutex);
+		while (true)
+		{
+			WaitForSingleObject(mutex, INFINITE);
+			RE_LOG("New Thread");
+			ReleaseMutex(mutex);
+		}
 		return 1;
 	}
 
@@ -57,11 +60,16 @@ int main(int argc, char** argv)
 	mutex = CreateMutex(NULL, false, "test");
 
 	TestRunnable test;
-	WEngine::WThread *pThread = WEngine::WThreadManager::CreateThread(&test);
+	WEngine::WThread *pThread = WEngine::WThread::Create(&test);
 
-	WaitForSingleObject(mutex, INFINITE);
-	RE_LOG("Main Thread");
-	ReleaseMutex(mutex);
+	GetCurrentThreadId();
+
+	while (true)
+	{
+		WaitForSingleObject(mutex, INFINITE);
+		RE_LOG("Main Thread");
+		ReleaseMutex(mutex);
+	}
 	Sleep(1000);
 
 	return 0;

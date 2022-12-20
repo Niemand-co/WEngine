@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Platform/Windows/Public/WThreadWin.h"
+#include "Platform/Windows/Public/WindowsWThread.h"
 #include "HAL/Public/WThreadManager.h"
 #include <windows.h>
 
@@ -13,28 +13,37 @@ namespace WEngine
 		return ThisThread->Run();
 	}
 	
-	WThreadWin::WThreadWin(WRunnable *pRunnable, const WString& name, size_t threadStackSize, ThreadPriority priority)
+	WThreadWin::WThreadWin()
 	{
-		m_pRunnable = pRunnable;
-		m_threadStackSize = threadStackSize;
-		m_priority = priority;
-
-		CreateInternal();
-
-		ResumeThread(m_pThread);
+		m_pRunnable = nullptr;
 	}
 
 	WThreadWin::~WThreadWin()
 	{
 	}
 
+	bool WThreadWin::IsValid() const
+	{
+		return m_pThread != NULL;
+	}
+
 	void WThreadWin::Setup()
 	{
 	}
 
-	bool WThreadWin::CreateInternal()
+	bool WThreadWin::CreateInternal(WRunnable* pRunnable, const WString& name, size_t threadStackSize, WThread::ThreadPriority priority)
 	{
+		m_pRunnable = pRunnable;
+		m_name = name;
+		m_threadStackSize = threadStackSize;
+		m_priority = priority;
+
 		m_pThread = CreateThread(NULL, m_threadStackSize, ThreadProc, this, STACK_SIZE_PARAM_IS_A_RESERVATION | CREATE_SUSPENDED, (LPDWORD)&m_id);
+
+		if (m_pThread != NULL)
+		{
+			ResumeThread(m_pThread);
+		}
 
 		return m_pThread != NULL;
 	}

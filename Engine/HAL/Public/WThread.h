@@ -18,9 +18,11 @@ namespace WEngine
 
 		virtual ~WThread() = default;
 
+		virtual bool IsValid() const = 0;
+
 		virtual void Setup() = 0;
 
-		virtual bool CreateInternal() = 0;
+		virtual bool CreateInternal(WRunnable* pRunnable, const WString& name, size_t threadStackSize, WThread::ThreadPriority priority) = 0;
 
 		unsigned int Run();
 
@@ -28,7 +30,7 @@ namespace WEngine
 
 	public:
 
-		static 	WThread* Create(WRunnable* pRunnable, const WString& name, size_t threadStackSize, WThread::ThreadPriority priority);
+		static 	WThread* Create(WRunnable* pRunnable, const WString& name = "", size_t threadStackSize = 0, WThread::ThreadPriority priority = WThread::ThreadPriority::Normal);
 
 	protected:
 
