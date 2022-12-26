@@ -21,7 +21,7 @@ public:
 		while (true)
 		{
 			WaitForSingleObject(mutex, INFINITE);
-			RE_LOG("New Thread");
+			RE_LOG(rank);
 			ReleaseMutex(mutex);
 		}
 		return 1;
@@ -36,6 +36,10 @@ public:
 	{
 
 	}
+
+public:
+
+	int rank;
 
 };
 
@@ -54,23 +58,24 @@ WEngine::WString GetTime()
 
 int main(int argc, char** argv)
 {
-	//WEngine::Application* g_pApp = WEngine::CreateApplication();
-	//g_pApp->Tick();
+	WEngine::Application* g_pApp = WEngine::CreateApplication();
+	g_pApp->Tick();
 
-	mutex = CreateMutex(NULL, false, "test");
+	//mutex = CreateMutex(NULL, false, "test");
 
-	TestRunnable test;
-	WEngine::WThread *pThread = WEngine::WThread::Create(&test);
+	//TestRunnable test;
+	//test.rank = 0;
+	//WEngine::WThread *pThread = WEngine::WThread::Create(&test);
 
-	GetCurrentThreadId();
+	//GetCurrentThreadId();
 
-	while (true)
-	{
-		WaitForSingleObject(mutex, INFINITE);
-		RE_LOG("Main Thread");
-		ReleaseMutex(mutex);
-	}
-	Sleep(1000);
+	//while (true)
+	//{
+	//	WaitForSingleObject(mutex, INFINITE);
+	//	test.rank++;
+	//	ReleaseMutex(mutex);
+	//}
+	//Sleep(1000);
 
 	return 0;
 }

@@ -4,13 +4,13 @@
 #include "Event/Public/KeyEvent.h"
 #include "Event/Public/WindowEvent.h"
 #include "FrameWork/Public/LayerStack.h"
-#include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Event/Public/WindowInput.h"
 #include "Framework/Public/GuiLayer.h"
 #include "RHI/Public/RHIContext.h"
 #include "Scene/Public/World.h"
 #include "Editor/Public/Editor.h"
 #include "Editor/Public/Debug.h"
+#include "Core/Public/WRenderThread.h"
 
 namespace WEngine
 {
@@ -54,6 +54,8 @@ namespace WEngine
 
 	void Application::Tick()
 	{
+		
+		
 		while (!IsQuit())
 		{
 			m_pLayerStack->OnUpdate(TimeStep::GetTimeStep());

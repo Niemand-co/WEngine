@@ -12,6 +12,12 @@ namespace WEngine
 
 	WString::WString(const char* str)
 	{
+		if (str == nullptr)
+		{
+			m_size = 0;
+			m_pData = nullptr;
+			return;
+		}
 		m_size = strlen(str);
 		m_pData = (char*)Allocator::Get()->Allocate(m_size + 1);
 		memcpy(m_pData, str, m_size + 1);

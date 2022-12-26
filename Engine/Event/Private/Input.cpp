@@ -12,6 +12,11 @@ namespace WEngine
 		g_pInstance = new WindowInput();
 	}
 
+	void Input::QueryPlayerInput()
+	{
+		
+	}
+
 	bool Input::IsKeyPressed(int keycode)
 	{
 		return g_pInstance->IsKeyPressedImpl(keycode);

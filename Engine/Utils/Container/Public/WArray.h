@@ -17,7 +17,7 @@ namespace WEngine
 
 		WArray(T *begin, T *end);
 
-		WArray(const WArray&) = default;
+		WArray(const WArray& array);
 
 		~WArray();
 
@@ -64,13 +64,28 @@ namespace WEngine
 			return *((T*)m_pData + index);
 		}
 
+		WArray<T>& operator=(const WArray<T>& array)
+		{
+			m_size = array.m_size;
+			m_capasity = array.m_capasity;
+			for (size_t i = 0; i < m_size; ++i)
+			{
+				(m_pData + i)->~T();
+			}
+			//WEngine::Allocator::Get()->Deallocate(m_pData);
+			delete(m_pData);
+			m_pData = (T*)malloc(sizeof(T) * m_capasity);
+			memcpy(m_pData, array.m_pData, sizeof(T) * m_size);
+			return *this;
+		}
+
 	private:
 
 		size_t m_size;
 
 		size_t m_capasity;
 
-		void *m_pData;
+		T *m_pData = nullptr;
 
 	};
 
@@ -81,7 +96,8 @@ namespace WEngine
 		m_capasity = size;
 		if (size > 0)
 		{
-			m_pData = Allocator::Get()->Allocate(size * sizeof(T));
+			//m_pData = (T*)Allocator::Get()->Allocate(size * sizeof(T));
+			m_pData = (T*)malloc(size * sizeof(T));
 		}
 	}
 
@@ -92,11 +108,12 @@ namespace WEngine
 		m_capasity = size;
 		if (size > 0)
 		{
-			m_pData = Allocator::Get()->Allocate(size * sizeof(var));
+			//m_pData = (T*)Allocator::Get()->Allocate(size * sizeof(var));
+			m_pData = (T*)malloc(size * sizeof(var));
 		}
 		for (size_t i = 0; i < size; ++i)
 		{
-			memcpy(((T*)m_pData) + i, &var, sizeof(var));
+			memcpy(m_pData + i, &var, sizeof(var));
 		}
 	}
 
@@ -104,15 +121,27 @@ namespace WEngine
 	inline WArray<T>::WArray(const std::initializer_list<T>& list)
 	{
 		m_capasity = m_size = list.size();
-		m_pData = Allocator::Get()->Allocate(m_size * sizeof(T));
-		memcpy(m_pData, list.begin(), m_size);
+		//m_pData = (T*)Allocator::Get()->Allocate(m_size * sizeof(T));
+		m_pData = (T*)malloc(m_size * sizeof(T));
+		memcpy(m_pData, list.begin(), m_size * sizeof(T));
 	}
 
 	template<typename T>
 	inline WArray<T>::WArray(T* begin, T* end)
 	{
-		m_capasity = m_size = (end - begin);
-		m_pData = begin;
+		m_capasity = m_size = size_t(end - begin);
+		//m_pData = (T*)Allocator::Get()->Allocate(sizeof(T) * m_capasity);
+		m_pData = (T*)malloc(sizeof(T) * m_capasity);
+		memcpy(m_pData, begin, sizeof(T) * m_capasity);
+	}
+
+	template<typename T>
+	inline WArray<T>::WArray(const WArray& array)
+	{
+		m_size = array.m_size;
+		m_capasity = array.m_capasity;
+		m_pData = (T*)malloc(sizeof(T) * m_capasity);
+		memcpy(m_pData, array.m_pData, sizeof(T) * m_size);
 	}
 
 	template<typename T>
@@ -120,9 +149,10 @@ namespace WEngine
 	{
 		for (size_t i = 0; i < m_size; ++i)
 		{
-			((T*)m_pData + i)->~T();
+			(m_pData + i)->~T();
 		}
-		WEngine::Allocator::Get()->Deallocate(m_pData);
+		//WEngine::Allocator::Get()->Deallocate(m_pData);
+		delete(m_pData);
 	}
 
 	template<typename T>
@@ -131,18 +161,21 @@ namespace WEngine
 		if (m_capasity == 0)
 		{
 			m_capasity = 1;
-			m_pData = Allocator::Get()->Allocate(sizeof(T));
+			//m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
+			m_pData = (T*)malloc(sizeof(T));
 		}
 		else if (m_size == m_capasity)
 		{
-			void* newPtr = WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
+			//T* newPtr = (T*)WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
+			T* newPtr = (T*)malloc(2 * m_capasity * sizeof(T));
 			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			WEngine::Allocator::Get()->Deallocate(m_pData);
+			//WEngine::Allocator::Get()->Deallocate(m_pData);
+			delete(m_pData);
 			m_pData = newPtr;
 			m_capasity *= 2;
 		}
 
-		memcpy((T*)m_pData + m_size, &var, sizeof(var));
+		memcpy(m_pData + m_size, &var, sizeof(var));
 		m_size++;
 	}
 
@@ -152,18 +185,21 @@ namespace WEngine
 		if (m_capasity == 0)
 		{
 			m_capasity = 1;
-			m_pData = Allocator::Get()->Allocate(sizeof(T));
+			//m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
+			m_pData = (T*)malloc(sizeof(T));
 		}
 		else if (m_size == m_capasity)
 		{
-			void* newPtr = WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
+			//T* newPtr = (T*)WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
+			T* newPtr = (T*)malloc(2 * m_capasity * sizeof(T));
 			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			WEngine::Allocator::Get()->Deallocate(m_pData);
+			//WEngine::Allocator::Get()->Deallocate(m_pData);
+			delete(m_pData);
 			m_pData = newPtr;
 			m_capasity *= 2;
 		}
 		
-		::new ((T*)m_pData + m_size) T(var);
+		::new (m_pData + m_size) T(var);
 		m_size++;
 	}
 
@@ -173,13 +209,16 @@ namespace WEngine
 		if (m_capasity == 0)
 		{
 			m_capasity = 1;
-			m_pData = Allocator::Get()->Allocate(sizeof(T));
+			//m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
+			m_pData = (T*)malloc(sizeof(T));
 		}
 		else if (m_size == m_capasity)
 		{
-			void* newPtr = WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
-			memcpy((T*)newPtr + 1, m_pData, sizeof(T) * m_size);
-			WEngine::Allocator::Get()->Deallocate(m_pData);
+			//T* newPtr = (T*)WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
+			T* newPtr = (T*)malloc(2 * m_capasity * sizeof(T));
+			memcpy(newPtr + 1, m_pData, sizeof(T) * m_size);
+			//WEngine::Allocator::Get()->Deallocate(m_pData);
+			delete(m_pData);
 			m_pData = newPtr;
 			m_capasity *= 2;
 		}
@@ -187,11 +226,11 @@ namespace WEngine
 		{
 			for (size_t index = m_size - 1; index > 0; --index)
 			{
-				((T*)m_pData)[index] = ((T*)m_pData)[index - 1];
+				(m_pData)[index] = (m_pData)[index - 1];
 			}
 		}
 
-		memcpy((T*)m_pData, &var, sizeof(var));
+		memcpy(m_pData, &var, sizeof(var));
 		m_size++;
 	}
 
@@ -201,13 +240,16 @@ namespace WEngine
 		if (m_capasity == 0)
 		{
 			m_capasity = 1;
-			m_pData = Allocator::Get()->Allocate(sizeof(T));
+			//m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
+			m_pData = (T*)malloc(sizeof(T));
 		}
 		else if (m_size == m_capasity)
 		{
-			void* newPtr = WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
+			//T* newPtr = (T*)WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
+			T* newPtr = (T*)malloc(2 * m_capasity * sizeof(T));
 			memcpy(newPtr + 1, m_pData, sizeof(T) * m_size);
-			WEngine::Allocator::Get()->Deallocate(m_pData);
+			//WEngine::Allocator::Get()->Deallocate(m_pData);
+			delete(m_pData);
 			m_pData = newPtr;
 			m_capasity *= 2;
 		}
@@ -215,11 +257,11 @@ namespace WEngine
 		{
 			for (size_t index = m_size - 1; index > 0; --index)
 			{
-				((T*)m_pData)[index] = ((T*)m_pData)[index - 1];
+				(m_pData)[index] = (m_pData)[index - 1];
 			}
 		}
 
-		::new ((T*)m_pData + m_size) T(var);
+		::new (m_pData + m_size) T(var);
 		m_size++;
 	}
 
@@ -228,9 +270,11 @@ namespace WEngine
 	{
 		if (size > m_capasity)
 		{
-			void *newPtr = WEngine::Allocator::Get()->Allocate(size * sizeof(T));
+			//T* newPtr = (T*)WEngine::Allocator::Get()->Allocate(size * sizeof(T));
+			T* newPtr = (T*)malloc(size * sizeof(T));
 			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			WEngine::Allocator::Get()->Deallocate(m_pData);
+			//WEngine::Allocator::Get()->Deallocate(m_pData);
+			delete(m_pData);
 			m_pData = newPtr;
 			m_size = size;
 			m_capasity = size;
@@ -246,9 +290,11 @@ namespace WEngine
 	{
 		if (size > m_capasity)
 		{
-			void* newPtr = WEngine::Allocator::Get()->Allocate(size * sizeof(T));
+			//T* newPtr = (T*)WEngine::Allocator::Get()->Allocate(size * sizeof(T));
+			T* newPtr = (T*)malloc(size * sizeof(T));
 			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			WEngine::Allocator::Get()->Deallocate(m_pData);
+			//WEngine::Allocator::Get()->Deallocate(m_pData);
+			delete(m_pData);
 			m_pData = newPtr;
 			m_capasity = size;
 		}
@@ -259,7 +305,7 @@ namespace WEngine
 	{
 		for (size_t i = 0; i < m_size; ++i)
 		{
-			((T*)m_pData + i)->~T();
+			(m_pData + i)->~T();
 		}
 		m_size = 0;
 	}
@@ -279,31 +325,31 @@ namespace WEngine
 	template<typename T>
 	inline T* WArray<T>::GetData() const
 	{
-		return (T*)m_pData;
+		return m_pData;
 	}
 
 	template<typename T>
 	inline T* WArray<T>::begin()
 	{
-		return (T*)m_pData;
+		return m_pData;
 	}
 
 	template<typename T>
 	inline const T* WArray<T>::begin() const
 	{
-		return (const T*)m_pData;
+		return m_pData;
 	}
 
 	template<typename T>
 	inline T* WArray<T>::end()
 	{
-		return (T*)m_pData + m_size;
+		return m_pData + m_size;
 	}
 
 	template<typename T>
 	inline const T* WArray<T>::end() const
 	{
-		return (const T*)m_pData + m_size;
+		return m_pData + m_size;
 	}
 
 	//template<typename T>

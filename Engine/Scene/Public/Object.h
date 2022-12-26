@@ -1,4 +1,5 @@
 #pragma once
+#include "Event/Public/TimeStep.h"
 
 namespace WEngine
 {

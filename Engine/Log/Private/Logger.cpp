@@ -26,7 +26,21 @@ void Logger::Error(const WEngine::WString& exp)
 	std::cout<<"\033[31m"<<GetTime()<<"Error:"<<exp<<"\033[37m"<<std::endl;
 }
 
+void Logger::Error(const char* exp)
+{
+	std::cout << "\033[31m" << GetTime() << "Error:" << exp << "\033[37m" << std::endl;
+}
+
 void Logger::AssertFail(bool judge, const WEngine::WString& exp)
+{
+	if (!judge)
+	{
+		Error(exp);
+		std::terminate();
+	}
+}
+
+void Logger::AssertFail(bool judge, const char* exp)
 {
 	if (!judge)
 	{

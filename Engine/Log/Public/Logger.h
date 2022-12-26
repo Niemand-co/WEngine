@@ -11,7 +11,9 @@ public:
 	static void Loading(const WEngine::WString& exp = "");
 	static void Success(const WEngine::WString& exp = "");
 	static void Error(const WEngine::WString& exp = "");
+	static void Error(const char* exp = "");
 	static void AssertFail(bool judge, const WEngine::WString& exp = "");
+	static void AssertFail(bool judge, const char* exp = "");
 private:
 	static WEngine::WString GetTime()
 	{
@@ -30,7 +32,8 @@ private:
 template<typename T>
 void Logger::Log(T exp)
 {
-	std::cout << "\033[35m" << GetTime() << "Logging:" << exp << "\033[37m" << std::endl;
+	if(exp != (T)NULL)
+		std::cout << "\033[35m" << GetTime() << "Logging:" << exp << "\033[37m" << std::endl;
 }
 
 #define RE_LOG(expression) Logger::Log(expression);

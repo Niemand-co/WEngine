@@ -11,6 +11,8 @@ namespace WEngine
 
 		virtual ~Input() = default;
 
+		static void QueryPlayerInput();
+
 		static bool IsKeyPressed(int keycode);
 
 		static glm::vec2 GetMousePosition();

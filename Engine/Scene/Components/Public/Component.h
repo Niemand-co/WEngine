@@ -41,6 +41,8 @@ public:
 
 	virtual ~Component() = default;
 
+	//virtual void Tick(const WEngine::TimeStep& timeStep) = 0;
+
 	virtual ComponentType GetType() { return m_type; }
 
 	inline GameObject* GetGameObject() { return m_pGameObject; } ;

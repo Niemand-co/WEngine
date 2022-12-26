@@ -69,7 +69,7 @@ namespace WEngine
 			return m_pData[index];
 		}
 
-		bool operator==(const WString& string)
+		bool operator==(WString& string)
 		{
 			if(m_size != string.m_size)
 				return false;
@@ -95,7 +95,7 @@ namespace WEngine
 
 		WString&& operator+(const WString& string)
 		{
-			char *newPtr = (char*)Allocator::Get()->Allocate(string.m_size + m_size + 1);
+			char* newPtr = (char*)Allocator::Get()->Allocate(string.m_size + m_size + 1);
 			memcpy(newPtr, m_pData, m_size);
 			memcpy(newPtr + m_size, string.m_pData, string.m_size + 1);
 			WString newString = WString();
@@ -106,6 +106,10 @@ namespace WEngine
 
 		WString&& operator+(const char *str)
 		{
+			if (str == nullptr)
+			{
+				return WString(*this);
+			}
 			size_t length = strlen(str);
 			char* newPtr = (char*)Allocator::Get()->Allocate(length + m_size + 1);
 			memcpy(newPtr, m_pData, m_size);
@@ -128,6 +132,10 @@ namespace WEngine
 
 		void operator+=(const char *str)
 		{
+			if (str == nullptr)
+			{
+				return;
+			}
 			size_t length = strlen(str);
 			char* newPtr = (char*)Allocator::Get()->Allocate(length + m_size + 1);
 			memcpy(newPtr, m_pData, m_size);

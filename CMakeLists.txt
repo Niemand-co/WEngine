@@ -21,6 +21,7 @@ file(GLOB DESCR_SRC Engine/Render/Descriptor/Private/*.*)
 file(GLOB MESH_SRC Engine/Render/Mesh/Private/*.*)
 file(GLOB RENDER_SRC Engine/Render/Private/*.*)
 
+file(GLOB CORE_SRC Engine/Core/Private/*.*)
 file(GLOB FRAME_SRC Engine/Framework/Private/*.*)
 file(GLOB COMP_SRC Engine/Scene/Components/Private/*.*)
 file(GLOB SCENE_SRC Engine/Scene/Private/*.*)
@@ -50,7 +51,8 @@ file(GLOB DESCR_INCLUDE Engine/Render/Descriptor/Public/*.h)
 file(GLOB MESH_INCLUDE Engine/Render/Mesh/Public/*.h)
 file(GLOB RENDER_INCLUDE Engine/Render/Public/*.h)
 
-file(GLOB CORE_INCLUDE Engine/Core/*.h)
+file(GLOB COREH_INCLUDE Engine/Core/*.h)
+file(GLOB CORE_INCLUDE Engine/Core/Public/*.h)
 file(GLOB FRAME_INCLUDE Engine/Framework/Public/*.h)
 file(GLOB COMP_INCLUDE Engine/Scene/Components/Public/*.h)
 file(GLOB SCENE_INCLUDE Engine/Scene/Public/*.h)
@@ -107,6 +109,7 @@ set(PLATFORM_INCLUDE
     ${VULKAN_GUI_INCLUDE})
 
 set(WE_SRC
+    ${CORE_SRC}
     ${FRAME_SRC}
     ${MATH_SRC}
     ${RENDER_SRC}
@@ -133,6 +136,7 @@ set(WE_SRC
     ${GLM_SRC})
 
 set(WE_INCLUDE
+    ${COREH_INCLUDE}
     ${CORE_INCLUDE}
     ${FRAME_INCLUDE}
     ${MATH_INCLUDE}
@@ -168,6 +172,7 @@ set(EXA_SRC
 list(APPEND WENGINE_INCLUDE ${GLAD_INCLUDE})
 list(APPEND WENGINE_INCLUDE ${DEPS_INCLUDE})
 
+source_group(Engine/Core/Private FILES ${CORE_SRC})
 source_group(Engine/Framework/Private FILES ${FRAME_SRC})
 source_group(Engine/Math FILES ${MATH_SRC})
 source_group(Engine/Render/Private FILES ${RENDER_SRC})
@@ -198,7 +203,8 @@ source_group(Platform/Vulkan/Encoder/Private FILES ${VULKAN_ENCODER_SRC})
 source_group(Platform/Vulkan/Allocator/Private FILES ${VULKAN_ALLOC_SRC})
 source_group(Platform/Vulkan/ImGui/Private FILES ${VULKAN_GUI_SRC})
 
-source_group(Engine/Core FILES ${CORE_INCLUDE})
+source_group(Engine/Core FILES ${COREH_INCLUDE})
+source_group(Engine/Core/Public FILES ${CORE_INCLUDE})
 source_group(Engine/Framework/Public FILES ${FRAME_INCLUDE})
 source_group(Engine/Math/Public FILES ${MATH_INCLUDE})
 source_group(Engine/Render/Public FILES ${RENDER_INCLUDE})
