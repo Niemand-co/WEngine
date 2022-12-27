@@ -7,7 +7,7 @@ class RHITextureView;
 class RHITexture;
 struct CameraData;
 
-struct RenderTarget
+struct CameraRenderTarget
 {
 	RHITextureView *pColorTexture;
 	RHITextureView *pDepthTexture;
@@ -37,7 +37,7 @@ public:
 
 	void SetRenderer(ScriptableRenderer *renderer);
 
-	inline RenderTarget& GetRenderTarget(unsigned int index) { return m_rendertargets[index]; }
+	inline CameraRenderTarget& GetRenderTarget(unsigned int index) { return m_rendertargets[index]; }
 
 	ScriptableRenderer* GetRenderer();
 
@@ -75,7 +75,7 @@ private:
 
 	ScriptableRenderer *m_renderer;
 
-	WEngine::WArray<RenderTarget> m_rendertargets;
+	WEngine::WArray<CameraRenderTarget> m_rendertargets;
 
 	WEngine::WArray<RHITexture*> m_textureResources;
 
@@ -96,7 +96,7 @@ struct CameraData
 	glm::mat4x4 MatrixV;
 	glm::mat4x4 MatrixP;
 	glm::mat4x4 MatrixVP;
-	RenderTarget *pRenderTarget;
+	CameraRenderTarget *pRenderTarget;
 	float fov;
 	float farClip;
 	float nearClip;

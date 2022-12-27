@@ -24,7 +24,7 @@ public:
 
 	inline const char* const GetNamePtr() const { return m_name.Data(); }
 
-	inline WEngine::WString const GetName() const { return m_name; }
+	inline const WEngine::WString& const GetName() const { return m_name; }
 
 	inline const WEngine::WGuid<WEngine::WString>& GetID() const { return m_id; }
 
@@ -71,7 +71,7 @@ inline T* GameObject::GetComponent()
 {
 	for (Component* component : m_components)
 	{
-		if (typeid(component) == typeid(T))
+		if (dynamic_cast<T*>(component) != nullptr)
 			return static_cast<T*>(component);
 	}
 	return nullptr;

@@ -9,7 +9,9 @@ namespace WEngine
 	{
 	public:
 
-		WArray(size_t size = 0);
+		WArray();
+
+		WArray(size_t size);
 
 		WArray(size_t size, const T& var);
 
@@ -72,9 +74,8 @@ namespace WEngine
 			{
 				(m_pData + i)->~T();
 			}
-			//WEngine::Allocator::Get()->Deallocate(m_pData);
-			delete(m_pData);
-			m_pData = (T*)malloc(sizeof(T) * m_capasity);
+			Allocator::Get()->Deallocate(m_pData);
+			m_pData = (T*)Allocator::Get()->Allocate(sizeof(T) * m_capasity);
 			memcpy(m_pData, array.m_pData, sizeof(T) * m_size);
 			return *this;
 		}
@@ -90,14 +91,22 @@ namespace WEngine
 	};
 
 	template<typename T>
+	inline WArray<T>::WArray()
+	{
+		m_size = 0;
+		m_capasity = 0;
+		m_pData = nullptr;
+	}
+
+	template<typename T>
 	inline WArray<T>::WArray(size_t size)
 	{
 		m_size = size;
 		m_capasity = size;
-		if (size > 0)
+		m_pData = (T*)Allocator::Get()->Allocate(size * sizeof(T));
+		for (size_t i = 0; i < size; ++i)
 		{
-			//m_pData = (T*)Allocator::Get()->Allocate(size * sizeof(T));
-			m_pData = (T*)malloc(size * sizeof(T));
+			::new (m_pData + i) T();
 		}
 	}
 
@@ -108,8 +117,7 @@ namespace WEngine
 		m_capasity = size;
 		if (size > 0)
 		{
-			//m_pData = (T*)Allocator::Get()->Allocate(size * sizeof(var));
-			m_pData = (T*)malloc(size * sizeof(var));
+			m_pData = (T*)Allocator::Get()->Allocate(size * sizeof(var));
 		}
 		for (size_t i = 0; i < size; ++i)
 		{
@@ -121,8 +129,7 @@ namespace WEngine
 	inline WArray<T>::WArray(const std::initializer_list<T>& list)
 	{
 		m_capasity = m_size = list.size();
-		//m_pData = (T*)Allocator::Get()->Allocate(m_size * sizeof(T));
-		m_pData = (T*)malloc(m_size * sizeof(T));
+		m_pData = (T*)Allocator::Get()->Allocate(m_size * sizeof(T));
 		memcpy(m_pData, list.begin(), m_size * sizeof(T));
 	}
 
@@ -130,8 +137,7 @@ namespace WEngine
 	inline WArray<T>::WArray(T* begin, T* end)
 	{
 		m_capasity = m_size = size_t(end - begin);
-		//m_pData = (T*)Allocator::Get()->Allocate(sizeof(T) * m_capasity);
-		m_pData = (T*)malloc(sizeof(T) * m_capasity);
+		m_pData = (T*)Allocator::Get()->Allocate(sizeof(T) * m_capasity);
 		memcpy(m_pData, begin, sizeof(T) * m_capasity);
 	}
 
@@ -140,7 +146,7 @@ namespace WEngine
 	{
 		m_size = array.m_size;
 		m_capasity = array.m_capasity;
-		m_pData = (T*)malloc(sizeof(T) * m_capasity);
+		m_pData = (T*)Allocator::Get()->Allocate(sizeof(T) * m_capasity);
 		memcpy(m_pData, array.m_pData, sizeof(T) * m_size);
 	}
 
@@ -151,8 +157,7 @@ namespace WEngine
 		{
 			(m_pData + i)->~T();
 		}
-		//WEngine::Allocator::Get()->Deallocate(m_pData);
-		delete(m_pData);
+		Allocator::Get()->Deallocate(m_pData);
 	}
 
 	template<typename T>
@@ -161,16 +166,13 @@ namespace WEngine
 		if (m_capasity == 0)
 		{
 			m_capasity = 1;
-			//m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
-			m_pData = (T*)malloc(sizeof(T));
+			m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
 		}
 		else if (m_size == m_capasity)
 		{
-			//T* newPtr = (T*)WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
-			T* newPtr = (T*)malloc(2 * m_capasity * sizeof(T));
+			T* newPtr = (T*)Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
 			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			//WEngine::Allocator::Get()->Deallocate(m_pData);
-			delete(m_pData);
+			Allocator::Get()->Deallocate(m_pData);
 			m_pData = newPtr;
 			m_capasity *= 2;
 		}
@@ -185,16 +187,13 @@ namespace WEngine
 		if (m_capasity == 0)
 		{
 			m_capasity = 1;
-			//m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
-			m_pData = (T*)malloc(sizeof(T));
+			m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
 		}
 		else if (m_size == m_capasity)
 		{
-			//T* newPtr = (T*)WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
-			T* newPtr = (T*)malloc(2 * m_capasity * sizeof(T));
+			T* newPtr = (T*)Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
 			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			//WEngine::Allocator::Get()->Deallocate(m_pData);
-			delete(m_pData);
+			WEngine::Allocator::Get()->Deallocate(m_pData);
 			m_pData = newPtr;
 			m_capasity *= 2;
 		}
@@ -209,16 +208,13 @@ namespace WEngine
 		if (m_capasity == 0)
 		{
 			m_capasity = 1;
-			//m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
-			m_pData = (T*)malloc(sizeof(T));
+			m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
 		}
 		else if (m_size == m_capasity)
 		{
-			//T* newPtr = (T*)WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
-			T* newPtr = (T*)malloc(2 * m_capasity * sizeof(T));
+			T* newPtr = (T*)Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
 			memcpy(newPtr + 1, m_pData, sizeof(T) * m_size);
-			//WEngine::Allocator::Get()->Deallocate(m_pData);
-			delete(m_pData);
+			Allocator::Get()->Deallocate(m_pData);
 			m_pData = newPtr;
 			m_capasity *= 2;
 		}
@@ -240,16 +236,13 @@ namespace WEngine
 		if (m_capasity == 0)
 		{
 			m_capasity = 1;
-			//m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
-			m_pData = (T*)malloc(sizeof(T));
+			m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
 		}
 		else if (m_size == m_capasity)
 		{
-			//T* newPtr = (T*)WEngine::Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
-			T* newPtr = (T*)malloc(2 * m_capasity * sizeof(T));
+			T* newPtr = (T*)Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
 			memcpy(newPtr + 1, m_pData, sizeof(T) * m_size);
-			//WEngine::Allocator::Get()->Deallocate(m_pData);
-			delete(m_pData);
+			Allocator::Get()->Deallocate(m_pData);
 			m_pData = newPtr;
 			m_capasity *= 2;
 		}
@@ -270,11 +263,9 @@ namespace WEngine
 	{
 		if (size > m_capasity)
 		{
-			//T* newPtr = (T*)WEngine::Allocator::Get()->Allocate(size * sizeof(T));
-			T* newPtr = (T*)malloc(size * sizeof(T));
+			T* newPtr = (T*)Allocator::Get()->Allocate(size * sizeof(T));
 			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			//WEngine::Allocator::Get()->Deallocate(m_pData);
-			delete(m_pData);
+			Allocator::Get()->Deallocate(m_pData);
 			m_pData = newPtr;
 			m_size = size;
 			m_capasity = size;
@@ -290,11 +281,9 @@ namespace WEngine
 	{
 		if (size > m_capasity)
 		{
-			//T* newPtr = (T*)WEngine::Allocator::Get()->Allocate(size * sizeof(T));
-			T* newPtr = (T*)malloc(size * sizeof(T));
+			T* newPtr = (T*)Allocator::Get()->Allocate(size * sizeof(T));
 			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			//WEngine::Allocator::Get()->Deallocate(m_pData);
-			delete(m_pData);
+			Allocator::Get()->Deallocate(m_pData);
 			m_pData = newPtr;
 			m_capasity = size;
 		}

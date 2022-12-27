@@ -25,6 +25,14 @@ public:
 
 	static Mesh* GetArrow();
 
+private:
+
+	WEngine::WString m_name;
+
+	RHIBuffer *m_pVertexBuffer;
+
+	RHIBuffer *m_pIndexBuffer;
+
 public:
 
 	const WEngine::WGuid<WEngine::WString> m_id;
@@ -40,14 +48,6 @@ public:
 	glm::vec3 m_boundingBoxMin;
 
 	glm::vec3 m_boundingBoxMax;
-
-private:
-
-	WEngine::WString m_name;
-
-	RHIBuffer *m_pVertexBuffer;
-
-	RHIBuffer *m_pIndexBuffer;
 
 };
 

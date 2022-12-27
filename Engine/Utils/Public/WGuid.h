@@ -18,7 +18,7 @@ namespace WEngine
 	{
 	public:
 
-		WGuid(T data)
+		WGuid(const T& data)
 		{
 			A = 0x67452301;
 			B = 0xefcdab89;

@@ -335,7 +335,7 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 	m_pRenderTargets.Resize(3);
 	for (int i = 0; i < 3; ++i)
 	{
-		RenderTarget& target = cameraData->camera->GetRenderTarget(i);
+		CameraRenderTarget& target = cameraData->camera->GetRenderTarget(i);
 		WEngine::WArray<RHITextureView*> textureViews = { target.pColorTexture, m_pStencilViews[i] };
 		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 		{
