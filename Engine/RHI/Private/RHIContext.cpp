@@ -334,6 +334,16 @@ RHIBuffer* RHIContext::CreateTextureBuffer(RHIBufferDescriptor* descriptor)
 	return g_pDevice->CreateBuffer(descriptor);
 }
 
+RHIScissor* RHIContext::CreateScissor(RHIScissorDescriptor* descriptor)
+{
+	return g_pDevice->CreateScissor(descriptor);
+}
+
+RHIViewport* RHIContext::CreateViewport(RHIViewportDescriptor* descriptor)
+{
+	return g_pDevice->CreateViewport(descriptor);
+}
+
 void RHIContext::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height)
 {
 

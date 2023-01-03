@@ -22,3 +22,5 @@
 #include "Platform/Vulkan/Public/VulkanTextureView.h"
 #include "Platform/Vulkan/Public/VulkanEvent.h"
 #include "Platform/Vulkan/Public/VulkanSampler.h"
+#include "Platform/Vulkan/Public/VulkanScissor.h"
+#include "Platform/Vulkan/Public/VulkanViewport.h"

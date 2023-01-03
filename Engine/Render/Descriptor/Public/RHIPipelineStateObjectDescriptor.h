@@ -7,33 +7,43 @@ class RHIShader;
 class RHIRenderPass;
 class RHIPipelineResourceLayout;
 class RHIRasterizationStateDescriptor;
+class RHIScissor;
+class RHIViewport;
 
 class RHIPipelineStateObjectDescriptor
 {
 public:
 
-	RHIPipelineStateObjectDescriptor();
+	RHIPipelineStateObjectDescriptor() = default;
 
 	~RHIPipelineStateObjectDescriptor() = default;
 
 public:
 
-	RHIVertexInputDescriptor *vertexDescriptor;
+	RHIVertexInputDescriptor *vertexDescriptor = nullptr;
 
-	RHIBlendDescriptor *blendDescriptor;
+	RHIBlendDescriptor *blendDescriptor = nullptr;
 
-	RHIDepthStencilDescriptor *depthStencilDescriptor;
+	RHIDepthStencilDescriptor *depthStencilDescriptor = nullptr;
 
-	RHIShader** pShader;
+	RHIShader** pShader = nullptr;
 
-	unsigned int shaderCount;
+	unsigned int shaderCount = 0;
 
-	RHIRenderPass *renderPass;
+	RHIRenderPass *renderPass = nullptr;
 
-	unsigned int subpass;
+	unsigned int subpass = 0;
 
-	RHIPipelineResourceLayout *pipelineResourceLayout;
+	RHIPipelineResourceLayout *pipelineResourceLayout = nullptr;
 
-	RHIRasterizationStateDescriptor *rasterizationStateDescriptor;
+	RHIRasterizationStateDescriptor *rasterizationStateDescriptor = nullptr;
+
+	unsigned int scissorCount = 0;
+
+	RHIScissor *pScissors = nullptr;
+
+	unsigned int viewportCount = 0;
+
+	RHIViewport *pViewports = nullptr;
 
 };

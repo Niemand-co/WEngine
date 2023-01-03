@@ -55,22 +55,12 @@ namespace Vulkan
 
 	void VulkanGraphicsEncoder::SetViewport(const RHIViewport& pViewport)
 	{
-		VkViewport viewport = {};
-		viewport.width = pViewport.width;
-		viewport.height = pViewport.height;
-		viewport.x = pViewport.posX;
-		viewport.y = pViewport.posY;
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
-		vkCmdSetViewport(*m_cmd, 0, 1, &viewport);
+		vkCmdSetViewport(*m_cmd, 0, 1, ((const VulkanViewport*)&pViewport)->GetHandle());
 	}
 
 	void VulkanGraphicsEncoder::SetScissor(const RHIScissor& scissor)
 	{
-		VkRect2D rect = {};
-		rect.offset = { scissor.offsetX, scissor.offsetY };
-		rect.extent = { scissor.width, scissor.height };
-		vkCmdSetScissor(*m_cmd, 0, 1, &rect);
+		vkCmdSetScissor(*m_cmd, 0, 1, ((const VulkanScissor*)&scissor)->GetHandle());
 	}
 
 	void VulkanGraphicsEncoder::SetLineWidth(float width)

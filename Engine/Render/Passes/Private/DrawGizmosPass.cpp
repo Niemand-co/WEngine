@@ -170,6 +170,22 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 
 	RHIVertexInputDescriptor vertexInputDescriptor = Vertex::GetVertexInputDescriptor();
 
+	RHIViewportDescriptor viewportDescriptor = {};
+	{
+		viewportDescriptor.x = 0.0f;
+		viewportDescriptor.y = 0.0f;
+		viewportDescriptor.width = 1024.0f;
+		viewportDescriptor.height = 1024.0f;
+	}
+
+	RHIScissorDescriptor scissorDescriptor = {};
+	{
+		scissorDescriptor.offsetX = 0;
+		scissorDescriptor.offsetY = 0;
+		scissorDescriptor.width = 1024;
+		scissorDescriptor.height = 1024;
+	}
+
 	RHIPipelineStateObjectDescriptor psoDescriptor = {};
 	{
 		psoDescriptor.shaderCount = 2;
@@ -181,6 +197,10 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 		psoDescriptor.pipelineResourceLayout = m_pResourceLayout;
 		psoDescriptor.vertexDescriptor = &vertexInputDescriptor;
 		psoDescriptor.rasterizationStateDescriptor = &rasterizationStateDescriptor;
+		psoDescriptor.scissorCount = 1;
+		psoDescriptor.pScissors = context->CreateScissor(&scissorDescriptor);
+		psoDescriptor.viewportCount = 1;
+		psoDescriptor.pViewports = context->CreateViewport(&viewportDescriptor);
 	}
 	m_pPSO = context->CreatePSO(&psoDescriptor);
 
@@ -406,8 +426,8 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 		}
 		encoder->BeginPass(&renderpassBeginDescriptor);
 		encoder->SetPipeline(m_pStencilPSO);
-		encoder->SetViewport({ (float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0 });
-		encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
+		//encoder->SetViewport({ (float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0 });
+		//encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
 		for (unsigned int i = 0; i < selectedObjects.Size(); ++i)
 		{
 			MeshFilter* filter = selectedObjects[i]->GetComponent<MeshFilter>();
@@ -434,8 +454,8 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 		}
 		encoder->BeginPass(&renderpassBeginDescriptor);
 		encoder->SetPipeline(m_pPSO);
-		encoder->SetViewport({ (float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0 });
-		encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
+		//encoder->SetViewport({ (float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0 });
+		//encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
 		for (unsigned int i = 0; i < selectedObjects.Size(); ++i)
 		{
 			MeshFilter *filter = selectedObjects[i]->GetComponent<MeshFilter>();

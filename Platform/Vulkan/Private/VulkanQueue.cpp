@@ -32,6 +32,7 @@ namespace Vulkan
 	{
 		VkCommandPoolCreateInfo commandPoolCreateInfo = {};
 		commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 		commandPoolCreateInfo.queueFamilyIndex = m_queueFamilyIndex;
 
 		VkCommandPool *pPool = (VkCommandPool*)WEngine::Allocator::Get()->Allocate(sizeof(VkCommandPool));

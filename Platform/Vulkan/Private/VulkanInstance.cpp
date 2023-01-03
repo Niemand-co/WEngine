@@ -8,7 +8,7 @@
 namespace Vulkan
 {
 
-	WEngine::WArray<const char*> VulkanInstance::g_validationLayers = { "VK_LAYER_KHRONOS_validation" };
+	WEngine::WArray<const char*> VulkanInstance::g_validationLayers = { "VK_LAYER_KHRONOS_validation", "VK_LAYER_KHRONOS_synchronization2" };
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 		const VkDebugUtilsMessageTypeFlagsEXT messageType,

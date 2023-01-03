@@ -5,8 +5,3 @@
 #include "Render/Descriptor/Public/RHIDepthStencilDescriptor.h"
 #include "RHI/Public/RHIShader.h"
 #include "RHI/Public/RHIRenderPass.h"
-
-RHIPipelineStateObjectDescriptor::RHIPipelineStateObjectDescriptor()
-{
-
-}

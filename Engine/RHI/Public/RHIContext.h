@@ -19,8 +19,12 @@ class RHIPipelineResourceLayout;
 class RHIPipelineStateObject;
 class RHISemaphore;
 class RHIFence;
+class RHIScissor;
+class RHIViewport;
 
 class RHIBufferDescriptor;
+class RHIScissorDescriptor;
+class RHIViewportDescriptor;
 class RHIGroupLayoutDescriptor;
 class RHIGroupDescriptor;
 class RHIUpdateResourceDescriptor;
@@ -80,6 +84,10 @@ public:
 	virtual RHIBuffer* CreateUniformBuffer(RHIBufferDescriptor *descriptor);
 
 	virtual RHIBuffer* CreateTextureBuffer(RHIBufferDescriptor *descriptor);
+
+	virtual RHIScissor* CreateScissor(RHIScissorDescriptor *descriptor);
+
+	virtual RHIViewport* CreateViewport(RHIViewportDescriptor *descriptor);
 
 	virtual void CopyBufferToImage(RHITexture *pTexture, RHIBuffer *pBuffer, unsigned int width, unsigned int height);
 

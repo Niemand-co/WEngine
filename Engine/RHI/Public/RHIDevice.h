@@ -17,6 +17,8 @@ class RHIGroup;
 class RHIGroupLayout;
 class RHIGroupPool;
 class RHIPipelineResourceLayout;
+class RHIScissor;
+class RHIViewport;
 
 class RHISwapchainDescriptor;
 class RHIShaderDescriptor;
@@ -31,6 +33,8 @@ class RHIGroupDescriptor;
 class RHIGroupLayoutDescriptor;
 class RHIPipelineResourceLayoutDescriptor;
 class RHIUpdateResourceDescriptor;
+class RHIScissorDescriptor;
+class RHIViewportDescriptor;
 
 class RHIDevice
 {
@@ -69,6 +73,10 @@ public:
 	virtual RHIPipelineResourceLayout* CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor *descriptor) = 0;
 
 	virtual RHIGroupPool* CreateGroupPool(RHIGroupPoolDescriptor *descriptor) = 0;
+
+	virtual RHIScissor* CreateScissor(RHIScissorDescriptor *descriptor) = 0;
+
+	virtual RHIViewport* CreateViewport(RHIViewportDescriptor *descriptor) = 0;
 
 	virtual void UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor *descriptor) = 0;
 

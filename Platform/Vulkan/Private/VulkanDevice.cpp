@@ -191,7 +191,7 @@ namespace Vulkan
 		{
 			RHISubPassDependencyDescriptor *dependencyDescriptor = descriptor->pDependencyDescriptors + i;
 			pSubpassDependencies[i].srcSubpass = dependencyDescriptor->dependedPass >= 0 ? dependencyDescriptor->dependedPass : VK_SUBPASS_EXTERNAL;
-			pSubpassDependencies[i].dstSubpass = i;
+			pSubpassDependencies[i].dstSubpass = dependencyDescriptor->waitingPass >= 0 ? dependencyDescriptor->waitingPass : VK_SUBPASS_EXTERNAL;
 			pSubpassDependencies[i].srcStageMask = dependencyDescriptor->dependedStage;
 			pSubpassDependencies[i].srcAccessMask = dependencyDescriptor->dependedAccess;
 			pSubpassDependencies[i].dstStageMask = dependencyDescriptor->waitingStage;
@@ -262,6 +262,10 @@ namespace Vulkan
 		VkPipelineViewportStateCreateInfo viewportStateCreateInfo = {};
 		{
 			viewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+			viewportStateCreateInfo.scissorCount = descriptor->scissorCount;
+			viewportStateCreateInfo.pScissors = ((VulkanScissor*)descriptor->pScissors)->GetHandle();
+			viewportStateCreateInfo.viewportCount = descriptor->viewportCount;
+			viewportStateCreateInfo.pViewports = ((VulkanViewport*)descriptor->pViewports)->GetHandle();
 		}
 
 		VkPipelineRasterizationStateCreateInfo rasterizationStateCreateInfo = {};
@@ -335,11 +339,11 @@ namespace Vulkan
 			colorBlendStateCreateInfo.blendConstants[3] = 0.0f;
 		}
 
-		VkDynamicState dynamicStates[2] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_LINE_WIDTH };
+		VkDynamicState dynamicStates[3] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_LINE_WIDTH };
 		VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo = {};
 		{
 			dynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-			dynamicStateCreateInfo.dynamicStateCount = 2;
+			dynamicStateCreateInfo.dynamicStateCount = 3;
 			dynamicStateCreateInfo.pDynamicStates = dynamicStates;
 		}
 
@@ -428,7 +432,7 @@ namespace Vulkan
 		VkSamplerCreateInfo samplerCreateInfo = {};
 		{
 			samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-			samplerCreateInfo.anisotropyEnable = true;
+			samplerCreateInfo.anisotropyEnable = false;
 			samplerCreateInfo.maxAnisotropy = 16;
 			samplerCreateInfo.magFilter = WEngine::ToVulkan(descriptor->magFilter);
 			samplerCreateInfo.minFilter = WEngine::ToVulkan(descriptor->minFilter);
@@ -610,6 +614,36 @@ namespace Vulkan
 		return groupPool;
 	}
 
+	RHIScissor* VulkanDevice::CreateScissor(RHIScissorDescriptor* descriptor)
+	{
+		VkRect2D *pScissor = (VkRect2D*)WEngine::Allocator::Get()->Allocate(sizeof(VkRect2D));
+		pScissor->offset.x = descriptor->offsetX;
+		pScissor->offset.y = descriptor->offsetY;
+		pScissor->extent.width = descriptor->width;
+		pScissor->extent.height = descriptor->height;
+
+		VulkanScissor *scissor = (VulkanScissor*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanScissor));
+		::new (scissor) VulkanScissor(pScissor);
+
+		return scissor;
+	}
+
+	RHIViewport* VulkanDevice::CreateViewport(RHIViewportDescriptor* descriptor)
+	{
+		VkViewport *pViewport = (VkViewport*)WEngine::Allocator::Get()->Allocate(sizeof(VkViewport));
+		pViewport->x = descriptor->x;
+		pViewport->y = descriptor->y;
+		pViewport->width = descriptor->width;
+		pViewport->height = descriptor->height;
+		pViewport->minDepth = descriptor->minDepth;
+		pViewport->maxDepth = descriptor->maxDepth;
+
+		VulkanViewport *viewport = (VulkanViewport*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanViewport));
+		::new (viewport) VulkanViewport(pViewport);
+
+		return viewport;
+	}
+
 	void VulkanDevice::UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
 	{
 		VkWriteDescriptorSet *pWriteDescriptorSets = (VkWriteDescriptorSet*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkWriteDescriptorSet));
@@ -695,6 +729,7 @@ namespace Vulkan
 		
 		VkSemaphoreCreateInfo semaphoreCreateInfo = {};
 		semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+		semaphoreCreateInfo.flags = VK_PIPELINE_STAGE_HOST_BIT;
 		for (int i = 0; i < count; ++i)
 		{
 			RE_ASSERT(vkCreateSemaphore(*m_pDevice, &semaphoreCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pSemaphore + i) == VK_SUCCESS, "Failed to Create Semaphore.");

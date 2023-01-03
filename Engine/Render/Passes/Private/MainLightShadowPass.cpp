@@ -158,6 +158,22 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 
 	m_pPipelineLayout = context->CreatePipelineResourceLayout(&pipelineResourceLayoutDescriptor);
 
+	RHIViewportDescriptor viewportDescriptor = {};
+	{
+		viewportDescriptor.x = 0.0f;
+		viewportDescriptor.y = 0.0f;
+		viewportDescriptor.width = 1024.0f;
+		viewportDescriptor.height = 1024.0f;
+	}
+
+	RHIScissorDescriptor scissorDescriptor = {};
+	{
+		scissorDescriptor.offsetX = 0;
+		scissorDescriptor.offsetY = 0;
+		scissorDescriptor.width = 1024;
+		scissorDescriptor.height = 1024;
+	}
+
 	RHIPipelineStateObjectDescriptor psoDescriptor = {};
 	{
 		psoDescriptor.shaderCount = 2;
@@ -169,6 +185,10 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 		psoDescriptor.subpass = 0;
 		psoDescriptor.pipelineResourceLayout = m_pPipelineLayout;
 		psoDescriptor.renderPass = m_pRenderPass;
+		psoDescriptor.scissorCount = 1;
+		psoDescriptor.pScissors = context->CreateScissor(&scissorDescriptor);
+		psoDescriptor.viewportCount = 1;
+		psoDescriptor.pViewports = context->CreateViewport(&viewportDescriptor);
 	}
 	m_pPSO = context->CreatePSO(&psoDescriptor);
 
@@ -235,8 +255,8 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 		ClearValue values[]{ {glm::vec4(1.f, 0.f, 0.f, 0.f), false } };
 
 		encoder->SetPipeline(m_pPSO);
-		encoder->SetViewport({ 1024, 1024, 0, 0 });
-		encoder->SetScissor({ 1024, 1024, 0, 0 });
+		//encoder->SetViewport({ 1024, 1024, 0, 0 });
+		//encoder->SetScissor({ 1024, 1024, 0, 0 });
 		for (unsigned int levelIndex = 0; levelIndex < 4; ++levelIndex)
 		{
 			SceneData sceneData =
@@ -282,8 +302,8 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 				encoder->DrawIndexed(pMesh->m_indexCount, 0);
 				drawcalls += m_pObjectDataBuffers[RHIContext::g_currentFrame]->Alignment();
 			}
+			encoder->EndPass();
 		}
-		encoder->EndPass();
 		encoder->~RHIGraphicsEncoder();
 		WEngine::Allocator::Get()->Deallocate(encoder);
 	}

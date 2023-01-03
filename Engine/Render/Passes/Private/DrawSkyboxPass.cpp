@@ -138,6 +138,22 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 
 	RHIRasterizationStateDescriptor rasterizationStateDescriptor = {};
 
+	RHIViewportDescriptor viewportDescriptor = {};
+	{
+		viewportDescriptor.x = 0.0f;
+		viewportDescriptor.y = 0.0f;
+		viewportDescriptor.width = (float)WEngine::Screen::GetWidth();
+		viewportDescriptor.height = (float)WEngine::Screen::GetHeight();
+	}
+
+	RHIScissorDescriptor scissorDescriptor = {};
+	{
+		scissorDescriptor.offsetX = 0;
+		scissorDescriptor.offsetY = 0;
+		scissorDescriptor.width = WEngine::Screen::GetWidth();
+		scissorDescriptor.height = WEngine::Screen::GetHeight();
+	}
+
 	RHIShader *shaders[] = { vertShader, fragShader };
 	RHIPipelineStateObjectDescriptor psoDescriptor = {};
 	{
@@ -150,6 +166,10 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 		psoDescriptor.vertexDescriptor = &vertexInputDescriptor;
 		psoDescriptor.pipelineResourceLayout = m_pPipelineLayout;
 		psoDescriptor.rasterizationStateDescriptor = &rasterizationStateDescriptor;
+		psoDescriptor.scissorCount = 1;
+		psoDescriptor.pScissors = context->CreateScissor(&scissorDescriptor);
+		psoDescriptor.viewportCount = 1;
+		psoDescriptor.pViewports = context->CreateViewport(&viewportDescriptor);
 	}
 	m_pPSO = context->CreatePSO(&psoDescriptor);
 
@@ -195,7 +215,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 
 	RHITextureViewDescriptor uvd = {};
 	{
-		uvd.format = Format::A8R8G8B8_UNorm;
+		uvd.format = Format::A8R8G8B8_SNorm;
 		uvd.arrayLayerCount = 1;
 		uvd.baseArrayLayer = 0;
 		uvd.mipCount = 1;
@@ -293,10 +313,10 @@ void DrawSkyboxPass::Execute(RHIContext* context, CameraData* cameraData)
 			renderpassBeginDescriptor.clearCount = 2;
 			renderpassBeginDescriptor.pClearValues = values;
 		}
-		encoder->BeginPass(&renderpassBeginDescriptor);
 		encoder->SetPipeline(m_pPSO);
-		encoder->SetViewport({ (float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0 });
-		encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
+		//encoder->SetViewport({ (float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0 });
+		//encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
+		encoder->BeginPass(&renderpassBeginDescriptor);
 		encoder->BindVertexBuffer(m_pMesh->GetVertexBuffer());
 		encoder->BindIndexBuffer(m_pMesh->GetIndexBuffer());
 		encoder->BindGroups(1, m_pGroup[0], m_pPipelineLayout);

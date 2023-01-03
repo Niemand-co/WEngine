@@ -4,16 +4,16 @@ class RHIRasterizationStateDescriptor
 {
 public:
 
-	RHIRasterizationStateDescriptor();
+	RHIRasterizationStateDescriptor() = default;
 
 	~RHIRasterizationStateDescriptor() = default;
 
 public:
 
-	PolygonMode polygonMode;
+	PolygonMode polygonMode = PolygonMode::Triangle;
 
-	float lineWidth;
+	float lineWidth = 1.0f;
 
-	PrimitiveTopology primitivePology;
+	PrimitiveTopology primitivePology = PrimitiveTopology::TriangleList;
 
 };

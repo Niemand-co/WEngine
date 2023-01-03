@@ -144,6 +144,22 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 
 	RHIRasterizationStateDescriptor rasterizationStateDescriptor = {};
 
+	RHIViewportDescriptor viewportDescriptor = {};
+	{
+		viewportDescriptor.x = 0.0f;
+		viewportDescriptor.y = 0.0f;
+		viewportDescriptor.width = (float)WEngine::Screen::GetWidth();
+		viewportDescriptor.height = (float)WEngine::Screen::GetWidth();
+	}
+
+	RHIScissorDescriptor scissorDescriptor = {};
+	{
+		scissorDescriptor.offsetX = 0;
+		scissorDescriptor.offsetY = 0;
+		scissorDescriptor.width = WEngine::Screen::GetWidth();
+		scissorDescriptor.height = WEngine::Screen::GetWidth();
+	}
+
 	RHIVertexInputDescriptor vertexInputDescriptor = Vertex::GetVertexInputDescriptor();
 	RHIPipelineStateObjectDescriptor psoDescriptor = {};
 	{
@@ -156,6 +172,10 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 		psoDescriptor.vertexDescriptor = &vertexInputDescriptor;
 		psoDescriptor.pipelineResourceLayout = m_pPipelineResourceLayout;
 		psoDescriptor.rasterizationStateDescriptor = &rasterizationStateDescriptor;
+		psoDescriptor.scissorCount = 1;
+		psoDescriptor.pScissors = context->CreateScissor(&scissorDescriptor);
+		psoDescriptor.viewportCount = 1;
+		psoDescriptor.pViewports = context->CreateViewport(&viewportDescriptor);
 	};
 	m_pPSO = context->CreatePSO(&psoDescriptor);
 
@@ -278,9 +298,8 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		}
 		encoder->BeginPass(&renderPassBeginDescriptor);
 		encoder->SetPipeline(m_pPSO);
-		encoder->SetViewport({(float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0});
-		encoder->SetScissor({WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0});
-		encoder->SetDepthTestEnable(true);
+		//encoder->SetViewport({(float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0});
+		//encoder->SetScissor({WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0});
 		unsigned int drawcalls = 0;
 		Light *mainLight = World::GetWorld()->GetMainLight();
 		const WEngine::WArray<glm::mat4>& frustum = mainLight->GetShadowFrustum();

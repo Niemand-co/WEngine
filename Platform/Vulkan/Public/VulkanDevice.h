@@ -50,6 +50,10 @@ namespace Vulkan
 
 		virtual RHIGroupPool* CreateGroupPool(RHIGroupPoolDescriptor *descriptor) override;
 
+		virtual RHIScissor* CreateScissor(RHIScissorDescriptor *descriptor) override;
+
+		virtual RHIViewport* CreateViewport(RHIViewportDescriptor *descriptor) override;
+
 		virtual void UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor *descriptor) override;
 
 		virtual void UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor *descriptor) override;
