@@ -2,7 +2,7 @@
 #include "Render/Public/RenderTarget.h"
 #include "Render/Public/RenderTexture.h"
 
-RenderTarget::RenderTarget(const RenderTexture& texture)
+RenderTarget::RenderTarget()
 {
 	
 }

@@ -8,12 +8,12 @@ class RenderTarget : public RenderResource
 {
 public:
 
-	RenderTarget(const RenderTexture& texture);
+	RenderTarget();
 
 	~RenderTarget() = default;
 
 private:
 
-	WEngine::WArray<RHIRenderTarget*> m_renderTargets;
+	WEngine::WSharedPtr<RHITexture> m_pTexture;
 
 };
