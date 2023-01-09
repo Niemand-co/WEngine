@@ -1,8 +1,8 @@
 #pragma once
 
 class GameObject;
-class Camera;
-class Light;
+class CameraComponent;
+class LightComponent;
 
 class World
 {
@@ -13,17 +13,17 @@ public:
 
 	GameObject* CreateGameObject(const WEngine::WString& name = "GameObject");
 
-	void AddCamera(Camera *pCamera);
+	void AddCamera(CameraComponent*pCamera);
 
-	void AddLight(Light *pLight);
+	void AddLight(LightComponent*pLight);
 
-	void SetMainLight(Light *pLight);
+	void SetMainLight(LightComponent*pLight);
 
-	WEngine::WArray<Camera*>& GetCameras();
+	WEngine::WArray<CameraComponent*>& GetCameras();
 
-	Light* GetMainLight() const;
+	LightComponent* GetMainLight() const;
 
-	const WEngine::WArray<Light*>& GetAdditionalLights() const;
+	const WEngine::WArray<LightComponent*>& GetAdditionalLights() const;
 
 	static World* CreateWorld();
 
@@ -39,13 +39,13 @@ private:
 
 	WEngine::WArray<WEngine::WString> m_pNames;
 
-	WEngine::WArray<Camera*> m_pCameras;
+	WEngine::WArray<CameraComponent*> m_pCameras;
 
-	WEngine::WArray<Light*> m_pAdditionalLights;
+	WEngine::WArray<LightComponent*> m_pAdditionalLights;
 
-	Camera *m_pEditorCamera;
+	CameraComponent*m_pEditorCamera;
 
-	Light *m_pMainLight;
+	LightComponent *m_pMainLight;
 
 	static World* g_pInstance;
 

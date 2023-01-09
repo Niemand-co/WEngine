@@ -27,7 +27,7 @@ enum Property
 	Shader,
 };
 
-class Material : public Component
+class MaterialComponent : public Component
 {
 	ENABLE_REFLECTION
 
@@ -37,11 +37,11 @@ class Material : public Component
 
 public:
 
-	typedef Material type;
+	typedef MaterialComponent type;
 
-	Material(GameObject *pGameObject);
+	MaterialComponent(GameObject *pGameObject);
 
-	~Material() = default;
+	~MaterialComponent() = default;
 
 	virtual void ShowInInspector() override;
 

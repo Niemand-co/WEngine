@@ -13,7 +13,7 @@ struct CameraRenderTarget
 	RHITextureView *pDepthTexture;
 };
 
-class Camera : public Component
+class CameraComponent : public Component
 {
 	ENABLE_REFLECTION
 
@@ -21,11 +21,11 @@ class Camera : public Component
 
 public:
 
-	typedef Camera type;
+	typedef CameraComponent type;
 
-	Camera(GameObject* pGameObject, const float& fov = 90.0f, const float& aspect = 1.0f, const float& nearPlane = 0.01f, const float& farPlane = 1000.0f);
+	CameraComponent(GameObject* pGameObject, const float& fov = 90.0f, const float& aspect = 1.0f, const float& nearPlane = 0.01f, const float& farPlane = 1000.0f);
 
-	~Camera() = default;
+	~CameraComponent() = default;
 
 	virtual void ShowInInspector() override;
 
@@ -91,7 +91,7 @@ private:
 
 struct CameraData
 {
-	Camera *camera;
+	CameraComponent *camera;
 	glm::vec3 Position;
 	glm::mat4x4 MatrixV;
 	glm::mat4x4 MatrixP;

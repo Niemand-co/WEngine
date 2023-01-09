@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "Scene/Components/Public/Transformer.h"
+#include "Scene/Components/Public/TransformComponent.h"
 
-Transformer::Transformer(GameObject* pGameObject)
+TransformComponent::TransformComponent(GameObject* pGameObject)
 	: Component(pGameObject)
 {
 	m_type = Component::ComponentType::Transformer;
@@ -12,7 +12,7 @@ Transformer::Transformer(GameObject* pGameObject)
 	m_scale = glm::vec3(1.f, 1.f, 1.f);
 }
 
-void Transformer::ShowInInspector()
+void TransformComponent::ShowInInspector()
 {
 	if (ImGui::CollapsingHeader("Transformer", ImGuiTreeNodeFlags_DefaultOpen))
 	{
@@ -66,32 +66,32 @@ void Transformer::ShowInInspector()
 	}
 }
 
-void Transformer::SetScale(glm::vec3 scale)
+void TransformComponent::SetScale(glm::vec3 scale)
 {
 	m_scale = scale;
 }
 
-void Transformer::SetRotate(glm::vec3 rotate)
+void TransformComponent::SetRotate(glm::vec3 rotate)
 {
 	m_rotate = rotate;
 }
 
-void Transformer::SetPosition(glm::vec3 translate)
+void TransformComponent::SetPosition(glm::vec3 translate)
 {
 	m_position = translate;
 }
 
-glm::vec3 Transformer::GetPosition()
+glm::vec3 TransformComponent::GetPosition()
 {
 	return m_position;
 }
 
-glm::mat4 Transformer::GetTranslateMatrix()
+glm::mat4 TransformComponent::GetTranslateMatrix()
 {
 	return glm::translate(glm::mat4(1.0f), m_position);
 }
 
-glm::mat4 Transformer::GetRotateMatrix()
+glm::mat4 TransformComponent::GetRotateMatrix()
 {
 	glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f))
 						   * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f))
@@ -99,7 +99,7 @@ glm::mat4 Transformer::GetRotateMatrix()
 	return rotateMatrix;
 }
 
-glm::mat4 Transformer::GetLocalToWorldMatrix()
+glm::mat4 TransformComponent::GetLocalToWorldMatrix()
 {
 	glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), m_scale);
 	glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f))
@@ -110,12 +110,12 @@ glm::mat4 Transformer::GetLocalToWorldMatrix()
 	return translateMatrix * rotateMatrix * scaleMatrix;
 }
 
-glm::mat4 Transformer::GetWorldToLocalMatrix()
+glm::mat4 TransformComponent::GetWorldToLocalMatrix()
 {
 	return glm::inverse(GetLocalToWorldMatrix());
 }
 
-glm::vec3 Transformer::GetForward()
+glm::vec3 TransformComponent::GetForward()
 {
 	glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.x), glm::vec3(1.0f, 0.0f, 0.0f))
 		   				   * glm::rotate(glm::mat4(1.0f), glm::radians(m_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f))
@@ -124,7 +124,7 @@ glm::vec3 Transformer::GetForward()
 	return m_forward;
 }
 
-void Transformer::Move(Direction dir, float dis)
+void TransformComponent::Move(Direction dir, float dis)
 {
 	glm::vec3 worldUP = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 right = glm::normalize(glm::cross(m_forward, worldUP));
@@ -156,12 +156,12 @@ void Transformer::Move(Direction dir, float dis)
 	m_position += displacement;
 }
 
-void Transformer::Move(glm::vec3 displacement)
+void TransformComponent::Move(glm::vec3 displacement)
 {
 	m_position += displacement;
 }
 
-void Transformer::Rotate(RotateDirection dir, float dis)
+void TransformComponent::Rotate(RotateDirection dir, float dis)
 {
 	switch (dir)
 	{

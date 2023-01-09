@@ -6,7 +6,7 @@ class RHITexture;
 class RHITextureView;
 struct CameraData;
 
-class Light : public Component
+class LightComponent : public Component
 {
 
 	enum class LightType
@@ -20,11 +20,11 @@ class Light : public Component
 
 public:
 	
-	typedef Light type;
+	typedef LightComponent type;
 
-	Light(GameObject* pGameObject);
+	LightComponent(GameObject* pGameObject);
 
-	virtual ~Light();
+	virtual ~LightComponent();
 
 	void SetMainLight(bool isMainLight);
 

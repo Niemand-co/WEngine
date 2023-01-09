@@ -23,7 +23,7 @@ GameObject* World::CreateGameObject(const WEngine::WString& name)
 	return gameObject;
 }
 
-void World::AddCamera(Camera* pCamera)
+void World::AddCamera(CameraComponent* pCamera)
 {
 	m_pCameras.Push(std::move(pCamera));
 }

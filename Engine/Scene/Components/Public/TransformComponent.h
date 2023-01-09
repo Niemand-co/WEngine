@@ -1,18 +1,18 @@
 #pragma once
 #include "Scene/Components/Public/Component.h"
 
-class Transformer : public Component
+class TransformComponent : public Component
 {
 
 	friend class GameObject;
 
 public:
 
-	typedef Transformer type;
+	typedef TransformComponent type;
 
-	Transformer(GameObject* pGameObject);
+	TransformComponent(GameObject* pGameObject);
 
-	~Transformer() = default;
+	~TransformComponent() = default;
 
 	virtual void ShowInInspector() override;
 

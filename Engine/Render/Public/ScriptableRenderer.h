@@ -46,7 +46,7 @@ private:
 
 	RHIContext *m_pContext;
 
-	RHIEvent * m_pEvent;
+	RHIEvent *m_pEvent;
 
 	WEngine::WArray<RHISemaphore*> m_pWaitSemaphore;
 
@@ -55,5 +55,24 @@ private:
 	WEngine::WArray<WEngine::WString> m_blockSubmission;
 
 	WEngine::WArray<WEngine::WArray<RHITextureView*>> m_pGlobalTextures;
+
+};
+
+class ForwardRenderer : ScriptableRenderer
+{
+public:
+
+	ForwardRenderer();
+
+	virtual ~ForwardRenderer();
+
+	virtual void Setup() override;
+
+
+
+};
+
+class DefferedRenderer : ScriptableRenderer
+{
 
 };

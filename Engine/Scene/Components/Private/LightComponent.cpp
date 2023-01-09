@@ -1,13 +1,13 @@
 #include "pch.h"
-#include "Scene/Components/Public/Light.h"
+#include "Scene/Components/Public/LightComponent.h"
 #include "Scene/Public/GameObject.h"
 #include "Scene/Public/World.h"
 #include "RHI/Public/RHIHeads.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
-#include "Scene/Components/Public/Camera.h"
+#include "Scene/Components/Public/CameraComponent.h"
 #include "Render/Public/CascadedShadowMap.h"
 
-Light::Light(GameObject *pGameObject)
+LightComponent::LightComponent(GameObject *pGameObject)
 	: Component(pGameObject), m_type(LightType::Directional), m_intensity(1.0f), m_color(glm::vec3(1.0f, 1.0f, 1.0f))
 {
 	World::GetWorld()->AddLight(this);
@@ -64,16 +64,16 @@ Light::Light(GameObject *pGameObject)
 
 }
 
-Light::~Light()
+LightComponent::~LightComponent()
 {
 }
 
-void Light::SetMainLight(bool isMainLight)
+void LightComponent::SetMainLight(bool isMainLight)
 {
 	m_isMainLight = isMainLight;
 }
 
-void Light::ShowInInspector()
+void LightComponent::ShowInInspector()
 {
 	if (ImGui::CollapsingHeader("Light", ImGuiTreeNodeFlags_DefaultOpen))
 	{
@@ -85,18 +85,18 @@ void Light::ShowInInspector()
 	}
 }
 
-void Light::UpdateShadowFrustum(CameraData* cameraData)
+void LightComponent::UpdateShadowFrustum(CameraData* cameraData)
 {
 	WEngine::CascadedShadowMap::UpdateSplices(m_mainLightCascadedShadowMapRange.GetData(), m_mainLightCascadedShadowMapRange.Size(), cameraData->nearClip, cameraData->farClip);
 	WEngine::CascadedShadowMap::UpdatePSSMMatrices(m_lightSpaceMatrix, glm::inverse(cameraData->MatrixVP), m_pGameObject->GetComponent<Transformer>()->GetForward(), m_mainLightCascadedShadowMapRange.GetData(), m_mainLightCascadedShadowMapNum);
 }
 
-const WEngine::WArray<glm::mat4>&Light::GetShadowFrustum()
+const WEngine::WArray<glm::mat4>& LightComponent::GetShadowFrustum()
 {
 	return m_lightSpaceMatrix;
 }
 
-const WEngine::WArray<float>& Light::GetSplices()
+const WEngine::WArray<float>& LightComponent::GetSplices()
 {
 	return m_mainLightCascadedShadowMapRange;
 }

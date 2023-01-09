@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Scene/Components/Public/Camera.h"
+#include "Scene/Components/Public/CameraComponent.h"
 #include "Scene/Public/GameObject.h"
 #include "RHI/Public/RHITexture.h"
 #include "RHI/Public/RHITextureView.h"
@@ -10,7 +10,7 @@
 #include "Scene/Public/World.h"
 #include "Editor/Public/Screen.h"
 
-Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, const float& nearPlane, const float& farPlane)
+CameraComponent::CameraComponent(GameObject* pGameObject, const float& fov, const float& aspect, const float& nearPlane, const float& farPlane)
 	: m_fov(fov), m_aspect(aspect), m_nearPlane(nearPlane), m_farPlane(farPlane), Component(pGameObject)
 {
 	phi = 0.0f;
@@ -84,33 +84,33 @@ Camera::Camera(GameObject* pGameObject, const float& fov, const float& aspect, c
 	m_pData->aspect = m_aspect;
 }
 
-void Camera::ShowInInspector()
+void CameraComponent::ShowInInspector()
 {
 }
 
-glm::mat4x4 Camera::GetViewMatrix()
+glm::mat4x4 CameraComponent::GetViewMatrix()
 {
 	UpdateViewMatrix();
 	return m_viewMatrix;
 }
 
-glm::mat4x4 Camera::GetProjectionMatrix()
+glm::mat4x4 CameraComponent::GetProjectionMatrix()
 {
 	UpdateProjectionMatrix();
 	return m_projectionMatrix;
 }
 
-void Camera::SetRenderer(ScriptableRenderer* renderer)
+void CameraComponent::SetRenderer(ScriptableRenderer* renderer)
 {
 	m_renderer = renderer;
 }
 
-ScriptableRenderer* Camera::GetRenderer()
+ScriptableRenderer* CameraComponent::GetRenderer()
 {
 	return m_renderer;
 }
 
-CameraData* Camera::GetData()
+CameraData* CameraComponent::GetData()
 {
 	m_pData->Position = m_pGameObject->GetComponent<Transformer>()->GetPosition();
 	m_pData->MatrixV = this->GetViewMatrix();
@@ -120,7 +120,7 @@ CameraData* Camera::GetData()
 	return m_pData;
 }
 
-void Camera::Move(Direction dir, float dis)
+void CameraComponent::Move(Direction dir, float dis)
 {
 	glm::vec3 right = glm::normalize(glm::cross(m_forward, glm::vec3(0.0f, 1.0f, 0.0f)));
 
@@ -152,7 +152,7 @@ void Camera::Move(Direction dir, float dis)
 	m_pGameObject->GetComponent<Transformer>()->Move(displacement);
 }
 
-void Camera::Rotate(RotateDirection dir, float dis)
+void CameraComponent::Rotate(RotateDirection dir, float dis)
 {
 	switch (dir)
 	{
@@ -171,7 +171,7 @@ void Camera::Rotate(RotateDirection dir, float dis)
 	m_forward.z = -glm::cos(glm::radians(phi)) * glm::sin(glm::radians(theta));
 }
 
-void Camera::RecreateRenderTarget(unsigned int width, unsigned int height)
+void CameraComponent::RecreateRenderTarget(unsigned int width, unsigned int height)
 {
 	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{
@@ -234,13 +234,13 @@ void Camera::RecreateRenderTarget(unsigned int width, unsigned int height)
 	m_aspect = (float)width / (float)height;
 }
 
-void Camera::UpdateViewMatrix()
+void CameraComponent::UpdateViewMatrix()
 {
 	glm::vec3 position = m_pGameObject->GetComponent<Transformer>()->GetPosition();
 	m_viewMatrix = glm::lookAt(position, position  + m_forward, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
-void Camera::UpdateProjectionMatrix()
+void CameraComponent::UpdateProjectionMatrix()
 {
 	//m_projectionMatrix = Matrix4x4f::GetIdentityMatrix();
 	//PerspectiveProjection(m_projectionMatrix, m_fov, m_aspect, m_nearPlane, m_farPlane);
