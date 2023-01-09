@@ -17,9 +17,15 @@ public:
 		WEngine::Allocator::Get()->Deallocate(pData);
 	}
 
+	const RHIContext* GetContext() const { return m_pContext; }
+
 protected:
 
 	virtual ~RHICommandListBase() = default;
+
+protected:
+
+	class RHIContext *m_pContext;
 
 };
 
