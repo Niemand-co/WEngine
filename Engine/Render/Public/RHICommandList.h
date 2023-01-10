@@ -37,6 +37,8 @@ public:
 
 	virtual ~RHIRenderCommandList() = default;
 
+	WEngine::WSharedPtr<RHIGraphicsEncoder> GetEncoder() const { return m_pEncoder; }
+
 	void BeginRenderPass(class RHIRenderPassBeginDescriptor *descriptor);
 
 	void EndRenderPass();
@@ -45,7 +47,7 @@ public:
 
 protected:
 
-	class RHIGraphicsEncoder *m_pEncoder;
+	WEngine::WSharedPtr<class RHIGraphicsEncoder> m_pEncoder;
 
 };
 
@@ -56,5 +58,11 @@ public:
 	RHIComputeCommandList();
 
 	virtual ~RHIComputeCommandList() = default;
+
+	const RHIComputeEncoder* GetEncoder() const { return m_pEncoder; }
+
+protected:
+
+	class RHIComputeEncoder *m_pEncoder;
 
 };
