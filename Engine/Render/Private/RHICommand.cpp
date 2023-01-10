@@ -11,3 +11,15 @@ void RHICommandBeginRenderPass::Execute(RHICommandListBase* CmdList)
 void RHICommandEndRenderPass::Execute(RHICommandListBase* CmdList)
 {
 }
+
+void RHICommandDrawIndexedPrimitive::Execute(RHICommandListBase* CmdList)
+{
+}
+
+void RHICommandSetViewport::Execute(RHICommandListBase* CmdList)
+{
+}
+
+void RHICommandSetScissor::Execute(RHICommandListBase* CmdList)
+{
+}

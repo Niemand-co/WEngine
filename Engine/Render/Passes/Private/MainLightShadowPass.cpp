@@ -6,7 +6,7 @@
 #include "Render/Mesh/Public/Vertex.h"
 #include "Scene/Public/World.h"
 #include "Scene/Public/GameObject.h"
-#include "Scene/Components/Public/Camera.h"
+#include "Scene/Components/Public/CameraComponent.h"
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
 #include "Render/Public/ScriptableRenderer.h"
 
@@ -282,7 +282,7 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 				if (filter == nullptr)
 					continue;
 
-				ObjectData objectData = { gameObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix() };
+				ObjectData objectData = { gameObjects[i]->GetComponent<TransformComponent>()->GetLocalToWorldMatrix() };
 				m_pObjectDataBuffers[RHIContext::g_currentFrame]->LoadData(&objectData, sizeof(objectData), drawcalls);
 				++drawcalls;
 			}

@@ -1,7 +1,10 @@
 #include "pch.h"
 #include "Render/Public/RHICommandList.h"
 
-template<typename T>
-RHICommandList<T>::RHICommandList()
+RHIRenderCommandList::RHIRenderCommandList()
+{
+}
+
+void RHIRenderCommandList::BeginRenderPass(RHIRenderPassBeginDescriptor* descriptor)
 {
 }

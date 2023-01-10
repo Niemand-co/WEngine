@@ -29,11 +29,32 @@ protected:
 
 };
 
-template<typename T>
-class RHICommandList : public RHICommandListBase
+class RHIRenderCommandList : public RHICommandListBase
 {
 public:
 
-	virtual ~RHICommandList() = default;
+	RHIRenderCommandList();
+
+	virtual ~RHIRenderCommandList() = default;
+
+	void BeginRenderPass(class RHIRenderPassBeginDescriptor *descriptor);
+
+	void EndRenderPass();
+
+	void DrawIndexedPrimitive(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount);
+
+protected:
+
+	class RHIGraphicsEncoder *m_pEncoder;
+
+};
+
+class RHIComputeCommandList : public RHICommandListBase
+{
+public:
+
+	RHIComputeCommandList();
+
+	virtual ~RHIComputeCommandList() = default;
 
 };
