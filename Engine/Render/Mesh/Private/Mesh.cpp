@@ -8,7 +8,7 @@
 
 #define PI 3.1415926535
 
-Mesh::Mesh(const char *name)
+StaticMesh::StaticMesh(const char *name)
 	: m_name(name), m_id(m_name)
 {
 
@@ -20,7 +20,7 @@ Mesh::Mesh(const char *name)
 	m_pIndexBuffer = nullptr;
 }
 
-Mesh::Mesh(const WEngine::WString& name)
+StaticMesh::StaticMesh(const WEngine::WString& name)
 	: m_name(name), m_id(name)
 {
 	m_pVertices = nullptr;
@@ -31,11 +31,11 @@ Mesh::Mesh(const WEngine::WString& name)
 	m_pIndexBuffer = nullptr;
 }
 
-Mesh::~Mesh()
+StaticMesh::~StaticMesh()
 {
 }
 
-RHIBuffer* Mesh::GetVertexBuffer()
+RHIBuffer* StaticMesh::GetVertexBuffer()
 {
 	if(m_pVertexBuffer != nullptr)
 		return m_pVertexBuffer;
@@ -52,7 +52,7 @@ RHIBuffer* Mesh::GetVertexBuffer()
 	return m_pVertexBuffer;
 }
 
-RHIBuffer* Mesh::GetIndexBuffer()
+RHIBuffer* StaticMesh::GetIndexBuffer()
 {
 	if(m_pIndexBuffer != nullptr)
 		return m_pIndexBuffer;
@@ -69,9 +69,9 @@ RHIBuffer* Mesh::GetIndexBuffer()
 	return m_pIndexBuffer;
 }
 
-Mesh* Mesh::GetCube()
+StaticMesh* StaticMesh::GetCube()
 {
-	Mesh *mesh = new Mesh("Cube");
+	StaticMesh *mesh = new StaticMesh("Cube");
 	Vertex *pVertices = (Vertex*)WEngine::Allocator::Get()->Allocate(24 * sizeof(Vertex));
 	{
 		pVertices[0] = { { -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f} };
@@ -124,9 +124,9 @@ Mesh* Mesh::GetCube()
 	return mesh;
 }
 
-Mesh* Mesh::GetPlane()
+StaticMesh* StaticMesh::GetPlane()
 {
-	Mesh *mesh = new Mesh("Plane");
+	StaticMesh *mesh = new StaticMesh("Plane");
 	Vertex* pVertices = (Vertex*)WEngine::Allocator::Get()->Allocate(4 * sizeof(Vertex));
 	{
 		pVertices[0] = { { -1.0f, 0.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f} };
@@ -149,11 +149,11 @@ Mesh* Mesh::GetPlane()
 	return mesh;
 }
 
-Mesh* Mesh::GetArrow()
+StaticMesh* StaticMesh::GetArrow()
 {
 	float sqrt2frag2 = std::sin(PI / 4.0f) * 0.02f;
 	float sqrt2 = 2.0f * sqrt2frag2;
-	Mesh *mesh = new Mesh("Arrow_Gui");
+	StaticMesh *mesh = new StaticMesh("Arrow_Gui");
 	Vertex *pVertices = (Vertex*)WEngine::Allocator::Get()->Allocate(27 * sizeof(Vertex));
 	{
 		pVertices[0] = { { 0.0f, 0.0f, 0.02f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
@@ -232,13 +232,13 @@ MeshLibrary::~MeshLibrary()
 {
 }
 
-void MeshLibrary::AddMesh(const WEngine::WGuid<WEngine::WString>& id, Mesh* pMesh)
+void MeshLibrary::AddMesh(const WEngine::WGuid<WEngine::WString>& id, StaticMesh* pMesh)
 {
 	
 	m_meshes.Push(WEngine::MakePiar(id, pMesh));
 }
 
-Mesh* MeshLibrary::GetMesh(const WEngine::WGuid<WEngine::WString>& id)
+StaticMesh* MeshLibrary::GetMesh(const WEngine::WGuid<WEngine::WString>& id)
 {
 	for (auto& p : m_meshes)
 	{

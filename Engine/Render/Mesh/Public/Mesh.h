@@ -3,15 +3,15 @@
 struct Vertex;
 class RHIBuffer;
 
-class Mesh : public WEngine::NamingSystem, public RenderResource
+class StaticMesh : public WEngine::NamingSystem, public RenderResource
 {
 public:
 
-	Mesh(const char *name);
+	StaticMesh(const char *name);
 
-	Mesh(const WEngine::WString& name);
+	StaticMesh(const WEngine::WString& name);
 
-	~Mesh();
+	~StaticMesh();
 
 	RHIBuffer* GetVertexBuffer();
 
@@ -19,11 +19,11 @@ public:
 
 public:
 
-	static Mesh* GetCube();
+	static StaticMesh* GetCube();
 
-	static Mesh* GetPlane();
+	static StaticMesh* GetPlane();
 
-	static Mesh* GetArrow();
+	static StaticMesh* GetArrow();
 
 private:
 
@@ -59,12 +59,12 @@ public:
 
 	~MeshLibrary();
 
-	void AddMesh(const WEngine::WGuid<WEngine::WString>& id, Mesh *pMesh);
+	void AddMesh(const WEngine::WGuid<WEngine::WString>& id, StaticMesh*pMesh);
 
-	Mesh* GetMesh(const WEngine::WGuid<WEngine::WString>& id);
+	StaticMesh* GetMesh(const WEngine::WGuid<WEngine::WString>& id);
 
 private:
 
-	WEngine::WArray<WEngine::WPair<WEngine::WGuid<WEngine::WString>, Mesh*>> m_meshes;
+	WEngine::WArray<WEngine::WPair<WEngine::WGuid<WEngine::WString>, StaticMesh*>> m_meshes;
 
 };

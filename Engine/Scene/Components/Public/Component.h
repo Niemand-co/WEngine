@@ -45,7 +45,7 @@ public:
 
 	virtual ComponentType GetType() { return m_type; }
 
-	inline GameObject* GetGameObject() { return m_pGameObject; } ;
+	inline GameObject* GetOwner() { return m_pGameObject; } ;
 
 	virtual void ShowInInspector() = 0;
 

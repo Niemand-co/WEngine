@@ -57,6 +57,7 @@
 #include "Utils/Public/WGuid.h"
 #include "Utils/Container/Public/WString.h"
 #include "Utils/Container/Public/WArray.h"
+#include "Utils/Container/Public/WSet.h"
 #include "Utils/Container/Public/WPair.h"
 #include "Utils/Container/Public/WHashMap.h"
 #include "Utils/Container/Public/WSharedPtr.h"

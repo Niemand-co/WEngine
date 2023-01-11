@@ -29,3 +29,11 @@ protected:
 	}
 
 };
+
+template<typename T>
+T* GetCopy(T* object)
+{
+	T *copy = WEngine::Allocator::Get()->Allocate(sizeof(T));
+	memcpy(copy, object, sizeof(T));
+	return copy;
+}

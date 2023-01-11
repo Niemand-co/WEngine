@@ -2,33 +2,33 @@
 #include "Scene/Public/World.h"
 #include "Scene/Public/GameObject.h"
 
-World* World::g_pInstance = nullptr;
+GWorld* GWorld::g_pInstance = nullptr;
 
-World::World()
+GWorld::GWorld()
 {
 	m_pMainLight = nullptr;
 }
 
-World::~World()
+GWorld::~GWorld()
 {
 
 }
 
-GameObject* World::CreateGameObject(const WEngine::WString& name)
+GameObject* GWorld::CreateGameObject(const WEngine::WString& name)
 {
 	GameObject* gameObject = new GameObject(name);
 	g_pInstance->m_pEntities.Push(std::move(gameObject));
 	g_pInstance->m_pNames.Push(name);
-	gameObject->AddComponent<Transformer>();
+	gameObject->AddComponent<TransformComponent>();
 	return gameObject;
 }
 
-void World::AddCamera(CameraComponent* pCamera)
+void GWorld::AddCamera(CameraComponent* pCamera)
 {
 	m_pCameras.Push(std::move(pCamera));
 }
 
-void World::AddLight(Light* pLight)
+void GWorld::AddLight(LightComponent* pLight)
 {
 	if (m_pMainLight == nullptr)
 	{
@@ -38,7 +38,7 @@ void World::AddLight(Light* pLight)
 	m_pAdditionalLights.Push(pLight);
 }
 
-void World::SetMainLight(Light* pLight)
+void GWorld::SetMainLight(LightComponent* pLight)
 {
 	for (unsigned int i = 0; i < m_pAdditionalLights.Size(); ++i)
 	{
@@ -53,12 +53,12 @@ void World::SetMainLight(Light* pLight)
 	}
 }
 
-World* World::CreateWorld()
+GWorld* GWorld::CreateWorld()
 {
 	if (g_pInstance == nullptr)
 	{
-		g_pInstance = (World*)WEngine::Allocator::Get()->Allocate(sizeof(World));
-		::new (g_pInstance) World();
+		g_pInstance = (GWorld*)WEngine::Allocator::Get()->Allocate(sizeof(GWorld));
+		::new (g_pInstance) GWorld();
 		return g_pInstance;
 	}
 	else
@@ -68,32 +68,32 @@ World* World::CreateWorld()
 	}
 }
 
-World* World::GetWorld()
+GWorld* GWorld::GetWorld()
 {
 	return g_pInstance;
 }
 
-const WEngine::WArray<GameObject*>& World::GetGameObjects() const
+const WEngine::WArray<GameObject*>& GWorld::GetGameObjects() const
 {
 	return m_pEntities;
 }
 
-const WEngine::WArray<WEngine::WString>& World::GetObjectNames() const
+const WEngine::WArray<WEngine::WString>& GWorld::GetObjectNames() const
 {
 	return m_pNames;
 }
 
-WEngine::WArray<Camera*>& World::GetCameras()
+WEngine::WArray<CameraComponent*>& GWorld::GetCameras()
 {
 	return m_pCameras;
 }
 
-Light* World::GetMainLight() const
+LightComponent* GWorld::GetMainLight() const
 {
 	return m_pMainLight;
 }
 
-const WEngine::WArray<Light*>& World::GetAdditionalLights() const
+const WEngine::WArray<LightComponent*>& GWorld::GetAdditionalLights() const
 {
 	return m_pAdditionalLights;
 }

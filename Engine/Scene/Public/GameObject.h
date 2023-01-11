@@ -1,16 +1,16 @@
 #pragma once
 #include "Scene/Public/Object.h"
-#include "Scene/Components/Public/Transformer.h"
+#include "Scene/Components/Public/TransformComponent.h"
 #include "Scene/Components/Public/MeshFilter.h"
-#include "Scene/Components/Public/Camera.h"
-#include "Scene/Components/Public/Material.h"
-#include "Scene/Components/Public/Light.h"
+#include "Scene/Components/Public/CameraComponent.h"
+#include "Scene/Components/Public/MaterialComponent.h"
+#include "Scene/Components/Public/LightComponent.h"
 
-class World;
+class GWorld;
 
 class GameObject : public Object
 {
-	friend class World;
+	friend class GWorld;
 
 	friend class Editor;
 

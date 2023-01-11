@@ -4,12 +4,12 @@ class GameObject;
 class CameraComponent;
 class LightComponent;
 
-class World
+class GWorld
 {
 public:
-	World();
+	GWorld();
 
-	~World();
+	~GWorld();
 
 	GameObject* CreateGameObject(const WEngine::WString& name = "GameObject");
 
@@ -25,9 +25,9 @@ public:
 
 	const WEngine::WArray<LightComponent*>& GetAdditionalLights() const;
 
-	static World* CreateWorld();
+	static GWorld* CreateWorld();
 
-	static World* GetWorld();
+	static GWorld* GetWorld();
 
 	const WEngine::WArray<GameObject*>& GetGameObjects() const;
 
@@ -47,6 +47,6 @@ private:
 
 	LightComponent *m_pMainLight;
 
-	static World* g_pInstance;
+	static GWorld* g_pInstance;
 
 };
