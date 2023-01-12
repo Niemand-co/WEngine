@@ -1,16 +1,16 @@
 #pragma once
-#include "Core/Public/WNamedThread.h"
+#include "HAL/Public/WRunnable.h"
 
 namespace WEngine
 {
 
-	class WRenderThread : public WNamedThread
+	class WRenderingThread : public WRunnable
 	{
 	public:
 
-		WRenderThread();
+		WRenderingThread();
 
-		virtual ~WRenderThread() = default;
+		virtual ~WRenderingThread();
 
 		virtual void Init() override;
 
@@ -19,10 +19,6 @@ namespace WEngine
 		virtual void Stop() override;
 
 		virtual void Exit() override;
-
-	private:
-
-		
 
 	};
 

@@ -17,6 +17,16 @@ namespace WEngine
 
 		virtual void Exit() = 0;
 
+		void* operator new(size_t size)
+		{
+			return Allocator::Get()->Allocate(size);
+		}
+
+		void operator delete(void* pData)
+		{
+			Allocator::Get()->Deallocate(pData);
+		}
+
 	};
 
 }

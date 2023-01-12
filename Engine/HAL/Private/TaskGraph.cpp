@@ -4,6 +4,6 @@
 namespace WEngine
 {
 
-
+	WTaskGraph* WTaskGraph::g_instance = nullptr;
 
 }
