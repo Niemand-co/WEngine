@@ -43,7 +43,7 @@ bool GameObject::HasChild() const
 
 GameObject* GameObject::Find(WEngine::WString name)
 {
-	for (GameObject* gameObject : World::GetWorld()->GetGameObjects())
+	for (GameObject* gameObject : GWorld::GetWorld()->GetGameObjects())
 	{
 		if (gameObject->IsName(name))
 		{

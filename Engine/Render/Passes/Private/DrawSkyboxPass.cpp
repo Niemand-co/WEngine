@@ -6,7 +6,7 @@
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Render/Mesh/Public/Mesh.h"
 #include "Render/Mesh/Public/Vertex.h"
-#include "Scene/Components/Public/Camera.h"
+#include "Scene/Components/Public/CameraComponent.h"
 #include "Utils/Public/Window.h"
 #include "Editor/Public/Screen.h"
 
@@ -107,7 +107,7 @@ void DrawSkyboxPass::Setup(RHIContext* context, CameraData* cameraData)
 		blendDescriptor.alphaDstFactor = BlendFactor::FactorZero;
 	}
 
-	m_pMesh = Mesh::GetCube();
+	m_pMesh = StaticMesh::GetCube();
 	RHIVertexInputDescriptor vertexInputDescriptor = Vertex::GetVertexInputDescriptor();
 
 	BindingResource resource[] = 

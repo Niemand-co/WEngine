@@ -10,11 +10,11 @@
 
 #include "Scene/Public/World.h"
 #include "Scene/Public/GameObject.h"
-#include "Scene/Components/Public/Camera.h"
-#include "Scene/Components/Public/Material.h"
+#include "Scene/Components/Public/CameraComponent.h"
+#include "Scene/Components/Public/MaterialComponent.h"
 #include "Scene/Components/Public/MeshFilter.h"
-#include "Scene/Components/Public/Transformer.h"
-#include "Scene/Components/Public/Light.h"
+#include "Scene/Components/Public/TransformComponent.h"
+#include "Scene/Components/Public/LightComponent.h"
 
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Render/Public/ScriptableRenderer.h"

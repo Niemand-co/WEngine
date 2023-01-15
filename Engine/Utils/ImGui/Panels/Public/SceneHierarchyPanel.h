@@ -1,6 +1,6 @@
 #pragma once
 
-class World;
+class GWorld;
 
 namespace WEngine
 {
@@ -13,7 +13,7 @@ namespace WEngine
 
 		~SceneHierarchyPanel() = default;
 
-		void SetScene(World *pWorld);
+		void SetScene(GWorld *pWorld);
 
 		void DrawNodes();
 
@@ -29,7 +29,7 @@ namespace WEngine
 
 	private:
 
-		World *m_pScene;
+		GWorld *m_pScene;
 
 	};
 

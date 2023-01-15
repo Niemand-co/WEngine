@@ -6,11 +6,10 @@
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Editor/Public/Editor.h"
 #include "Editor/Public/Screen.h"
-#include "Scene/Components/Public/Camera.h"
+#include "Scene/Components/Public/CameraComponent.h"
 #include "Event/Public/Event.h"
 #include "Event/Public/WindowEvent.h"
 #include "Event/Public/MouseButtonEvent.h"
-#include "Scene/Components/Public/Camera.h"
 #include "Scene/Public/World.h"
 #include "Scene/Public/GameObject.h"
 #include "Platform/GLFWWindow/Public/GLFWWindow.h"
@@ -163,7 +162,7 @@ namespace WEngine
 					ImVec2 mousePos = ImGui::GetMousePos();
 					glm::vec2 pos = { (mousePos.x - m_displayArea.First().x) / (m_displayArea.Second().x - m_displayArea.First().x), (m_displayArea.Second().y - mousePos.y) / (m_displayArea.Second().y - m_displayArea.First().y) };
 					Ray ray = Ray::GetClickRay(pos, data->Position, glm::inverse(data->MatrixV), glm::inverse(data->MatrixP));
-					const WArray<GameObject*>& pGameObjects = World::GetWorld()->GetGameObjects();
+					const WArray<GameObject*>& pGameObjects = GWorld::GetWorld()->GetGameObjects();
 					for (GameObject* pGameObject : pGameObjects)
 					{
 						if (ray.IsIntersectWithGameObject(pGameObject))

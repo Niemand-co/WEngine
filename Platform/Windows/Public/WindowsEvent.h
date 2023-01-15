@@ -1,5 +1,5 @@
 #pragma once
-#include "HAL/Public/Event.h"
+#include "HAL/Public/WEvent.h"
 
 namespace WEngine
 {
@@ -12,9 +12,9 @@ namespace WEngine
 
 		virtual ~WEventWin();
 
-		virtual bool Create() override;
-
 		virtual void Wait() override;
+
+		virtual void Trigger() override;
 
 	private:
 

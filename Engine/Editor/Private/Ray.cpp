@@ -39,7 +39,7 @@ namespace WEngine
 		return false;
 	}
 
-	bool Ray::IsIntersectWithMesh(Mesh* pMesh)
+	bool Ray::IsIntersectWithMesh(StaticMesh* pMesh)
 	{
 		for (unsigned int i = 0; i < pMesh->m_indexCount; i += 3)
 		{
@@ -53,7 +53,7 @@ namespace WEngine
 
 	bool Ray::IsIntersectWithGameObject(GameObject* pGameObject)
 	{
-		Transformer *transformer = pGameObject->GetComponent<Transformer>();
+		TransformComponent *transformer = pGameObject->GetComponent<TransformComponent>();
 
 		glm::vec3 newO = transformer->GetWorldToLocalMatrix() * glm::vec4(O, 1.0f);
 		glm::vec3 newD = transformer->GetWorldToLocalMatrix() * glm::vec4(O + D, 1.0f);

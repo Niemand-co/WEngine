@@ -10,7 +10,7 @@
 LightComponent::LightComponent(GameObject *pGameObject)
 	: Component(pGameObject), m_type(LightType::Directional), m_intensity(1.0f), m_color(glm::vec3(1.0f, 1.0f, 1.0f))
 {
-	World::GetWorld()->AddLight(this);
+	GWorld::GetWorld()->AddLight(this);
 
 	m_mainLightCascadedShadowMapNum = 4;
 
@@ -88,7 +88,7 @@ void LightComponent::ShowInInspector()
 void LightComponent::UpdateShadowFrustum(CameraData* cameraData)
 {
 	WEngine::CascadedShadowMap::UpdateSplices(m_mainLightCascadedShadowMapRange.GetData(), m_mainLightCascadedShadowMapRange.Size(), cameraData->nearClip, cameraData->farClip);
-	WEngine::CascadedShadowMap::UpdatePSSMMatrices(m_lightSpaceMatrix, glm::inverse(cameraData->MatrixVP), m_pGameObject->GetComponent<Transformer>()->GetForward(), m_mainLightCascadedShadowMapRange.GetData(), m_mainLightCascadedShadowMapNum);
+	WEngine::CascadedShadowMap::UpdatePSSMMatrices(m_lightSpaceMatrix, glm::inverse(cameraData->MatrixVP), m_pGameObject->GetComponent<TransformComponent>()->GetForward(), m_mainLightCascadedShadowMapRange.GetData(), m_mainLightCascadedShadowMapNum);
 }
 
 const WEngine::WArray<glm::mat4>& LightComponent::GetShadowFrustum()

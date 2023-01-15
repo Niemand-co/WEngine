@@ -10,7 +10,7 @@ class RHIContext;
 class RHISemaphore;
 class RHIFence;
 class RHITexture;
-class Camera;
+class CameraComponent;
 struct CameraData;
 
 class ScriptableRenderPipeline
@@ -49,7 +49,7 @@ protected:
 
 	RHIContext *m_pContext;
 
-	WEngine::WArray<Camera*> m_pCameras;
+	WEngine::WArray<CameraComponent*> m_pCameras;
 
 	WEngine::WArray<CameraData*> m_pCameraDatas;
 

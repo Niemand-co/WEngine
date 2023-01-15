@@ -13,7 +13,7 @@ namespace WEngine
 
 	WArray<GameObject*> Editor::g_selectedObjects = WArray<GameObject*>();
 
-	Camera* Editor::g_pEditorCamera = nullptr;
+	CameraComponent* Editor::g_pEditorCamera = nullptr;
 
 	Editor::Editor()
 	{
@@ -22,8 +22,8 @@ namespace WEngine
 	void Editor::Init()
 	{
 		GameObject *go = new GameObject("Editor");
-		go->AddComponent<Transformer>();
-		g_pEditorCamera = go->AddComponent<Camera>();
+		go->AddComponent<TransformComponent>();
+		g_pEditorCamera = go->AddComponent<CameraComponent>();
 		g_pEditorCamera->SetRenderer(ScriptableRenderPipeline::CreateRenderer());
 	}
 

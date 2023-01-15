@@ -9,10 +9,10 @@ namespace WEngine
 
 	SceneHierarchyPanel::SceneHierarchyPanel()
 	{
-		SetScene(World::GetWorld());
+		SetScene(GWorld::GetWorld());
 	}
 
-	void SceneHierarchyPanel::SetScene(World* pWorld)
+	void SceneHierarchyPanel::SetScene(GWorld* pWorld)
 	{
 		m_pScene = pWorld;
 	}

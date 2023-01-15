@@ -3,7 +3,7 @@
 
 class RHITexture;
 class RHISampler;
-class Mesh;
+class StaticMesh;
 class RHIBuffer;
 class RHIGroup;
 class RHIPipelineResourceLayout;

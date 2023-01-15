@@ -20,32 +20,29 @@ namespace WEngine
 
 	enum EThreadProperty : unsigned int
 	{
-		GameThread         = 0u,
-		RenderThread       = 1u,
-		RHIThread          = 1u << 1,
+		None               = 0u,
+		GameThread         = 1u,
+		RenderThread       = 1u << 1,
+		RHIThread          = 1u << 2,
 						   
 		NamedThreadNum     = 3u,
 						   
-		AnyThread          = 1u << 2,
+		AnyThread          = 1u << 3,
 						   
-		ThreadIndexMask    = 7u,
+		ThreadIndexMask    = 15u,
 						   
-		HighPriority       = 1u << 3,
-		NormalPriority     = 1u << 4,
-		LowPriority        = 1u << 5,
+		HighPriority       = 1u << 4,
+		NormalPriority     = 1u << 5,
+		LowPriority        = 1u << 6,
 
-		ThreadPriorityMask = 56u,
+		ThreadPriorityMask = 112u,
 	};
 
-	EThreadProperty GetThreadName(EThreadProperty property)
-	{
-		return EThreadProperty(EThreadProperty::NamedThreadNum & property);
-	}
+	EThreadProperty GetThreadName(EThreadProperty property);
 
-	EThreadProperty GetThreadPriority(EThreadProperty property)
-	{
-		return EThreadProperty(EThreadProperty::ThreadPriorityMask & property);
-	}
+	EThreadProperty GetThreadPriority(EThreadProperty property);
+
+	unsigned int GetQueueIndex(EThreadProperty property);
 
 	class WTaskGraph
 	{
@@ -60,9 +57,23 @@ namespace WEngine
 
 		void AttachToThread(EThreadProperty property);
 
+		void ProcessUntilQuit(EThreadProperty property);
+
+		void ProcessUntilIdle(EThreadProperty property);
+
+		void* operator new(size_t size)
+		{
+			return Allocator::Get()->Allocate(size);
+		}
+
+		void operator delete(void* pData)
+		{
+			Allocator::Get()->Deallocate(pData);
+		}
+
 	public:
 
-		static WTaskGraph* Get() { return g_instance; }
+		static WTaskGraph* Get() { if(g_instance == nullptr)g_instance = new WTaskGraph(); return g_instance; }
 
 	private:
 
@@ -74,13 +85,39 @@ namespace WEngine
 
 	};
 
+	class WGraphTaskBase
+	{
+	public:
+
+		virtual void operator()() = 0;
+
+	protected:
+		
+		WGraphTaskBase() = default;
+
+		~WGraphTaskBase() = default;
+
+	};
+
+	template<typename Task>
 	class WGraphTask
 	{
 	public:
 
-		WGraphTask();
+		WGraphTask(Task inTask)
+			: task(inTask)
+		{
+		}
 
-		~WGraphTask();
+		template<typename... Args>
+		void DispatchWhenReady(Args... args)
+		{
+			task(args...);
+		}
+
+	private:
+
+		Task task;
 
 	};
 
@@ -88,7 +125,9 @@ namespace WEngine
 	{
 	public:
 
-		WTaskThreadBase();
+		friend class WTaskGraph;
+
+		WTaskThreadBase() = default;
 
 		virtual ~WTaskThreadBase();
 
@@ -96,11 +135,14 @@ namespace WEngine
 
 		virtual void ProcessUntilIdle() = 0;
 
-	private:
+	protected:
 
-		EThreadProperty m_threadId;
+		EThreadProperty m_threadId = EThreadProperty::None;
 
-		
+		struct WGraphTaskQueue
+		{
+
+		};
 
 	};
 

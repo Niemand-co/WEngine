@@ -10,7 +10,7 @@
 #include "Scene/Public/World.h"
 #include "Editor/Public/Editor.h"
 #include "Editor/Public/Debug.h"
-#include "Core/Public/WRenderThread.h"
+#include "Core/Public/Engine.h"
 
 namespace WEngine
 {
@@ -34,22 +34,24 @@ namespace WEngine
 		WinProc proc = { "WEngine", 1920u, 1080u };
 		m_window = Window::Get(&proc);
 
-		m_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+		//m_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
-		RHIContext::Init();
+		//RHIContext::Init();
 
-		Input::Init();
+		//Input::Init();
 
-		World::CreateWorld();
+		//World::CreateWorld();
 
-		Editor::Init();
+		//Editor::Init();
 
-		Debug::Init();
+		//Debug::Init();
 
-		m_pLayerStack = new LayerStack();
+		//m_pLayerStack = new LayerStack();
 
-		m_pLayerStack->PushLayer(new GuiLayer("ImGui"));
+		//m_pLayerStack->PushLayer(new GuiLayer("ImGui"));
 
+
+		REngine::Get()->PreInit();
 	}
 
 	void Application::Tick()
@@ -58,8 +60,8 @@ namespace WEngine
 		
 		while (!IsQuit())
 		{
-			m_pLayerStack->OnUpdate(TimeStep::GetTimeStep());
-			m_window->Update();
+			//m_pLayerStack->OnUpdate(TimeStep::GetTimeStep());
+			//m_window->Update();
 		}
 		Finalize();
 	}

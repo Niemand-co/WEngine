@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Render/RenderPipeline/Public/GameRenderPipeline.h"
 #include "Render/Public/ScriptableRenderer.h"
-#include "Scene/Components/Public/Camera.h"
+#include "Scene/Components/Public/CameraComponent.h"
 
 namespace WEngine
 {

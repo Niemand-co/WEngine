@@ -10,6 +10,8 @@ namespace WEngine
 
 		static class WThread* CreateThread();
 
+		static class WEvent* CreateWEvent();
+
 		static unsigned long GetCurrentThreadId();
 	};
 

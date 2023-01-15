@@ -8,7 +8,7 @@ namespace WEngine
 
 class Object
 {
-	friend class World;
+	friend class GWorld;
 
 	friend class WEngine::Editor;
 
@@ -33,7 +33,7 @@ protected:
 template<typename T>
 T* GetCopy(T* object)
 {
-	T *copy = WEngine::Allocator::Get()->Allocate(sizeof(T));
+	T *copy = (T*)WEngine::Allocator::Get()->Allocate(sizeof(T));
 	memcpy(copy, object, sizeof(T));
 	return copy;
 }

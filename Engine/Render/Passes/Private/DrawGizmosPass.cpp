@@ -5,7 +5,7 @@
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Render/Mesh/Public/Vertex.h"
 #include "Render/Mesh/Public/Mesh.h"
-#include "Scene/Components/Public/Camera.h"
+#include "Scene/Components/Public/CameraComponent.h"
 #include "Editor/Public/Screen.h"
 #include "Editor/Public/Editor.h"
 #include "Editor/Public/Debug.h"
@@ -385,7 +385,7 @@ void DrawGizmosPass::Setup(RHIContext* context, CameraData* cameraData)
 
 	m_pCommandBuffers = context->GetCommandBuffer(RHIContext::g_maxFrames, false);
 
-	m_pAxisMesh = Mesh::GetArrow();
+	m_pAxisMesh = StaticMesh::GetArrow();
 }
 
 void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
@@ -401,7 +401,7 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 	{
 		RHIGraphicsEncoder* encoder = cmd->GetGraphicsEncoder();
 
-		Transformer* pTransformer = selectedObjects[0]->GetComponent<Transformer>();
+		TransformComponent* pTransformer = selectedObjects[0]->GetComponent<TransformComponent>();
 		glm::mat4 objectMatrix = pTransformer->GetTranslateMatrix();
 		ObjectData arrowData[3] =
 		{
@@ -434,8 +434,8 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 			if (filter == nullptr)
 				continue;
 
-			Mesh* pMesh = filter->GetStaticMesh();
-			ObjectData objectData = { selectedObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix(), glm::vec4(1.0f, 0.55f, 0.0f, 1.0f) };
+			StaticMesh* pMesh = filter->GetStaticMesh();
+			ObjectData objectData = { selectedObjects[i]->GetComponent<TransformComponent>()->GetLocalToWorldMatrix(), glm::vec4(1.0f, 0.55f, 0.0f, 1.0f) };
 			m_pObjectBuffer->LoadData(&objectData, sizeof(objectData), 0 );
 			m_pObjectBuffer->Flush(4);
 
@@ -462,7 +462,7 @@ void DrawGizmosPass::Execute(RHIContext* context, CameraData* cameraData)
 			if(filter == nullptr)
 				continue;
 
-			Mesh *pMesh = filter->GetStaticMesh();
+			StaticMesh *pMesh = filter->GetStaticMesh();
 
 			unsigned int offset = 0;
 			encoder->BindVertexBuffer(pMesh->GetVertexBuffer());

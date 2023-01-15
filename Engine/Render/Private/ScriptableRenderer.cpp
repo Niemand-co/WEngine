@@ -7,7 +7,7 @@
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "RHI/Public/RHIHeads.h"
-#include "Scene/Components/Public/Camera.h"
+#include "Scene/Components/Public/CameraComponent.h"
 #include "Utils/Public/Synchronizer.h"
 
 ScriptableRenderer::ScriptableRenderer(RHIContext* pContext)

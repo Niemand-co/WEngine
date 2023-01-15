@@ -8,7 +8,7 @@
 #include "Platform/Vulkan/Public/VulkanInstance.h"
 #include "Utils/Public/Window.h"
 #include "Scene/Public/World.h"
-#include "Scene/Components/Public/Camera.h"
+#include "Scene/Components/Public/CameraComponent.h"
 #include "Utils/ImGui/Public/Gui.h"
 
 ScriptableRenderPipeline::ScriptableRenderPipeline(RHIContext *pContext)
@@ -22,15 +22,15 @@ ScriptableRenderPipeline::~ScriptableRenderPipeline()
 
 void ScriptableRenderPipeline::Init()
 {
-	m_pCameras = World::GetWorld()->GetCameras();
+	m_pCameras = GWorld::GetWorld()->GetCameras();
 }
 
 void ScriptableRenderPipeline::Setup()
 {
-	m_pCameras = World::GetWorld()->GetCameras();
+	m_pCameras = GWorld::GetWorld()->GetCameras();
 	m_pCameraDatas.Reserve(m_pCameras.Size());
 
-	for (Camera *camera : m_pCameras)
+	for (CameraComponent *camera : m_pCameras)
 	{
 		CameraData *data = camera->GetData();
 		ScriptableRenderer* renderer = camera->GetRenderer();
@@ -45,7 +45,7 @@ void ScriptableRenderPipeline::Setup()
 
 void ScriptableRenderPipeline::Execute()
 {
-	for (Camera* camera : m_pCameras)
+	for (CameraComponent* camera : m_pCameras)
 	{
 		camera->GetRenderer()->Execute(m_pContext, camera->GetData());
 	}

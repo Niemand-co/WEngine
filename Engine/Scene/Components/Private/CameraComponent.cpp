@@ -18,7 +18,7 @@ CameraComponent::CameraComponent(GameObject* pGameObject, const float& fov, cons
 	m_forward = glm::vec3(0.0f, 0.0f, -1.0f);
 
 	m_type = Component::ComponentType::Camera;
-	World::GetWorld()->AddCamera(this);
+	GWorld::GetWorld()->AddCamera(this);
 	UpdateProjectionMatrix();
 	m_rendertargets.Resize(RHIContext::g_maxFrames);
 	m_textureResources.Resize(RHIContext::g_maxFrames * 2u);
@@ -112,7 +112,7 @@ ScriptableRenderer* CameraComponent::GetRenderer()
 
 CameraData* CameraComponent::GetData()
 {
-	m_pData->Position = m_pGameObject->GetComponent<Transformer>()->GetPosition();
+	m_pData->Position = m_pGameObject->GetComponent<TransformComponent>()->GetPosition();
 	m_pData->MatrixV = this->GetViewMatrix();
 	m_pData->MatrixP = this->GetProjectionMatrix();
 	m_pData->MatrixVP = m_pData->MatrixP * m_pData->MatrixV;
@@ -149,7 +149,7 @@ void CameraComponent::Move(Direction dir, float dis)
 		break;
 	}
 
-	m_pGameObject->GetComponent<Transformer>()->Move(displacement);
+	m_pGameObject->GetComponent<TransformComponent>()->Move(displacement);
 }
 
 void CameraComponent::Rotate(RotateDirection dir, float dis)
@@ -236,7 +236,7 @@ void CameraComponent::RecreateRenderTarget(unsigned int width, unsigned int heig
 
 void CameraComponent::UpdateViewMatrix()
 {
-	glm::vec3 position = m_pGameObject->GetComponent<Transformer>()->GetPosition();
+	glm::vec3 position = m_pGameObject->GetComponent<TransformComponent>()->GetPosition();
 	m_viewMatrix = glm::lookAt(position, position  + m_forward, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 

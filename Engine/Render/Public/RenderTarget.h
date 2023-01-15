@@ -14,6 +14,6 @@ public:
 
 private:
 
-	WEngine::WSharedPtr<RHITexture> m_pTexture;
+	//WEngine::WSharedPtr<RHITexture> m_pTexture;
 
 };

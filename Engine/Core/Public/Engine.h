@@ -13,6 +13,16 @@ namespace WEngine
 
 		virtual void Run() = 0;
 
+		void* operator new(size_t size)
+		{
+			return Allocator::Get()->Allocate(size);
+		}
+
+		void operator delete(void* pData)
+		{
+			Allocator::Get()->Deallocate(pData);
+		}
+
 	protected:
 
 		EngineBase() = default;
@@ -55,7 +65,7 @@ namespace WEngine
 
 	public:
 
-		static REngine* Get() { return g_instance; }
+		static REngine* Get() { if(g_instance == nullptr)g_instance = new REngine(); return g_instance; }
 
 	private:
 

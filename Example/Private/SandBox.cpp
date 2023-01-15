@@ -9,7 +9,7 @@ GameScene::GameScene(const WEngine::WString& name)
 	m_isMoving = false;
 	m_sceneCamera = WEngine::Editor::g_pEditorCamera;
 	m_sceneCamera->m_aspect = (float)Window::cur_window->GetWidth() / (float)Window::cur_window->GetHeight();
-	m_sceneCamera->GetGameObject()->GetComponent<Transformer>()->SetPosition(glm::vec3(2.0f, 2.0f, 2.0f));
+	m_sceneCamera->GetOwner()->GetComponent<TransformComponent>()->SetPosition(glm::vec3(2.0f, 2.0f, 2.0f));
 	WEngine::Screen::SetDisplayCamera(m_sceneCamera);
 	
 }
@@ -78,26 +78,26 @@ void GameScene::OnUpdate(WEngine::TimeStep timeStep)
 		m_sceneCamera->Rotate(RotateDirection::Yaw,  -OffsetX * 0.1f);
 		m_sceneCamera->Rotate(RotateDirection::Pitch, -OffsetY * 0.1f);
 	}
-	GameObject::Find("Main Light")->GetComponent<Light>()->UpdateShadowFrustum(m_sceneCamera->GetData());
+	GameObject::Find("Main Light")->GetComponent<LightComponent>()->UpdateShadowFrustum(m_sceneCamera->GetData());
 	m_pPipeline->Execute();
 }
 
 SandBox::SandBox()
 {
-	GameObject *pLight = m_scene->CreateGameObject("Main Light");
-	pLight->AddComponent<Light>();
+	//GameObject *pLight = m_scene->CreateGameObject("Main Light");
+	//pLight->AddComponent<LightComponent>();
 
-	GameObject *plane = m_scene->CreateGameObject("Plane");
-	plane->AddComponent<MeshFilter>()->SetStaticMesh(Mesh::GetPlane());
-	plane->AddComponent<Material>();
+	//GameObject *plane = m_scene->CreateGameObject("Plane");
+	//plane->AddComponent<MeshFilter>()->SetStaticMesh(StaticMesh::GetPlane());
+	//plane->AddComponent<MaterialComponent>();
 
-	GameObject* go = m_scene->CreateGameObject("Cube");
-	MeshFilter* filter = go->AddComponent<MeshFilter>();
-	filter->SetStaticMesh(Mesh::GetCube());
-	go->AddComponent<Material>();
-	plane->GetComponent<Transformer>()->SetScale(glm::vec3(50.0f, 50.0f, 50.0f));
+	//GameObject* go = m_scene->CreateGameObject("Cube");
+	//MeshFilter* filter = go->AddComponent<MeshFilter>();
+	//filter->SetStaticMesh(StaticMesh::GetCube());
+	//go->AddComponent<MaterialComponent>();
+	//plane->GetComponent<TransformComponent>()->SetScale(glm::vec3(50.0f, 50.0f, 50.0f));
 
-	m_pLayerStack->PushLayer(new GameScene("Game Scene"));
+	//m_pLayerStack->PushLayer(new GameScene("Game Scene"));
 
 }
 

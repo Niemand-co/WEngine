@@ -61,6 +61,7 @@
 #include "Utils/Container/Public/WPair.h"
 #include "Utils/Container/Public/WHashMap.h"
 #include "Utils/Container/Public/WSharedPtr.h"
+#include "Utils/Container/Public/WDeque.h"
 #include "Utils/Public/NamingSystem.h"
 
 #define ENABLE_REFLECTION template<typename T> friend struct WEngine::SRefl::TypeInfo;

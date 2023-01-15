@@ -2,7 +2,7 @@
 #include "Render/Mesh/Public/Vertex.h"
 
 class GameObject;
-class Camera;
+class CameraComponent;
 
 namespace WEngine
 {
@@ -35,7 +35,7 @@ namespace WEngine
 
 		static WArray<GameObject*> g_selectedObjects;
 
-		static Camera *g_pEditorCamera;
+		static CameraComponent *g_pEditorCamera;
 
 	};
 

@@ -10,7 +10,7 @@ class RHICommandBase
 };
 
 template<typename T>
-struct RHICommand
+struct RHICommand : public RHICommandBase
 {
 	virtual void ExecuteAndDestruct(RHICommandListBase *CmdList) override final
 	{

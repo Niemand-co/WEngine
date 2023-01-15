@@ -1,6 +1,6 @@
 #pragma once
 
-class Camera;
+class CameraComponent;
 
 namespace WEngine
 {
@@ -25,11 +25,11 @@ namespace WEngine
 
 		static void ResetState();
 
-		static void SetDisplayCamera(Camera *pCamera);
+		static void SetDisplayCamera(CameraComponent *pCamera);
 
 	public:
 
-		static Camera *g_displayingCamera;
+		static CameraComponent *g_displayingCamera;
 
 	private:
 

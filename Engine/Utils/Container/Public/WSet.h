@@ -1,4 +1,5 @@
 #pragma once
+#include "Utils/Container/Public/WArray.h"
 
 namespace WEngine
 {
@@ -50,12 +51,12 @@ namespace WEngine
 		}
 		if (m_size == 0)
 		{
-			m_pData = Allocator::Get()->Allocate(sizeof(T));
+			m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
 			m_pData[0] = element;
 		}
 		else if (m_count == m_size)
 		{
-			T *newPtr = Allocator::Get()->Allocate(2 * m_size * sizeof(T));
+			T *newPtr = (T*)Allocator::Get()->Allocate(2 * m_size * sizeof(T));
 			memcpy(newPtr, m_pData, sizeof(T) * m_count);
 			newPtr[m_count] = element;
 			m_count++;
@@ -87,7 +88,7 @@ namespace WEngine
 	template<typename T>
 	inline WArray<T> WSet<T>::Array()
 	{
-		return WArray<T> array(m_pData, m_pData + m_count);
+		return WArray<T>(m_pData, m_pData + m_count);
 	}
 
 }

@@ -66,9 +66,6 @@ public:
 
 	virtual ~ForwardRenderer();
 
-	virtual void Setup() override;
-
-
 
 };
 

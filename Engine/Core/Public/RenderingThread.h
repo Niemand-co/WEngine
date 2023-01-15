@@ -20,6 +20,14 @@ namespace WEngine
 
 		virtual void Exit() override;
 
+	public:
+
+		class WEvent* pMainThreadAsyncEvent;
+
+	private:
+
+		void RenderThreadMain();
+
 	};
 
 }

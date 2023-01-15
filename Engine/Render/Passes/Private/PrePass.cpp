@@ -283,7 +283,7 @@ void PrePass::Execute(RHIContext* context, CameraData* cameraData)
 
 	SceneData sceneData =
 	{
-		World::GetWorld()->GetMainLight()->GetGameObject()->GetComponent<Transformer>()->GetWorldToLocalMatrix()
+		GWorld::GetWorld()->GetMainLight()->GetOwner()->GetComponent<TransformComponent>()->GetWorldToLocalMatrix()
 	};
 	m_pSceneDataBuffers[RHIContext::g_currentFrame]->LoadData(&sceneData, sizeof(sceneData));
 
@@ -305,14 +305,14 @@ void PrePass::Execute(RHIContext* context, CameraData* cameraData)
 		//encoder->SetScissor({ WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0 });
 
 		unsigned int drawcalls = 0;
-		const WEngine::WArray<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
+		const WEngine::WArray<GameObject*>& gameObjects = GWorld::GetWorld()->GetGameObjects();
 		for (unsigned int i = 0; i < gameObjects.Size(); ++i)
 		{
 			MeshFilter* filter = gameObjects[i]->GetComponent<MeshFilter>();
 			if (filter == nullptr)
 				continue;
 
-			ObjectData objectData = { gameObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix() };
+			ObjectData objectData = { gameObjects[i]->GetComponent<TransformComponent>()->GetLocalToWorldMatrix() };
 			m_pObjectDataBuffers[RHIContext::g_currentFrame]->LoadData(&objectData, sizeof(objectData), drawcalls);
 			++drawcalls;
 		}
@@ -325,7 +325,7 @@ void PrePass::Execute(RHIContext* context, CameraData* cameraData)
 			if (filter == nullptr)
 				continue;
 
-			Mesh* pMesh = filter->GetStaticMesh();
+			StaticMesh* pMesh = filter->GetStaticMesh();
 			encoder->BindVertexBuffer(pMesh->GetVertexBuffer());
 			encoder->BindIndexBuffer(pMesh->GetIndexBuffer());
 			encoder->BindGroups(1, m_pDataGroup[RHIContext::g_currentFrame], m_pPipelineLayout, 1, &drawcalls);

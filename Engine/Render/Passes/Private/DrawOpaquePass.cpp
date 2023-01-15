@@ -202,7 +202,7 @@ void DrawOpaquePass::Setup(RHIContext *context, CameraData *cameraData)
 	m_pSceneUniformBuffers[1] = context->CreateUniformBuffer(&uniformBufferDescriptor);
 	m_pSceneUniformBuffers[2] = context->CreateUniformBuffer(&uniformBufferDescriptor);
 
-	const WEngine::WArray<RHITextureView*>& depthTextures = World::GetWorld()->GetMainLight()->GetDepthTexture();
+	const WEngine::WArray<RHITextureView*>& depthTextures = GWorld::GetWorld()->GetMainLight()->GetDepthTexture();
 	for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 	{
 		m_pObjectUniformBuffers[i]->SetDataSize(sizeof(ObjectData));
@@ -283,7 +283,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 {
 	RHICommandBuffer *cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
 
-	const WEngine::WArray<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
+	const WEngine::WArray<GameObject*>& gameObjects = GWorld::GetWorld()->GetGameObjects();
 
 	cmd->BeginScopePass("Opaque", m_pRenderPass, 0, m_pRenderTargets[RHIContext::g_currentFrame]);
 	{
@@ -301,7 +301,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 		//encoder->SetViewport({(float)WEngine::Screen::GetWidth(), (float)WEngine::Screen::GetHeight(), 0, 0});
 		//encoder->SetScissor({WEngine::Screen::GetWidth(), WEngine::Screen::GetHeight(), 0, 0});
 		unsigned int drawcalls = 0;
-		Light *mainLight = World::GetWorld()->GetMainLight();
+		LightComponent *mainLight = GWorld::GetWorld()->GetMainLight();
 		const WEngine::WArray<glm::mat4>& frustum = mainLight->GetShadowFrustum();
 		const WEngine::WArray<float>& splices = mainLight->GetSplices();
 
@@ -313,7 +313,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 			frustum[2],
 			frustum[3],
 			glm::vec4(splices[0], splices[1], splices[2], splices[3]),
-			mainLight->GetGameObject()->GetComponent<Transformer>()->GetRotateMatrix() * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f),
+			mainLight->GetOwner()->GetComponent<TransformComponent>()->GetRotateMatrix() * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f),
 			glm::vec4(mainLight->GetColor() * mainLight->GetIntensity(), 1.0f),
 			glm::vec4(cameraData->Position, 1.0f),
 		};
@@ -324,8 +324,8 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 			if (filter == nullptr)
 				continue;
 
-			SurfaceData surfaceData = gameObjects[i]->GetComponent<Material>()->GetSurfaceData();
-			glm::mat4 M = gameObjects[i]->GetComponent<Transformer>()->GetLocalToWorldMatrix();
+			SurfaceData surfaceData = gameObjects[i]->GetComponent<MaterialComponent>()->GetSurfaceData();
+			glm::mat4 M = gameObjects[i]->GetComponent<TransformComponent>()->GetLocalToWorldMatrix();
 			ObjectData objectData = 
 			{
 				M,
@@ -344,7 +344,7 @@ void DrawOpaquePass::Execute(RHIContext *context, CameraData *cameraData)
 			if(filter == nullptr)
 				continue;
 			
-			Mesh *pMesh = filter->GetStaticMesh();
+			StaticMesh *pMesh = filter->GetStaticMesh();
 			encoder->BindVertexBuffer(pMesh->GetVertexBuffer());
 			encoder->BindIndexBuffer(pMesh->GetIndexBuffer());
 			encoder->BindGroups(1, m_pGroup[RHIContext::g_currentFrame], m_pPipelineResourceLayout, 1, &drawcalls);

@@ -21,7 +21,7 @@ private:
 	
 	bool m_isMoving;
 
-	Camera *m_sceneCamera;
+	CameraComponent *m_sceneCamera;
 
 };
 
@@ -35,7 +35,7 @@ public:
 
 private:
 
-	World *m_scene;
+	GWorld *m_scene;
 
 };
 

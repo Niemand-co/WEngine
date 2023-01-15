@@ -34,9 +34,9 @@ void RHICommandSetViewport::Execute(RHICommandListBase* CmdList)
 		descriptor.minDepth = MinZ;
 		descriptor.maxDepth = MinZ == MaxZ ? (MinZ + 1.0f) : MaxZ;
 	}
-	RHIContext::CreateViewport();
+	//RHIContext::CreateViewport(&descriptor);
 	
-	ENCODER_EXECUTE(SetViewport)(viewport);
+	//ENCODER_EXECUTE(SetViewport)(viewport);
 }
 
 void RHICommandSetScissor::Execute(RHICommandListBase* CmdList)

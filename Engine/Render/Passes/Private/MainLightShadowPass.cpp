@@ -222,7 +222,7 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 		}
 	}
 	
-	const WEngine::WArray<RHITextureView*>& depthTextureViews = World::GetWorld()->GetMainLight()->GetDepthTexture();
+	const WEngine::WArray<RHITextureView*>& depthTextureViews = GWorld::GetWorld()->GetMainLight()->GetDepthTexture();
 	m_pRenderTargets.Resize(depthTextureViews.Size());
 	for (unsigned int i = 0; i < depthTextureViews.Size(); ++i)
 	{
@@ -244,7 +244,7 @@ void MainLightShadowPass::Setup(RHIContext *context, CameraData *cameraData)
 void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 {
 	RHICommandBuffer* cmd = m_pCommandBuffers[RHIContext::g_currentFrame];
-	Light *mainLight = World::GetWorld()->GetMainLight();
+	LightComponent *mainLight = GWorld::GetWorld()->GetMainLight();
 	WEngine::WArray<glm::mat4> frustum = mainLight->GetShadowFrustum();
 	WEngine::WArray<float> splices = mainLight->GetSplices();
 
@@ -275,7 +275,7 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 			encoder->BeginPass(&renderpassBeginDescriptor);
 
 			unsigned int drawcalls = 0;
-			const WEngine::WArray<GameObject*>& gameObjects = World::GetWorld()->GetGameObjects();
+			const WEngine::WArray<GameObject*>& gameObjects = GWorld::GetWorld()->GetGameObjects();
 			for (unsigned int i = 0; i < gameObjects.Size(); ++i)
 			{
 				MeshFilter* filter = gameObjects[i]->GetComponent<MeshFilter>();
@@ -295,7 +295,7 @@ void MainLightShadowPass::Execute(RHIContext *context, CameraData* cameraData)
 				if(filter == nullptr)
 					continue;
 
-				Mesh* pMesh = filter->GetStaticMesh();
+				StaticMesh* pMesh = filter->GetStaticMesh();
 				encoder->BindVertexBuffer(pMesh->GetVertexBuffer());
 				encoder->BindIndexBuffer(pMesh->GetIndexBuffer());
 				encoder->BindGroups(1, m_pDataGroup[levelIndex + RHIContext::g_currentFrame * 4], m_pPipelineLayout, 1, &drawcalls);

@@ -6,22 +6,21 @@ namespace WEngine
 
 	WEventWin::WEventWin()
 	{
-		Create();
+		m_event = CreateEvent(NULL, true, false, "Test");
 	}
 
 	WEventWin::~WEventWin()
 	{
 	}
 
-	bool WEventWin::Create()
-	{
-		m_event = CreateEvent(NULL, true, false, "Test");
-		return m_event != NULL;
-	}
-
 	void WEventWin::Wait()
 	{
 		WaitForSingleObject(m_event, INFINITE);
+	}
+
+	void WEventWin::Trigger()
+	{
+		RE_ASSERT(SetEvent(m_event), "Failed to set event signaled.");
 	}
 
 }

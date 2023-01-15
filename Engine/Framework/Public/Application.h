@@ -46,6 +46,10 @@ namespace WEngine
 
 		Layer *m_pEditorLayer;
 
+		class GEngine *m_pGEngine;
+
+		class REngine *m_pREngine;
+
 	};
 
 	Application* CreateApplication();

@@ -1,7 +1,7 @@
 #pragma once
 #include "Scene/Components/Public/Component.h"
 
-class Mesh;
+class StaticMesh;
 
 class MeshFilter : public Component
 {
@@ -18,12 +18,12 @@ public:
 
 	virtual void ShowInInspector() override;
 
-	void SetStaticMesh(Mesh *pStaticMesh);
+	void SetStaticMesh(StaticMesh *pStaticMesh);
 
-	Mesh* GetStaticMesh();
+	StaticMesh *GetStaticMesh();
 
 private:
 
-	Mesh *m_pStaticMesh;
+	StaticMesh *m_pStaticMesh;
 
 };

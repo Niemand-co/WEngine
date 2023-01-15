@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Editor/Public/Screen.h"
-#include "Scene/Components/Public/Camera.h"
+#include "Scene/Components/Public/CameraComponent.h"
 
 namespace WEngine
 {
@@ -11,7 +11,7 @@ namespace WEngine
 
 	bool Screen::g_isSizeChanged = false;
 
-	Camera* Screen::g_displayingCamera = nullptr;
+	CameraComponent* Screen::g_displayingCamera = nullptr;
 
 	Screen::Screen()
 	{
@@ -49,7 +49,7 @@ namespace WEngine
 		g_isSizeChanged = false;
 	}
 
-	void Screen::SetDisplayCamera(Camera* pCamera)
+	void Screen::SetDisplayCamera(CameraComponent* pCamera)
 	{
 		g_displayingCamera = pCamera;
 	}
