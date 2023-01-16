@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Platform/Windows/Public/WindowsWThread.h"
 #include "HAL/Public/WThreadManager.h"
-#include <windows.h>
 
 namespace WEngine
 {

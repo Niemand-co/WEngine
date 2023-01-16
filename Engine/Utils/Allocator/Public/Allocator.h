@@ -1,4 +1,5 @@
 #pragma once
+#include "Utils/Container/Public/WQueue.h"
 
 #define MIN_BLOCK_SIZE
 
@@ -48,9 +49,11 @@ namespace WEngine
 
 		size_t sizes[8];
 
-		Block* freeLists[8];
+		WQueue<void*> freeLists[8];
 
-		Block* closedLists[8];
+		WQueue<void*> closedLists[8];
+
+		HANDLE m_allocationMutex;
 
 	};
 

@@ -1,5 +1,5 @@
 #pragma once
-#include <queue>
+#include "Utils/Container/Public/WDeque.h"
 
 namespace WEngine
 {
@@ -9,7 +9,7 @@ namespace WEngine
 	{
 	public:
 
-		WQueue();
+		WQueue() = default;
 
 		WQueue(const std::initializer_list<T>& list);
 
@@ -17,14 +17,11 @@ namespace WEngine
 
 		WQueue(WQueue&& other);
 
-		~WQueue();
+		~WQueue() = default;
 
 		void Push(const T& element);
 
-		void AtomicPush(const T& element);
-
 		T Pop();
-
 
 		T& Front();
 
@@ -38,109 +35,68 @@ namespace WEngine
 
 	private:
 
-		size_t m_capacity;
-
-		size_t m_size;
-
-		size_t m_front;
-
-		size_t m_back;
-
-		T *m_pData;
+		WDeque<T> m_queue = WDeque<T>();
 
 	};
 
 	template<typename T>
-	inline WQueue<T>::WQueue()
-		: m_pData(nullptr), m_capacity(0), m_size(0), m_front(0), m_back(0)
-	{
-	}
-
-	template<typename T>
 	inline WQueue<T>::WQueue(const std::initializer_list<T>& list)
-		: m_front(0)
+		: m_queue(list)
 	{
-		m_capacity = m_size = list.size();
-		m_pData = (T*)Allocator::Get()->Allocate(m_size * sizeof(T));
-		m_back = m_size - 1;
-		memcpy(m_pData, list.begin(), m_size * sizeof(T));
 	}
 
 	template<typename T>
 	inline WQueue<T>::WQueue(const WQueue& other)
-		: m_size(other.m_size),
-		  m_capacity(other.m_capacity),
-		  m_front(other.m_front),
-		  m_back(other.m_back)
+		: m_queue(other.m_queue)
 	{
-		m_pData = (T*)Allocator::Get()->Allocate(m_size * sizeof(T));
-		memcpy(m_pData, other.m_pData, m_size * sizeof(T));
 	}
 
 	template<typename T>
 	inline WQueue<T>::WQueue(WQueue&& other)
-		: m_size(WEngine::move(other.m_size)),
-		  m_capacity(WEngine::move(other.m_capacity)),
-		  m_front(WEngine::move(other.m_front)),
-		  m_back(WEngine::move(other.m_back))
+		: m_queue(WEngine::move(other.m_queue))
 	{
-	}
-
-	template<typename T>
-	inline WQueue<T>::~WQueue()
-	{
-		Allocator::Get()->Deallocate(m_pData);
 	}
 
 	template<typename T>
 	inline void WQueue<T>::Push(const T& element)
 	{
-		if (m_capacity == 0)
-		{
-			m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
-			m_pData[0] = element;
-			m_capacity = m_size = 1;
-		}
-	}
-
-	template<typename T>
-	inline void WQueue<T>::AtomicPush(const T& element)
-	{
+		m_queue.AtomicPushBack(element);
 	}
 
 	template<typename T>
 	inline T WQueue<T>::Pop()
 	{
+		return m_queue.AtomicPopFront();
 	}
 
 	template<typename T>
 	inline T& WQueue<T>::Front()
 	{
-		// TODO: 在此处插入 return 语句
+		return m_queue.Front();
 	}
 
 	template<typename T>
 	inline const T& WQueue<T>::Front() const
 	{
-		// TODO: 在此处插入 return 语句
+		return m_queue.Front();
 	}
 
 	template<typename T>
 	inline T& WQueue<T>::Back()
 	{
-		// TODO: 在此处插入 return 语句
+		return m_queue.Back();
 	}
 
 	template<typename T>
 	inline const T& WQueue<T>::Back() const
 	{
-		// TODO: 在此处插入 return 语句
+		return m_queue.Back();
 	}
 
 	template<typename T>
 	inline bool WQueue<T>::Empty() const
 	{
-		return false;
+		return m_queue.Empty();
 	}
 
 }

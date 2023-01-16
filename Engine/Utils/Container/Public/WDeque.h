@@ -4,6 +4,10 @@
 namespace WEngine
 {
 
+	void* QueueAllocate(size_t size);
+
+	void QueueDeallocate(void *pData);
+
 	template<typename T>
 	class WDeque
 	{
@@ -27,13 +31,13 @@ namespace WEngine
 
 		void AtomicPushBack(const T& element);
 
-		void PopFront();
+		T PopFront();
 
-		void PopBack();
+		T PopBack();
 
-		void AtomicPopFront();
+		T AtomicPopFront();
 
-		void AtomicPopBack();
+		T AtomicPopBack();
 
 		T& Front();
 
@@ -49,15 +53,17 @@ namespace WEngine
 
 		struct Node
 		{
+			Node() : Val((T)0), next(NodePtr()), pre(NodePtr()) {}
 			T Val;
-			class NodePtr *next = nullptr;
-			class NodePtr *pre = nullptr;
+			class NodePtr next;
+			class NodePtr pre;
 		};
 
 		struct alignas(16) NodePtr
 		{
+			NodePtr() : ptr(nullptr), count(0) {}
 			Node *ptr;
-			long long count = 0;
+			long long count;
 		};
 
 		size_t m_capacity;
@@ -66,15 +72,15 @@ namespace WEngine
 
 		volatile long m_popCount;
 
-		NodePtr* m_front;
+		NodePtr m_front;
 
-		NodePtr* m_back;
+		NodePtr m_back;
 
 	};
 
 	template<typename T>
 	inline WDeque<T>::WDeque()
-		: m_capacity(0), m_size(0), m_front(nullptr), m_back(nullptr), m_popCount(0)
+		: m_capacity(0), m_size(0), m_front(NodePtr()), m_back(NodePtr()), m_popCount(0)
 	{
 	}
 
@@ -84,14 +90,13 @@ namespace WEngine
 	{
 		m_capacity = m_size = list.size();
 		if(m_capacity == 0)return;
-		m_front = (NodePtr*)Allocator::Get()->Allocate(sizeof(NodePtr));
-		m_front->ptr->Val = *list.begin();
-		NodePtr *cur = m_front;
+		m_front.ptr->Val = *list.begin();
+		NodePtr cur = m_front;
 		for (unsigned int i = 1; i < list.size(); ++i)
 		{
-			cur->ptr->next = (NodePtr*)Allocator::Get()->Allocate(sizeof(NodePtr));
-			cur->ptr->next->Val = *(list.begin() + i);
-			cur = cur->ptr->next;
+			cur.ptr->next = (NodePtr*)QueueAllocate(sizeof(NodePtr));
+			cur.ptr->next->Val = *(list.begin() + i);
+			cur = cur.ptr->next;
 			if(i == list.size() - 1)
 				m_back = cur;
 		}
@@ -120,127 +125,156 @@ namespace WEngine
 	template<typename T>
 	inline WDeque<T>::~WDeque()
 	{
-		while (m_front)
+		while (m_front.ptr)
 		{
-			NodePtr* cur = m_front;
-			m_front = m_front->ptr->next;
-			cur->ptr->~Node();
-			Allocator::Get()->Deallocate(cur->ptr);
-			cur->~NodePtr();
-			Allocator::Get()->Deallocate(cur);
+			NodePtr cur = m_front;
+			m_front = m_front.ptr->next;
+			cur.ptr->~Node();
+			QueueDeallocate(cur.ptr);
 		}
 	}
 
 	template<typename T>
 	inline void WDeque<T>::PushFront(const T& element)
 	{
-		NodePtr *newFront = (NodePtr*)Allocator::Get()->Allocate(sizeof(NodePtr));
-		newFront->ptr = (Node*)Allocator::Get()->Allocate(sizeof(Node));
-		newFront->ptr->Val = element;
-		newFront->ptr->next = m_front;
-		m_front->ptr->pre = newFront;
+		NodePtr newFront;
+		newFront.ptr = (Node*)QueueAllocate(sizeof(Node));
+		::new (newFront.ptr) Node();
+		newFront.ptr->Val = element;
+		newFront.ptr->next = m_front;
+		m_front.ptr->pre = newFront;
 		m_front = newFront;
 	}
 
 	template<typename T>
 	inline void WDeque<T>::PushBack(const T& element)
 	{
-		m_back->ptr->next = (NodePtr*)Allocator::Get()->Allocate(sizeof(NodePtr));
-		m_back->ptr->next->pre = m_back;
-		m_back = m_back->ptr->next;
-		m_back->ptr->Val = element;
+		m_back.ptr->next.ptr = (Node*)QueueAllocate(sizeof(Node));
+		::new (m_back.ptr->next.ptr) Node();
+		m_back.ptr->next.ptr->pre = m_back;
+		m_back = m_back.ptr->next;
+		m_back.ptr->Val = element;
 	}
 
 	template<typename T>
 	inline void WDeque<T>::AtomicPushFront(const T& element)
 	{
-		NodePtr* newFront = (NodePtr*)Allocator::Get()->Allocate(sizeof(NodePtr));
-		newFront->ptr->Val = element;
+		NodePtr newFront;
+		newFront.ptr = (Node*)QueueAllocate(sizeof(Node));
+		::new (newFront.ptr) Node();
+		newFront.ptr->Val = element;
 		while (true)
 		{
-			NodePtr *oldFront = m_front;
-			newFront->ptr->next = oldFront;
-			oldFront->ptr->pre = newFront;
+			NodePtr oldFront = m_front;
+			newFront.ptr->next = oldFront;
+			if (oldFront.ptr != nullptr)
+			{
+				oldFront.ptr->pre = newFront;
+				if(InterlockedCompareExchange128((volatile long long*)&m_front, (long long)m_popCount, (long long)newFront.ptr, (long long*)&oldFront))
+					break;
+			}
+			else
+			{
+				oldFront = NodePtr();
+				if (InterlockedCompareExchange128((volatile long long*)&m_back, (long long)m_popCount, (long long)newFront.ptr, (long long*)&oldFront))
+				{
+					m_front = newFront;
+					break;
+				}
+			}
 
-			if(InterlockedCompareExchange128((volatile long long*)&m_front, (long long)newFront, (long long)m_popCount, (long long*)&oldFront) == oldFront)
-				break;
 		}
 	}
 
 	template<typename T>
 	inline void WDeque<T>::AtomicPushBack(const T& element)
 	{
-		NodePtr*newBack = (NodePtr*)Allocator::Get()->Allocate(sizeof(NodePtr));
-		newBack->ptr->Val = element;
+		NodePtr newBack;
+		newBack.ptr = (Node*)QueueAllocate(sizeof(Node));
+		::new (newBack.ptr) Node();
+		newBack.ptr->Val = element;
 		while (true)
 		{
-			NodePtr *oldBack = m_back;
-			oldBack->ptr->next = newBack;
-			newBack->ptr->pre = oldBack;
-
-			if(InterlockedCompareExchange128((volatile long long*)&m_back, (long long)newBack, (long long)m_popCount, (long long*)&oldBack) == oldBack)
-				break;
-		}
-	}
-
-	template<typename T>
-	inline void WDeque<T>::PopFront()
-	{
-		NodePtr* temp = m_front;
-		m_front = m_front->ptr->next;
-		temp->ptr->~Node();
-		Allocator::Get()->Deallocate(temp->ptr);
-		temp->~NodePtr();
-		Allocator::Get()->Deallocate(temp);
-	}
-
-	template<typename T>
-	inline void WDeque<T>::PopBack()
-	{
-		NodePtr* temp = m_back;
-		m_back = m_back->ptr->pre;
-		temp->ptr->~Node();
-		Allocator::Get()->Deallocate(temp->ptr);
-		temp->~NodePtr();
-		Allocator::Get()->Deallocate(temp);
-	}
-
-	template<typename T>
-	inline void WDeque<T>::AtomicPopFront()
-	{
-		while (true)
-		{
-			NodePtr *oldFront = m_front;
-			NodePtr *newFront = m_front->ptr->next;
-
-			if (InterlockedCompareExchange128((volatile long long*)&m_front, (long long)newFront, (long long)m_popCount, (long long*)&oldFront) == oldFront)
+			NodePtr oldBack = m_back;
+			newBack.ptr->pre = oldBack;
+			if (oldBack.ptr != nullptr)
 			{
-				oldFront->ptr->~Node();
-				Allocator::Get()->Deallocate(oldFront->ptr);
-				oldFront->~NodePtr();
-				Allocator::Get()->Deallocate(oldFront);
-				InterlockedAdd(&m_popCount, 1);
-				break;
+				oldBack.ptr->next = newBack;
+				if(InterlockedCompareExchange128((volatile long long*)&m_back, (long long)m_popCount, (long long)newBack.ptr, (long long*)&oldBack))
+					break;
+			}
+			else
+			{
+				oldBack = NodePtr();
+				if (InterlockedCompareExchange128((volatile long long*)&m_front, (long long)m_popCount, (long long)newBack.ptr, (long long*)&oldBack))
+				{
+					m_back = newBack;
+					break;
+				}
 			}
 		}
 	}
 
 	template<typename T>
-	inline void WDeque<T>::AtomicPopBack()
+	inline T WDeque<T>::PopFront()
 	{
+		if(m_front.ptr == nullptr)return T(0);
+		NodePtr temp = m_front;
+		m_front = m_front.ptr->next;
+		T tmp = temp.ptr->Val;
+		temp.ptr->~Node();
+		QueueDeallocate(temp.ptr);
+		return tmp;
+	}
+
+	template<typename T>
+	inline T WDeque<T>::PopBack()
+	{
+		if(m_back.ptr == nullptr)return T(0);
+		NodePtr temp = m_back;
+		m_back = m_back.ptr->pre;
+		T tmp = temp.ptr->Val;
+		temp.ptr->~Node();
+		QueueDeallocate(temp.ptr);
+		return tmp;
+	}
+
+	template<typename T>
+	inline T WDeque<T>::AtomicPopFront()
+	{
+		if(m_front.ptr == nullptr)return T(0);
 		while (true)
 		{
-			NodePtr* oldBack = m_back;
-			NodePtr* newBack = m_back->ptr->pre;
+			NodePtr oldFront = m_front;
+			NodePtr newFront = m_front.ptr->next;
 
-			if (InterlockedCompareExchange128((volatile long long*)&m_back, (long long)newBack, (long long)m_popCount, (long long*)&oldBack) == oldBack)
+			if (InterlockedCompareExchange128((volatile long long*)&m_front, (long long)m_popCount, (long long)newFront.ptr, (long long*)&oldFront))
 			{
-				oldBack->ptr->~Node();
-				Allocator::Get()->Deallocate(oldBack->ptr);
-				oldBack->~NodePtr();
-				Allocator::Get()->Deallocate(oldBack);
 				InterlockedAdd(&m_popCount, 1);
-				break;
+				T tmp = oldFront.ptr->Val;
+				oldFront.ptr->~Node();
+				QueueDeallocate(oldFront.ptr);
+				return tmp;
+			}
+		}
+	}
+
+	template<typename T>
+	inline T WDeque<T>::AtomicPopBack()
+	{
+		if(m_back.ptr == nullptr)return T(0);
+		while (true)
+		{
+			NodePtr oldBack = m_back;
+			NodePtr newBack = m_back.ptr->pre;
+
+			if (InterlockedCompareExchange128((volatile long long*)&m_back, (long long)m_popCount, (long long)newBack.ptr, (long long*)&oldBack))
+			{
+				InterlockedAdd(&m_popCount, 1);
+				T tmp = oldBack.ptr->Val;
+				oldBack.ptr->~Node();
+				QueueDeallocate(oldBack.ptr);
+				return tmp;
 			}
 		}
 	}
@@ -248,31 +282,31 @@ namespace WEngine
 	template<typename T>
 	inline T& WDeque<T>::Front()
 	{
-		return m_front->ptr->Val;
+		return m_front.ptr->Val;
 	}
 
 	template<typename T>
 	inline const T& WDeque<T>::Front() const
 	{
-		return m_front->ptr->Val;
+		return m_front.ptr->Val;
 	}
 
 	template<typename T>
 	inline T& WDeque<T>::Back()
 	{
-		return m_back->ptr->Val;
+		return m_back.ptr->Val;
 	}
 
 	template<typename T>
 	inline const T& WDeque<T>::Back() const
 	{
-		return m_back->ptr->Val;
+		return m_back.ptr->Val;
 	}
 
 	template<typename T>
 	inline bool WDeque<T>::Empty() const
 	{
-		return m_front == nullptr;
+		return m_front.ptr == nullptr;
 	}
 
 }

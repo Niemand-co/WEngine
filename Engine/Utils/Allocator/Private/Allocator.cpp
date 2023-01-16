@@ -58,9 +58,9 @@ namespace WEngine
 		for (unsigned int i = 0; i < 8; ++i)
 		{
 			heads[i] = nullptr;
-			freeLists[i] = nullptr;
 			sizes[i] = 0;
 		}
+		m_allocationMutex = CreateMutex(NULL, false, "Allocation");
 	}
 
 	Allocator::~Allocator()
@@ -108,25 +108,21 @@ namespace WEngine
 		{
 			size_t index = GetIndex(size);
 			size_t blockSize = GetBlockSize(index);
-			if (freeLists[index] != nullptr)
+			if (freeLists[index].Empty())
 			{
-				Block* block = freeLists[index];
-				freeLists[index] = block->prev;
-				block->~Block();
-
-				return block;
+				WaitForSingleObject(m_allocationMutex, INFINITE);
+				size_t blockCount = 4096 / blockSize;
+				BYTE *data = (BYTE*)malloc(blockCount * blockSize + blockCount * sizeof(BYTE));
+				for (size_t i = 0; i < blockCount; ++i)
+				{
+					::new (data) BYTE(index + 1);
+					freeLists[index].Push(data + 1);
+					data += (blockSize + 1);
+				}
+				RE_ASSERT(ReleaseMutex(m_allocationMutex), "Mutex Error.");
 			}
-			if (sizes[index] == 0)
-			{
-				size_t blockCount = 16 * 4096 / blockSize;
-				sizes[index] += blockCount * blockSize;
-				heads[index] = (BYTE*)malloc(sizes[index] + blockCount * sizeof(BYTE));
-			}
-			BYTE *block = (BYTE*)heads[index];
-			heads[index] += (blockSize + sizeof(BYTE));
-			sizes[index] -= blockSize;
-			::new (block) BYTE(index + 1);
-			return block + 1;
+			void* block = freeLists[index].Pop();
+			return block;
 		}
 	}
 
@@ -142,10 +138,7 @@ namespace WEngine
 		else
 		{
 			index -= 1;
-			Block *block = (Block*)pBlock;
-			::new (block) Block();
-			block->prev = freeLists[index];
-			freeLists[index] = block;
+			freeLists[index].Push(pBlock);
 		}
 	}
 

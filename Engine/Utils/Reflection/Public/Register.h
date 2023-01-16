@@ -1,5 +1,6 @@
 #pragma once
 #include "Utils/Container/Public/WString.h"
+#include "Utils/Public/Tools.h"
 
 namespace WEngine
 {
@@ -17,72 +18,6 @@ namespace WEngine
 //#endif
 //		return s.Substr(start, end - start);
 //	}
-
-	template<bool>
-	struct enable_if { };
-
-	template<>
-	struct enable_if<true> { typedef int type; };
-
-	template<>
-	struct enable_if<false> { };
-
-	template<typename T, typename U>
-	struct is_same { enum { isSame = false }; };
-
-	template<typename T>
-	struct is_same<T, T> { enum { isSame = true }; };
-
-	template<typename T>
-	struct is_const { enum { isConst = false }; };
-
-	template<typename T>
-	struct is_const<const T> { enum { isConst = true }; };
-
-	template<typename T>
-	struct is_reference { enum { isRef = false }; };
-
-	template<typename T>
-	struct is_reference<T&> { enum { isRef = true }; };
-
-	template<typename T>
-	struct is_reference<T&&> { enum { isRef = true }; };
-
-	template<typename T>
-	struct is_function { enum { isFunction = !is_const<const T>::isConst && !is_reference<T>::isRef }; };
-
-	template<typename T>
-	struct remove_reference { typedef T type; };
-
-	template<typename T>
-	struct remove_reference<T&> { typedef T type; };
-
-	template<typename T>
-	struct remove_reference<T&&> { typedef T type; };
-
-	template<typename T>
-	struct remove_const { typedef T type; };
-
-	template<typename T>
-	struct remove_const<const T> { typedef T type; };
-
-	template<typename T>
-	struct remove_const_and_referencet { typedef T type; };
-
-	template<typename T>
-	struct remove_const_and_referencet<const T> { typedef T type; };
-
-	template<typename T>
-	struct remove_const_and_referencet<const T&> { typedef T type; };
-
-	template<typename T>
-	struct remove_const_and_referencet<const T&&> { typedef T type; };
-
-	template<typename T>
-	struct remove_const_and_referencet<T&> { typedef T type; };
-
-	template<typename T>
-	struct remove_const_and_referencet<T&&> { typedef T type; };
 
 	template<int Begin, int End, class Func, typename enable_if<Begin == End>::type = 0>
 	void static_for(Func const& func)
