@@ -45,15 +45,7 @@ namespace WEngine
 
 	private:
 
-		BYTE* heads[8];
-
-		size_t sizes[8];
-
 		WQueue<void*> freeLists[8];
-
-		WQueue<void*> closedLists[8];
-
-		HANDLE m_allocationMutex;
 
 	};
 

@@ -1,5 +1,8 @@
 #pragma once
 #include "HAL/Public/WRunnable.h"
+#include "HAL/Public/WEvent.h"
+#include "HAL/Public/PlatformProcess.h"
+#include "HAL/Public/Platform.h"
 
 #define NUM_WORKING_THREAD 4
 
@@ -52,14 +55,13 @@ namespace WEngine
 
 		~WTaskGraph();
 
-		template<typename LAMBDA>
-		void CreateTask(LAMBDA lambda);
-
 		void AttachToThread(EThreadProperty property);
 
 		void ProcessUntilQuit(EThreadProperty property);
 
 		void ProcessUntilIdle(EThreadProperty property);
+
+		void EnqueTask(class WGraphTaskBase* task, EThreadProperty property);
 
 		void* operator new(size_t size)
 		{
@@ -85,39 +87,110 @@ namespace WEngine
 
 	};
 
-	class WGraphTaskBase
+	class WGraphEvent
 	{
 	public:
 
-		virtual void operator()() = 0;
-
-	protected:
-		
-		WGraphTaskBase() = default;
-
-		~WGraphTaskBase() = default;
-
-	};
-
-	template<typename Task>
-	class WGraphTask
-	{
-	public:
-
-		WGraphTask(Task inTask)
-			: task(inTask)
+		WGraphEvent()
+			: m_event(PlatformProcess::CreateWEvent())
 		{
 		}
 
-		template<typename... Args>
-		void DispatchWhenReady(Args... args)
+		~WGraphEvent()
 		{
-			task(args...);
+
+		}
+
+		void Wait()
+		{
+			m_event->Wait();
+		}
+
+		void Trigger()
+		{
+			m_event->Trigger();
 		}
 
 	private:
 
-		Task task;
+		WEvent *m_event;
+
+		WQueue<class WGraphTaskBase*> m_waitingTasks;
+
+	};
+
+	class WGraphTaskBase
+	{
+	public:
+
+		virtual void ExecuteTask(EThreadProperty property) = 0;
+
+		template<typename TTask, typename... Args>
+		static WGraphTaskBase* CreateTask(Args... args)
+		{
+			return new TTask(args...);
+		}
+
+		void* operator new(size_t size)
+		{
+			return Allocator::Get()->Allocate(size);
+		}
+
+		void operator delete(void* pData)
+		{
+			Allocator::Get()->Deallocate(pData);
+		}
+
+		WGraphTaskBase() = default;
+
+		~WGraphTaskBase() = default;
+
+	protected:
+
+		WGraphEvent m_taskEvent;
+
+	};
+
+	class WTriggerTask : public WGraphTaskBase
+	{
+	public:
+
+		WTriggerTask() = default;
+
+		virtual ~WTriggerTask() = default;
+
+		virtual void ExecuteTask(EThreadProperty property) override
+		{
+			m_taskEvent.Trigger();
+		}
+
+		void Wait()
+		{
+			m_taskEvent.Wait();
+		}
+
+	};
+
+	template<typename Lambda>
+	class WLambdaTask : public WGraphTaskBase
+	{
+	public:
+
+		WLambdaTask(Lambda inLambda)
+			: lambda(inLambda)
+		{
+		}
+
+		virtual ~WLambdaTask() = default;
+
+		virtual void ExecuteTask(EThreadProperty property) override
+		{
+			lambda();
+		}
+
+	private:
+
+		Lambda lambda;
 
 	};
 
@@ -135,14 +208,24 @@ namespace WEngine
 
 		virtual void ProcessUntilIdle() = 0;
 
+		virtual void RequistForQuit() = 0;
+
 	protected:
 
 		EThreadProperty m_threadId = EThreadProperty::None;
 
 		struct WGraphTaskQueue
 		{
+			WQueue<WGraphTaskBase*> TaskQueue;
 
+			class WEvent *StallingEvent = nullptr;
+
+			uint8_t bQuitForReturn : 1 = false;
+
+			uint8_t bQuitForIdle : 1 = false;
 		};
+
+		WGraphTaskQueue m_taskQueue;
 
 	};
 
@@ -157,6 +240,8 @@ namespace WEngine
 		virtual void ProcessUntilQuit() override;
 
 		virtual void ProcessUntilIdle() override;
+
+		virtual void RequistForQuit() override;
 
 		void ProcessNamedTaskThread();
 

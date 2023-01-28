@@ -1,6 +1,6 @@
 #pragma once
 
-class ScriptableRenderPipeline;
+class WViewport;
 
 namespace WEngine
 {
@@ -17,7 +17,7 @@ namespace WEngine
 
 		virtual void OnEvent(Event *pEvent) = 0;
 
-		virtual void OnUpdate(TimeStep timeStep) = 0;
+		virtual void Tick(TimeStep timeStep) = 0;
 
 		virtual const WString& GetName() const
 		{
@@ -44,7 +44,7 @@ namespace WEngine
 
 		WString m_debugName;
 
-		ScriptableRenderPipeline *m_pPipeline;
+		WViewport *m_pViewport;
 
 	};
 

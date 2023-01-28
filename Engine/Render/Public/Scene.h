@@ -16,6 +16,14 @@ public:
 
 	void UpdatePrimitiveInfosForScene();
 
+public:
+
+	static RScene* GetActiveScene() { return g_activeScene; }
+
+private:
+
+	static RScene *g_activeScene;
+
 private:
 
 	class GWorld* m_pWorld;

@@ -33,6 +33,11 @@ struct PrimitiveInfo
 		
 	}
 
+	static void AddToScene(RHICommandListBase *CmdList, RScene *scene, WEngine::WArray<PrimitiveInfo*>& primitives)
+	{
+		
+	}
+
 	glm::mat4 LocalToWorldMatrix;
 
 	GameObject *Owner;

@@ -97,8 +97,8 @@ void GLFWWindow::Init()
 	glfwSetFramebufferSizeCallback(m_handle, [](GLFWwindow *window, int width, int height)
 	{
 		GLFWWindow *win = reinterpret_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
-		WEngine::Event *e = new WEngine::WindowResizeEvent(width, height);
-		win->ExecuteEventCallback(e);
+		win->SetWidth(width);
+		win->SetHeight(height);
 	});
 }
 
@@ -109,9 +109,8 @@ void GLFWWindow::Destroy()
 	glfwTerminate();
 }
 
-void GLFWWindow::Update()
+void GLFWWindow::Poll()
 {
-	m_isSizeChanged = false;
 	glfwPollEvents();
 }
 
@@ -120,9 +119,14 @@ void* GLFWWindow::GetHandle() const
 	return m_handle;
 }
 
-bool GLFWWindow::IsKeyPressed(int keycode)
+bool GLFWWindow::IsKeyPressed(int32 keycode)
 {
 	return glfwGetKey(m_handle, keycode) == GLFW_PRESS;
+}
+
+bool GLFWWindow::IsMouseClicked(int32 mouseButton)
+{
+	return glfwGetMouseButton(m_handle, mouseButton) == GLFW_PRESS;
 }
 
 void GLFWWindow::SetMousePosition(glm::vec2 pos)
@@ -133,4 +137,18 @@ void GLFWWindow::SetMousePosition(glm::vec2 pos)
 glm::vec2 GLFWWindow::GetMousePosition()
 {
 	return m_cursorPosition;
+}
+
+glm::vec2 GLFWWindow::GetWindowPos()
+{
+	int xPos, yPos;
+	glfwGetWindowPos(m_handle, &xPos, &yPos);
+	return glm::vec2(xPos, yPos);
+}
+
+glm::vec2 GLFWWindow::GetWindowSize()
+{
+	int width, height;
+	glfwGetWindowSize(m_handle, &width, &height);
+	return glm::vec2(width, height);
 }

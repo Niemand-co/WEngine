@@ -21,10 +21,6 @@ namespace WEngine
 
 	void Editor::Init()
 	{
-		GameObject *go = new GameObject("Editor");
-		go->AddComponent<TransformComponent>();
-		g_pEditorCamera = go->AddComponent<CameraComponent>();
-		g_pEditorCamera->SetRenderer(ScriptableRenderPipeline::CreateRenderer());
 	}
 
 	void Editor::ClearSelection()

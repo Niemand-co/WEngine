@@ -33,7 +33,7 @@ public:
 
 	virtual void Destroy() = 0;
 
-	virtual void Update() = 0;
+	virtual void Poll() = 0;
 
 	virtual void* GetHandle() const = 0;
 
@@ -45,11 +45,17 @@ public:
 
 	virtual void SetHeight(unsigned int) = 0;
 
-	virtual bool IsKeyPressed(int keycode) = 0;
+	virtual bool IsKeyPressed(int32 keycode) = 0;
+
+	virtual bool IsMouseClicked(int32 mouseButton) = 0;
 
 	virtual void SetMousePosition(glm::vec2 pos) = 0;
 
 	virtual glm::vec2 GetMousePosition() = 0;
+
+	virtual glm::vec2 GetWindowPos() = 0;
+
+	virtual glm::vec2 GetWindowSize() = 0;
 
 	void SetEventCallback(EventCallbackFunc func);
 

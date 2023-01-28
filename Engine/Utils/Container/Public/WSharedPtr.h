@@ -66,6 +66,8 @@ namespace WEngine
 
 		WSharedPtr(const WSharedPtr& ptr);
 
+		WSharedPtr(T *ptr);
+
 		T* Get() const { return m_ptr; }
 
 		T* operator->() { return m_ptr; }
@@ -86,10 +88,6 @@ namespace WEngine
 
 		template<typename Y, typename ...Args>
 		friend WSharedPtr<Y> MakeShared(Args... args);
-
-	private:
-
-		WSharedPtr(T *ptr);
 
 	private:
 

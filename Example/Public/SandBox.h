@@ -15,7 +15,7 @@ public:
 
 	virtual void OnEvent(WEngine::Event* pEvent) override;
 
-	virtual void OnUpdate(WEngine::TimeStep timeStep) override;
+	virtual void Tick(WEngine::TimeStep timeStep) override;
 
 private:
 	

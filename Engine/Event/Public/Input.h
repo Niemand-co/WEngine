@@ -1,4 +1,5 @@
 #pragma once
+#include "Event/Public/InputMacro.h"
 
 namespace WEngine
 {
@@ -11,9 +12,11 @@ namespace WEngine
 
 		virtual ~Input() = default;
 
-		static void QueryPlayerInput();
+		static void Poll();
 
-		static bool IsKeyPressed(int keycode);
+		static bool IsKeyPressed(int32 keycode);
+
+		static bool IsMouseClicked(int32 mouseButton);
 
 		static glm::vec2 GetMousePosition();
 
@@ -21,15 +24,27 @@ namespace WEngine
 
 		static float GetMouseOffsetY();
 
+		static glm::vec2 GetWindowPos();
+
+		static glm::vec2 GetWindowSize();
+
 	protected:
 
-		virtual bool IsKeyPressedImpl(int keycoder) = 0;
+		virtual bool IsKeyPressedImpl(int32 keycode) = 0;
+
+		virtual bool IsMouseClickedImpl(int32 mouseButton) = 0;
 
 		virtual glm::vec2 GetMousePositionImpl() = 0;
 
 		virtual float GetMouseOffsetXImpl();
 
 		virtual float GetMouseOffsetYImpl();
+
+		virtual glm::vec2 GetWindowPosImpl() = 0;
+
+		virtual glm::vec2 GetWindowSizeImpl() = 0;
+
+		virtual void RegisterEvent(class Event *event);
 
 	private:
 

@@ -7,6 +7,8 @@
 namespace WEngine
 {
 
+	LayerStack* LayerStack::g_instance = nullptr;
+
 	LayerStack::LayerStack()
 	{
 	}
@@ -48,7 +50,7 @@ namespace WEngine
 		}
 		for (unsigned int i = 0; i < m_pLayers.Size(); ++i)
 		{
-			m_pLayers[i]->OnUpdate(timeStep);
+			m_pLayers[i]->Tick(timeStep);
 		}
 		RHIContext::GetContext()->Present(RHIContext::g_currentImage);
 	}

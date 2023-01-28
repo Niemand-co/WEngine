@@ -26,6 +26,8 @@
 #include "HAL/Public/WThreadManager.h"
 
 #include "Render/Mesh/Public/Mesh.h"
+#include "Render/Public/Viewport.h"
+#include "Render/Public/Scene.h"
 
 #include "Utils/Public/Window.h"
 #include "Utils/ImGui/Public/Gui.h"

@@ -49,6 +49,7 @@
 #include "Platform/Vulkan/Public/VulkanMacro.h"
 #include "Render/Public/RenderCore.h"
 #include "Render/Public/RenderResource.h"
+#include "Render/Public/RHICommandList.h"
 #include "RHI/Public/RHICore.h"
 #include "Utils/Public/ShaderCodeBlob.h"
 #include "Utils/Public/FileLoader.h"
@@ -64,6 +65,7 @@
 #include "Utils/Container/Public/WDeque.h"
 #include "Utils/Container/Public/WQueue.h"
 #include "Utils/Public/NamingSystem.h"
+#include "HAL/Public/TaskGraph.h"
 
 #define ENABLE_REFLECTION template<typename T> friend struct WEngine::SRefl::TypeInfo;
 

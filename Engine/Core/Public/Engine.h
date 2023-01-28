@@ -11,7 +11,7 @@ namespace WEngine
 
 		virtual void Init() = 0;
 
-		virtual void Run() = 0;
+		virtual void Tick(const class TimeStep& timeStep) = 0;
 
 		void* operator new(size_t size)
 		{
@@ -43,7 +43,15 @@ namespace WEngine
 
 		virtual void Init() override;
 
-		virtual void Run() override;
+		virtual void Tick(const TimeStep& timeStep) override;
+
+	public:
+
+		static GEngine* Get() { if(g_instance == nullptr)g_instance = new GEngine(); return g_instance; }
+
+	private:
+
+		static GEngine* g_instance;
 
 	};
 
@@ -59,7 +67,7 @@ namespace WEngine
 
 		virtual void Init() override;
 
-		virtual void Run() override;
+		virtual void Tick(const TimeStep& timeStep) override;
 
 		class RHIContext* GetContext() const { return m_pContext; }
 
@@ -84,6 +92,20 @@ namespace WEngine
 		class WRenderingThread *m_pRenderingRunnable;
 
 		class WThread *m_pRenderingThread;
+
+	};
+
+	class FrameSync
+	{
+	public:
+
+		static void Sync();
+
+	private:
+
+		static class WTriggerTask SyncEvent[2];
+
+		static uint32 FrameIndex;
 
 	};
 

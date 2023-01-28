@@ -5,9 +5,16 @@
 #include "HAL/Public/WEvent.h"
 #include "RHI/Public/RHIContext.h"
 #include "Event/Public/Input.h"
+#include "HAL/Public/TaskGraph.h"
+#include "Render/Public/Scene.h"
+#include "Framework/Public/LayerStack.h"
+#include "Framework/Public/GuiLayer.h"
+#include "Event/Public/TimeStep.h"
 
 namespace WEngine
 {
+
+	GEngine* GEngine::g_instance = nullptr;
 
 	GEngine::GEngine()
 	{
@@ -21,14 +28,17 @@ namespace WEngine
 	void GEngine::PreInit()
 	{
 		Input::Init();
+		LayerStack::Init();
 	}
 
 	void GEngine::Init()
 	{
+		//LayerStack::Get()->PushLayer(new GuiLayer("Gui"));
 	}
 
-	void GEngine::Run()
+	void GEngine::Tick(const TimeStep& timeStep)
 	{
+		Input::Poll();
 	}
 
 	REngine* REngine::g_instance = nullptr;
@@ -43,16 +53,23 @@ namespace WEngine
 
 	void REngine::PreInit()
 	{
-		//InitRHIDevice();
-		StartRenderingThread();
+		InitRHIDevice();
 	}
 
 	void REngine::Init()
 	{
+		StartRenderingThread();
+		LayerStack::Get()->PushLayer(new GuiLayer("Gui"));
 	}
 
-	void REngine::Run()
+	void REngine::Tick(const TimeStep& timeStep)
 	{
+		const WArray<Layer*>& layers = LayerStack::Get()->GetLayers();
+		for (int32 LayerIndex = layers.Size() - 1; LayerIndex >= 0; LayerIndex--)
+		{
+			layers[LayerIndex]->Tick(timeStep);
+		}
+		FrameSync::Sync();
 	}
 
 	void REngine::InitRHIDevice()
@@ -64,7 +81,18 @@ namespace WEngine
 	{
 		m_pRenderingRunnable = new WRenderingThread();
 		m_pRenderingThread = WThread::Create(m_pRenderingRunnable, "Rendering_Thread");
-		m_pRenderingRunnable->pMainThreadAsyncEvent->Wait();
+		m_pRenderingRunnable->pMainThreadSyncEvent->Wait();
+	}
+
+	WTriggerTask FrameSync::SyncEvent[2] = { WTriggerTask(), WTriggerTask() };
+
+	uint32 FrameSync::FrameIndex = 0;
+
+	void FrameSync::Sync()
+	{
+		WTaskGraph::Get()->EnqueTask(&SyncEvent[FrameIndex], EThreadProperty::RenderThread);
+		SyncEvent[FrameIndex].Wait();
+		FrameIndex = (FrameIndex + 1) % 2;
 	}
 
 }

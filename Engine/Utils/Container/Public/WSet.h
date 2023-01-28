@@ -17,6 +17,8 @@ namespace WEngine
 
 		bool Remove(const T& element);
 
+		void Clear();
+
 		WArray<T> Array();
 
 	private:
@@ -31,13 +33,17 @@ namespace WEngine
 
 	template<typename T>
 	inline WSet<T>::WSet()
-		: m_pData(nullptr), m_count(0)
+		: m_pData(nullptr), m_count(0), m_size(0)
 	{
 	}
 
 	template<typename T>
 	inline WSet<T>::~WSet()
 	{
+		for (size_t i = 0; i < m_size; ++i)
+		{
+			(m_pData + i)->~T();
+		}
 		Allocator::Get()->Deallocate(m_pData);
 	}
 
@@ -83,6 +89,16 @@ namespace WEngine
 			}
 		}
 		return false;
+	}
+
+	template<typename T>
+	inline void WSet<T>::Clear()
+	{
+		for (size_t i = 0; i < m_size; ++i)
+		{
+			(m_pData + i)->~T();
+		}
+		m_count = 0;
 	}
 
 	template<typename T>

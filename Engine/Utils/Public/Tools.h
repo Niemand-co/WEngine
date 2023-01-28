@@ -93,4 +93,13 @@ namespace WEngine
 		return static_cast<remove_reference<T>::type&&>(_Val);
 	}
 
+	template<typename T>
+	void Swap(T* val1, T* val2)
+	{
+		T tmp;
+		memcpy(&tmp, val1, sizeof(T));
+		memcpy(&val1, val2, sizeof(T));
+		memcpy(&val2, tmp, sizeof(T));
+	}
+
 }

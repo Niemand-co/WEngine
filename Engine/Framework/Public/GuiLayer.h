@@ -26,7 +26,7 @@ namespace WEngine
 
 		virtual void OnEvent(Event* pEvent) override;
 
-		virtual void OnUpdate(TimeStep timeStep) override;
+		virtual void Tick(TimeStep timeStep) override;
 
 	private:
 

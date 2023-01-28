@@ -57,10 +57,8 @@ namespace WEngine
 	{
 		for (unsigned int i = 0; i < 8; ++i)
 		{
-			heads[i] = nullptr;
-			sizes[i] = 0;
+			::new (&freeLists[i]) WQueue<void*>();
 		}
-		m_allocationMutex = CreateMutex(NULL, false, "Allocation");
 	}
 
 	Allocator::~Allocator()
@@ -87,7 +85,7 @@ namespace WEngine
 	{
 		if (g_pInstance == nullptr)
 		{
-			g_pInstance = new Allocator();
+			g_pInstance = new Vulkan::VulkanAllocator();
 		}
 		return g_pInstance;
 	}
@@ -110,7 +108,6 @@ namespace WEngine
 			size_t blockSize = GetBlockSize(index);
 			if (freeLists[index].Empty())
 			{
-				WaitForSingleObject(m_allocationMutex, INFINITE);
 				size_t blockCount = 4096 / blockSize;
 				BYTE *data = (BYTE*)malloc(blockCount * blockSize + blockCount * sizeof(BYTE));
 				for (size_t i = 0; i < blockCount; ++i)
@@ -119,7 +116,6 @@ namespace WEngine
 					freeLists[index].Push(data + 1);
 					data += (blockSize + 1);
 				}
-				RE_ASSERT(ReleaseMutex(m_allocationMutex), "Mutex Error.");
 			}
 			void* block = freeLists[index].Pop();
 			return block;

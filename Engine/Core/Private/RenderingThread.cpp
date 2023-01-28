@@ -1,13 +1,15 @@
 #include "pch.h"
 #include "Core/Public/RenderingThread.h"
+#include "Core/Public/RHIThread.h"
 #include "HAL/Public/TaskGraph.h"
 #include "HAL/Public/WEvent.h"
+#include "HAL/Public/WThread.h"
 
 namespace WEngine
 {
 
 	WRenderingThread::WRenderingThread()
-		: pMainThreadAsyncEvent(WEvent::Create())
+		: pMainThreadSyncEvent(WEvent::Create())
 	{
 	}
 
@@ -38,7 +40,11 @@ namespace WEngine
 	{
 		WTaskGraph::Get()->AttachToThread(EThreadProperty::RenderThread);
 
-		pMainThreadAsyncEvent->Trigger();
+		pMainThreadSyncEvent->Trigger();
+
+		m_pRHIRunnable = new WRHIThread();
+		m_pRHIThread = WThread::Create(m_pRHIRunnable, "RHI Thread");
+		m_pRHIRunnable->m_pRenderingThreadSyncEvent->Wait();
 
 		WTaskGraph::Get()->ProcessUntilQuit(EThreadProperty::RenderThread);
 	}

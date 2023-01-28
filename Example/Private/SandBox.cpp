@@ -4,14 +4,13 @@
 GameScene::GameScene(const WEngine::WString& name)
 	: Layer(name)
 {
-	m_pPipeline = RHIContext::CreateRenderPipeline<ScriptableRenderPipeline>();
-
 	m_isMoving = false;
 	m_sceneCamera = WEngine::Editor::g_pEditorCamera;
 	m_sceneCamera->m_aspect = (float)Window::cur_window->GetWidth() / (float)Window::cur_window->GetHeight();
 	m_sceneCamera->GetOwner()->GetComponent<TransformComponent>()->SetPosition(glm::vec3(2.0f, 2.0f, 2.0f));
 	WEngine::Screen::SetDisplayCamera(m_sceneCamera);
 	
+	m_pViewport = new WSceneViewport();
 }
 
 GameScene::~GameScene()
@@ -20,8 +19,6 @@ GameScene::~GameScene()
 
 void GameScene::OnAttach()
 {
-	m_pPipeline->Init();
-	m_pPipeline->Setup();
 }
 
 void GameScene::OnDettach()
@@ -53,8 +50,17 @@ void GameScene::OnEvent(WEngine::Event* pEvent)
 	});
 }
 
-void GameScene::OnUpdate(WEngine::TimeStep timeStep)
+void GameScene::Tick(WEngine::TimeStep timeStep)
 {
+	m_pViewport->ProcessInput();
+	
+	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask([]()
+	{
+		RScene::GetActiveScene()->UpdatePrimitiveInfosForScene();
+	}
+	), WEngine::EThreadProperty::RenderThread);
+	
+
 	float OffsetX = WEngine::Input::GetMouseOffsetX();
 	float OffsetY = WEngine::Input::GetMouseOffsetY();
 	if (m_isMoving)
@@ -79,7 +85,6 @@ void GameScene::OnUpdate(WEngine::TimeStep timeStep)
 		m_sceneCamera->Rotate(RotateDirection::Pitch, -OffsetY * 0.1f);
 	}
 	GameObject::Find("Main Light")->GetComponent<LightComponent>()->UpdateShadowFrustum(m_sceneCamera->GetData());
-	m_pPipeline->Execute();
 }
 
 SandBox::SandBox()

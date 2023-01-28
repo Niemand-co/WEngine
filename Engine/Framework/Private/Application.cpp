@@ -29,7 +29,7 @@ namespace WEngine
 
 	void Application::Init()
 	{
-		WEngine::Allocator::Init(WEngine::Backend::Vulkan);
+		//WEngine::Allocator::Init(WEngine::Backend::Vulkan);
 
 		WinProc proc = { "WEngine", 1920u, 1080u };
 		m_window = Window::Get(&proc);
@@ -50,18 +50,20 @@ namespace WEngine
 
 		//m_pLayerStack->PushLayer(new GuiLayer("ImGui"));
 
-
+		GEngine::Get()->PreInit();
 		REngine::Get()->PreInit();
+
+		GEngine::Get()->Init();
+		REngine::Get()->Init();
 	}
 
 	void Application::Tick()
 	{
-		
-		
 		while (!IsQuit())
 		{
-			//m_pLayerStack->OnUpdate(TimeStep::GetTimeStep());
-			//m_window->Update();
+			TimeStep timeStep = TimeStep::GetTimeStep();
+			REngine::Get()->Tick(timeStep);
+			GEngine::Get()->Tick(timeStep);
 		}
 		Finalize();
 	}

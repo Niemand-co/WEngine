@@ -10,16 +10,23 @@ namespace WEngine
 	void Input::Init()
 	{
 		g_pInstance = new WindowInput();
+
+
 	}
 
-	void Input::QueryPlayerInput()
+	void Input::Poll()
 	{
 		
 	}
 
-	bool Input::IsKeyPressed(int keycode)
+	bool Input::IsKeyPressed(int32 keycode)
 	{
 		return g_pInstance->IsKeyPressedImpl(keycode);
+	}
+
+	bool Input::IsMouseClicked(int32 mouseButton)
+	{
+		return g_pInstance->IsMouseClickedImpl(mouseButton);
 	}
 
 	glm::vec2 Input::GetMousePosition()
@@ -37,6 +44,16 @@ namespace WEngine
 		return g_pInstance->GetMouseOffsetYImpl();
 	}
 
+	glm::vec2 Input::GetWindowPos()
+	{
+		return g_pInstance->GetWindowPosImpl();
+	}
+
+	glm::vec2 Input::GetWindowSize()
+	{
+		return g_pInstance->GetWindowSizeImpl();
+	}
+
 	float Input::GetMouseOffsetXImpl()
 	{
 		float currentX = g_pInstance->GetMousePositionImpl().x;
@@ -51,6 +68,10 @@ namespace WEngine
 		float offsetY = currentY - m_lastFrameMousePositionY;
 		m_lastFrameMousePositionY = currentY;
 		return offsetY;
+	}
+
+	void Input::RegisterEvent(Event* event)
+	{
 	}
 
 }

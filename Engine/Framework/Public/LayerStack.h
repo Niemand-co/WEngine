@@ -22,6 +22,8 @@ namespace WEngine
 
 		void OnUpdate(TimeStep timeStep);
 
+		const WArray<class Layer*>& GetLayers() const { return m_pLayers; }
+
 		void* operator new(size_t size)
 		{
 			return Allocator::Get()->Allocate(size);
@@ -31,6 +33,16 @@ namespace WEngine
 		{
 			Allocator::Get()->Deallocate(pData);
 		}
+
+	public:
+
+		static void Init() { g_instance = new LayerStack(); }
+
+		static LayerStack* Get() { return g_instance; }
+
+	private:
+
+		static LayerStack *g_instance;
 
 	private:
 

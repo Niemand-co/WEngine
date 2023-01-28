@@ -57,6 +57,11 @@ namespace WEngine
 		m_threads[queueIndex]->pTaskThread->ProcessUntilIdle();
 	}
 
+	void WTaskGraph::EnqueTask(WGraphTaskBase* task, EThreadProperty property)
+	{
+		m_threads[GetQueueIndex(property)]->pTaskThread->m_taskQueue.TaskQueue.Push(task);
+	}
+
 	WTaskThreadBase::~WTaskThreadBase()
 	{
 	}
@@ -71,14 +76,28 @@ namespace WEngine
 
 	void WNamedTaskThread::ProcessUntilQuit()
 	{
-		while (true)
+		while (!m_taskQueue.bQuitForReturn)
 		{
-			
+			ProcessNamedTaskThread();
 		}
 	}
 
 	void WNamedTaskThread::ProcessUntilIdle()
 	{
+	}
+
+	void WNamedTaskThread::RequistForQuit()
+	{
+		
+	}
+
+	void WNamedTaskThread::ProcessNamedTaskThread()
+	{
+		while (!m_taskQueue.TaskQueue.Empty() && !m_taskQueue.bQuitForReturn && !m_taskQueue.bQuitForIdle)
+		{
+			WGraphTaskBase* task = m_taskQueue.TaskQueue.Pop();
+			task->ExecuteTask(EThreadProperty::RenderThread);
+		}
 	}
 
 }

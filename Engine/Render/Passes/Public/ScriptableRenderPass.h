@@ -19,9 +19,9 @@ public:
 
 	virtual ~ScriptableRenderPass();
 
-	virtual void Setup(RHIContext *context, CameraData *cameraData) = 0;
+	virtual void Setup(RHIContext* context, CameraData *cameraData) = 0;
 
-	virtual void Execute(RHIContext *context, CameraData* cameraData) = 0;
+	virtual void Execute(RHIContext* context, CameraData* cameraData) = 0;
 
 	virtual void UpdateRenderTarget(CameraData *cameraData) = 0;
 

@@ -22,11 +22,17 @@ namespace WEngine
 
 	public:
 
-		class WEvent* pMainThreadAsyncEvent;
+		class WEvent* pMainThreadSyncEvent;
 
 	private:
 
 		void RenderThreadMain();
+
+	private:
+
+		class WRHIThread *m_pRHIRunnable;
+
+		class WThread *m_pRHIThread;
 
 	};
 

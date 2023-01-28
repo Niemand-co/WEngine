@@ -7,6 +7,7 @@ namespace WEngine
 	WEventWin::WEventWin()
 	{
 		m_event = CreateEvent(NULL, true, false, "Test");
+		ResetEvent(m_event);
 	}
 
 	WEventWin::~WEventWin()
@@ -16,6 +17,7 @@ namespace WEngine
 	void WEventWin::Wait()
 	{
 		WaitForSingleObject(m_event, INFINITE);
+		ResetEvent(m_event);
 	}
 
 	void WEventWin::Trigger()

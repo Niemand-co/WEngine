@@ -17,7 +17,7 @@ public:
 
 	virtual void Destroy();
 
-	virtual void Update();
+	virtual void Poll();
 
 	virtual void* GetHandle() const override;
 
@@ -25,11 +25,17 @@ public:
 
 	virtual unsigned int GetHeight() const override { return m_height; }
 
-	virtual bool IsKeyPressed(int keycode) override;
+	virtual bool IsKeyPressed(int32 keycode) override;
+
+	virtual bool IsMouseClicked(int32 mouseButton) override;
 
 	virtual void SetMousePosition(glm::vec2 pos) override;
 
 	virtual glm::vec2 GetMousePosition() override;
+
+	virtual glm::vec2 GetWindowPos() override;
+
+	virtual glm::vec2 GetWindowSize() override;
 
 	void SetWidth(unsigned int width) { m_width = width; }
 
