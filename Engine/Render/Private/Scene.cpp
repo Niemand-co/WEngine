@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Render/Public/Scene.h"
 #include "Scene/Components/Public/InstancedStaticMeshComponent.h"
+#include "Scene/Components/Public/LightComponent.h"
+#include "Scene/Components/Public/CameraComponent.h"
 
 RScene* RScene::g_activeScene = nullptr;
 
@@ -45,10 +47,57 @@ void RScene::UpdatePrimitiveInfosForScene()
 	}
 	m_primitives.Resize(m_primitives.Size() - RemovedPrimitives.Size());
 
-	for (PrimitiveInfo* removedInfo : AddedPrimitives)
+	for (PrimitiveInfo* addedInfo : AddedPrimitives)
 	{
-		m_primitives.Push(removedInfo);
+		m_primitives.Push(addedInfo);
 	}
 
 	WEngine::WArray<PrimitiveInfo*>& primitives = m_primitives;
+}
+
+void RScene::AddLight(LightComponent* light)
+{
+	m_addedLights.Add(light->GetLightInfo());
+}
+
+void RScene::RemoveLight(LightComponent* light)
+{
+	m_removedLights.Add(light->GetLightInfo());
+}
+
+void RScene::UpdateLightInfosForScene()
+{
+	WEngine::WArray<LightInfo*> AddedLights = m_addedLights.Array();
+	m_addedLights.Clear();
+
+	WEngine::WArray<LightInfo*> RemovedLights = m_removedLights.Array();
+	m_removedLights.Clear();
+
+	for (LightInfo* removedInfo : RemovedLights)
+	{
+		uint32 size = m_lights.Size();
+		uint32 index = 0;
+		for (; index < size && m_lights[index] == removedInfo; ++index);
+		if(index >= size)continue;
+		while (index < size)
+		{
+			uint32 removedIndex = index;
+			for (; index < size && m_lights[index]->type == removedInfo->type; ++index);
+			WEngine::Swap(&m_lights[index - 1], &m_lights[removedIndex]);
+		}
+		m_lights.Resize(size - 1);
+	}
+
+	for (LightInfo* addedInfo : AddedLights)
+	{
+		m_lights.Push(addedInfo);
+		uint32 size = m_lights.Size();
+		if(size == 1)continue;
+		uint32 index = size - 2;
+		for(; index >= 0 && m_lights[index]->type == addedInfo->type; --index);
+	}
+}
+
+void RScene::UpdateCameraInfosForScene()
+{
 }

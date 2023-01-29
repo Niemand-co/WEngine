@@ -21,7 +21,7 @@ class CameraComponent : public Component
 
 public:
 
-	typedef CameraComponent type;
+	enum { type = 3 };
 
 	CameraComponent(GameObject* pGameObject, const float& fov = 90.0f, const float& aspect = 1.0f, const float& nearPlane = 0.01f, const float& farPlane = 1000.0f);
 
@@ -89,18 +89,41 @@ private:
 
 };
 
-struct CameraData
+struct CameraInfo
 {
-	CameraComponent *camera;
+	CameraInfo(CameraComponent* camera)
+		: Position(camera->GetOwner()->GetComponent<TransformComponent>()->GetPosition()),
+		  MatrixV(camera->GetViewMatrix()),
+		  MatrixP(camera->GetProjectionMatrix()),
+		  MatrixVP(MatrixP * MatrixV),
+		  Fov(camera->m_fov),
+		  FarClip(camera->m_farPlane),
+		  NearClip(camera->m_nearPlane),
+		  Aspect(camera->m_aspect),
+		  Owner(camera->GetOwner())
+	{
+
+	}
+
 	glm::vec3 Position;
+	
 	glm::mat4x4 MatrixV;
+	
 	glm::mat4x4 MatrixP;
+	
 	glm::mat4x4 MatrixVP;
+	
 	CameraRenderTarget *pRenderTarget;
-	float fov;
-	float farClip;
-	float nearClip;
-	float aspect;
+	
+	float Fov;
+	
+	float FarClip;
+	
+	float NearClip;
+	
+	float Aspect;
+
+	GameObject *Owner;
 };
 
 //namespace WEngine

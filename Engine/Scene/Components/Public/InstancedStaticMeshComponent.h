@@ -5,6 +5,8 @@ class InstancedStaticMeshComponent : public StaticMeshComponent
 {
 public:
 
+	enum { type = 7 };
+
 	InstancedStaticMeshComponent(GameObject *pGameObject);
 
 	virtual ~InstancedStaticMeshComponent();

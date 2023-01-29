@@ -60,30 +60,6 @@ void GameScene::Tick(WEngine::TimeStep timeStep)
 	}
 	), WEngine::EThreadProperty::RenderThread);
 	
-
-	float OffsetX = WEngine::Input::GetMouseOffsetX();
-	float OffsetY = WEngine::Input::GetMouseOffsetY();
-	if (m_isMoving)
-	{
-		if (WEngine::Input::IsKeyPressed(GLFW_KEY_W))
-		{
-			m_sceneCamera->Move(Direction::FORWARD, (float)timeStep.GetSeconds() * 5.0f);
-		}
-		else if (WEngine::Input::IsKeyPressed(GLFW_KEY_S))
-		{
-			m_sceneCamera->Move(Direction::BACKWARD, (float)timeStep.GetSeconds() * 5.0f);
-		}
-		if (WEngine::Input::IsKeyPressed(GLFW_KEY_A))
-		{
-			m_sceneCamera->Move(Direction::LEFT, (float)timeStep.GetSeconds() * 5.0f);
-		}
-		else if (WEngine::Input::IsKeyPressed(GLFW_KEY_D))
-		{
-			m_sceneCamera->Move(Direction::RIGHT, (float)timeStep.GetSeconds() * 5.0f);
-		}
-		m_sceneCamera->Rotate(RotateDirection::Yaw,  -OffsetX * 0.1f);
-		m_sceneCamera->Rotate(RotateDirection::Pitch, -OffsetY * 0.1f);
-	}
 	GameObject::Find("Main Light")->GetComponent<LightComponent>()->UpdateShadowFrustum(m_sceneCamera->GetData());
 }
 

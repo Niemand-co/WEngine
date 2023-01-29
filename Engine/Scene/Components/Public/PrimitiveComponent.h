@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene/Components/Public/Component.h"
+#include "Scene/Components/Public/TransformComponent.h"
 #include "Scene/Public/GameObject.h"
 
 struct PrimitiveInfo;
@@ -7,6 +8,8 @@ struct PrimitiveInfo;
 class PrimitiveComponent : public Component
 {
 public:
+
+	enum { type = 5 };
 
 	PrimitiveComponent(GameObject *pGameObject);
 

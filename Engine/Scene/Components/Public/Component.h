@@ -1,5 +1,5 @@
 #pragma once
-#include "Scene/Public/Object.h"
+#include "Scene/Public/GameObject.h"
 
 enum class Direction
 {
@@ -27,32 +27,16 @@ class Component : public Object
 	friend class GameObject;
 
 public:
-	enum class ComponentType
-	{
-		Transformer = 0,
-		Camera,
-		MeshFilter,
-		Material,
-	};
-
-public:
-
-	typedef Component type;
+	
+	enum { type = 0 };
 
 	virtual ~Component() = default;
 
 	//virtual void Tick(const WEngine::TimeStep& timeStep) = 0;
 
-	virtual ComponentType GetType() { return m_type; }
-
 	inline GameObject* GetOwner() { return m_pGameObject; } ;
 
 	virtual void ShowInInspector() = 0;
-
-	virtual bool IsType(ComponentType type) 
-	{
-		return type == m_type; 
-	}
 
 protected:
 
@@ -64,8 +48,6 @@ protected:
 protected:
 
 	GameObject* m_pGameObject;
-
-	ComponentType m_type;
 
 };
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "Scene/Components/Public/Component.h"
+#include "Scene/Components/Public/TransformComponent.h"
 
-class GameObject;
 class RHITexture;
 class RHITextureView;
 struct CameraData;
@@ -9,22 +9,15 @@ struct CameraData;
 class LightComponent : public Component
 {
 
-	enum class LightType
-	{
-		Directional = 0,
-		Point,
-		Spot,
-	};
-
 	friend class GameObject;
 
 public:
 	
-	typedef LightComponent type;
+	enum { type = 2 };
 
 	LightComponent(GameObject* pGameObject);
 
-	virtual ~LightComponent();
+	virtual ~LightComponent() = default;
 
 	void SetMainLight(bool isMainLight);
 
@@ -36,15 +29,11 @@ public:
 
 	const WEngine::WArray<RHITextureView*>& GetDepthTexture() const { return m_pDepthTextureViews; }
 
-	void UpdateShadowFrustum(CameraData* cameraData);
+	class LightInfo* GetLightInfo();
 
-	const WEngine::WArray<glm::mat4>& GetShadowFrustum();
-
-	const WEngine::WArray<float>& GetSplices();
+	void MarkDirty() { m_bMarkedDirty = true; }
 
 private:
-
-	LightType m_type;
 
 	bool m_isMainLight;
 
@@ -56,10 +45,27 @@ private:
 
 	WEngine::WArray<RHITextureView*> m_pDepthTextureViews;
 
-	unsigned int m_mainLightCascadedShadowMapNum = 4;
+	LightInfo *m_pInfo;
 
-	WEngine::WArray<float> m_mainLightCascadedShadowMapRange;
+	uint8 m_bMarkedDirty : 1;
 
-	WEngine::WArray<glm::mat4> m_lightSpaceMatrix;
+};
 
+struct LightInfo
+{
+	LightInfo(LightComponent *light)
+		: LightColor(light->GetColor()),
+		  LightInstensity(light->GetIntensity()),
+		  Owner(light->GetOwner())
+	{
+
+	}
+
+	enum { type = 0 };
+
+	glm::vec3 LightColor;
+
+	float LightInstensity;
+
+	GameObject *Owner;
 };

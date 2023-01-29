@@ -1,10 +1,5 @@
 #pragma once
 #include "Scene/Public/Object.h"
-#include "Scene/Components/Public/TransformComponent.h"
-#include "Scene/Components/Public/MeshFilter.h"
-#include "Scene/Components/Public/CameraComponent.h"
-#include "Scene/Components/Public/MaterialComponent.h"
-#include "Scene/Components/Public/LightComponent.h"
 
 class GWorld;
 
@@ -54,7 +49,7 @@ private:
 
 	WEngine::WArray<GameObject*> m_sonGameObjects;
 
-	WEngine::WArray<Component*> m_components;
+	WEngine::WArray<class Component*> m_components;
 
 };
 
@@ -71,7 +66,9 @@ inline T* GameObject::GetComponent()
 {
 	for (Component* component : m_components)
 	{
-		if (dynamic_cast<T*>(component) != nullptr)
+		//if (dynamic_cast<T*>(component) != nullptr)
+			//return static_cast<T*>(component);
+		if(component->type == T::type)
 			return static_cast<T*>(component);
 	}
 	return nullptr;

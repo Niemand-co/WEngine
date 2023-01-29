@@ -37,7 +37,7 @@ class MaterialComponent : public Component
 
 public:
 
-	typedef MaterialComponent type;
+	enum { type = 4 };
 
 	MaterialComponent(GameObject *pGameObject);
 

@@ -5,6 +5,8 @@
 class StaticMeshComponent : public PrimitiveComponent
 {
 public:
+	
+	enum { type = 6 };
 
 	StaticMeshComponent(GameObject *pGameObject);
 

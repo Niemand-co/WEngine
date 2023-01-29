@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Scene/Public/GameObject.h"
+#include "Scene/Components/Public/Component.h"
 #include "Scene/Public/World.h"
 
 GameObject::GameObject(const WEngine::WString& name)

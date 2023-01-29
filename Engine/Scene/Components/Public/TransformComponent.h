@@ -8,7 +8,7 @@ class TransformComponent : public Component
 
 public:
 
-	typedef TransformComponent type;
+	enum { type = 1 };
 
 	TransformComponent(GameObject* pGameObject);
 
