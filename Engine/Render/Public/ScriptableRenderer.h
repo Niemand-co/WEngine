@@ -8,7 +8,7 @@ class RHISemaphore;
 class RHIFence;
 class RHIEvent;
 class RHITextureView;
-struct CameraData;
+struct CameraInfo;
 
 class ScriptableRenderer
 {
@@ -18,13 +18,13 @@ public:
 
 	virtual ~ScriptableRenderer();
 
-	virtual void Setup(RHIContext* context, CameraData *cameraData);
+	virtual void Setup(RHIContext* context, CameraInfo *cameraData);
 
-	virtual void Execute(RHIContext *context, CameraData* cameraData);
+	virtual void Execute(RHIContext *context, CameraInfo* cameraData);
 
 	virtual void EnqueRenderPass(ScriptableRenderPass* renderPass);
 
-	virtual void UpdateRenderTarget(CameraData* cameraData);
+	virtual void UpdateRenderTarget(CameraInfo* cameraData);
 
 	void SetGlobalTexture(WEngine::WArray<RHITextureView*>& pTexture) { m_pGlobalTextures.Push(pTexture); }
 

@@ -42,6 +42,8 @@ struct InstancedStaticMeshInfo : public StaticMeshInfo
 		}
 	}
 
+	enum { type = 2 };
+
 	unsigned int InstanceCount;
 
 	WEngine::WArray<glm::mat4> LocalToWorldMatrices;

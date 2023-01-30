@@ -19,11 +19,11 @@ ScriptableRenderer::~ScriptableRenderer()
 {
 }
 
-void ScriptableRenderer::Setup(RHIContext* context, CameraData* cameraData)
+void ScriptableRenderer::Setup(RHIContext* context, CameraInfo* cameraData)
 {
 	for (ScriptableRenderPass* pass : m_passes)
 	{
-		pass->Setup(context, cameraData);
+		pass->Setup();
 	}
 
 	m_pSignalSemaphore = RHIContext::GetDevice()->GetSemaphore(1);
@@ -36,11 +36,11 @@ void ScriptableRenderer::Setup(RHIContext* context, CameraData* cameraData)
 	WEngine::Synchronizer::RegisterTrigger(trigger);
 }
 
-void ScriptableRenderer::Execute(RHIContext *context, CameraData *cameraData)
+void ScriptableRenderer::Execute(RHIContext *context, CameraInfo *cameraData)
 {
 	for (unsigned int i = 0; i < m_passes.Size(); ++i)
 	{
-		m_passes[i]->Execute(context, cameraData);
+		m_passes[i]->Execute();
 	}
 
 	RHISemaphore *waitSemaphores[] = { context->GetImageVailableSemaphore() };
@@ -62,10 +62,6 @@ void ScriptableRenderer::EnqueRenderPass(ScriptableRenderPass *renderPass)
 	m_passes.Push(renderPass);
 }
 
-void ScriptableRenderer::UpdateRenderTarget(CameraData* cameraData)
+void ScriptableRenderer::UpdateRenderTarget(CameraInfo* cameraData)
 {
-	for (ScriptableRenderPass* pass : m_passes)
-	{
-		pass->UpdateRenderTarget(cameraData);
-	}
 }

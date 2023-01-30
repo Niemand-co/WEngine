@@ -15,11 +15,9 @@ public:
 
 	virtual ~MainLightShadowPass();
 
-	virtual void Setup(RHIContext *context, CameraData *cameraData) override;
+	virtual void Setup() override;
 
-	virtual void Execute(RHIContext *context, CameraData* cameraData) override;
-
-	virtual void UpdateRenderTarget(CameraData* cameraData) override;
+	virtual void Execute() override;
 
 private:
 

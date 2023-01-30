@@ -11,7 +11,7 @@ class RHISemaphore;
 class RHIFence;
 class RHITexture;
 class CameraComponent;
-struct CameraData;
+struct CameraInfo;
 
 class ScriptableRenderPipeline
 {
@@ -51,6 +51,6 @@ protected:
 
 	WEngine::WArray<CameraComponent*> m_pCameras;
 
-	WEngine::WArray<CameraData*> m_pCameraDatas;
+	WEngine::WArray<CameraInfo*> m_pCameraDatas;
 
 };

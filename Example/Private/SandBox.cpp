@@ -4,12 +4,6 @@
 GameScene::GameScene(const WEngine::WString& name)
 	: Layer(name)
 {
-	m_isMoving = false;
-	m_sceneCamera = WEngine::Editor::g_pEditorCamera;
-	m_sceneCamera->m_aspect = (float)Window::cur_window->GetWidth() / (float)Window::cur_window->GetHeight();
-	m_sceneCamera->GetOwner()->GetComponent<TransformComponent>()->SetPosition(glm::vec3(2.0f, 2.0f, 2.0f));
-	WEngine::Screen::SetDisplayCamera(m_sceneCamera);
-	
 	m_pViewport = new WSceneViewport();
 }
 
@@ -54,13 +48,24 @@ void GameScene::Tick(WEngine::TimeStep timeStep)
 {
 	m_pViewport->ProcessInput();
 	
-	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask([]()
+	RScene *scene = RScene::GetActiveScene();
+
+	//WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [&scene]()
+	//{
+	//	//scene->UpdatePrimitiveInfosForScene();
+
+	//	//scene->UpdateLightInfosForScene();
+
+	//	//scene->UpdateCameraInfosForScene();
+	//}
+	//), WEngine::EThreadProperty::RenderThread);
+
+	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [&scene]()
 	{
-		RScene::GetActiveScene()->UpdatePrimitiveInfosForScene();
+		scene->StartFrame();
 	}
 	), WEngine::EThreadProperty::RenderThread);
 	
-	GameObject::Find("Main Light")->GetComponent<LightComponent>()->UpdateShadowFrustum(m_sceneCamera->GetData());
 }
 
 SandBox::SandBox()
@@ -78,7 +83,8 @@ SandBox::SandBox()
 	//go->AddComponent<MaterialComponent>();
 	//plane->GetComponent<TransformComponent>()->SetScale(glm::vec3(50.0f, 50.0f, 50.0f));
 
-	//m_pLayerStack->PushLayer(new GameScene("Game Scene"));
+	WEngine::LayerStack::Get()->PushLayer(new GameScene("Game Scene"));
+	RScene::SetActiveScene(new RScene);
 
 }
 

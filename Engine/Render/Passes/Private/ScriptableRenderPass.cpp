@@ -12,8 +12,3 @@ ScriptableRenderPass::ScriptableRenderPass(ScriptableRenderer *pRenderer)
 ScriptableRenderPass::~ScriptableRenderPass()
 {
 }
-
-RHIGroup* ScriptableRenderPass::GetResourceGroup()
-{
-	return m_pResource;
-}

@@ -66,10 +66,10 @@ inline T* GameObject::GetComponent()
 {
 	for (Component* component : m_components)
 	{
-		//if (dynamic_cast<T*>(component) != nullptr)
-			//return static_cast<T*>(component);
-		if(component->type == T::type)
+		if (dynamic_cast<T*>(component) != nullptr)
 			return static_cast<T*>(component);
+		//if(component->type == T::type)
+			//return static_cast<T*>(component);
 	}
 	return nullptr;
 }

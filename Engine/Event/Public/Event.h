@@ -13,7 +13,6 @@ namespace WEngine
 
 	enum EventCategory
 	{
-		None = 0,
 		EventCategoryApplication = 0x00000001,
 		EventCategoryInput       = 0x00000002,
 		EventCategoryKeyboard    = 0x00000004,

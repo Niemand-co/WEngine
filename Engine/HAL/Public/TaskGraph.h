@@ -98,7 +98,7 @@ namespace WEngine
 
 		~WGraphEvent()
 		{
-
+			delete m_event;
 		}
 
 		void Wait()
@@ -123,7 +123,7 @@ namespace WEngine
 	{
 	public:
 
-		virtual void ExecuteTask(EThreadProperty property) = 0;
+		virtual bool ExecuteTask(EThreadProperty property) = 0;
 
 		template<typename TTask, typename... Args>
 		static WGraphTaskBase* CreateTask(Args... args)
@@ -141,7 +141,11 @@ namespace WEngine
 			Allocator::Get()->Deallocate(pData);
 		}
 
-		WGraphTaskBase() = default;
+		WGraphTaskBase(bool bInShouldDestroy)
+			: m_bShouldDestroyAfterExecution(bInShouldDestroy)
+		{
+
+		}
 
 		~WGraphTaskBase() = default;
 
@@ -149,19 +153,26 @@ namespace WEngine
 
 		WGraphEvent m_taskEvent;
 
+		uint8 m_bShouldDestroyAfterExecution : 1;
+
 	};
 
 	class WTriggerTask : public WGraphTaskBase
 	{
 	public:
 
-		WTriggerTask() = default;
+		WTriggerTask(bool bInShouldDestroy)
+			: WGraphTaskBase(bInShouldDestroy)
+		{
+
+		}
 
 		virtual ~WTriggerTask() = default;
 
-		virtual void ExecuteTask(EThreadProperty property) override
+		virtual bool ExecuteTask(EThreadProperty property) override
 		{
 			m_taskEvent.Trigger();
+			return m_bShouldDestroyAfterExecution;
 		}
 
 		void Wait()
@@ -176,16 +187,17 @@ namespace WEngine
 	{
 	public:
 
-		WLambdaTask(Lambda inLambda)
-			: lambda(inLambda)
+		WLambdaTask(bool bInShouldDestroy, Lambda inLambda)
+			: WGraphTaskBase(bInShouldDestroy), lambda(inLambda)
 		{
 		}
 
 		virtual ~WLambdaTask() = default;
 
-		virtual void ExecuteTask(EThreadProperty property) override
+		virtual bool ExecuteTask(EThreadProperty property) override
 		{
 			lambda();
+			return m_bShouldDestroyAfterExecution;
 		}
 
 	private:

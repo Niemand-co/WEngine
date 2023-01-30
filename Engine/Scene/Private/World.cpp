@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Scene/Public/World.h"
 #include "Scene/Public/GameObject.h"
+#include "Scene/Components/Public/TransformComponent.h"
+#include "Scene/Components/Public/LightComponent.h"
 
 GWorld* GWorld::g_pInstance = nullptr;
 

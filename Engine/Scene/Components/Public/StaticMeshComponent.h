@@ -36,6 +36,8 @@ struct StaticMeshInfo : public PrimitiveInfo
 
 	}
 
+	enum { type = 1 };
+
 	StaticMesh *Mesh;
 
 	uint8_t bCastShadow : 1;

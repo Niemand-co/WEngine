@@ -93,7 +93,7 @@ namespace WEngine
 				{
 					Editor::ClearSelection();
 
-					CameraData* data = Editor::g_pEditorCamera->GetData();
+					CameraInfo* data = Editor::g_pEditorCamera->GetCameraInfo();
 					ImVec2 mousePos = ImGui::GetMousePos();
 					glm::vec2 pos = { (mousePos.x - m_displayArea.First().x) / (m_displayArea.Second().x - m_displayArea.First().x), (m_displayArea.Second().y - mousePos.y) / (m_displayArea.Second().y - m_displayArea.First().y) };
 					Ray ray = Ray::GetClickRay(pos, data->Position, glm::inverse(data->MatrixV), glm::inverse(data->MatrixP));

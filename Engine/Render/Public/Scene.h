@@ -24,9 +24,27 @@ public:
 
 	void UpdateLightInfosForScene();
 
+	void AddCamera(class CameraComponent *camera);
+
+	void RemoveCamera(class CameraComponent *camera);
+
 	void UpdateCameraInfosForScene();
 
+	void StartFrame();
+
+	void* operator new(size_t size)
+	{
+		return WEngine::Allocator::Get()->Allocate(size);
+	}
+
+	void operator delete(void* pData)
+	{
+		WEngine::Allocator::Get()->Deallocate(pData);
+	}
+
 public:
+
+	static void SetActiveScene(RScene *scene) { g_activeScene = scene; }
 
 	static RScene* GetActiveScene() { return g_activeScene; }
 

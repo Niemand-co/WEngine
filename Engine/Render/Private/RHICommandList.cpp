@@ -2,6 +2,8 @@
 #include "Render/Public/RHICommandList.h"
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
 
+RHIRenderCommandList* RHIRenderCommandList::g_instance = nullptr;
+
 RHIRenderCommandList::RHIRenderCommandList()
 {
 }

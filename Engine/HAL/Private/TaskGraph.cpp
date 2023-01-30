@@ -96,7 +96,8 @@ namespace WEngine
 		while (!m_taskQueue.TaskQueue.Empty() && !m_taskQueue.bQuitForReturn && !m_taskQueue.bQuitForIdle)
 		{
 			WGraphTaskBase* task = m_taskQueue.TaskQueue.Pop();
-			task->ExecuteTask(EThreadProperty::RenderThread);
+			if(task->ExecuteTask(EThreadProperty::RenderThread))
+				delete task;
 		}
 	}
 

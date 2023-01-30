@@ -28,7 +28,7 @@ namespace WEngine
 	{
 		for (unsigned int i = 0; i < m_pCameras.Size(); ++i)
 		{
-			m_pCameras[i]->GetRenderer()->Execute(m_pContext, m_pCameras[i]->GetData());
+			m_pCameras[i]->GetRenderer()->Execute(m_pContext, m_pCameras[i]->GetCameraInfo());
 		}
 	}
 

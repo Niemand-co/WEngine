@@ -17,7 +17,7 @@ public:
 		WEngine::Allocator::Get()->Deallocate(pData);
 	}
 
-	const RHIContext* GetContext() const { return m_pContext; }
+	const class RHIContext* GetContext() const { return m_pContext; }
 
 protected:
 
@@ -25,7 +25,7 @@ protected:
 
 protected:
 
-	class RHIContext *m_pContext;
+	RHIContext *m_pContext;
 
 };
 
@@ -44,6 +44,14 @@ public:
 	void EndRenderPass();
 
 	void DrawIndexedPrimitive(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount);
+
+public:
+
+	static RHIRenderCommandList* Get() { if(g_instance == nullptr)g_instance = new RHIRenderCommandList(); return g_instance; }
+
+private:
+
+	static RHIRenderCommandList* g_instance;
 
 protected:
 

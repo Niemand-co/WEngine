@@ -9,7 +9,7 @@ class RHIContext;
 class RHICommandBuffer;
 class RHIPipelineResourceLayout;
 
-struct CameraData;
+struct CameraInfo;
 
 class DrawSkyboxPass : public ScriptableRenderPass
 {
@@ -19,11 +19,9 @@ public:
 
 	virtual ~DrawSkyboxPass();
 
-	virtual void Setup(RHIContext *context, CameraData *cameraData) override;
+	virtual void Setup() override;
 
-	virtual void Execute(RHIContext *context, CameraData* cameraData) override;
-
-	virtual void UpdateRenderTarget(CameraData *cameraData) override;
+	virtual void Execute() override;
 
 private:
 

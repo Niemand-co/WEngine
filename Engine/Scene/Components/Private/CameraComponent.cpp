@@ -17,7 +17,6 @@ CameraComponent::CameraComponent(GameObject* pGameObject, const float& fov, cons
 	theta = 0.0f;
 	m_forward = glm::vec3(0.0f, 0.0f, -1.0f);
 
-	m_type = Component::ComponentType::Camera;
 	GWorld::GetWorld()->AddCamera(this);
 	UpdateProjectionMatrix();
 	m_rendertargets.Resize(RHIContext::g_maxFrames);
@@ -73,15 +72,6 @@ CameraComponent::CameraComponent(GameObject* pGameObject, const float& fov, cons
 		RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
 		m_rendertargets[i].pDepthTexture = m_textureResources[i * 2u + 1]->CreateTextureView(&viewDescriptor);
 	}
-
-	m_pData = (CameraData*)WEngine::Allocator::Get()->Allocate(sizeof(CameraData));
-	::new (m_pData) CameraData();
-	m_pData->camera = this;
-	m_pData->pRenderTarget = &m_rendertargets[RHIContext::g_currentFrame];
-	m_pData->nearClip = m_nearPlane;
-	m_pData->farClip = m_farPlane;
-	m_pData->fov = m_fov;
-	m_pData->aspect = m_aspect;
 }
 
 void CameraComponent::ShowInInspector()
@@ -110,14 +100,19 @@ ScriptableRenderer* CameraComponent::GetRenderer()
 	return m_renderer;
 }
 
-CameraData* CameraComponent::GetData()
+CameraInfo* CameraComponent::GetCameraInfo()
 {
-	m_pData->Position = m_pGameObject->GetComponent<TransformComponent>()->GetPosition();
-	m_pData->MatrixV = this->GetViewMatrix();
-	m_pData->MatrixP = this->GetProjectionMatrix();
-	m_pData->MatrixVP = m_pData->MatrixP * m_pData->MatrixV;
+	if (m_bMarkedDirty)
+	{
+		if (m_pInfo == nullptr)
+		{
+			m_pInfo = (CameraInfo*)WEngine::Allocator::Get()->Allocate(sizeof(CameraInfo));
+		}
+		::new (m_pInfo) CameraInfo(this);
+		m_bMarkedDirty = false;
+	}
 
-	return m_pData;
+	return m_pInfo;
 }
 
 void CameraComponent::Move(Direction dir, float dis)
@@ -229,7 +224,7 @@ void CameraComponent::RecreateRenderTarget(unsigned int width, unsigned int heig
 		m_rendertargets[i].pDepthTexture = m_textureResources[i * 2 + 1]->CreateTextureView(&viewDescriptor);
 	}
 
-	m_renderer->UpdateRenderTarget(GetData());
+	m_renderer->UpdateRenderTarget(GetCameraInfo());
 
 	m_aspect = (float)width / (float)height;
 }

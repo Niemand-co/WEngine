@@ -5,7 +5,6 @@
 MeshFilter::MeshFilter(GameObject* pGameObject)
 	: Component(pGameObject)
 {
-	m_type = Component::ComponentType::MeshFilter;
 }
 
 void MeshFilter::ShowInInspector()

@@ -1,11 +1,12 @@
 #pragma once
 #include "Scene/Components/Public/Component.h"
+#include "Scene/Components/Public/TransformComponent.h"
 
 class GameObject;
 class ScriptableRenderer;
 class RHITextureView;
 class RHITexture;
-struct CameraData;
+struct CameraInfo;
 
 struct CameraRenderTarget
 {
@@ -41,7 +42,7 @@ public:
 
 	ScriptableRenderer* GetRenderer();
 
-	CameraData* GetData();
+	CameraInfo* GetCameraInfo();
 
 	void Move(Direction dir, float dis);
 
@@ -79,7 +80,7 @@ private:
 
 	WEngine::WArray<RHITexture*> m_textureResources;
 
-	CameraData *m_pData;
+	CameraInfo *m_pInfo;
 
 	glm::vec3 m_forward;
 
@@ -104,6 +105,8 @@ struct CameraInfo
 	{
 
 	}
+
+	enum { type = 0 };
 
 	glm::vec3 Position;
 	

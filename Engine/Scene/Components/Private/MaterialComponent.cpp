@@ -7,7 +7,6 @@
 MaterialComponent::MaterialComponent(GameObject* pGameObject)
 	: Component(pGameObject), albedo(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)), roughness(0.5f), metallic(0.0f), m_shader(nullptr)
 {
-	m_type = Component::ComponentType::Material;
 }
 
 void MaterialComponent::SetShader(RHIShader* shader)

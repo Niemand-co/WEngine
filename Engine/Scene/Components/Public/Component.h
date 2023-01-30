@@ -38,16 +38,20 @@ public:
 
 	virtual void ShowInInspector() = 0;
 
+	void MarkDirty() { m_bMarkedDirty = true; }
+
 protected:
 
 	Component(GameObject *pGameObject)
-		: m_pGameObject(pGameObject)
+		: m_pGameObject(pGameObject), m_bMarkedDirty(true)
 	{
 	};
 
 protected:
 
 	GameObject* m_pGameObject;
+
+	uint8 m_bMarkedDirty : 1;
 
 };
 

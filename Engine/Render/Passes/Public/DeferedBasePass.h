@@ -5,12 +5,12 @@ class DeferedBasePass : public ScriptableRenderPass
 {
 public:
 
-	DeferedBasePass();
+	DeferedBasePass(ScriptableRenderer *pRenderer);
 
 	virtual ~DeferedBasePass();
 
-	virtual void Setup(RHIContext* context, CameraData *data) override;
+	virtual void Setup() override;
 
-	virtual void Execute(RHIContext* context, CameraData *data) override;
+	virtual void Execute() override;
 
 };

@@ -3,6 +3,8 @@
 #include "Render/Mesh/Public/Mesh.h"
 #include "Render/Mesh/Public/Vertex.h"
 #include "Scene/Public/GameObject.h"
+#include "Scene/Components/Public/TransformComponent.h"
+#include "Scene/Components/Public/MeshFilter.h"
 #include "Editor/Public/Editor.h"
 
 namespace WEngine

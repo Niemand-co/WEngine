@@ -59,7 +59,7 @@ namespace WEngine
 	void REngine::Init()
 	{
 		StartRenderingThread();
-		LayerStack::Get()->PushLayer(new GuiLayer("Gui"));
+		//LayerStack::Get()->PushLayer(new GuiLayer("Gui"));
 	}
 
 	void REngine::Tick(const TimeStep& timeStep)
@@ -84,7 +84,7 @@ namespace WEngine
 		m_pRenderingRunnable->pMainThreadSyncEvent->Wait();
 	}
 
-	WTriggerTask FrameSync::SyncEvent[2] = { WTriggerTask(), WTriggerTask() };
+	WTriggerTask FrameSync::SyncEvent[2] = { WTriggerTask(false), WTriggerTask(false) };
 
 	uint32 FrameSync::FrameIndex = 0;
 

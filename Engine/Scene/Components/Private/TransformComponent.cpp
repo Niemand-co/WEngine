@@ -4,7 +4,6 @@
 TransformComponent::TransformComponent(GameObject* pGameObject)
 	: Component(pGameObject)
 {
-	m_type = Component::ComponentType::Transformer;
 	m_localToWorldMatrix = glm::mat4(1.0f);
 	m_rotate = glm::vec3(0.0f);
 	m_position = glm::vec3(0.0f);

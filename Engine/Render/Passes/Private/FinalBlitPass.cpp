@@ -10,10 +10,10 @@ FinalBlitPass::~FinalBlitPass()
 {
 }
 
-void FinalBlitPass::Setup(RHIContext *context, CameraData *cameraData)
+void FinalBlitPass::Setup()
 {
 }
 
-void FinalBlitPass::Execute(RHIContext *context, CameraData* cameraData)
+void FinalBlitPass::Execute()
 {
 }

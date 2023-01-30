@@ -46,7 +46,8 @@ namespace WEngine
 
 		//Debug::Init();
 
-		//m_pLayerStack = new LayerStack();
+		LayerStack::Init();
+		m_pLayerStack = LayerStack::Get();
 
 		//m_pLayerStack->PushLayer(new GuiLayer("ImGui"));
 

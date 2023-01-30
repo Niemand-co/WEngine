@@ -32,12 +32,8 @@ void ScriptableRenderPipeline::Setup()
 
 	for (CameraComponent *camera : m_pCameras)
 	{
-		CameraData *data = camera->GetData();
+		CameraInfo *data = camera->GetCameraInfo();
 		ScriptableRenderer* renderer = camera->GetRenderer();
-		renderer->EnqueRenderPass(new MainLightShadowPass(renderer));
-		renderer->EnqueRenderPass(new DrawOpaquePass(renderer));
-		renderer->EnqueRenderPass(new DrawSkyboxPass(renderer));
-		renderer->EnqueRenderPass(new DrawGizmosPass(renderer));
 		renderer->Setup(m_pContext, data);
 		m_pCameraDatas.Push(data);
 	}
@@ -47,7 +43,7 @@ void ScriptableRenderPipeline::Execute()
 {
 	for (CameraComponent* camera : m_pCameras)
 	{
-		camera->GetRenderer()->Execute(m_pContext, camera->GetData());
+		camera->GetRenderer()->Execute(m_pContext, camera->GetCameraInfo());
 	}
 }
 

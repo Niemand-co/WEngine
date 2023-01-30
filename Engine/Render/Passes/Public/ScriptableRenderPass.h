@@ -9,7 +9,7 @@ class RHICommandBuffer;
 class RHISemaphore;
 class RHIRenderTarget;
 class ScriptableRenderer;
-struct CameraData;
+struct CameraInfo;
 
 class ScriptableRenderPass
 {
@@ -19,13 +19,9 @@ public:
 
 	virtual ~ScriptableRenderPass();
 
-	virtual void Setup(RHIContext* context, CameraData *cameraData) = 0;
+	virtual void Setup() = 0;
 
-	virtual void Execute(RHIContext* context, CameraData* cameraData) = 0;
-
-	virtual void UpdateRenderTarget(CameraData *cameraData) = 0;
-
-	virtual RHIGroup* GetResourceGroup();
+	virtual void Execute() = 0;
 
 	void* operator new(size_t size)
 	{

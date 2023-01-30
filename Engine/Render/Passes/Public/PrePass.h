@@ -15,11 +15,9 @@ public:
 
 	virtual ~PrePass();
 
-	virtual void Setup(RHIContext *context, CameraData *cameraData);
+	virtual void Setup();
 
-	virtual void Execute(RHIContext *context, CameraData* cameraData);
-
-	virtual void UpdateRenderTarget(CameraData *cameraData);
+	virtual void Execute();
 
 private:
 

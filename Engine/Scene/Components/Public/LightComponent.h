@@ -4,7 +4,7 @@
 
 class RHITexture;
 class RHITextureView;
-struct CameraData;
+struct CameraInfo;
 
 class LightComponent : public Component
 {
@@ -31,8 +31,6 @@ public:
 
 	class LightInfo* GetLightInfo();
 
-	void MarkDirty() { m_bMarkedDirty = true; }
-
 private:
 
 	bool m_isMainLight;
@@ -46,8 +44,6 @@ private:
 	WEngine::WArray<RHITextureView*> m_pDepthTextureViews;
 
 	LightInfo *m_pInfo;
-
-	uint8 m_bMarkedDirty : 1;
 
 };
 

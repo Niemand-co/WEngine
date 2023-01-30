@@ -17,11 +17,7 @@ public:
 
 	virtual PrimitiveInfo* GetPrimitiveInfo() = 0;
 
-	void MarkDirty() { m_bMarkedDirty = true; }
-
 protected:
-
-	uint8_t m_bMarkedDirty : 1;
 
 	PrimitiveInfo *m_pInfo;
 
@@ -36,10 +32,12 @@ struct PrimitiveInfo
 		
 	}
 
-	static void AddToScene(RHICommandListBase *CmdList, RScene *scene, WEngine::WArray<PrimitiveInfo*>& primitives)
+	static void AddToScene(RHICommandListBase *CmdList, class RScene *scene, WEngine::WArray<PrimitiveInfo*>& primitives)
 	{
 		
 	}
+
+	enum { type = 0 };
 
 	glm::mat4 LocalToWorldMatrix;
 
