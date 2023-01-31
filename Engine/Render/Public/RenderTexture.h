@@ -18,6 +18,8 @@ public:
 
 	void CreateObject();
 
+	void ReCreateObject();
+
 	/**
 	 * Resize the texture
 	 * 
@@ -30,11 +32,13 @@ public:
 
 	inline unsigned int GetHeight() const { return m_height; }
 
+	inline void MakrDirty() { m_bDirty = true; }
+
 private:
 
-	WEngine::WArray<RHITexture*> m_textures;
+	WEngine::WSharedPtr<RHITexture> m_texture;
 
-	WEngine::WArray<RHITextureView*> m_textureViews;
+	WEngine::WSharedPtr<RHITextureView> m_textureView;
 
 	RHITextureDescriptor m_textureDescriptor;
 
@@ -43,12 +47,37 @@ private:
 	AttachmentLayout m_layout;
 
 	/** Whether the texture has been created. */
-	bool m_bCreated;
+	uint8 m_bCreated : 1;
 
 	/** The width of the texture */
 	unsigned int m_width;
 
 	/** The height of the texture */
 	unsigned int m_height;
+
+	/** Whether the texture state has been changed */
+	uint8 m_bDirty : 1;
+
+};
+
+class UAVTexture : public RenderTexture
+{
+public:
+
+	UAVTexture(unsigned int width, unsigned int height, Format format);
+
+	UAVTexture(unsigned int width, unsigned int height, Format format, unsigned int mipLevel, unsigned int layerCount);
+
+
+
+};
+
+class SRVTexture : public RenderTexture
+{
+public:
+
+	SRVTexture(unsigned int width, unsigned int height, Format format);
+
+	SRVTexture(unsigned int width, unsigned int height, Format format, unsigned int mipLevel, unsigned int layerCount);
 
 };

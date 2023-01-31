@@ -8,12 +8,12 @@ class RenderTarget : public RenderResource
 {
 public:
 
-	RenderTarget();
+	RenderTarget(uint32 width, uint32 height);
 
 	~RenderTarget() = default;
 
 private:
 
-	//WEngine::WSharedPtr<RHITexture> m_pTexture;
+	WEngine::WSharedPtr<RHITexture> m_pTexture;
 
 };

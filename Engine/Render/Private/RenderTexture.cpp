@@ -84,51 +84,74 @@ void RenderTexture::CreateObject()
 	if(m_bCreated)
 		return;
 
-	m_textures.Resize(RHIContext::g_maxFrames);
-	m_textureViews.Resize(RHIContext::g_maxFrames);
-	WEngine::WArray<TextureBarrier> barriers(RHIContext::g_maxFrames);
 	unsigned int dstAccess = 0;
 	if(m_textureViewDescriptor.imageAspect & IMAGE_ASPECT_COLOR > 0)
 		dstAccess |= (ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE);
 	if(m_textureViewDescriptor.imageAspect & IMAGE_ASPECT_DEPTH > 0)
 		dstAccess |= (ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE);
-	for (unsigned int i = 0; i < m_textures.Size(); ++i)
-	{
-		m_textures[i] = RHIContext::GetDevice()->CreateTexture(&m_textureDescriptor);
-		barriers[i] = { m_textures[i], AttachmentLayout::Undefined, m_layout, 0, dstAccess, m_textureViewDescriptor.imageAspect };
-	}
+	m_texture = RHIContext::GetDevice()->CreateTexture(&m_textureDescriptor);
+	TextureBarrier barrier = { m_texture.Get(), AttachmentLayout::Undefined, m_layout, 0, dstAccess, m_textureViewDescriptor.imageAspect };
 
 	RHIBarrierDescriptor barrierDescriptor = {};
 	{
-		barrierDescriptor.textureCount = barriers.Size();
-		barrierDescriptor.pTextureBarriers = barriers.GetData();
+		barrierDescriptor.textureCount = 1;
+		barrierDescriptor.pTextureBarriers = &barrier;
 		barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
 		barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
 	}
 	RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
 
-	for (unsigned int i = 0; i < m_textureViews.Size(); ++i)
-	{
-		m_textureViews[i] = m_textures[i]->CreateTextureView(&m_textureViewDescriptor);
-	}
+	m_textureView = m_texture->CreateTextureView(&m_textureViewDescriptor);
 
 	m_bCreated = true;
+	m_bDirty = false;
+}
+
+void RenderTexture::ReCreateObject()
+{
+	if(!m_bDirty)
+		return;
+
+	unsigned int dstAccess = 0;
+	if (m_textureViewDescriptor.imageAspect & IMAGE_ASPECT_COLOR > 0)
+		dstAccess |= (ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE);
+	if (m_textureViewDescriptor.imageAspect & IMAGE_ASPECT_DEPTH > 0)
+		dstAccess |= (ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE);
+	m_texture = RHIContext::GetDevice()->CreateTexture(&m_textureDescriptor);
+	TextureBarrier barrier = { m_texture.Get(), AttachmentLayout::Undefined, m_layout, 0, dstAccess, m_textureViewDescriptor.imageAspect };
+
+	RHIBarrierDescriptor barrierDescriptor = {};
+	{
+		barrierDescriptor.textureCount = 1;
+		barrierDescriptor.pTextureBarriers = &barrier;
+		barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
+		barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
+	}
+	RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
+
+	m_textureView = m_texture->CreateTextureView(&m_textureViewDescriptor);
+
+	m_bDirty = false;
 }
 
 void RenderTexture::Resize(unsigned int width, unsigned int height)
 {
 	WEngine::WArray<TextureBarrier> barriers(RHIContext::g_maxFrames);
 
-	for (unsigned int i = 0; i < m_textures.Size(); ++i)
-	{
-		delete m_textures[i];
-		delete m_textureViews[i];
-	}
 	m_textureDescriptor.width = width;
 	m_textureDescriptor.height = height;
 
 	m_width = width;
 	m_height = height;
 
-	m_bCreated = false;
+	MakrDirty();
+}
+
+UAVTexture::UAVTexture(unsigned int width, unsigned int height, Format format)
+	: RenderTexture(width, height, format)
+{
+}
+
+UAVTexture::UAVTexture(unsigned int width, unsigned int height, Format format, unsigned int mipLevel, unsigned int layerCount)
+{
 }
