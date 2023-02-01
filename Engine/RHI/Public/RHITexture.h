@@ -29,6 +29,13 @@ public:
 
 protected:
 
+	RHITexture2D(uint32 width, uint32 height)
+		: Width(width), Height(height)
+	{
+	}
+
+protected:
+
 	uint32 Width;
 
 	uint32 Height;
@@ -41,6 +48,14 @@ public:
 
 	virtual ~RHITexture3D() = default;
 
+protected:
+
+	uint32 Width;
+
+	uint32 Height;
+
+	uint32 Depth;
+
 };
 
 class RHITexture2DArray : public RHITexture2D
@@ -50,6 +65,13 @@ public:
 	virtual ~RHITexture2DArray() = default;
 
 	uint32 GetDepth() const { return Depth; }
+
+protected:
+
+	RHITexture2DArray(uint32 width, uint32 height, uint32 depth)
+		: RHITexture2D(width, height), Depth(depth)
+	{
+	}
 
 protected:
 

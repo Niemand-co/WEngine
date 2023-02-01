@@ -9,6 +9,7 @@ RenderTarget::RenderTarget(uint32 width, uint32 height)
 	{
 		textureDescriptor.width = width;
 		textureDescriptor.height = height;
+		textureDescriptor.format = format;
 	}
 	WEngine::WSharedPtr<RHITexture>& pTexture = m_pTexture;
 	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [&pTexture, &textureDescriptor]()

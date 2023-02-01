@@ -16,10 +16,6 @@ namespace Vulkan
 
 	private:
 
-		VkImage *pImage;
-
-		VkImageView *pImageView;
-
 		VkMemoryRequirements *pMemoryRequirements;
 
 		VkDeviceMemory *pDeviceMemory;

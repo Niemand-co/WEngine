@@ -34,7 +34,7 @@ public:
 
 	inline void MakrDirty() { m_bDirty = true; }
 
-private:
+protected:
 
 	WEngine::WSharedPtr<RHITexture> m_texture;
 

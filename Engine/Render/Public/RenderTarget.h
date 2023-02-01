@@ -8,7 +8,7 @@ class RenderTarget : public RenderResource
 {
 public:
 
-	RenderTarget(uint32 width, uint32 height);
+	RenderTarget(uint32 width, uint32 height, Format format);
 
 	~RenderTarget() = default;
 

@@ -150,8 +150,23 @@ void RenderTexture::Resize(unsigned int width, unsigned int height)
 UAVTexture::UAVTexture(unsigned int width, unsigned int height, Format format)
 	: RenderTexture(width, height, format)
 {
+	m_textureDescriptor.usage |= IMAGE_USAGE_STORAGE;
 }
 
 UAVTexture::UAVTexture(unsigned int width, unsigned int height, Format format, unsigned int mipLevel, unsigned int layerCount)
+	: RenderTexture(width, height, format, mipLevel, layerCount)
 {
+	m_textureDescriptor.usage |= IMAGE_USAGE_STORAGE;
+}
+
+SRVTexture::SRVTexture(unsigned int width, unsigned int height, Format format)
+	: RenderTexture(width, height, format)
+{
+	m_textureDescriptor.usage |= IMAGE_USAGE_SAMPLED;
+}
+
+SRVTexture::SRVTexture(unsigned int width, unsigned int height, Format format, unsigned int mipLevel, unsigned int layerCount)
+	: RenderTexture(width, height, format, mipLevel, layerCount)
+{
+	m_textureDescriptor.usage |= IMAGE_USAGE_SAMPLED;
 }

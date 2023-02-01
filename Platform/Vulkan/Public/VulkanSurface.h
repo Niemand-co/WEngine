@@ -4,21 +4,19 @@
 namespace Vulkan
 {
 
-	class VulkanSurface : public RHISurface
+	class VulkanSurface
 	{
 	public:
 
-		VulkanSurface(VkSurfaceKHR *surface);
+		VulkanSurface();
 
 		virtual ~VulkanSurface();
 
-		void SetHandle(VkSurfaceKHR *surface);
-
-		VkSurfaceKHR GetHandle();
-
 	private:
 
-		VkSurfaceKHR *m_surface;
+		VkImage* pImage;
+
+		VkImageView* pImageView;
 
 	};
 

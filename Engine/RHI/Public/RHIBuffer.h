@@ -42,3 +42,27 @@ protected:
 	BufferResourceInfo *m_pInfos;
 
 };
+
+class RHIVertexBuffer : public RHIBuffer
+{
+public:
+
+	virtual ~RHIVertexBuffer() = default;
+
+};
+
+class RHIIndexBuffer : public RHIBuffer
+{
+public:
+
+	virtual ~RHIIndexBuffer() = default;
+
+};
+
+class RHIUniformBuffer : public RHIBuffer
+{
+public:
+
+	virtual ~RHIUniformBuffer() = default;
+
+};

@@ -4,35 +4,59 @@
 namespace Vulkan
 {
 
-	class VulkanBuffer : public RHIBuffer
+	class VulkanBufferBase
 	{
 	public:
 
-		VulkanBuffer(VkBuffer* buffer, VkDevice* device, unsigned int memoryHeapIndex, bool isDynamic, VkDeviceSize size);
+		VulkanBufferBase(VkBuffer* buffer, VkDevice* device, unsigned int memoryHeapIndex, bool isDynamic, VkDeviceSize size);
 
-		VulkanBuffer(VkBuffer* buffer, VkDevice* device, unsigned int memoryHeapIndex, bool isDynamic, size_t dynamicAlignment, size_t count);
+		VulkanBufferBase(VkBuffer* buffer, VkDevice* device, unsigned int memoryHeapIndex, bool isDynamic, size_t dynamicAlignment, size_t count);
 
-		virtual ~VulkanBuffer();
-
-		virtual void LoadData(void *pData, size_t size, size_t offset = 0) override;
-
-		virtual void Flush(size_t range) override;
-
-		virtual void Resize(size_t count) override;
+		virtual ~VulkanBufferBase();
 
 		VkBuffer* GetHandle();
 
 	private:
 
-		VkBuffer *m_pBuffer;
+		VkBuffer *pBuffer;
 
-		VkMemoryRequirements *m_pMemoryRequirements;
+		VkMemoryRequirements *pMemoryRequirements;
 
-		VkDeviceMemory *m_pDeviceMemory;
+		VkDeviceMemory *pDeviceMemory;
 
-		VkDevice *m_pDevice;
+		void *pData;
 
-		void *m_pData;
+		class VulkanDevice *pDevice;
+
+	};
+
+	class VulkanVertexBuffer : public RHIVertexBuffer, public VulkanBufferBase
+	{
+	public:
+
+		VulkanVertexBuffer(VulkanDevice *pInDevice);
+
+		virtual ~VulkanVertexBuffer();
+
+	};
+
+	class VulkanIndexBuffer : public RHIIndexBuffer, public VulkanBufferBase
+	{
+	public:
+
+		VulkanIndexBuffer();
+
+		virtual ~VulkanIndexBuffer();
+
+	};
+
+	class VulkanUniformBuffer : public RHIUniformBuffer, public VulkanBufferBase
+	{
+	public:
+
+		VulkanUniformBuffer();
+
+		virtual ~VulkanUniformBuffer();
 
 	};
 
