@@ -6,33 +6,50 @@ class RHIDevice;
 namespace Vulkan
 {
 
-	class VulkanTexture : public RHITexture
+	class VulkanTextureBase
 	{
 	public:
 
-		VulkanTexture(VkImage *image, VkMemoryRequirements* pMemoryRequirements, VkDeviceMemory* pDeviceMemory, VkDevice *device, bool isDisplay = false);
+		VulkanTextureBase();
 
-		virtual ~VulkanTexture();
-
-		virtual RHITextureView* CreateTextureView(RHITextureViewDescriptor *descriptor) override;
-
-		virtual void LoadData(const WEngine::WString& path, RHIContext* context) override;
-
-		VkImage* GetHandle();
-
-		void SetHandle(VkImage *image);
+		virtual ~VulkanTextureBase();
 
 	private:
 
-		VkImage *m_pImage;
+		VkImage *pImage;
 
-		VkDevice *m_pDevice;
+		VkImageView *pImageView;
 
-		bool m_isDisplayTexture;
+		VkMemoryRequirements *pMemoryRequirements;
 
-		VkMemoryRequirements *m_pMemoryRequirements;
+		VkDeviceMemory *pDeviceMemory;
 
-		VkDeviceMemory *m_pDeviceMemory;
+	};
+
+	class VulkanTexture2D : public RHITexture2D, public VulkanTextureBase
+	{
+	public:
+
+		VulkanTexture2D();
+
+		virtual ~VulkanTexture2D();
+
+
+
+	};
+
+	class VulkanTexture3D : public RHITexture3D
+	{
+
+	};
+
+	class VulkanTexture2DArray : public RHITexture2DArray
+	{
+
+	};
+
+	class VulkanTexture3DArray : public RHITexture3DArray
+	{
 
 	};
 

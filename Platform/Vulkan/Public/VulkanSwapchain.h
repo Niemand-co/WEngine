@@ -4,13 +4,17 @@
 namespace Vulkan
 {
 
-	class VulkanSwapchain : public RHISwapchain
+	class VulkanSwapchain : public RHISwapchain, public VulkanResource
 	{
 	public:
 
 		VulkanSwapchain(VkSwapchainKHR *swapchain, VkDevice *device, unsigned int familyIndex);
 
 		virtual ~VulkanSwapchain();
+
+		virtual int32 AcquireImageIndex(RHISemaphore** outSemaphore) override;
+
+		virtual void Present(RHIQueue *queue, RHISemaphore *renderingDoneSemaphore) override;
 
 		void SetHandle(VkSwapchainKHR *swapchain);
 
@@ -20,7 +24,11 @@ namespace Vulkan
 
 	private:
 
-		VkSwapchainKHR *m_pSwapchain;
+		VkDevice *pDevice;
+
+		VkSwapchainKHR *pSwapchain;
+
+		VkSurfaceKHR *pSurface;
 
 		VkDevice *m_pDevice;
 

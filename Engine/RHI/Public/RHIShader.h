@@ -12,8 +12,38 @@ public:
 
 protected:
 
-	unsigned int m_stage;
-
 	WEngine::WString m_entryName;
+
+};
+
+class RHIVertexShader : public RHIShader
+{
+public:
+
+	virtual ~RHIVertexShader() = default;
+
+};
+
+class RHIGeometryShader : public RHIShader
+{
+public:
+
+	virtual ~RHIGeometryShader() = default;
+
+};
+
+class RHIPixelShader : public RHIShader
+{
+public:
+
+	virtual ~RHIPixelShader() = default;
+
+};
+
+class RHIComputeShader : public RHIShader
+{
+public:
+
+	virtual ~RHIComputeShader() = default;
 
 };

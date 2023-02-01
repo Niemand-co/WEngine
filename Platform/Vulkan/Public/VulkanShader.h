@@ -4,19 +4,59 @@
 namespace Vulkan
 {
 
-	class VulkanShader : public RHIShader
+	class VulkanShaderBase : public VulkanResource
 	{
 	public:
 	
-		VulkanShader(VkShaderModule *shaderModule, unsigned int stage, const WEngine::WString& entryName);
+		VulkanShaderBase(VkShaderModule *shaderModule);
 
-		virtual ~VulkanShader();
+		virtual ~VulkanShaderBase();
 
-		VkShaderModule* GetShaderModule();
+		VkShaderModule* GetShaderModule() const { return m_shaderModule; }
 
 	private:
 
 		VkShaderModule *m_shaderModule;
+
+	};
+
+	class VulkanVertexShader : public RHIVertexShader, public VulkanShaderBase
+	{
+	public:
+
+		VulkanVertexShader();
+
+		virtual ~VulkanVertexShader();
+
+	};
+
+	class VulkanGeometryShader : public RHIGeometryShader, public VulkanShaderBase
+	{
+	public:
+
+		VulkanGeometryShader();
+
+		virtual ~VulkanGeometryShader();
+
+	};
+
+	class VulkanPixelShader : public RHIPixelShader, public VulkanShaderBase
+	{
+	public:
+
+		VulkanPixelShader();
+
+		virtual ~VulkanPixelShader();
+
+	};
+
+	class VulkanComputeShader : public RHIComputeShader, public VulkanShaderBase
+	{
+	public:
+
+		VulkanComputeShader();
+
+		virtual ~VulkanComputeShader();
 
 	};
 

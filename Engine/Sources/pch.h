@@ -68,6 +68,10 @@
 #include "Utils/Public/NamingSystem.h"
 #include "HAL/Public/TaskGraph.h"
 
+//-----------------------Vulkan-------------------------------
+#include "Platform/Vulkan/Public/VulkanResource.h"
+//------------------------------------------------------------
+
 #define ENABLE_REFLECTION template<typename T> friend struct WEngine::SRefl::TypeInfo;
 
 #endif

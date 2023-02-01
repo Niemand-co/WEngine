@@ -6,24 +6,23 @@ namespace Vulkan
 {
 
 	VulkanSwapchain::VulkanSwapchain(VkSwapchainKHR* swapchain, VkDevice *device, unsigned int familyIndex)
-		: m_pSwapchain(swapchain), m_pDevice(device), m_familyIndex(familyIndex)
+		: pSwapchain(swapchain), m_pDevice(device), m_familyIndex(familyIndex), pDevice(device)
 	{
 		unsigned int imageCount = 0;
-		vkGetSwapchainImagesKHR(*m_pDevice, *m_pSwapchain, &imageCount, nullptr);
+		vkGetSwapchainImagesKHR(*m_pDevice, *pSwapchain, &imageCount, nullptr);
 		VkImage *pImages = (VkImage*)WEngine::Allocator::Get()->Allocate(imageCount * sizeof(VkImage));
-		vkGetSwapchainImagesKHR(*m_pDevice, *m_pSwapchain, &imageCount, pImages);
+		vkGetSwapchainImagesKHR(*m_pDevice, *pSwapchain, &imageCount, pImages);
 
 		m_textures.Resize(imageCount);
 		for (unsigned int i = 0; i < imageCount; ++i)
 		{
-			m_textures[i] = (RHITexture*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanAllocator));
-			::new (m_textures[i]) VulkanTexture(pImages + i, nullptr, nullptr, m_pDevice, true);
+			m_textures[i] = new  VulkanTextureBase(pImages + i, nullptr, nullptr, m_pDevice, true);
 		}
 	}
 
 	VulkanSwapchain::~VulkanSwapchain()
 	{
-		vkDestroySwapchainKHR(*m_pDevice, *m_pSwapchain, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
+		vkDestroySwapchainKHR(*m_pDevice, *pSwapchain, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
 		for (int i = 0; i < m_textures.Size(); ++i)
 		{
 			m_textures[i]->~RHITexture();
@@ -31,14 +30,23 @@ namespace Vulkan
 		}
 	}
 
+	int32 VulkanSwapchain::AcquireImageIndex(RHISemaphore** outSemaphore)
+	{
+		vkAcquireNextImageKHR(*pDevice, *pSwapchain, VK_TIMEOUT, );
+	}
+
+	void VulkanSwapchain::Present(RHIQueue* queue, RHISemaphore* renderingDoneSemaphore)
+	{
+	}
+
 	void VulkanSwapchain::SetHandle(VkSwapchainKHR* pSwapchain)
 	{
-		m_pSwapchain = pSwapchain;
+		pSwapchain = pSwapchain;
 	}
 
 	VkSwapchainKHR* VulkanSwapchain::GetHandle()
 	{
-		return m_pSwapchain;
+		return pSwapchain;
 	}
 
 	unsigned int VulkanSwapchain::GetQueueFamilyIndex()
