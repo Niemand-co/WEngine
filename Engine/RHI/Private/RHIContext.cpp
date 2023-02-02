@@ -5,6 +5,7 @@
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Utils/Public/Window.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
+#include "Render/Public/Buffer.h"
 
 unsigned int RHIContext::g_maxFrames = 3;
 
@@ -310,22 +311,40 @@ void RHIContext::ResourceBarrier(RHIBarrierDescriptor *pDescriptor)
 	WEngine::Allocator::Get()->Deallocate(cmd);
 }
 
-RHIBuffer* RHIContext::CreateVertexBuffer(size_t stride, size_t count)
+RHIVertexBuffer* RHIContext::CreateVertexBuffer(size_t stride, size_t count)
 {
-	
-	return g_pDevice->CreateVertexBuffer(descriptor);
+	RHIBufferDescriptor descriptor = {};
+	{
+		descriptor.count = count;
+		descriptor.dataSize = stride;
+		descriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE;
+		descriptor.bufferType = BUFFER_USAGE_VERTEX_BUFFER;
+	}
+	return g_pDevice->CreateVertexBuffer(&descriptor);
 }
 
-RHIBuffer* RHIContext::CreateIndexBuffer(size_t count)
+RHIIndexBuffer* RHIContext::CreateIndexBuffer(size_t count)
 {
-	descriptor->bufferType = BUFFER_USAGE_INDEX_BUFFER;
-	return g_pDevice->CreateIndexBuffer(descriptor);
+	RHIBufferDescriptor descriptor = {};
+	{
+		descriptor.count = count;
+		descriptor.dataSize = sizeof(uint32);
+		descriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
+		descriptor.bufferType = BUFFER_USAGE_INDEX_BUFFER;
+	}
+	return g_pDevice->CreateIndexBuffer(&descriptor);
 }
 
-RHIBuffer* RHIContext::CreateUniformBuffer(size_t stride, size_t count)
+RHIUniformBuffer* RHIContext::CreateUniformBuffer(size_t stride, size_t count)
 {
-	descriptor->bufferType = BUFFER_USAGE_UNIFORM_BUFFER;
-	return g_pDevice->CreateUniformBuffer(descriptor);
+	RHIBufferDescriptor descriptor = {};
+	{
+		descriptor.count = count;
+		descriptor.dataSize = stride;
+		descriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
+		descriptor.bufferType = BUFFER_USAGE_UNIFORM_BUFFER;
+	}
+	return g_pDevice->CreateUniformBuffer(&descriptor);
 }
 
 RHIBuffer* RHIContext::CreateTextureBuffer(RHIBufferDescriptor* descriptor)

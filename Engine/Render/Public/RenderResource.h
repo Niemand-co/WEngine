@@ -10,6 +10,8 @@ public:
 
 	virtual void UpdateRHIResource() = 0;
 
+	bool WaitForRHIResourceReady() { ReasourceReadyEvent->Wait(); }
+
 	void* operator new(size_t size)
 	{
 		return WEngine::Allocator::Get()->Allocate(size);
@@ -19,6 +21,10 @@ public:
 	{
 		WEngine::Allocator::Get()->Deallocate(pData);
 	}
+
+private:
+
+	WEngine::WSharedPtr<WEngine::WGraphEvent> ReasourceReadyEvent;
 
 };
 

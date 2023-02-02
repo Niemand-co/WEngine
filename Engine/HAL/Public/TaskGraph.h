@@ -98,7 +98,6 @@ namespace WEngine
 
 		~WGraphEvent()
 		{
-			delete m_event;
 		}
 
 		void Wait()
@@ -111,9 +110,19 @@ namespace WEngine
 			m_event->Trigger();
 		}
 
+		void* operator new(size_t size)
+		{
+			return Allocator::Get()->Allocate(size);
+		}
+
+		void operator delete(void* pData)
+		{
+			Allocator::Get()->Deallocate(pData);
+		}
+
 	private:
 
-		WEvent *m_event;
+		WSharedPtr<WEvent> m_event;
 
 		WQueue<class WGraphTaskBase*> m_waitingTasks;
 
@@ -142,7 +151,7 @@ namespace WEngine
 		}
 
 		WGraphTaskBase(bool bInShouldDestroy)
-			: m_bShouldDestroyAfterExecution(bInShouldDestroy)
+			: m_pTaskEvent(new WGraphEvent()), m_bShouldDestroyAfterExecution(bInShouldDestroy)
 		{
 
 		}
@@ -151,7 +160,7 @@ namespace WEngine
 
 	protected:
 
-		WGraphEvent m_taskEvent;
+		WSharedPtr<WGraphEvent> m_pTaskEvent;
 
 		uint8 m_bShouldDestroyAfterExecution : 1;
 
@@ -171,13 +180,13 @@ namespace WEngine
 
 		virtual bool ExecuteTask(EThreadProperty property) override
 		{
-			m_taskEvent.Trigger();
+			m_pTaskEvent->Trigger();
 			return m_bShouldDestroyAfterExecution;
 		}
 
 		void Wait()
 		{
-			m_taskEvent.Wait();
+			m_pTaskEvent->Wait();
 		}
 
 	};
@@ -197,6 +206,7 @@ namespace WEngine
 		virtual bool ExecuteTask(EThreadProperty property) override
 		{
 			lambda();
+			m_pTaskEvent->Trigger();
 			return m_bShouldDestroyAfterExecution;
 		}
 

@@ -12,7 +12,7 @@ protected:
 
 };
 
-class WVertexBuffer : public RenderResource
+class WVertexBuffer : public WBuffer
 {
 public:
 

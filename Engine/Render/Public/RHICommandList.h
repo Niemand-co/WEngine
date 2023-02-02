@@ -45,6 +45,12 @@ public:
 
 	void DrawIndexedPrimitive(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount);
 
+	class WVertexBuffer* CreateVertexBuffer(size_t stride, size_t count);
+
+	class WIndexBuffer* CreateIndexBuffer(size_t stride, size_t count);
+
+	class WUniformBuffer* CreateUniformBuffer(size_t stride, size_t count);
+
 public:
 
 	static RHIRenderCommandList* Get() { if(g_instance == nullptr)g_instance = new RHIRenderCommandList(); return g_instance; }

@@ -31,3 +31,24 @@ void WIndexBuffer::ReleaseRHIResource()
 void WIndexBuffer::UpdateRHIResource()
 {
 }
+
+WVertexBuffer::WVertexBuffer()
+{
+}
+
+WVertexBuffer::~WVertexBuffer()
+{
+}
+
+void WVertexBuffer::InitRHIResource()
+{
+	m_pBuffer = RHIContext
+}
+
+void WVertexBuffer::ReleaseRHIResource()
+{
+}
+
+void WVertexBuffer::UpdateRHIResource()
+{
+}
