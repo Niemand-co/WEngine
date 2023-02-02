@@ -64,7 +64,11 @@ public:
 
 	virtual RHIRenderTarget* CreateRenderTarget(RHIRenderTargetDescriptor *descriptor) = 0;
 
-	virtual RHIBuffer* CreateBuffer(RHIBufferDescriptor *descriptor) = 0;
+	virtual class RHIVertexBuffer* CreateVertexBuffer(RHIBufferDescriptor* descriptor) = 0;
+
+	virtual class RHIIndexBuffer* CreateIndexBuffer(RHIBufferDescriptor* descriptor) = 0;
+
+	virtual class RHIUniformBuffer* CreateUniformBuffer(RHIBufferDescriptor* descriptor) = 0;
 
 	virtual RHIGroup* CreateResourceGroup(RHIGroupDescriptor *descriptor) = 0;
 

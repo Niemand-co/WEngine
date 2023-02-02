@@ -12,6 +12,22 @@ protected:
 
 };
 
+class WVertexBuffer : public RenderResource
+{
+public:
+
+	WVertexBuffer();
+
+	virtual ~WVertexBuffer();
+
+	virtual void InitRHIResource() override;
+
+	virtual void ReleaseRHIResource() override;
+
+	virtual void UpdateRHIResource() override;
+
+};
+
 class WIndexBuffer : public WBuffer
 {
 public:

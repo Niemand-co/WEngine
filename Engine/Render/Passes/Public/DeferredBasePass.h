@@ -1,13 +1,13 @@
 #pragma once
 #include "Render/Passes/Public/ScriptableRenderPass.h"
 
-class DeferedBasePass : public ScriptableRenderPass
+class DeferredBasePass : public ScriptableRenderPass
 {
 public:
 
-	DeferedBasePass(ScriptableRenderer *pRenderer);
+	DeferredBasePass(ScriptableRenderer *pRenderer);
 
-	virtual ~DeferedBasePass();
+	virtual ~DeferredBasePass();
 
 	virtual void Setup() override;
 

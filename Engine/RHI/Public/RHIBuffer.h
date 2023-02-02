@@ -3,7 +3,7 @@
 struct BufferResourceInfo;
 struct TextureResourceInfo;
 
-class RHIBuffer
+class RHIBuffer : public RHIResource
 {
 public:
 

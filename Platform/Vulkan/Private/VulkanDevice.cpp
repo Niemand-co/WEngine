@@ -483,6 +483,22 @@ namespace Vulkan
 		return renderTarget;
 	}
 
+	RHIVertexBuffer* VulkanDevice::CreateVertexBuffer(RHIBufferDescriptor* descriptor)
+	{
+		
+		return nullptr;
+	}
+
+	RHIIndexBuffer* VulkanDevice::CreateIndexBuffer(RHIBufferDescriptor* descriptor)
+	{
+		return nullptr;
+	}
+
+	RHIUniformBuffer* VulkanDevice::CreateUniformBuffer(RHIBufferDescriptor* descriptor)
+	{
+		return nullptr;
+	}
+
 	RHIBuffer* VulkanDevice::CreateBuffer(RHIBufferDescriptor* descriptor)
 	{
 		size_t bufferSize = descriptor->dataSize;

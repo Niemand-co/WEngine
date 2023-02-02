@@ -310,22 +310,22 @@ void RHIContext::ResourceBarrier(RHIBarrierDescriptor *pDescriptor)
 	WEngine::Allocator::Get()->Deallocate(cmd);
 }
 
-RHIBuffer* RHIContext::CreateVertexBuffer(RHIBufferDescriptor* descriptor)
+RHIBuffer* RHIContext::CreateVertexBuffer(size_t stride, size_t count)
 {
-	descriptor->bufferType = BUFFER_USAGE_VERTEX_BUFFER;
-	return g_pDevice->CreateBuffer(descriptor);
+	
+	return g_pDevice->CreateVertexBuffer(descriptor);
 }
 
-RHIBuffer* RHIContext::CreateIndexBuffer(RHIBufferDescriptor* descriptor)
+RHIBuffer* RHIContext::CreateIndexBuffer(size_t count)
 {
 	descriptor->bufferType = BUFFER_USAGE_INDEX_BUFFER;
-	return g_pDevice->CreateBuffer(descriptor);
+	return g_pDevice->CreateIndexBuffer(descriptor);
 }
 
-RHIBuffer* RHIContext::CreateUniformBuffer(RHIBufferDescriptor* descriptor)
+RHIBuffer* RHIContext::CreateUniformBuffer(size_t stride, size_t count)
 {
 	descriptor->bufferType = BUFFER_USAGE_UNIFORM_BUFFER;
-	return g_pDevice->CreateBuffer(descriptor);
+	return g_pDevice->CreateUniformBuffer(descriptor);
 }
 
 RHIBuffer* RHIContext::CreateTextureBuffer(RHIBufferDescriptor* descriptor)

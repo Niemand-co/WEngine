@@ -1,4 +1,6 @@
 #pragma once
+#include "Render/Public/Scene.h"
+#include "Render/Mesh/Public/MeshBatch.h"
 
 class ScriptableRenderPass;
 
@@ -58,18 +60,16 @@ private:
 
 };
 
-class ForwardRenderer : ScriptableRenderer
+class SceneRenderer : public ScriptableRenderer
 {
 public:
 
-	ForwardRenderer();
+	virtual ~SceneRenderer() = default;
 
-	virtual ~ForwardRenderer();
+protected:
 
+	RScene *Scene;
 
-};
-
-class DefferedRenderer : ScriptableRenderer
-{
+	WEngine::WArray<WMeshBatch*> Batches;
 
 };

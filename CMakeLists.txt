@@ -20,6 +20,7 @@ file(GLOB PIPELINE_SRC Engine/Render/RenderPipeline/Private/*.*)
 file(GLOB DESCR_SRC Engine/Render/Descriptor/Private/*.*)
 file(GLOB MESH_SRC Engine/Render/Mesh/Private/*.*)
 file(GLOB RENDER_SRC Engine/Render/Private/*.*)
+file(GLOB RENDERER_SRC Engine/Render/Renderer/Private/*.*)
 
 file(GLOB CORE_SRC Engine/Core/Private/*.*)
 file(GLOB FRAME_SRC Engine/Framework/Private/*.*)
@@ -50,6 +51,7 @@ file(GLOB PIPELINE_INCLUDE Engine/Render/RenderPipeline/Public/*.h)
 file(GLOB DESCR_INCLUDE Engine/Render/Descriptor/Public/*.h)
 file(GLOB MESH_INCLUDE Engine/Render/Mesh/Public/*.h)
 file(GLOB RENDER_INCLUDE Engine/Render/Public/*.h)
+file(GLOB RENDERER_INCLUDE Engine/Render/Renderer/Public/*.h)
 
 file(GLOB COREH_INCLUDE Engine/Core/*.h)
 file(GLOB CORE_INCLUDE Engine/Core/Public/*.h)
@@ -113,6 +115,7 @@ set(WE_SRC
     ${FRAME_SRC}
     ${MATH_SRC}
     ${RENDER_SRC}
+    ${RENDERER_SRC}
     ${DESCR_SRC}
     ${COMP_SRC}
     ${SCENE_SRC}
@@ -141,6 +144,7 @@ set(WE_INCLUDE
     ${FRAME_INCLUDE}
     ${MATH_INCLUDE}
     ${RENDER_INCLUDE}
+    ${RENDERER_INCLUDE}
     ${DESCR_INCLUDE}
     ${COMP_INCLUDE}
     ${SCENE_INCLUDE}
@@ -179,6 +183,7 @@ source_group(Engine/Render/Private FILES ${RENDER_SRC})
 source_group(Engine/Render/Descriptor/Private FILES ${DESCR_SRC})
 source_group(Engine/Render/Passes/Private FILES ${PASS_SRC})
 source_group(Engine/Render/RenderPipeline/Private FILES ${PIPELINE_SRC})
+source_group(Engine/Render/Renderer/Private FILES ${RENDERER_SRC})
 source_group(Engine/Utils/Private FILES ${UTILS_SRC})
 source_group(Engine/Utils/Allocator/Private FILES ${ALLOC_SRC})
 source_group(Engine/Sources FILES ${ROOT_SRC})
@@ -211,6 +216,7 @@ source_group(Engine/Render/Public FILES ${RENDER_INCLUDE})
 source_group(Engine/Render/Descriptor/Public FILES ${DESCR_INCLUDE})
 source_group(Engine/Render/Passes/Public FILES ${PASS_INCLUDE})
 source_group(Engine/Render/RenderPipeline/Public FILES ${PIPELINE_INCLUDE})
+source_group(Engine/Render/Renderer/Public FILES ${RENDERER_INCLUDE})
 source_group(Engine/Utils/Public FILES ${UTILS_INCLUDE})
 source_group(Engine/Utils/Allocator/Public FILES ${ALLOC_INCLUDE})
 source_group(Engine/Scene/Components/Public FILES ${COMP_INCLUDE})

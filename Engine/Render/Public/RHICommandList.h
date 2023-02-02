@@ -74,3 +74,9 @@ protected:
 	RHIComputeEncoder *m_pEncoder;
 
 };
+
+RHIRenderCommandList* GetRenderCommandList()
+{
+	static RHIRenderCommandList *list = new RHIRenderCommandList;
+	return list;
+}

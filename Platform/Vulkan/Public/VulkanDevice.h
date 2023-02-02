@@ -40,7 +40,11 @@ namespace Vulkan
 
 		virtual RHIRenderTarget* CreateRenderTarget(RHIRenderTargetDescriptor *descriptor) override;
 
-		virtual RHIBuffer* CreateBuffer(RHIBufferDescriptor *descriptor) override;
+		virtual RHIVertexBuffer* CreateVertexBuffer(RHIBufferDescriptor* descriptor) override;
+
+		virtual RHIIndexBuffer* CreateIndexBuffer(RHIBufferDescriptor* descriptor) override;
+
+		virtual RHIUniformBuffer* CreateUniformBuffer(RHIBufferDescriptor *descriptor) override;
 
 		virtual RHIGroup* CreateResourceGroup(RHIGroupDescriptor *descriptor) override;
 
