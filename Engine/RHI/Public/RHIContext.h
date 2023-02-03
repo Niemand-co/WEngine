@@ -77,11 +77,13 @@ public:
 
 	virtual void ResourceBarrier(RHIBarrierDescriptor* pDescriptor);
 
-	virtual class RHIVertexBuffer* CreateVertexBuffer(size_t stride, size_t count);
+	virtual class RHIBuffer* CreateVertexBuffer(size_t stride, size_t count);
 
-	virtual class RHIIndexBuffer* CreateIndexBuffer(size_t count);
+	virtual class RHIBuffer* CreateIndexBuffer(size_t count);
 
-	virtual class RHIUniformBuffer* CreateUniformBuffer(size_t stride, size_t count);
+	virtual class RHIBuffer* CreateUniformBuffer(size_t stride, size_t count);
+
+	virtual class RHIBuffer* CreateDynamicUniformBuffer(size_t stride, size_t count);
 
 	virtual RHIBuffer* CreateTextureBuffer(RHIBufferDescriptor *descriptor);
 

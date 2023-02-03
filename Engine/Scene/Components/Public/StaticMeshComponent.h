@@ -33,12 +33,30 @@ struct StaticMeshInfo : public PrimitiveInfo
 		  Mesh(primitive->GetStaticMesh()),
 		  bCastShadow(primitive->IsCastShadow())
 	{
+		Proxy = new StaticMeshProxy(this);
+	}
 
+	virtual PrimitiveProxy* GetProxy() override
+	{
+		return Proxy;
 	}
 
 	enum { type = 1 };
 
 	StaticMesh *Mesh;
 
+	class StaticMeshProxy *Proxy;
+
 	uint8_t bCastShadow : 1;
+};
+
+struct StaticMeshProxy : public PrimitiveProxy
+{
+	StaticMeshProxy(PrimitiveInfo *info)
+		: PrimitiveProxy(info)
+	{
+
+	}
+
+
 };

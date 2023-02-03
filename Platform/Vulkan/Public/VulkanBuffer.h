@@ -8,9 +8,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanBufferBase(VkBuffer* buffer, VkDevice* device, unsigned int memoryHeapIndex, bool isDynamic, VkDeviceSize size);
-
-		VulkanBufferBase(VkBuffer* buffer, VkDevice* device, unsigned int memoryHeapIndex, bool isDynamic, size_t dynamicAlignment, size_t count);
+		VulkanBufferBase(VulkanDevice* pInDevice, VkBufferCreateInfo *pInfo, uint32 memoryType);
 
 		virtual ~VulkanBufferBase();
 
@@ -26,7 +24,7 @@ namespace Vulkan
 
 		void *pData;
 
-		class VulkanDevice *pDevice;
+		VkDevice *pDevice;
 
 	};
 
@@ -34,19 +32,46 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanVertexBuffer(VulkanDevice *pInDevice);
+		VulkanVertexBuffer(VulkanDevice *pInDevice, VkBufferCreateInfo * pInfo, uint32 memoryType);
 
 		virtual ~VulkanVertexBuffer();
 
+		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override;
+
+		virtual void Flush(size_t range) override;
+
+		virtual void Resize(size_t count) override;
+
+	};
+
+	class VulkanDynamicVertexBuffer : public RHIDynamicVertexBuffer, public VulkanBufferBase
+	{
+	public:
+
+		VulkanDynamicVertexBuffer(VulkanDevice* pInDevice, VkBufferCreateInfo* pInfo, uint32 memoryType);
+
+		virtual ~VulkanDynamicVertexBuffer();
+
+		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override;
+
+		virtual void Flush(size_t range) override;
+
+		virtual void Resize(size_t count) override;
 	};
 
 	class VulkanIndexBuffer : public RHIIndexBuffer, public VulkanBufferBase
 	{
 	public:
 
-		VulkanIndexBuffer();
+		VulkanIndexBuffer(VulkanDevice* pInDevice, VkBufferCreateInfo* pInfo, uint32 memoryType);
 
 		virtual ~VulkanIndexBuffer();
+
+		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override;
+
+		virtual void Flush(size_t range) override;
+
+		virtual void Resize(size_t count) override;
 
 	};
 
@@ -54,10 +79,31 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanUniformBuffer();
+		VulkanUniformBuffer(VulkanDevice* pInDevice, VkBufferCreateInfo* pInfo, uint32 memoryType);
 
 		virtual ~VulkanUniformBuffer();
 
+		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override;
+
+		virtual void Flush(size_t range) override;
+
+		virtual void Resize(size_t count) override;
+
+	};
+
+	class VulkanDynamicUniformBuffer : public RHIDynamicUniformBuffer, public VulkanBufferBase
+	{
+	public:
+
+		VulkanDynamicUniformBuffer(VulkanDevice* pInDevice, VkBufferCreateInfo* pInfo, uint32 memoryType);
+
+		virtual ~VulkanDynamicUniformBuffer();
+
+		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override;
+
+		virtual void Flush(size_t range) override;
+
+		virtual void Resize(size_t count) override;
 	};
 
 }

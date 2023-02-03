@@ -483,59 +483,78 @@ namespace Vulkan
 		return renderTarget;
 	}
 
-	RHIVertexBuffer* VulkanDevice::CreateVertexBuffer(RHIBufferDescriptor* descriptor)
+	RHIBuffer* VulkanDevice::CreateVertexBuffer(RHIBufferDescriptor* descriptor)
 	{
+		size_t bufferSize = descriptor->stride * descriptor->count;
+		VkBufferCreateInfo info = {};
+		{
+			info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+			info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+			info.size = bufferSize;
+			info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		}
 		
-		return nullptr;
+		return new VulkanVertexBuffer(this, &info, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	}
 
-	RHIIndexBuffer* VulkanDevice::CreateIndexBuffer(RHIBufferDescriptor* descriptor)
+	RHIBuffer* VulkanDevice::CreateDynamicVertexBuffer(RHIBufferDescriptor* descriptor)
 	{
-		return nullptr;
-	}
-
-	RHIUniformBuffer* VulkanDevice::CreateUniformBuffer(RHIBufferDescriptor* descriptor)
-	{
-		return nullptr;
-	}
-
-	RHIBuffer* VulkanDevice::CreateBuffer(RHIBufferDescriptor* descriptor)
-	{
-		size_t bufferSize = descriptor->dataSize;
-		if (descriptor->isDynamic)
+		size_t bufferSize = descriptor->stride * descriptor->count;
+		size_t minUBOSize = m_pGPU->GetFeature().minUBOAlignment;
+		bufferSize = (bufferSize + minUBOSize - 1) & ~(minUBOSize - 1);
+		VkBufferCreateInfo info = {};
 		{
-			size_t minUBOSize = m_pGPU->GetFeature().minUBOAlignment;
-			bufferSize = (bufferSize + minUBOSize - 1) & ~(minUBOSize - 1);
+			info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+			info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+			info.size = bufferSize;
+			info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		}
 
-		VkBufferCreateInfo bufferCreateInfo = {};
-		bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		bufferCreateInfo.usage = descriptor->bufferType;
-		bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		bufferCreateInfo.size = bufferSize * descriptor->count;
+		return new VulkanDynamicVertexBuffer(this, &info, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+	}
 
-		VkBuffer* pBuffer = (VkBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkBuffer));
-		::new (pBuffer) VkBuffer();
-		RE_ASSERT(vkCreateBuffer(*m_pDevice, &bufferCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pBuffer) == VK_SUCCESS, "Failed to Create Buffer.");
-
-		unsigned int index = 0;
-		GPUFeature feature = m_pGPU->GetFeature();
-		for (; index < feature.memorySupports.Size(); ++index)
+	RHIBuffer* VulkanDevice::CreateIndexBuffer(RHIBufferDescriptor* descriptor)
+	{
+		size_t bufferSize = descriptor->stride * descriptor->count;
+		VkBufferCreateInfo info = {};
 		{
-			if (feature.memorySupports[index]->type == MemoryType::LocalMemory && (feature.memorySupports[index]->properties & descriptor->memoryType) == descriptor->memoryType )
-			{
-				break;
-			}
+			info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+			info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+			info.size = bufferSize;
+			info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		}
-		RE_ASSERT(feature.memorySupports.Size() > index, "No Suitable Memory Heap Exists.");
 
-		VulkanBuffer *buffer = (VulkanBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanBuffer));
-		if(descriptor->isDynamic)
-			::new (buffer) VulkanBuffer(pBuffer, m_pDevice, index, descriptor->isDynamic, bufferSize, descriptor->count);
-		else
-			::new (buffer) VulkanBuffer(pBuffer, m_pDevice, index, descriptor->isDynamic, descriptor->dataSize);
+		return new VulkanIndexBuffer(this, &info, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	}
 
-		return buffer;
+	RHIBuffer* VulkanDevice::CreateUniformBuffer(RHIBufferDescriptor* descriptor)
+	{
+		size_t bufferSize = descriptor->stride * descriptor->count;
+		VkBufferCreateInfo info = {};
+		{
+			info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+			info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+			info.size = bufferSize;
+			info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		}
+
+		return new VulkanUniformBuffer(this, &info, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	}
+
+	RHIBuffer* VulkanDevice::CreateDynamicUniformBuffer(RHIBufferDescriptor* descriptor)
+	{
+		size_t bufferSize = descriptor->stride * descriptor->count;
+		size_t minUBOSize = m_pGPU->GetFeature().minUBOAlignment;
+		bufferSize = (bufferSize + minUBOSize - 1) & ~(minUBOSize - 1);
+		VkBufferCreateInfo info = {};
+		{
+			info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+			info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+			info.size = bufferSize;
+			info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		}
+
+		return new VulkanDynamicUniformBuffer(this, &info, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 	}
 
 	RHIGroup* VulkanDevice::CreateResourceGroup(RHIGroupDescriptor* descriptor)
@@ -795,11 +814,6 @@ namespace Vulkan
 	void VulkanDevice::Wait()
 	{
 		vkDeviceWaitIdle(*m_pDevice);
-	}
-
-	VkDevice* VulkanDevice::GetHandle()
-	{
-		return m_pDevice;
 	}
 
 }

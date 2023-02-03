@@ -311,40 +311,39 @@ void RHIContext::ResourceBarrier(RHIBarrierDescriptor *pDescriptor)
 	WEngine::Allocator::Get()->Deallocate(cmd);
 }
 
-RHIVertexBuffer* RHIContext::CreateVertexBuffer(size_t stride, size_t count)
+RHIBuffer* RHIContext::CreateVertexBuffer(size_t stride, size_t count)
 {
 	RHIBufferDescriptor descriptor = {};
 	{
 		descriptor.count = count;
-		descriptor.dataSize = stride;
-		descriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE;
-		descriptor.bufferType = BUFFER_USAGE_VERTEX_BUFFER;
+		descriptor.stride = stride;
 	}
 	return g_pDevice->CreateVertexBuffer(&descriptor);
 }
 
-RHIIndexBuffer* RHIContext::CreateIndexBuffer(size_t count)
+RHIBuffer* RHIContext::CreateIndexBuffer(size_t count)
 {
 	RHIBufferDescriptor descriptor = {};
 	{
 		descriptor.count = count;
-		descriptor.dataSize = sizeof(uint32);
-		descriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
-		descriptor.bufferType = BUFFER_USAGE_INDEX_BUFFER;
+		descriptor.stride = sizeof(uint32);
 	}
 	return g_pDevice->CreateIndexBuffer(&descriptor);
 }
 
-RHIUniformBuffer* RHIContext::CreateUniformBuffer(size_t stride, size_t count)
+RHIBuffer* RHIContext::CreateUniformBuffer(size_t stride, size_t count)
 {
 	RHIBufferDescriptor descriptor = {};
 	{
 		descriptor.count = count;
-		descriptor.dataSize = stride;
-		descriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
-		descriptor.bufferType = BUFFER_USAGE_UNIFORM_BUFFER;
+		descriptor.stride = stride;
 	}
 	return g_pDevice->CreateUniformBuffer(&descriptor);
+}
+
+RHIBuffer* RHIContext::CreateDynamicUniformBuffer(size_t stride, size_t count)
+{
+	return nullptr;
 }
 
 RHIBuffer* RHIContext::CreateTextureBuffer(RHIBufferDescriptor* descriptor)

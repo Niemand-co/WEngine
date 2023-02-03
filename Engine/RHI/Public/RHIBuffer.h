@@ -51,6 +51,14 @@ public:
 
 };
 
+class RHIDynamicVertexBuffer : public RHIBuffer
+{
+public:
+
+	virtual ~RHIDynamicVertexBuffer() = default;
+
+};
+
 class RHIIndexBuffer : public RHIBuffer
 {
 public:
@@ -64,5 +72,13 @@ class RHIUniformBuffer : public RHIBuffer
 public:
 
 	virtual ~RHIUniformBuffer() = default;
+
+};
+
+class RHIDynamicUniformBuffer : public RHIUniformBuffer
+{
+public:
+
+	virtual ~RHIDynamicUniformBuffer() = default;
 
 };

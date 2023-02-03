@@ -40,11 +40,15 @@ namespace Vulkan
 
 		virtual RHIRenderTarget* CreateRenderTarget(RHIRenderTargetDescriptor *descriptor) override;
 
-		virtual RHIVertexBuffer* CreateVertexBuffer(RHIBufferDescriptor* descriptor) override;
+		virtual RHIBuffer* CreateVertexBuffer(RHIBufferDescriptor* descriptor) override;
 
-		virtual RHIIndexBuffer* CreateIndexBuffer(RHIBufferDescriptor* descriptor) override;
+		virtual RHIBuffer* CreateDynamicVertexBuffer(RHIBufferDescriptor* descriptor) override;
 
-		virtual RHIUniformBuffer* CreateUniformBuffer(RHIBufferDescriptor *descriptor) override;
+		virtual RHIBuffer* CreateIndexBuffer(RHIBufferDescriptor* descriptor) override;
+
+		virtual RHIBuffer* CreateUniformBuffer(RHIBufferDescriptor* descriptor) override;
+
+		virtual RHIBuffer* CreateDynamicUniformBuffer(RHIBufferDescriptor *descriptor) override;
 
 		virtual RHIGroup* CreateResourceGroup(RHIGroupDescriptor *descriptor) override;
 
@@ -72,7 +76,9 @@ namespace Vulkan
 
 		virtual void Wait() override;
 
-		VkDevice* GetHandle();
+		VulkanGPU* GetGPU() const { return m_pGPU; }
+
+		VkDevice* GetHandle() const { return m_pDevice; }
 
 	private:
 

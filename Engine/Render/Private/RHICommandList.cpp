@@ -23,15 +23,15 @@ void RHIRenderCommandList::DrawIndexedPrimitive(unsigned int indexCount, unsigne
 
 WVertexBuffer* RHIRenderCommandList::CreateVertexBuffer(size_t stride, size_t count)
 {
-    return new WVertexBuffer();
+    return new WVertexBuffer(stride, count);
 }
 
-WIndexBuffer* RHIRenderCommandList::CreateIndexBuffer(size_t stride, size_t count)
+WIndexBuffer* RHIRenderCommandList::CreateIndexBuffer(size_t count)
 {
-    return nullptr;
+    return new WIndexBuffer(count);
 }
 
 WUniformBuffer* RHIRenderCommandList::CreateUniformBuffer(size_t stride, size_t count)
 {
-    return nullptr;
+    return new WUniformBuffer(stride, count);
 }

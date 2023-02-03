@@ -47,7 +47,7 @@ public:
 
 	class WVertexBuffer* CreateVertexBuffer(size_t stride, size_t count);
 
-	class WIndexBuffer* CreateIndexBuffer(size_t stride, size_t count);
+	class WIndexBuffer* CreateIndexBuffer(size_t count);
 
 	class WUniformBuffer* CreateUniformBuffer(size_t stride, size_t count);
 

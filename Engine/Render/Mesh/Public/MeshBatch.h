@@ -4,7 +4,9 @@ class WMeshBatchElement
 {
 public:
 
-	
+	WMeshBatchElement();
+
+	~WMeshBatchElement();
 
 };
 

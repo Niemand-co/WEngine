@@ -48,19 +48,19 @@ void GameScene::Tick(WEngine::TimeStep timeStep)
 {
 	m_pViewport->ProcessInput();
 	
-	RScene *scene = RScene::GetActiveScene();
+	RScene& scene = *RScene::GetActiveScene();
 
 	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [&scene]()
 	{
-		scene->UpdatePrimitiveInfosForScene();
+		scene.UpdateLightInfosForScene();
 
-		scene->UpdateLightInfosForScene();
+		scene.UpdatePrimitiveInfosForScene();
 	}
 	), WEngine::EThreadProperty::RenderThread);
 
 	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [&scene]()
 	{
-		scene->StartFrame();
+		scene.StartFrame();
 	}
 	), WEngine::EThreadProperty::RenderThread);
 	

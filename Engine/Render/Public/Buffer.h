@@ -8,7 +8,7 @@ public:
 
 protected:
 
-	WEngine::WSharedPtr<class RHIBuffer> m_pBuffer;
+	WEngine::WSharedPtr<class RHIBuffer> pBuffer;
 
 };
 
@@ -16,7 +16,7 @@ class WVertexBuffer : public WBuffer
 {
 public:
 
-	WVertexBuffer();
+	WVertexBuffer(size_t inStride, size_t inCount);
 
 	virtual ~WVertexBuffer();
 
@@ -26,13 +26,19 @@ public:
 
 	virtual void UpdateRHIResource() override;
 
+private:
+
+	size_t Stride;
+
+	size_t Count;
+
 };
 
 class WIndexBuffer : public WBuffer
 {
 public:
 
-	WIndexBuffer();
+	WIndexBuffer(size_t inCount);
 
 	virtual ~WIndexBuffer();
 
@@ -42,16 +48,45 @@ public:
 
 	virtual void UpdateRHIResource() override;
 
+private:
+
+	size_t Count;
+
 };
 
 class WUniformBuffer : public WBuffer
 {
 public:
 
-	WUniformBuffer();
+	WUniformBuffer(size_t inStride, size_t inCount);
 
 	virtual ~WUniformBuffer();
 
+	virtual void InitRHIResource() override;
 
+	virtual void ReleaseRHIResource() override;
 
+	virtual void UpdateRHIResource() override;
+
+private:
+
+	size_t Stride;
+
+	size_t Count;
+
+};
+
+class WDynamicUniform : public WUniformBuffer
+{
+public:
+
+	WDynamicUniform(size_t inStride, size_t inCount);
+
+	virtual ~WDynamicUniform();
+
+	virtual void InitRHIResource() override;
+
+	virtual void ReleaseRHIResource() override;
+
+	virtual void UpdateRHIResource() override;
 };

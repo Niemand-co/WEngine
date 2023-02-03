@@ -19,16 +19,8 @@ public:
 
 public:
 
-	size_t dataSize;
+	size_t stride;
 
 	size_t count;
-
-	unsigned short memoryType;
-
-	bool isDynamic;
-
-private:
-
-	unsigned int bufferType;
 
 };
