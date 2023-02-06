@@ -11,6 +11,8 @@ namespace WEngine
 
 		virtual void Wait() = 0;
 
+		virtual void Reset() = 0;
+
 		virtual void Trigger() = 0;
 
 		void* operator new(size_t size)

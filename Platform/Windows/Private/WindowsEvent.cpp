@@ -17,6 +17,10 @@ namespace WEngine
 	void WEventWin::Wait()
 	{
 		WaitForSingleObject(m_event, INFINITE);
+	}
+
+	void WEventWin::Reset()
+	{
 		ResetEvent(m_event);
 	}
 

@@ -16,9 +16,11 @@ public:
 
 	virtual ~RenderTexture() = default;
 
-	void CreateObject();
+	virtual void InitRHIResource() override;
 
-	void ReCreateObject();
+	virtual void ReleaseRHIResource() override;
+
+	virtual void UpdateRHIResource() override;
 
 	/**
 	 * Resize the texture
@@ -79,5 +81,15 @@ public:
 	SRVTexture(unsigned int width, unsigned int height, Format format);
 
 	SRVTexture(unsigned int width, unsigned int height, Format format, unsigned int mipLevel, unsigned int layerCount);
+
+};
+
+class ShadowMap2D : public SRVTexture
+{
+public:
+
+	ShadowMap2D(unsigned int width, unsigned int height);
+
+	ShadowMap2D(unsigned int width, unsigned int height, Format format);
 
 };

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Render/Public/ScriptableRenderer.h"
+#include "Render/Renderer/Public/ScriptableRenderer.h"
 #include "Render/Passes/Public/DrawOpaquePass.h"
 #include "Render/Passes/Public/MainLightShadowPass.h"
 #include "Render/Passes/Public/FinalBlitPass.h"
@@ -10,8 +10,7 @@
 #include "Scene/Components/Public/CameraComponent.h"
 #include "Utils/Public/Synchronizer.h"
 
-ScriptableRenderer::ScriptableRenderer(RHIContext* pContext)
-	: m_pContext(pContext)
+ScriptableRenderer::ScriptableRenderer()
 {
 }
 

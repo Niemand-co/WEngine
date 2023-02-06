@@ -16,7 +16,7 @@ class ScriptableRenderer
 {
 public:
 
-	ScriptableRenderer(RHIContext *pContext);
+	ScriptableRenderer();
 
 	virtual ~ScriptableRenderer();
 

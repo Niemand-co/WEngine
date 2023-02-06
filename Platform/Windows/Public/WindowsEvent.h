@@ -14,6 +14,8 @@ namespace WEngine
 
 		virtual void Wait() override;
 
+		virtual void Reset() override;
+
 		virtual void Trigger() override;
 
 	private:

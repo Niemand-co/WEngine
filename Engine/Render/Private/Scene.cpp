@@ -71,7 +71,7 @@ void RScene::UpdatePrimitiveInfosForScene()
 
 	WEngine::WArray<PrimitiveInfo*>& primitives = m_primitives;
 
-	PrimitiveInfo::AddToScene(GetRenderCommandList(), this, m_primitives);
+	PrimitiveInfo::AddToScene(GetRenderCommandList(), this, AddedPrimitives);
 }
 
 void RScene::AddLight(LightComponent* light)

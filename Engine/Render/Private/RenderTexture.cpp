@@ -79,57 +79,69 @@ RenderTexture::RenderTexture(unsigned int width, unsigned int height, Format for
 	m_height = height;
 }
 
-void RenderTexture::CreateObject()
+void RenderTexture::InitRHIResource()
 {
 	if(m_bCreated)
 		return;
 
-	unsigned int dstAccess = 0;
-	if(m_textureViewDescriptor.imageAspect & IMAGE_ASPECT_COLOR > 0)
-		dstAccess |= (ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE);
-	if(m_textureViewDescriptor.imageAspect & IMAGE_ASPECT_DEPTH > 0)
-		dstAccess |= (ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE);
-	m_texture = RHIContext::GetDevice()->CreateTexture(&m_textureDescriptor);
-	TextureBarrier barrier = { m_texture.Get(), AttachmentLayout::Undefined, m_layout, 0, dstAccess, m_textureViewDescriptor.imageAspect };
-
-	RHIBarrierDescriptor barrierDescriptor = {};
+	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [this]()
 	{
-		barrierDescriptor.textureCount = 1;
-		barrierDescriptor.pTextureBarriers = &barrier;
-		barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
-		barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
-	}
-	RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
+			unsigned int dstAccess = 0;
+			if (m_textureViewDescriptor.imageAspect & IMAGE_ASPECT_COLOR > 0)
+				dstAccess |= (ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE);
+			if (m_textureViewDescriptor.imageAspect & IMAGE_ASPECT_DEPTH > 0)
+				dstAccess |= (ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE);
+			m_texture = RHIContext::GetDevice()->CreateTexture(&m_textureDescriptor);
+			TextureBarrier barrier = { m_texture.Get(), AttachmentLayout::Undefined, m_layout, 0, dstAccess, m_textureViewDescriptor.imageAspect };
 
-	m_textureView = m_texture->CreateTextureView(&m_textureViewDescriptor);
+			RHIBarrierDescriptor barrierDescriptor = {};
+			{
+				barrierDescriptor.textureCount = 1;
+				barrierDescriptor.pTextureBarriers = &barrier;
+				barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
+				barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
+			}
+			RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
+
+			m_textureView = m_texture->CreateTextureView(&m_textureViewDescriptor);
+	}
+	), WEngine::RHIThread);
 
 	m_bCreated = true;
 	m_bDirty = false;
 }
 
-void RenderTexture::ReCreateObject()
+void RenderTexture::ReleaseRHIResource()
+{
+}
+
+void RenderTexture::UpdateRHIResource()
 {
 	if(!m_bDirty)
 		return;
 
-	unsigned int dstAccess = 0;
-	if (m_textureViewDescriptor.imageAspect & IMAGE_ASPECT_COLOR > 0)
-		dstAccess |= (ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE);
-	if (m_textureViewDescriptor.imageAspect & IMAGE_ASPECT_DEPTH > 0)
-		dstAccess |= (ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE);
-	m_texture = RHIContext::GetDevice()->CreateTexture(&m_textureDescriptor);
-	TextureBarrier barrier = { m_texture.Get(), AttachmentLayout::Undefined, m_layout, 0, dstAccess, m_textureViewDescriptor.imageAspect };
-
-	RHIBarrierDescriptor barrierDescriptor = {};
+	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [this]()
 	{
-		barrierDescriptor.textureCount = 1;
-		barrierDescriptor.pTextureBarriers = &barrier;
-		barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
-		barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
-	}
-	RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
+		unsigned int dstAccess = 0;
+		if (m_textureViewDescriptor.imageAspect & IMAGE_ASPECT_COLOR > 0)
+			dstAccess |= (ACCESS_COLOR_ATTACHMENT_READ | ACCESS_COLOR_ATTACHMENT_WRITE);
+		if (m_textureViewDescriptor.imageAspect & IMAGE_ASPECT_DEPTH > 0)
+			dstAccess |= (ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE);
+		m_texture = RHIContext::GetDevice()->CreateTexture(&m_textureDescriptor);
+		TextureBarrier barrier = { m_texture.Get(), AttachmentLayout::Undefined, m_layout, 0, dstAccess, m_textureViewDescriptor.imageAspect };
 
-	m_textureView = m_texture->CreateTextureView(&m_textureViewDescriptor);
+		RHIBarrierDescriptor barrierDescriptor = {};
+		{
+			barrierDescriptor.textureCount = 1;
+			barrierDescriptor.pTextureBarriers = &barrier;
+			barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
+			barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
+		}
+		RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
+
+		m_textureView = m_texture->CreateTextureView(&m_textureViewDescriptor);
+	}
+	), WEngine::RHIThread);
 
 	m_bDirty = false;
 }
@@ -169,4 +181,14 @@ SRVTexture::SRVTexture(unsigned int width, unsigned int height, Format format, u
 	: RenderTexture(width, height, format, mipLevel, layerCount)
 {
 	m_textureDescriptor.usage |= IMAGE_USAGE_SAMPLED;
+}
+
+ShadowMap2D::ShadowMap2D(unsigned int width, unsigned int height)
+	: SRVTexture(width, height, Format::D16_Unorm)
+{
+}
+
+ShadowMap2D::ShadowMap2D(unsigned int width, unsigned int height, Format format)
+	: SRVTexture(width, height, format)
+{
 }

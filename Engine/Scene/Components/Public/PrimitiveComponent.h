@@ -69,7 +69,11 @@ struct PrimitiveInfo
 				scene->m_dynamicShadowCaster.Push(info);
 			}
 
-			info->Proxy->DrawStaticMesh(CmdList);
+			if (info->bStatic)
+			{
+				scene->m_static
+				info->Proxy->DrawStaticMesh(CmdList);
+			}
 		}
 	}
 
