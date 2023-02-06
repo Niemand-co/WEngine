@@ -11,7 +11,7 @@ public:
 
 	virtual ~InstancedStaticMeshComponent();
 
-	virtual PrimitiveInfo* GetPrimitiveInfo() override;
+	virtual PrimitiveProxy* GetPrimitiveProxy() override;
 
 	unsigned int GetInstanceCount() const { return m_instancedCount; }
 
@@ -29,17 +29,12 @@ private:
 
 };
 
-struct InstancedStaticMeshInfo : public StaticMeshInfo
+struct InstancedStaticMeshProxy : public StaticMeshProxy
 {
-	InstancedStaticMeshInfo(InstancedStaticMeshComponent* primitive)
-		: StaticMeshInfo(primitive),
-		  InstanceCount(primitive->GetInstanceCount())
+	InstancedStaticMeshProxy(InstancedStaticMeshComponent* primitive)
+		: StaticMeshProxy(primitive)
 	{
-		LocalToWorldMatrices.Reserve(primitive->GetInstanceCount());
-		for (TransformComponent* transform : primitive->GetTransforms())
-		{
-			LocalToWorldMatrices.Push(transform->GetLocalToWorldMatrix());
-		}
+
 	}
 
 	enum { type = 2 };

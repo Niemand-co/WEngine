@@ -51,6 +51,8 @@ private:
 
 	WEngine::WArray<class Component*> m_components;
 
+	uint8 m_bStatic : 1;
+
 };
 
 template<typename T>

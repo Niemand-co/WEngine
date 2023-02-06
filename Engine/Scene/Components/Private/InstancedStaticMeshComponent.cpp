@@ -10,7 +10,7 @@ InstancedStaticMeshComponent::~InstancedStaticMeshComponent()
 {
 }
 
-PrimitiveInfo* InstancedStaticMeshComponent::GetPrimitiveInfo()
+PrimitiveProxy* InstancedStaticMeshComponent::GetPrimitiveProxy()
 {
 	if (!m_pMesh)
 	{
@@ -19,15 +19,15 @@ PrimitiveInfo* InstancedStaticMeshComponent::GetPrimitiveInfo()
 
 	if (m_bMarkedDirty)
 	{
-		if (m_pInfo == nullptr)
+		if (m_pProxy == nullptr)
 		{
-			WEngine::Allocator::Get()->Allocate(sizeof(InstancedStaticMeshComponent));
+			m_pProxy = (InstancedStaticMeshProxy*)WEngine::Allocator::Get()->Allocate(sizeof(InstancedStaticMeshProxy));
 		}
-		::new (m_pInfo) InstancedStaticMeshInfo(this);
+		::new (m_pProxy) InstancedStaticMeshProxy(this);
 		m_bMarkedDirty = false;
 	}
 
-	return m_pInfo;
+	return m_pProxy;
 }
 
 void InstancedStaticMeshComponent::AddInstance()

@@ -16,13 +16,19 @@ struct VertexAttributeDescription
 
 class RHIVertexInputDescriptor;
 
-struct Vertex
+class WVertexFactory : public RenderResource
 {
 public:
 
-	Vertex(glm::vec3 position = {0, 0, 0}, glm::vec3 color = {0, 0, 0}, glm::vec3 normal = {1.0f, 0, 0}, glm::vec2 uv = {0, 0});
+	WVertexFactory();
 
-	~Vertex();
+	virtual ~WVertexFactory();
+
+	virtual void InitRHIResource() override;
+
+	virtual void ReleaseRHIResource() override;
+
+	virtual void UpdateRHIResource() override;
 
 	static void GenerateVertexInputDescription();
 
@@ -30,18 +36,41 @@ public:
 
 public:
 
-	glm::vec3 Position;
-
-	glm::vec3 Color;
-
-	glm::vec3 Normal;
-
-	glm::vec2 UV;
+	struct VertexStream
+	{
+		const WEngine::WSharedPtr<class WVertexBuffer> m_pVertexBuffer = nullptr;
+		uint32 Offset = 0;
+		uint16 Stride = 0;
+	};
 
 private:
+
+	WEngine::WArray<VertexStream> m_streams;
 
 	static VertexBindingDescription* m_bindingDescription;
 
 	static WEngine::WArray<VertexAttributeDescription*> m_attributeDescriptions;
 	
+};
+
+class WLocalVertexFactory : public WVertexFactory
+{
+public:
+
+	WLocalVertexFactory();
+
+	virtual ~WLocalVertexFactory();
+
+
+
+};
+
+class WNormalVertexFactory : public WVertexFactory
+{
+public:
+
+	WNormalVertexFactory();
+
+	virtual ~WNormalVertexFactory();
+
 };

@@ -8,6 +8,8 @@ class RScene
 {
 public:
 
+	friend struct PrimitiveInfo;
+
 	RScene();
 
 	~RScene();
@@ -23,12 +25,6 @@ public:
 	void RemoveLight(LightComponent *light);
 
 	void UpdateLightInfosForScene();
-
-	void AddCamera(class CameraComponent *camera);
-
-	void RemoveCamera(class CameraComponent *camera);
-
-	void UpdateCameraInfosForScene();
 
 	void StartFrame();
 
@@ -70,10 +66,10 @@ private:
 
 	WEngine::WSet<LightInfo*> m_removedLights;
 
-	WEngine::WArray<CameraInfo*> m_cameras;
+	WEngine::WArray<PrimitiveInfo*> m_opaqueAndMaskPrimitives;
 
-	WEngine::WSet<CameraInfo*> m_addedCameras;
+	WEngine::WArray<PrimitiveInfo*> m_translucentPrimitives;
 
-	WEngine::WSet<CameraInfo*> m_removedCameras;
+	WEngine::WArray<PrimitiveInfo*> m_dynamicShadowCaster;
 
 };

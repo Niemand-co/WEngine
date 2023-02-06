@@ -2,9 +2,13 @@
 #include "Scene/Components/Public/PrimitiveComponent.h"
 
 PrimitiveComponent::PrimitiveComponent(GameObject* pGameObject)
-    : Component(pGameObject)
+    : Component(pGameObject),
+      m_bVisible(true),
+      m_bTranslucent(false),
+      m_bCastShadow(true),
+      m_bStatic(false),
+      m_pProxy(nullptr)
 {
-    m_pInfo = nullptr;
 }
 
 PrimitiveComponent::~PrimitiveComponent()

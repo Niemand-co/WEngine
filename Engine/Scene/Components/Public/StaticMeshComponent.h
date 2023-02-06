@@ -5,14 +5,16 @@
 class StaticMeshComponent : public PrimitiveComponent
 {
 public:
+
+	friend class StaticMeshInfo;
 	
 	enum { type = 6 };
 
-	StaticMeshComponent(GameObject *pGameObject);
+	StaticMeshComponent(GameObject *pGameObject, StaticMesh *pMesh = nullptr);
 
 	virtual ~StaticMeshComponent();
 
-	virtual PrimitiveInfo* GetPrimitiveInfo() override;
+	virtual PrimitiveProxy* GetPrimitiveProxy() override;
 
 	StaticMesh* GetStaticMesh() const { return m_pMesh; }
 
@@ -26,37 +28,16 @@ protected:
 
 };
 
-struct StaticMeshInfo : public PrimitiveInfo
-{
-	StaticMeshInfo(StaticMeshComponent* primitive)
-		: PrimitiveInfo(primitive),
-		  Mesh(primitive->GetStaticMesh()),
-		  bCastShadow(primitive->IsCastShadow())
-	{
-		Proxy = new StaticMeshProxy(this);
-	}
-
-	virtual PrimitiveProxy* GetProxy() override
-	{
-		return Proxy;
-	}
-
-	enum { type = 1 };
-
-	StaticMesh *Mesh;
-
-	class StaticMeshProxy *Proxy;
-
-	uint8_t bCastShadow : 1;
-};
-
 struct StaticMeshProxy : public PrimitiveProxy
 {
-	StaticMeshProxy(PrimitiveInfo *info)
-		: PrimitiveProxy(info)
+	StaticMeshProxy(StaticMeshComponent *primitive)
+		: PrimitiveProxy(primitive)
 	{
 
 	}
 
+	virtual void DrawStaticMesh(RHICommandListBase* CmdList) override;
+
+	enum { type = 1 };
 
 };

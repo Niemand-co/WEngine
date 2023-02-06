@@ -1,21 +1,7 @@
 #include "pch.h"
 #include "Render/Mesh/Public/Vertex.h"
 #include "Render/Descriptor/Public/RHIVertexInputDescriptor.h"
-
-VertexBindingDescription* Vertex::m_bindingDescription = nullptr;
-
-WEngine::WArray<VertexAttributeDescription*> Vertex::m_attributeDescriptions = WEngine::WArray<VertexAttributeDescription*>();
-
-Vertex::Vertex(glm::vec3 position, glm::vec3 color, glm::vec3 normal, glm::vec2 uv)
-	: Position(position), Color(color), Normal(normal), UV(uv)
-{
-
-}
-
-Vertex::~Vertex()
-{
-
-}
+#include "Render/Public/Buffer.h"
 
 void Vertex::GenerateVertexInputDescription()
 {
@@ -66,4 +52,27 @@ RHIVertexInputDescriptor Vertex::GetVertexInputDescriptor()
 	}
 
 	return vertexInputDescriptor;
+}
+
+WVertexFactory::WVertexFactory()
+{
+}
+
+WVertexFactory::~WVertexFactory()
+{
+}
+
+void WVertexFactory::InitRHIResource()
+{
+	m_pVertexBuffer->InitRHIResource();
+}
+
+void WVertexFactory::ReleaseRHIResource()
+{
+	m_pVertexBuffer->ReleaseRHIResource();
+}
+
+void WVertexFactory::UpdateRHIResource()
+{
+	m_pVertexBuffer->UpdateRHIResource();
 }
