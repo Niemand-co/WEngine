@@ -11,8 +11,6 @@ public:
 
 	virtual ~DirectionalLightComponent() = default;
 
-	void UpdateShadowFrustum(class CameraInfo* info);
-
 	const WEngine::WArray<float>& GetCSMRanges() const { return m_cascadedShadowMapRanges; }
 
 	const WEngine::WArray<glm::mat4>& GetCSMMatrices() const { return m_cascadedShadowMapMatrices; }

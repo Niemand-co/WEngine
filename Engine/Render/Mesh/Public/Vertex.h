@@ -16,6 +16,14 @@ struct VertexAttributeDescription
 
 class RHIVertexInputDescriptor;
 
+struct VertexComponent
+{
+	glm::vec3 Position;
+	glm::vec3 Color;
+	glm::vec3 Normal;
+	glm::vec3 UV;
+};
+
 class WVertexFactory : public RenderResource
 {
 public:
@@ -46,6 +54,8 @@ public:
 private:
 
 	WEngine::WArray<VertexStream> m_streams;
+
+	WEngine::WArray<VertexComponent> m_vertices;
 
 	static VertexBindingDescription* m_bindingDescription;
 

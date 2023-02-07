@@ -6,8 +6,6 @@ public:
 
 	virtual ~RHIShader() = default;
 
-	virtual unsigned int GetStage();
-
 	virtual const char* GetEntry();
 
 protected:

@@ -20,6 +20,8 @@ class CameraComponent : public Component
 
 	friend class GameObject;
 
+	friend struct CameraInfo;
+
 public:
 
 	enum { type = 3 };
@@ -43,6 +45,8 @@ public:
 	ScriptableRenderer* GetRenderer();
 
 	CameraInfo* GetCameraInfo();
+
+	glm::vec2& GetResolution() { return m_resolution; }
 
 	void Move(Direction dir, float dis);
 
@@ -88,6 +92,8 @@ private:
 
 	float theta;
 
+	glm::vec2 m_resolution;
+
 };
 
 struct CameraInfo
@@ -101,6 +107,7 @@ struct CameraInfo
 		  FarClip(camera->m_farPlane),
 		  NearClip(camera->m_nearPlane),
 		  Aspect(camera->m_aspect),
+		  Renderer(camera->m_renderer),
 		  Owner(camera->GetOwner())
 	{
 
@@ -125,6 +132,8 @@ struct CameraInfo
 	float NearClip;
 	
 	float Aspect;
+
+	ScriptableRenderer* Renderer;
 
 	GameObject *Owner;
 };

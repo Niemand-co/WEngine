@@ -11,12 +11,27 @@
 namespace Vulkan
 {
 
-	VulkanTextureBase::VulkanTextureBase()
+	VulkanTextureBase::VulkanTextureBase(VkImage* pInImage)
+		: pImage(pInImage)
 	{
 	}
 
 	VulkanTextureBase::~VulkanTextureBase()
 	{
+	}
+
+	VulkanTexture2D::VulkanTexture2D(VkImage* pImage, uint32 width, uint32 height)
+		: VulkanTextureBase(pImage), RHITexture2D(width, height)
+	{
+	}
+
+	VulkanTexture2D::~VulkanTexture2D()
+	{
+	}
+
+	RHITextureView* VulkanTexture2D::CreateTextureView(RHITextureViewDescriptor* descriptor)
+	{
+		return nullptr;
 	}
 
 }

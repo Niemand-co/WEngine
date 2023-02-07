@@ -17,3 +17,6 @@ typedef char int8;
 typedef short int16;
 typedef int int32;
 typedef long long int64;
+
+#define FLOAT_MIN 1.175494351e-38F
+#define FLOAT_MAX 3.402823466e+38F

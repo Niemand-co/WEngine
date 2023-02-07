@@ -10,8 +10,6 @@ public:
 
 public:
 
-	unsigned int shaderStage;
-
 	unsigned int* pCode;
 
 	size_t codeSize;

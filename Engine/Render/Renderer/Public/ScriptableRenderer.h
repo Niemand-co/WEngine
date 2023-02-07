@@ -16,21 +16,11 @@ class ScriptableRenderer
 {
 public:
 
-	ScriptableRenderer();
+	ScriptableRenderer(class CameraComponent * pCamera);
 
 	virtual ~ScriptableRenderer();
 
-	virtual void Setup(RHIContext* context, CameraInfo *cameraData);
-
-	virtual void Execute(RHIContext *context, CameraInfo* cameraData);
-
-	virtual void EnqueRenderPass(ScriptableRenderPass* renderPass);
-
-	virtual void UpdateRenderTarget(CameraInfo* cameraData);
-
-	void SetGlobalTexture(WEngine::WArray<RHITextureView*>& pTexture) { m_pGlobalTextures.Push(pTexture); }
-
-	const WEngine::WArray<WEngine::WArray<RHITextureView*>>& GetGlobalTextures() const { return m_pGlobalTextures; }
+	virtual void Render() = 0;
 
 	void* operator new(size_t size)
 	{
@@ -42,7 +32,7 @@ public:
 		WEngine::Allocator::Get()->Deallocate(pData);
 	}
 
-private:
+protected:
 
 	WEngine::WArray<ScriptableRenderPass*> m_passes;
 
@@ -54,21 +44,33 @@ private:
 
 	WEngine::WArray<RHISemaphore*> m_pSignalSemaphore;
 
-	WEngine::WArray<WEngine::WString> m_blockSubmission;
+	CameraComponent *m_pCamera;
 
-	WEngine::WArray<WEngine::WArray<RHITextureView*>> m_pGlobalTextures;
+};
 
+struct SceneViewInfo
+{
+	uint8 Visibility : 1;
 };
 
 class SceneRenderer : public ScriptableRenderer
 {
 public:
 
+	SceneRenderer(CameraComponent* pCamera)
+		: ScriptableRenderer(pCamera)
+	{
+	}
+
 	virtual ~SceneRenderer() = default;
+
+	void SetScene(RScene *inScene) { Scene = inScene; }
 
 protected:
 
 	RScene *Scene;
+
+	WEngine::WArray<SceneViewInfo> Views;
 
 	WEngine::WArray<WMeshBatch*> Batches;
 

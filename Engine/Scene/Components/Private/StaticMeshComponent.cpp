@@ -38,3 +38,8 @@ void StaticMeshProxy::DrawStaticMesh(RHICommandListBase* CmdList)
 {
 	
 }
+
+void StaticMeshProxy::GenerateBoundingBox()
+{
+	Mesh->GenerateBoundingBox();
+}

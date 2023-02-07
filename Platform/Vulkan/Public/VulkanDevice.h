@@ -2,7 +2,7 @@
 #include "RHI/Public/RHIDevice.h"
 
 class RHIQueue;
-class VulkanTexture;
+class VulkanTextureBase;
 struct QueueStack;
 
 namespace Vulkan
@@ -28,7 +28,11 @@ namespace Vulkan
 
 		virtual RHIEvent* GetEvent() override;
 
-		virtual RHIShader* CreateShader(RHIShaderDescriptor *descriptor) override;
+		virtual RHIShader* CreateVertexShader(RHIShaderDescriptor* descriptor) override;
+
+		virtual RHIShader* CreateGeometryShader(RHIShaderDescriptor* descriptor) override;
+
+		virtual RHIShader* CreatePixelShader(RHIShaderDescriptor* descriptor) override;
 
 		virtual RHIRenderPass* CreateRenderPass(RHIRenderPassDescriptor *descriptor) override;
 

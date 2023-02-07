@@ -17,7 +17,7 @@
 #include "Scene/Components/Public/LightComponent.h"
 
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
-#include "Render/Public/ScriptableRenderer.h"
+#include "Render/Renderer/Public/ScriptableRenderer.h"
 
 #include "RHI/Public/RHIHeads.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"

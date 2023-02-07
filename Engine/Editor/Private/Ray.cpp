@@ -45,7 +45,7 @@ namespace WEngine
 	{
 		for (unsigned int i = 0; i < pMesh->m_indexCount; i += 3)
 		{
-			if (IsIntersectWithTriangle(pMesh->m_pVertices[pMesh->m_pIndices[i]].Position, pMesh->m_pVertices[pMesh->m_pIndices[i + 1]].Position, pMesh->m_pVertices[pMesh->m_pIndices[i + 2]].Position))
+			if (IsIntersectWithTriangle(pMesh->m_vertices[pMesh->m_pIndices[i]].Position, pMesh->m_vertices[pMesh->m_pIndices[i + 1]].Position, pMesh->m_vertices[pMesh->m_pIndices[i + 2]].Position))
 			{
 				return true;
 			}
@@ -64,7 +64,7 @@ namespace WEngine
 		MeshFilter* staticMesh = pGameObject->GetComponent<MeshFilter>();
 		if (staticMesh == nullptr)
 			return false;
-		if(!ray.IsIntersectionWithCube(staticMesh->GetStaticMesh()->m_boundingBoxMin, staticMesh->GetStaticMesh()->m_boundingBoxMax))
+		if(!ray.IsIntersectionWithCube(staticMesh->GetStaticMesh()->m_boundingBox.BoxMin, staticMesh->GetStaticMesh()->m_boundingBox.BoxMax))
 			return false;
 		if (ray.IsIntersectWithMesh(staticMesh->GetStaticMesh()))
 			return true;

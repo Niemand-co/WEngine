@@ -115,8 +115,6 @@ namespace Vulkan
 		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(*m_pInstance, "vkCreateWin32SurfaceKHR");
 
 		RE_ASSERT(CreateWin32SurfaceKHR(*m_pInstance, &surfaceCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), m_pSurface) == VK_SUCCESS, "Failed to Recreate Win32 Surface.");
-
-		static_cast<VulkanSurface*>(RHIInstance::m_surface)->SetHandle(m_pSurface);
 	}
 
 	VkInstance* VulkanInstance::GetHandle()
@@ -151,8 +149,6 @@ namespace Vulkan
 
 		m_pSurface = (VkSurfaceKHR*)WEngine::Allocator::Get()->Allocate(sizeof(VkSurfaceKHR));
 		RE_ASSERT(CreateWin32SurfaceKHR(*m_pInstance, &surfaceCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), m_pSurface) == VK_SUCCESS, "Failed to Create Win32 Surface.");
-
-		RHIInstance::m_surface = new VulkanSurface(m_pSurface);
 	}
 
 	bool VulkanInstance::CheckLayerAvailability(const WEngine::WArray<const char*>& layers)

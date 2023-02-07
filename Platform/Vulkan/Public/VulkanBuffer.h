@@ -4,6 +4,8 @@
 namespace Vulkan
 {
 
+	class VulkanDevice;
+
 	class VulkanBufferBase
 	{
 	public:
@@ -14,7 +16,7 @@ namespace Vulkan
 
 		VkBuffer* GetHandle();
 
-	private:
+	protected:
 
 		VkBuffer *pBuffer;
 
@@ -104,6 +106,18 @@ namespace Vulkan
 		virtual void Flush(size_t range) override;
 
 		virtual void Resize(size_t count) override;
+	};
+
+	class VulkanTextureBuffer : public RHITextureBuffer, public VulkanBufferBase
+	{
+	public:
+		
+		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override;
+
+		virtual void Flush(size_t range) override;
+
+		virtual void Resize(size_t count) override;
+
 	};
 
 }

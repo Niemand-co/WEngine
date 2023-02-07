@@ -6,7 +6,10 @@ class WViewport : public RenderTarget
 {
 public:
 
-	WViewport() = default;
+	WViewport(uint32 width, uint32 height, Format format)
+		: RenderTarget(width, height, format)
+	{
+	}
 
 	virtual ~WViewport() = default;
 
@@ -24,7 +27,7 @@ class WEditorViewport : public WViewport
 {
 public:
 
-	WEditorViewport();
+	WEditorViewport(uint32 width, uint32 height, Format format);
 
 	virtual ~WEditorViewport();
 
@@ -44,7 +47,7 @@ class WSceneViewport : public WViewport
 {
 public:
 
-	WSceneViewport();
+	WSceneViewport(uint32 width, uint32 height, Format format);
 
 	virtual ~WSceneViewport();
 

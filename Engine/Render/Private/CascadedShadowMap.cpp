@@ -5,22 +5,22 @@
 
 namespace WEngine
 {
-	void CascadedShadowMap::UpdateSplices(float* splices, unsigned int spliceCount, float nearClip, float farClip)
+	void CascadedShadowMap::UpdateSplices(CSMShadowMapPack& outPack, float nearClip, float farClip)
 	{
-		for (unsigned int i = 0; i < 4; ++i)
+		for (unsigned int i = 0; i < outPack.SpliceDistances.Size(); ++i)
 		{
 			float ratio = (float)(i + 1) / 4.0;
 			float logC = nearClip * std::pow(farClip / nearClip, ratio);
 			float uniC = 0.01f + (farClip - nearClip) * ratio;
 			float d = 0.95f * logC + 0.05f * uniC;
-			splices[i] = (d - nearClip) / (farClip - nearClip);
+			outPack.SpliceDistances[i] = (d - nearClip) / (farClip - nearClip);
 		}
 	}
 
-	void CascadedShadowMap::UpdatePSSMMatrices(WEngine::WArray<glm::mat4>& matrices, glm::mat4 cameraMatrixInv, glm::vec3 lightDir, float* splices, unsigned int spliceCount)
+	void CascadedShadowMap::UpdatePSSMMatrices(CSMShadowMapPack& outPack, glm::mat4 cameraMatrixInv, glm::vec3 lightDir)
 	{
 		float lastSplice = 0.0f;
-		for (unsigned int i = 0; i < spliceCount; ++i)
+		for (unsigned int i = 0; i < outPack.SpliceMatrices.Size(); ++i)
 		{
 			glm::vec3 box[8];
 			{
@@ -43,10 +43,10 @@ namespace WEngine
 			for (unsigned int j = 0; j < 4; ++j)
 			{
 				glm::vec3 frustumDir = box[j + 4] - box[j];
-				box[j + 4] = splices[i] * frustumDir + box[j];
+				box[j + 4] = outPack.SpliceDistances[i] * frustumDir + box[j];
 				box[j] = lastSplice * frustumDir + box[j];
 			}
-			lastSplice = splices[i];
+			lastSplice = outPack.SpliceDistances[i];
 
 			glm::mat4 lightViewMatrix = glm::lookAt(glm::vec3(), lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
 			glm::mat4 lightViewMatrixInv = glm::inverse(lightViewMatrix);
@@ -103,7 +103,7 @@ namespace WEngine
 			lightViewMatrix = glm::lookAt(center, center + lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
 			glm::mat4 lightProjectionMatrix = glm::ortho(-len, len, -len, len, -distance, distance);
 
-			matrices[i] = lightProjectionMatrix * lightViewMatrix;
+			outPack.SpliceMatrices[i] = lightProjectionMatrix * lightViewMatrix;
 		}
 	}
 

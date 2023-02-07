@@ -82,3 +82,11 @@ public:
 	virtual ~RHIDynamicUniformBuffer() = default;
 
 };
+
+class RHITextureBuffer : public RHIBuffer
+{
+public:
+
+	virtual ~RHITextureBuffer() = default;
+
+};

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "HAL/Public/TaskGraph.h"
+#include <thread>
 
 namespace WEngine
 {
@@ -30,6 +31,10 @@ namespace WEngine
 			::new (m_threads[threadIndex]) WThreadPack();
 			m_threads[threadIndex]->pTaskThread = new WNamedTaskThread();
 			m_threads[threadIndex]->pTaskThread->m_threadId = (EThreadProperty)threadIndex;
+		}
+		for (unsigned int threadIndex = EThreadProperty::NamedThreadNum; threadIndex < NUM_WORKING_THREAD; ++threadIndex)
+		{
+			m_threads[threadIndex]->pTaskThread->ProcessUntilQuit();
 		}
 	}
 
@@ -97,6 +102,37 @@ namespace WEngine
 		{
 			WGraphTaskBase* task = m_taskQueue.TaskQueue.Pop();
 			if(task->ExecuteTask(EThreadProperty::RenderThread))
+				delete task;
+		}
+	}
+
+	WAnyTaskThread::WAnyTaskThread()
+	{
+		
+	}
+
+	WAnyTaskThread::~WAnyTaskThread()
+	{
+	}
+
+	void WAnyTaskThread::ProcessUntilQuit()
+	{
+		while (!m_taskQueue.bQuitForReturn)
+		{
+			ProcessAnyTaskThread();
+		}
+	}
+
+	void WAnyTaskThread::ProcessUntilIdle()
+	{
+	}
+
+	void WAnyTaskThread::ProcessAnyTaskThread()
+	{
+		while (!m_taskQueue.TaskQueue.Empty() && !m_taskQueue.bQuitForReturn && !m_taskQueue.bQuitForIdle)
+		{
+			WGraphTaskBase* task = m_taskQueue.TaskQueue.Pop();
+			if (task->ExecuteTask(EThreadProperty::RenderThread))
 				delete task;
 		}
 	}

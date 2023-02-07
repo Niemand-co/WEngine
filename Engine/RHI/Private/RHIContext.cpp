@@ -86,7 +86,7 @@ void RHIContext::Init()
 		swapchainDescriptor.format = Format::B8G8R8A8_UNorm;
 		swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
 		swapchainDescriptor.presenMode = PresentMode::Immediate;
-		swapchainDescriptor.surface = g_pSurface;
+		swapchainDescriptor.instance = g_pInstance;
 		swapchainDescriptor.presentFamilyIndex = g_pQueue->GetIndex();
 		swapchainDescriptor.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
 	}
@@ -103,9 +103,9 @@ void RHIContext::Init()
 		textureViewDescriptor.baseArrayLayer = 0;
 		textureViewDescriptor.dimension = Dimension::Texture2D;
 	}
-	g_pTextureViews.Push(g_pSwapchain->GetTexture(0)->CreateTextureView(&textureViewDescriptor));
-	g_pTextureViews.Push(g_pSwapchain->GetTexture(1)->CreateTextureView(&textureViewDescriptor));
-	g_pTextureViews.Push(g_pSwapchain->GetTexture(2)->CreateTextureView(&textureViewDescriptor));
+	//g_pTextureViews.Push(g_pSwapchain->GetTexture(0)->CreateTextureView(&textureViewDescriptor));
+	//g_pTextureViews.Push(g_pSwapchain->GetTexture(1)->CreateTextureView(&textureViewDescriptor));
+	//g_pTextureViews.Push(g_pSwapchain->GetTexture(2)->CreateTextureView(&textureViewDescriptor));
 
 	g_pDepthTextures.Resize(3);
 	g_pDepthTextureViews.Resize(3);
@@ -145,8 +145,8 @@ void RHIContext::Init()
 		depthViewDescriptor.dimension = Dimension::Texture2D;
 		depthViewDescriptor.imageAspect = IMAGE_ASPECT_DEPTH;
 	}
-	for(int i = 0; i < 3; ++i)
-		g_pDepthTextureViews[i] = g_pDepthTextures[i]->CreateTextureView(&depthViewDescriptor);
+	//for(int i = 0; i < 3; ++i)
+	//	g_pDepthTextureViews[i] = g_pDepthTextures[i]->CreateTextureView(&depthViewDescriptor);
 
 	g_pPrimaryCommandBuffers = g_pPool->GetCommandBuffer(3u, true);
 
@@ -170,7 +170,7 @@ void RHIContext::RecreateSwapchain()
 		swapchainDescriptor.format = Format::B8G8R8A8_UNorm;
 		swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
 		swapchainDescriptor.presenMode = PresentMode::Immediate;
-		swapchainDescriptor.surface = g_pSurface;
+		swapchainDescriptor.instance = g_pInstance;
 		swapchainDescriptor.presentFamilyIndex = 0;
 		swapchainDescriptor.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
 	}
@@ -190,7 +190,7 @@ void RHIContext::RecreateSwapchain()
 	{
 		g_pTextureViews[i]->~RHITextureView();
 		WEngine::Allocator::Get()->Deallocate(g_pTextureViews[i]);
-		g_pTextureViews[i] = g_pSwapchain->GetTexture(i)->CreateTextureView(&textureViewDescriptor);
+		//g_pTextureViews[i] = g_pSwapchain->GetTexture(i)->CreateTextureView(&textureViewDescriptor);
 	}
 
 	m_isDisplayChagned = true;
@@ -348,8 +348,9 @@ RHIBuffer* RHIContext::CreateDynamicUniformBuffer(size_t stride, size_t count)
 
 RHIBuffer* RHIContext::CreateTextureBuffer(RHIBufferDescriptor* descriptor)
 {
-	descriptor->bufferType = BUFFER_USAGE_TRANSFER_SRC;
-	return g_pDevice->CreateBuffer(descriptor);
+	//descriptor->bufferType = BUFFER_USAGE_TRANSFER_SRC;
+	//return g_pDevice->CreateBuffer(descriptor);
+	return nullptr;
 }
 
 RHIScissor* RHIContext::CreateScissor(RHIScissorDescriptor* descriptor)

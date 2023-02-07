@@ -15,20 +15,20 @@ ImageData* FileLoader::ImageLoad(const char* filePath)
 
 RHIBuffer* FileLoader::ImageLoad(const char* filePath, RHIContext *pContext, int *width, int *height)
 {
-	int nrChannel;
-	unsigned char *pData = stbi_load(filePath, width, height, &nrChannel, STBI_rgb_alpha);
+	//int nrChannel;
+	//unsigned char *pData = stbi_load(filePath, width, height, &nrChannel, STBI_rgb_alpha);
 
-	size_t imageSize = *width * *height * 4;
+	//size_t imageSize = *width * *height * 4;
 
-	RE_ASSERT(pData, "Failed to Load Image.");
+	//RE_ASSERT(pData, "Failed to Load Image.");
 
-	RHIBufferDescriptor bufferDescriptor = {};
-	{
-		bufferDescriptor.dataSize = imageSize;
-		bufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
-	}
-	RHIBuffer* buffer = pContext->CreateTextureBuffer(&bufferDescriptor);
-	buffer->LoadData(pData, imageSize);
+	//RHIBufferDescriptor bufferDescriptor = {};
+	//{
+	//	bufferDescriptor.dataSize = imageSize;
+	//	bufferDescriptor.memoryType = MEMORY_PROPERTY_HOST_VISIBLE | MEMORY_PROPERTY_HOST_COHERENT;
+	//}
+	//RHIBuffer* buffer = pContext->CreateTextureBuffer(&bufferDescriptor);
+	//buffer->LoadData(pData, imageSize);
 
-	return buffer;
+	return nullptr;
 }

@@ -4,7 +4,7 @@
 #include "HAL/Public/PlatformProcess.h"
 #include "HAL/Public/Platform.h"
 
-#define NUM_WORKING_THREAD 4
+#define NUM_WORKING_THREAD 8
 
 namespace WEngine
 {
@@ -62,6 +62,9 @@ namespace WEngine
 		void ProcessUntilIdle(EThreadProperty property);
 
 		void EnqueTask(class WGraphTaskBase* task, EThreadProperty property);
+
+		template<typename LAMBDA>
+		void ParallelFor(uint32 IterationCount, LAMBDA lambda);
 
 		void* operator new(size_t size)
 		{
@@ -281,8 +284,18 @@ namespace WEngine
 
 		virtual void ProcessUntilIdle() override;
 
-
+		void ProcessAnyTaskThread();
 
 	};
+
+	template<typename LAMBDA>
+	inline void WTaskGraph::ParallelFor(uint32 IterationCount, LAMBDA lambda)
+	{
+		uint32 AnyThreadCount = NUM_WORKING_THREAD - EThreadProperty::NamedThreadNum;
+		for (uint32 index = 0; index < IterationCount; ++index)
+		{
+			m_threads[EThreadProperty::NamedThreadNum + index % AnyThreadCount]->pTaskThread->m_taskQueue.TaskQueue.Push(new WLambdaTask(true, []() { lambda(index); }));
+		}
+	}
 
 }

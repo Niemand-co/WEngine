@@ -6,7 +6,7 @@
 #include "RHI/Public/RHIContext.h"
 #include "RHI/Public/RHIDevice.h"
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
-#include "Render/Public/ScriptableRenderer.h"
+#include "Render/Renderer/Public/ScriptableRenderer.h"
 #include "Scene/Public/World.h"
 #include "Editor/Public/Screen.h"
 
@@ -223,8 +223,6 @@ void CameraComponent::RecreateRenderTarget(unsigned int width, unsigned int heig
 		RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
 		m_rendertargets[i].pDepthTexture = m_textureResources[i * 2 + 1]->CreateTextureView(&viewDescriptor);
 	}
-
-	m_renderer->UpdateRenderTarget(GetCameraInfo());
 
 	m_aspect = (float)width / (float)height;
 }

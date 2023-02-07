@@ -19,7 +19,7 @@ public:
 
 	inline const char* const GetNamePtr() const { return m_name.Data(); }
 
-	inline const WEngine::WString& const GetName() const { return m_name; }
+	inline const WEngine::WString& GetName() { return m_name; }
 
 	inline const WEngine::WGuid<WEngine::WString>& GetID() const { return m_id; }
 

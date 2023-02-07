@@ -10,9 +10,11 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTextureBase();
+		VulkanTextureBase(VkImage* pInImage);
 
 		virtual ~VulkanTextureBase();
+
+		VkImage* GetHandle() const { return pImage; }
 
 	private:
 
@@ -20,17 +22,19 @@ namespace Vulkan
 
 		VkDeviceMemory *pDeviceMemory;
 
+		VkImage *pImage;
+
 	};
 
 	class VulkanTexture2D : public RHITexture2D, public VulkanTextureBase
 	{
 	public:
 
-		VulkanTexture2D();
+		VulkanTexture2D(VkImage *pImage, uint32 width, uint32 height);
 
 		virtual ~VulkanTexture2D();
 
-
+		virtual RHITextureView* CreateTextureView(RHITextureViewDescriptor* descriptor) override;
 
 	};
 

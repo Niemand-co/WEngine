@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
-#include "Render/Public/ScriptableRenderer.h"
+#include "Render/Renderer/Public/ScriptableRenderer.h"
 #include "Render/Passes/Public/RenderPassHeads.h"
 #include "RHI/Public/RHIHeads.h"
 #include "RHI/Public/RHIGPU.h"
@@ -27,29 +27,15 @@ void ScriptableRenderPipeline::Init()
 
 void ScriptableRenderPipeline::Setup()
 {
-	m_pCameras = GWorld::GetWorld()->GetCameras();
-	m_pCameraDatas.Reserve(m_pCameras.Size());
 
-	for (CameraComponent *camera : m_pCameras)
-	{
-		CameraInfo *data = camera->GetCameraInfo();
-		ScriptableRenderer* renderer = camera->GetRenderer();
-		renderer->Setup(m_pContext, data);
-		m_pCameraDatas.Push(data);
-	}
 }
 
 void ScriptableRenderPipeline::Execute()
 {
-	for (CameraComponent* camera : m_pCameras)
-	{
-		camera->GetRenderer()->Execute(m_pContext, camera->GetCameraInfo());
-	}
+
 }
 
 ScriptableRenderer* ScriptableRenderPipeline::CreateRenderer()
 {
-	ScriptableRenderer *renderer = new ScriptableRenderer(RHIContext::GetContext());
-	
-	return renderer;
+	return nullptr;
 }

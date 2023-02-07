@@ -99,12 +99,12 @@ namespace Vulkan
 	void VulkanGraphicsEncoder::BindVertexBuffer(RHIBuffer* pBuffer)
 	{
 		VkDeviceSize offets[] = {0};
-		vkCmdBindVertexBuffers(*m_cmd, 0, 1, static_cast<VulkanBuffer*>(pBuffer)->GetHandle(), offets);
+		vkCmdBindVertexBuffers(*m_cmd, 0, 1, static_cast<VulkanVertexBuffer*>(pBuffer)->GetHandle(), offets);
 	}
 
 	void VulkanGraphicsEncoder::BindIndexBuffer(RHIBuffer* pBuffer)
 	{
-		vkCmdBindIndexBuffer(*m_cmd, *static_cast<VulkanBuffer*>(pBuffer)->GetHandle(), 0, VK_INDEX_TYPE_UINT32);
+		vkCmdBindIndexBuffer(*m_cmd, *static_cast<VulkanIndexBuffer*>(pBuffer)->GetHandle(), 0, VK_INDEX_TYPE_UINT32);
 	}
 
 	void VulkanGraphicsEncoder::BindGroups(unsigned int groupCount, RHIGroup* pGroup, RHIPipelineResourceLayout* pPipelineResourceLayout, unsigned int offsetCount, unsigned int *offsets)
@@ -135,7 +135,7 @@ namespace Vulkan
 			::new (pBufferBarriers + i) VkBufferMemoryBarrier();
 			BufferBarrier *pBarrier = pDescriptor->pBufferBarriers + i;
 			pBufferBarriers[i].sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-			pBufferBarriers[i].buffer = *static_cast<VulkanBuffer*>(pBarrier->pBuffer)->GetHandle();
+			pBufferBarriers[i].buffer = *static_cast<VulkanUniformBuffer*>(pBarrier->pBuffer)->GetHandle();
 			pBufferBarriers[i].size = pBarrier->pBuffer->Size() * pBarrier->pBuffer->Alignment();
 			pBufferBarriers[i].offset = 0;
 			pBufferBarriers[i].srcAccessMask = VK_ACCESS_HOST_READ_BIT;
@@ -149,7 +149,7 @@ namespace Vulkan
 			TextureBarrier *pBarrier = pDescriptor->pTextureBarriers + i;
 			pImageBarriers[i].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 			pImageBarriers[i].pNext = nullptr;
-			pImageBarriers[i].image = *static_cast<VulkanTexture*>(pBarrier->pTexture)->GetHandle();
+			pImageBarriers[i].image = *static_cast<VulkanTexture2D*>(pBarrier->pTexture)->GetHandle();
 			pImageBarriers[i].oldLayout = WEngine::ToVulkan(pBarrier->oldLayout);
 			pImageBarriers[i].newLayout = WEngine::ToVulkan(pBarrier->newLayout);
 			pImageBarriers[i].srcAccessMask = pBarrier->srcAccess;
@@ -180,7 +180,7 @@ namespace Vulkan
 			bufferImageCopy.imageSubresource.mipLevel = 0;
 			bufferImageCopy.imageSubresource.layerCount = 1;
 		}
-		vkCmdCopyBufferToImage(*m_cmd, *static_cast<VulkanBuffer*>(pBuffer)->GetHandle(), *static_cast<VulkanTexture*>(pTexture)->GetHandle(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
+		vkCmdCopyBufferToImage(*m_cmd, *static_cast<VulkanTextureBuffer*>(pBuffer)->GetHandle(), *static_cast<VulkanTexture2D*>(pTexture)->GetHandle(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
 	}
 
 	void VulkanGraphicsEncoder::SetEvent(RHIEvent* pEvent)

@@ -10,10 +10,18 @@ public:
 
 	RenderTarget(uint32 width, uint32 height, Format format);
 
+	virtual void InitRHIResource() override;
+
+	virtual void ReleaseRHIResource() override;
+
+	virtual void UpdateRHIResource() override;
+
 	~RenderTarget() = default;
 
 private:
 
-	WEngine::WSharedPtr<RHITexture> m_pTexture;
+	WEngine::WSharedPtr<class RHITexture> m_pTexture;
+
+	class RHITextureDescriptor *m_pDescriptor;
 
 };

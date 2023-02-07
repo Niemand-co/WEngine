@@ -4,7 +4,7 @@
 GameScene::GameScene(const WEngine::WString& name)
 	: Layer(name)
 {
-	m_pViewport = new WSceneViewport();
+	m_pViewport = new WSceneViewport(1920, 1080, Format::A16R16G16B16_SFloat);
 }
 
 GameScene::~GameScene()

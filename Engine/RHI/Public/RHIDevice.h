@@ -52,7 +52,11 @@ public:
 
 	virtual RHIEvent* GetEvent() = 0;
 
-	virtual RHIShader* CreateShader(RHIShaderDescriptor *descriptor) = 0;
+	virtual RHIShader* CreateVertexShader(RHIShaderDescriptor* descriptor) = 0;
+
+	virtual RHIShader* CreateGeometryShader(RHIShaderDescriptor* descriptor) = 0;
+
+	virtual RHIShader* CreatePixelShader(RHIShaderDescriptor* descriptor) = 0;
 
 	virtual RHIRenderPass* CreateRenderPass(RHIRenderPassDescriptor *descriptor) = 0;
 

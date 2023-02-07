@@ -26,7 +26,21 @@ public:
 
 	void UpdateLightInfosForScene();
 
+	void AddCamera(class CameraComponent *camera);
+
+	void RemoveCamera(CameraComponent *camera);
+
+	void UpdateCameraInfoForScene();
+
 	void StartFrame();
+
+	WEngine::WArray<PrimitiveInfo*> GetOpaqueAndMaskPrimitives() const { return m_opaqueAndMaskPrimitives; }
+
+	WEngine::WArray<PrimitiveInfo*> GetTranslucentPrimitives() const { return m_translucentPrimitives; }
+
+	WEngine::WArray<PrimitiveInfo*> GetDynamicShadowCaster() const { return m_dynamicShadowCaster; }
+
+	WEngine::WArray<LightInfo*> GetLightInfos() const { return m_lights; }
 
 	void* operator new(size_t size)
 	{
@@ -71,5 +85,11 @@ private:
 	WEngine::WArray<PrimitiveInfo*> m_translucentPrimitives;
 
 	WEngine::WArray<PrimitiveInfo*> m_dynamicShadowCaster;
+
+	WEngine::WArray<CameraInfo*> m_cameras;
+
+	WEngine::WSet<CameraInfo*> m_addedCameras;
+
+	WEngine::WSet<CameraInfo*> m_removedCameras;
 
 };

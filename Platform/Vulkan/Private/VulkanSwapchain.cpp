@@ -16,7 +16,7 @@ namespace Vulkan
 		m_textures.Resize(imageCount);
 		for (unsigned int i = 0; i < imageCount; ++i)
 		{
-			m_textures[i] = new  VulkanTextureBase(pImages + i, nullptr, nullptr, m_pDevice, true);
+			m_textures[i] = new  VulkanTexture2D(pImages + i, 0, 0);
 		}
 	}
 
@@ -32,7 +32,8 @@ namespace Vulkan
 
 	int32 VulkanSwapchain::AcquireImageIndex(RHISemaphore** outSemaphore)
 	{
-		vkAcquireNextImageKHR(*pDevice, *pSwapchain, VK_TIMEOUT, );
+		//vkAcquireNextImageKHR(*pDevice, *pSwapchain, VK_TIMEOUT, );
+		return 0;
 	}
 
 	void VulkanSwapchain::Present(RHIQueue* queue, RHISemaphore* renderingDoneSemaphore)

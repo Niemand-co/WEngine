@@ -3,6 +3,7 @@
 #include "Scene/Components/Public/InstancedStaticMeshComponent.h"
 #include "Scene/Components/Public/LightComponent.h"
 #include "Scene/Components/Public/CameraComponent.h"
+#include "Render/Renderer/Public/DeferredRenderer.h"
 
 RScene* RScene::g_activeScene = nullptr;
 
@@ -51,6 +52,7 @@ void RScene::UpdatePrimitiveInfosForScene()
 			uint32 removedIndex = index;
 			for (; index < size && m_primitives[index]->GetProxy()->type == removedInfo->GetProxy()->type; ++index);
 			WEngine::Swap(&m_primitives[index - 1], &m_primitives[removedIndex]);
+			WEngine::Swap(&m_primitiveMatrices[index - 1], &m_primitiveMatrices[removedIndex]);
 		}
 		m_primitives.Resize(size - 1);
 	}
@@ -58,6 +60,7 @@ void RScene::UpdatePrimitiveInfosForScene()
 	for (PrimitiveInfo* addedInfo : AddedPrimitives)
 	{
 		m_primitives.Push(addedInfo);
+		m_primitiveMatrices.Push(addedInfo->Owner->GetComponent<TransformComponent>()->GetLocalToWorldMatrix());
 		uint32 size = m_primitives.Size();
 		if (size == 1)continue;
 		while (m_primitives[size - 1]->GetProxy()->type != m_primitives[size - 2]->GetProxy()->type)
@@ -66,6 +69,7 @@ void RScene::UpdatePrimitiveInfosForScene()
 			for (; index >= 0 && m_primitives[index]->GetProxy()->type == m_primitives[size - 1]->GetProxy()->type; --index);
 			if (index == 0 && m_primitives[index]->GetProxy()->type != m_primitives[size - 1]->GetProxy()->type)break;
 			WEngine::Swap(&m_primitives[index + 1], &m_primitives[size - 1]);
+			WEngine::Swap(&m_primitiveMatrices[index + 1], &m_primitiveMatrices[size - 1]);
 		}
 	}
 
@@ -122,6 +126,50 @@ void RScene::UpdateLightInfosForScene()
 	}
 }
 
+void RScene::AddCamera(CameraComponent* camera)
+{
+	m_addedCameras.Add(camera->GetCameraInfo());
+}
+
+void RScene::RemoveCamera(CameraComponent* camera)
+{
+	m_removedCameras.Add(camera->GetCameraInfo());
+}
+
+void RScene::UpdateCameraInfoForScene()
+{
+	WEngine::WArray<CameraInfo*> AddedCameras = m_addedCameras.Array();
+	m_addedCameras.Clear();
+
+	WEngine::WArray<CameraInfo*> RemovedCameras = m_removedCameras.Array();
+	m_removedCameras.Clear();
+
+	uint32 RemovedCount = 0;
+	for (CameraInfo* info : RemovedCameras)
+	{
+		uint32 size = m_cameras.Size();
+		for (uint32 index = 0; index < size; ++index)
+		{
+			if (m_cameras[index] == info)
+			{
+				WEngine::Swap(&m_cameras[index], &m_cameras[size - 1 - RemovedCount]);
+				RemovedCount++;
+			}
+		}
+	}
+	m_cameras.Resize(m_cameras.Size() - RemovedCount);
+
+	for (CameraInfo* info : AddedCameras)
+	{
+		m_cameras.Push(info);
+	}
+}
+
 void RScene::StartFrame()
 {
+	for (CameraInfo* info : m_cameras)
+	{
+		static_cast<SceneRenderer*>(info->Renderer)->SetScene(this);
+		info->Renderer->Render();
+	}
 }

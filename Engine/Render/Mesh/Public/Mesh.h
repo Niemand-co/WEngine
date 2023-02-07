@@ -1,7 +1,13 @@
 #pragma once
 
-struct Vertex;
+struct VertexComponent;
 class RHIBuffer;
+
+struct BoundingBox
+{
+	glm::vec3 BoxMin;
+	glm::vec3 BoxMax;
+};
 
 class StaticMesh : public WEngine::NamingSystem, public RenderResource
 {
@@ -17,13 +23,17 @@ public:
 
 	RHIBuffer* GetIndexBuffer();
 
+	void GenerateBoundingBox();
+
+	const BoundingBox& GetBoundingBox() { return m_boundingBox; }
+
 public:
 
-	static StaticMesh* GetCube();
+	//static StaticMesh* GetCube();
 
-	static StaticMesh* GetPlane();
+	//static StaticMesh* GetPlane();
 
-	static StaticMesh* GetArrow();
+	//static StaticMesh* GetArrow();
 
 private:
 
@@ -37,7 +47,7 @@ public:
 
 	const WEngine::WGuid<WEngine::WString> m_id;
 
-	Vertex *m_pVertices;
+	WEngine::WArray<VertexComponent> m_vertices;
 
 	unsigned int m_vertexCount;
 
@@ -45,9 +55,7 @@ public:
 
 	unsigned int m_indexCount;
 
-	glm::vec3 m_boundingBoxMin;
-
-	glm::vec3 m_boundingBoxMax;
+	BoundingBox m_boundingBox;
 
 };
 

@@ -24,7 +24,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanVertexShader();
+		VulkanVertexShader(VkShaderModule* shaderModule);
 
 		virtual ~VulkanVertexShader();
 
@@ -34,7 +34,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanGeometryShader();
+		VulkanGeometryShader(VkShaderModule* shaderModule);
 
 		virtual ~VulkanGeometryShader();
 
@@ -44,7 +44,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanPixelShader();
+		VulkanPixelShader(VkShaderModule* shaderModule);
 
 		virtual ~VulkanPixelShader();
 
@@ -54,7 +54,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanComputeShader();
+		VulkanComputeShader(VkShaderModule* shaderModule);
 
 		virtual ~VulkanComputeShader();
 

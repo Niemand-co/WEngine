@@ -47,7 +47,7 @@ namespace Vulkan
 	{
 		VkSwapchainCreateInfoKHR swapchainCreateInfo = {};
 		swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-		swapchainCreateInfo.surface = static_cast<VulkanSurface*>(descriptor->surface)->GetHandle();
+		swapchainCreateInfo.surface = *static_cast<VulkanInstance*>(descriptor->instance)->GetSurface();
 		swapchainCreateInfo.imageFormat = WEngine::ToVulkan(descriptor->format);
 		swapchainCreateInfo.imageColorSpace = WEngine::ToVulkan(descriptor->colorSpace);
 		swapchainCreateInfo.presentMode = WEngine::ToVulkan(descriptor->presenMode);
@@ -110,20 +110,43 @@ namespace Vulkan
 		return event;
 	}
 
-	RHIShader* VulkanDevice::CreateShader(RHIShaderDescriptor *descriptor)
+	RHIShader* VulkanDevice::CreateVertexShader(RHIShaderDescriptor* descriptor)
 	{
 		VkShaderModuleCreateInfo shaderModuleCreateInfo = {};
 		shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 		shaderModuleCreateInfo.codeSize = descriptor->codeSize;
 		shaderModuleCreateInfo.pCode = descriptor->pCode;
 
-		VkShaderModule *pShaderModule = (VkShaderModule*)WEngine::Allocator::Get()->Allocate(sizeof(VkShaderModule));
+		VkShaderModule* pShaderModule = (VkShaderModule*)WEngine::Allocator::Get()->Allocate(sizeof(VkShaderModule));
 		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pShaderModule);
 
-		RHIShader *shader = (RHIShader*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanShader));
-		:: new (shader) VulkanShader(pShaderModule, descriptor->shaderStage, descriptor->entryName);
+		return new VulkanVertexShader(pShaderModule);
+	}
 
-		return shader;
+	RHIShader* VulkanDevice::CreateGeometryShader(RHIShaderDescriptor* descriptor)
+	{
+		VkShaderModuleCreateInfo shaderModuleCreateInfo = {};
+		shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+		shaderModuleCreateInfo.codeSize = descriptor->codeSize;
+		shaderModuleCreateInfo.pCode = descriptor->pCode;
+
+		VkShaderModule* pShaderModule = (VkShaderModule*)WEngine::Allocator::Get()->Allocate(sizeof(VkShaderModule));
+		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pShaderModule);
+
+		return new VulkanGeometryShader(pShaderModule);
+	}
+
+	RHIShader* VulkanDevice::CreatePixelShader(RHIShaderDescriptor* descriptor)
+	{
+		VkShaderModuleCreateInfo shaderModuleCreateInfo = {};
+		shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+		shaderModuleCreateInfo.codeSize = descriptor->codeSize;
+		shaderModuleCreateInfo.pCode = descriptor->pCode;
+
+		VkShaderModule* pShaderModule = (VkShaderModule*)WEngine::Allocator::Get()->Allocate(sizeof(VkShaderModule));
+		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pShaderModule);
+
+		return new VulkanPixelShader(pShaderModule);
 	}
 
 	RHIRenderPass* VulkanDevice::CreateRenderPass(RHIRenderPassDescriptor* descriptor)
@@ -219,15 +242,15 @@ namespace Vulkan
 	RHIPipelineStateObject* VulkanDevice::CreatePipelineStateObject(RHIPipelineStateObjectDescriptor* descriptor)
 	{
 
-		WEngine::WArray<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos(descriptor->shaderCount);
-		for (unsigned int i = 0; i < descriptor->shaderCount; ++i)
-		{
-			RHIShader* shader = descriptor->pShader[i];
-			shaderStageCreateInfos[i].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-			shaderStageCreateInfos[i].stage = (VkShaderStageFlagBits)shader->GetStage();
-			shaderStageCreateInfos[i].module = *static_cast<VulkanShader*>(shader)->GetShaderModule();
-			shaderStageCreateInfos[i].pName = shader->GetEntry();
-		}
+		//WEngine::WArray<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos(descriptor->shaderCount);
+		//for (unsigned int i = 0; i < descriptor->shaderCount; ++i)
+		//{
+		//	RHIShader* shader = descriptor->pShader[i];
+		//	shaderStageCreateInfos[i].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		//	shaderStageCreateInfos[i].stage = (VkShaderStageFlagBits)shader->GetStage();
+		//	shaderStageCreateInfos[i].module = *static_cast<VulkanShaderBase*>(shader)->GetShaderModule();
+		//	shaderStageCreateInfos[i].pName = shader->GetEntry();
+		//}
 
 		VkVertexInputBindingDescription vertexInputBindgDescription = {};
 		{
@@ -350,8 +373,9 @@ namespace Vulkan
 		VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {};
 		{
 			graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-			graphicsPipelineCreateInfo.stageCount = shaderStageCreateInfos.Size();
-			graphicsPipelineCreateInfo.pStages = shaderStageCreateInfos.GetData();
+			//graphicsPipelineCreateInfo.stageCount = shaderStageCreateInfos.Size();
+			graphicsPipelineCreateInfo.stageCount = 0;
+			//graphicsPipelineCreateInfo.pStages = shaderStageCreateInfos.GetData();
 			graphicsPipelineCreateInfo.pVertexInputState = &vertexInputStateCreateInfo;
 			graphicsPipelineCreateInfo.pInputAssemblyState = &inputAssemblyStateCreateInfo;
 			graphicsPipelineCreateInfo.pViewportState = &viewportStateCreateInfo;
@@ -424,7 +448,7 @@ namespace Vulkan
 
 		vkBindImageMemory(*m_pDevice, *image, *pMemory, 0);
 
-		return new VulkanTexture(image, memoryRequirements, pMemory, m_pDevice);
+		return new VulkanTexture2D(image, descriptor->width, descriptor->height);
 	}
 
 	RHISampler* VulkanDevice::CreateSampler(RHISamplerDescriptor* descriptor)
@@ -689,7 +713,7 @@ namespace Vulkan
 			for (unsigned int j = 0; j < descriptor->pBindingDescriptors[i].bufferResourceCount; ++j)
 			{
 				::new (pDescriptorBufferInfos[i] + j) VkDescriptorBufferInfo();
-				pDescriptorBufferInfos[i][j].buffer = *static_cast<VulkanBuffer*>((descriptor->pBindingDescriptors[i].pBufferResourceInfo + j)->pBuffer)->GetHandle();
+				pDescriptorBufferInfos[i][j].buffer = *static_cast<VulkanUniformBuffer*>((descriptor->pBindingDescriptors[i].pBufferResourceInfo + j)->pBuffer)->GetHandle();
 				pDescriptorBufferInfos[i][j].offset = (descriptor->pBindingDescriptors[i].pBufferResourceInfo + j)->offset;
 				pDescriptorBufferInfos[i][j].range = (descriptor->pBindingDescriptors[i].pBufferResourceInfo + j)->range;
 			}

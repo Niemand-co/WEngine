@@ -21,6 +21,8 @@ namespace Vulkan
 
 		VkInstance* GetHandle();
 
+		VkSurfaceKHR* GetSurface() const { return m_pSurface; }
+
 	private:
 
 		void SetupDebugCallback();

@@ -1,6 +1,6 @@
 #pragma once
 
-class RHISurface;
+class RHIInstance;
 
 class RHISwapchainDescriptor
 {
@@ -22,7 +22,7 @@ public:
 
 	PresentMode presenMode;
 
-	RHISurface *surface;
+	RHIInstance *instance;
 
 	int presentFamilyIndex;
 

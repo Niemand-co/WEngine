@@ -1,4 +1,7 @@
 #pragma once
+#include "Utils/Container/Public/WSharedPtr.h"
+#include "HAL/Public/TaskGraph.h"
+#include "HAL/Public/WEvent.h"
 
 class RenderResource
 {

@@ -6,7 +6,7 @@ class StaticMeshComponent : public PrimitiveComponent
 {
 public:
 
-	friend class StaticMeshInfo;
+	friend class StaticMeshProxy;
 	
 	enum { type = 6 };
 
@@ -31,13 +31,22 @@ protected:
 struct StaticMeshProxy : public PrimitiveProxy
 {
 	StaticMeshProxy(StaticMeshComponent *primitive)
-		: PrimitiveProxy(primitive)
+		: PrimitiveProxy(primitive),
+		  Mesh(primitive->m_pMesh)
 	{
 
 	}
 
 	virtual void DrawStaticMesh(RHICommandListBase* CmdList) override;
 
+	virtual void DrawDynamicMesh(RHICommandListBase* CmdList) {}
+
+	virtual void GenerateBoundingBox() override;
+
+	virtual const BoundingBox& GetBoundingBox() override { return Mesh->GetBoundingBox(); }
+
 	enum { type = 1 };
+
+	StaticMesh *Mesh;
 
 };

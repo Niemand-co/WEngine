@@ -9,6 +9,5 @@ RHISwapchainDescriptor::RHISwapchainDescriptor()
 	colorSpace = ColorSpace::SRGB_Linear;
 	extent = { 1920u, 1080u };
 	presenMode = PresentMode::Immediate;
-	surface = nullptr;
 
 }

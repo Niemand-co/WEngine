@@ -1,6 +1,13 @@
 #pragma once
 #include "Render/Public/RenderTexture.h"
 
+struct CSMShadowMapPack
+{
+	WEngine::WArray<ShadowMap2D> ShadowMaps;
+	WEngine::WArray<float> SpliceDistances;
+	WEngine::WArray<glm::mat4> SpliceMatrices;
+};
+
 namespace WEngine
 {
 
@@ -8,17 +15,11 @@ namespace WEngine
 	{
 	public:
 
-		static void UpdateSplices(float *splices, unsigned int spliceCount, float nearClip, float farClip);
+		static void UpdateSplices(CSMShadowMapPack& outPack, float nearClip, float farClip);
 
-		static void UpdatePSSMMatrices(WEngine::WArray<glm::mat4>& matrices, glm::mat4 cameraMatrixInv, glm::vec3 lightDir, float *splices, unsigned int spliceCount);
+		static void UpdatePSSMMatrices(CSMShadowMapPack& outPack, glm::mat4 cameraMatrixInv, glm::vec3 lightDir);
 
 	};
 
-	struct CSMShadowMapPack
-	{
-		WArray<ShadowMap2D> ShadowMaps;
-		WArray<float> SpliceDistances;
-		WArray<glm::mat4> SpliceMatrices;
-	};
 
 }

@@ -2,7 +2,8 @@
 #include "Render/Public/Viewport.h"
 #include "Event/Public/Input.h"
 
-WEditorViewport::WEditorViewport()
+WEditorViewport::WEditorViewport(uint32 width, uint32 height, Format format)
+	: WViewport(width, height, format)
 {
 }
 
@@ -30,7 +31,8 @@ void WEditorViewport::ProcessInput()
 	}
 }
 
-WSceneViewport::WSceneViewport()
+WSceneViewport::WSceneViewport(uint32 width, uint32 height, Format format)
+	: WViewport(width, height, format)
 {
 }
 
