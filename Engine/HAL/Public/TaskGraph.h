@@ -294,7 +294,7 @@ namespace WEngine
 		uint32 AnyThreadCount = NUM_WORKING_THREAD - EThreadProperty::NamedThreadNum;
 		for (uint32 index = 0; index < IterationCount; ++index)
 		{
-			m_threads[EThreadProperty::NamedThreadNum + index % AnyThreadCount]->pTaskThread->m_taskQueue.TaskQueue.Push(new WLambdaTask(true, []() { lambda(index); }));
+			m_threads[EThreadProperty::NamedThreadNum + index % AnyThreadCount]->pTaskThread->m_taskQueue.TaskQueue.Push(new WLambdaTask(true, [&lambda, &index]() { lambda(index); }));
 		}
 	}
 

@@ -81,8 +81,4 @@ protected:
 
 };
 
-RHIRenderCommandList* GetRenderCommandList()
-{
-	static RHIRenderCommandList *list = new RHIRenderCommandList;
-	return list;
-}
+RHIRenderCommandList* GetRenderCommandList();

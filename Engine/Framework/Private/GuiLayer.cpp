@@ -35,7 +35,7 @@ namespace WEngine
 		Gui* pGui = Gui::CreateGui(WEngine::Backend::Vulkan);
 		pGui->Init(&guiConfigure);
 
-		m_pViewport = new WEditorViewport();
+		m_pViewport = new WEditorViewport(1920, 1080, Format::A16R16G16B16_SFloat);
 
 		RHISamplerDescriptor samplerDescriptor = {};
 		{

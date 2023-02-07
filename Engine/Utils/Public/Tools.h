@@ -99,7 +99,7 @@ namespace WEngine
 		T tmp;
 		memcpy(&tmp, val1, sizeof(T));
 		memcpy(&val1, val2, sizeof(T));
-		memcpy(&val2, tmp, sizeof(T));
+		memcpy(&val2, &tmp, sizeof(T));
 	}
 
 }

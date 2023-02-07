@@ -107,7 +107,7 @@ void DeferredRenderer::ComputeVisibility()
 		Frustum[7] = FarCenter + FarUp - FarRight;
 	}
 	
-	WEngine::WTaskGraph::Get()->ParallelFor(OpaqueAndMaskPrimitives.Size(), [&OpaqueAndMaskPrimitives, &Frustum, this](uint32 index)
+	WEngine::WTaskGraph::Get()->ParallelFor(OpaqueAndMaskPrimitives.Size(), [this, &OpaqueAndMaskPrimitives, &Frustum](uint32 index)
 	{
 		PrimitiveInfo *info = OpaqueAndMaskPrimitives[index];
 		const BoundingBox& box = info->Proxy->GetBoundingBox();

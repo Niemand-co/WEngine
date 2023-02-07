@@ -37,11 +37,4 @@ private:
 * @param resource The resource wating for initialization
 * @return void
 */
-void BeginInitResource(RenderResource* resource)
-{
-	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [&resource]()
-	{
-		resource->InitRHIResource();
-	}
-	), WEngine::EThreadProperty::RenderThread);
-}
+void BeginInitResource(RenderResource* resource);

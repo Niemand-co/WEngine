@@ -35,3 +35,9 @@ WUniformBuffer* RHIRenderCommandList::CreateUniformBuffer(size_t stride, size_t 
 {
     return new WUniformBuffer(stride, count);
 }
+
+RHIRenderCommandList* GetRenderCommandList()
+{
+    static RHIRenderCommandList* list = new RHIRenderCommandList;
+    return list;
+}
