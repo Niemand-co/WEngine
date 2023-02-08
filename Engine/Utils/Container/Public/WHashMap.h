@@ -14,10 +14,10 @@ namespace WEngine
 	struct Entry
 	{
 		size_t id;
-		WPair<size_t, const v&> pair;
+		WPair<size_t, v> pair;
 		Entry<v> *next;
 
-		Entry(size_t key, const v& val) : id(key), pair(WEngine::MakePiar<size_t, const v&>(key, val)), next(nullptr) {  }
+		Entry(size_t key, const v& val) : id(key), pair(key, val), next(nullptr) {  }
 
 		void* operator new(size_t size)
 		{

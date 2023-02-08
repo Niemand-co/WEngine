@@ -12,7 +12,10 @@ namespace WEngine
 
 		WPair(const k& key, const v& val);
 
-		WPair(const WPair&) = default;
+		explicit WPair(const WPair& other)
+			: m_key(other.m_key), m_val(other.m_val)
+		{
+		}
 
 		~WPair() = default;
 
@@ -29,14 +32,14 @@ namespace WEngine
 	};
 
 	template<typename k, typename v>
-	inline WPair<k, v>::WPair(const k& key, const v& val)
+	WPair<k, v>::WPair(const k& key, const v& val)
 		: m_key(key), m_val(val)
 	{
 		
 	}
 
 	template<typename k, typename v>
-	WPair<k, remove_const_and_reference<v>> MakePiar(k key, remove_const_and_reference<v> val)
+	WPair<k, v> MakePair(k key, v val)
 	{
 		return WPair(key, val);
 	}

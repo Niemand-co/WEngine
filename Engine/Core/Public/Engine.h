@@ -79,6 +79,8 @@ namespace WEngine
 
 		void InitRHIDevice();
 
+		void ResourceLoading();
+
 		void StartRenderingThread();
 
 	private:

@@ -12,6 +12,7 @@
 //------------------------OS SDK-------------------------------
 #if defined(WIN32) || defined(_WIN32)
 #include <windows.h>
+#include <io.h>
 #define VK_USE_PLATFORM_WIN32_KHR
 #define GLFW_EXPOSE_NATIVE_WIN32
 #endif

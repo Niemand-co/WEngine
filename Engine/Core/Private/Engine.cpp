@@ -11,6 +11,7 @@
 #include "Framework/Public/GuiLayer.h"
 #include "Event/Public/TimeStep.h"
 #include "Scene/Public/World.h"
+#include "Render/Public/Shader.h"
 
 namespace WEngine
 {
@@ -61,6 +62,7 @@ namespace WEngine
 	void REngine::Init()
 	{
 		StartRenderingThread();
+		ResourceLoading();
 		//LayerStack::Get()->PushLayer(new GuiLayer("Gui"));
 	}
 
@@ -77,6 +79,15 @@ namespace WEngine
 	void REngine::InitRHIDevice()
 	{
 		RHIContext::Init();
+	}
+
+	void REngine::ResourceLoading()
+	{
+		_finddata_t file;
+		while (_findfirst("assets\\*.*", &file) == 0)
+		{
+			WShaderLibrary::LoadShader(file.name);
+		}
 	}
 
 	void REngine::StartRenderingThread()

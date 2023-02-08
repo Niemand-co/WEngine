@@ -112,17 +112,15 @@ class WShaderLibrary : public WEngine::NamingSystem
 {
 public:
 
-	WShaderLibrary() = default;
-
-	~WShaderLibrary() = default;
-
-	WShader* GetShader(const WEngine::WString& name)
+	static WShader* GetShader(const WEngine::WString& name)
 	{
 		return Shaders[WEngine::WGuid(name)];
 	}
 
+	static void LoadShader(const WEngine::WString& path);
+
 private:
 
-	WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WShader*, Hash> Shaders;
+	static WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WShader*, Hash> Shaders;
 
 };
