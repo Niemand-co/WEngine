@@ -1,13 +1,14 @@
 #include "pch.h"
 #include "Render/Public/Scene.h"
 #include "Scene/Components/Public/InstancedStaticMeshComponent.h"
-#include "Scene/Components/Public/LightComponent.h"
+#include "Scene/Components/Public/DirectionalLightComponent.h"
 #include "Scene/Components/Public/CameraComponent.h"
 #include "Render/Renderer/Public/DeferredRenderer.h"
 
 RScene* RScene::g_activeScene = nullptr;
 
 RScene::RScene()
+	: m_pMainLight(nullptr)
 {
 }
 
@@ -98,6 +99,7 @@ void RScene::UpdateLightInfosForScene()
 
 	for (LightInfo* removedInfo : RemovedLights)
 	{
+		if(m_pMainLight == removedInfo)m_pMainLight = nullptr;
 		uint32 size = m_lights.Size();
 		uint32 index = 0;
 		for (; index < size && m_lights[index] == removedInfo; ++index);
@@ -122,6 +124,18 @@ void RScene::UpdateLightInfosForScene()
 			for (; index >= 0 && m_lights[index]->type == m_lights[size - 1]->type; --index);
 			if(index == 0 && m_lights[index]->type != m_lights[size - 1]->type)break;
 			WEngine::Swap(&m_lights[index + 1], &m_lights[size - 1]);
+		}
+	}
+
+	if (!m_pMainLight)
+	{
+		for (LightInfo *info : m_lights)
+		{
+			if (info->type == DirectionalLightComponent::type)
+			{
+				m_pMainLight = info;
+				break;
+			}
 		}
 	}
 }
@@ -163,13 +177,17 @@ void RScene::UpdateCameraInfoForScene()
 	{
 		m_cameras.Push(info);
 	}
+
+	for (CameraInfo* info : AddedCameras)
+	{
+		info->UpdateInfo();
+	}
 }
 
 void RScene::StartFrame()
 {
 	for (CameraInfo* info : m_cameras)
 	{
-		static_cast<SceneRenderer*>(info->Renderer)->SetScene(this);
 		info->Renderer->Render();
 	}
 }

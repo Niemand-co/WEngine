@@ -11,6 +11,10 @@ RenderTarget::RenderTarget(uint32 width, uint32 height, Format format)
 		m_pDescriptor->width = width;
 		m_pDescriptor->height = height;
 		m_pDescriptor->format = format;
+		m_pDescriptor->usage = IMAGE_USAGE_COLOR_ATTACHMENT;
+		m_pDescriptor->mipCount = 1;
+		m_pDescriptor->layerCount = 1;
+		m_pDescriptor->layout = AttachmentLayout::Undefined;
 	}
 	InitRHIResource();
 }

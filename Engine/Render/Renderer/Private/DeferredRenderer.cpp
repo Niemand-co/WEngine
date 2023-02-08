@@ -3,6 +3,7 @@
 #include "Render/Public/Scene.h"
 #include "Scene/Components/Public/CameraComponent.h"
 #include "Scene/Components/Public/PrimitiveComponent.h"
+#include "Scene/Components/Public/DirectionalLightComponent.h"
 #include "Render/Public/SceneVisibility.h"
 
 DeferredRenderer::DeferredRenderer(CameraComponent* pCamera)
@@ -22,7 +23,7 @@ void DeferredRenderer::Render()
 
 	RenderPrePass();
 
-	RenderShadowPass();
+	RenderBasePass();
 
 	RenderShadowPass();
 
@@ -39,8 +40,12 @@ void DeferredRenderer::InitView()
 {
 	ComputeVisibility();
 
-	WEngine::CascadedShadowMap::UpdateSplices(CSMMaps, m_pCamera->m_nearPlane, m_pCamera->m_farPlane);
-	//WEngine::CascadedShadowMap::UpdatePSSMMatrices(CSMMaps, glm::inverse(m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix()), )
+	LightInfo *MainLight = Scene->GetMainLightInfo();
+	if (MainLight)
+	{
+		WEngine::CascadedShadowMap::UpdateSplices(CSMMaps, m_pCamera->m_nearPlane, m_pCamera->m_farPlane);
+		WEngine::CascadedShadowMap::UpdatePSSMMatrices(CSMMaps, glm::inverse(m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix()), static_cast<DirectionalLightInfo*>(MainLight)->LightDirection);
+	}
 }
 
 void DeferredRenderer::RenderPrePass()

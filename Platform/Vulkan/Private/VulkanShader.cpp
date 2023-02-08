@@ -23,4 +23,31 @@ namespace Vulkan
 	{
 	}
 
+	VulkanGeometryShader::VulkanGeometryShader(VkShaderModule* shaderModule)
+		: VulkanShaderBase(shaderModule)
+	{
+	}
+
+	VulkanGeometryShader::~VulkanGeometryShader()
+	{
+	}
+
+	VulkanPixelShader::VulkanPixelShader(VkShaderModule* shaderModule)
+		: VulkanShaderBase(shaderModule)
+	{
+	}
+
+	VulkanPixelShader::~VulkanPixelShader()
+	{
+	}
+
+	VulkanComputeShader::VulkanComputeShader(VkShaderModule* shaderModule)
+		: VulkanShaderBase(shaderModule)
+	{
+	}
+
+	VulkanComputeShader::~VulkanComputeShader()
+	{
+	}
+
 }

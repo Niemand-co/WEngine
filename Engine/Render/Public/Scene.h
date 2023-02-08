@@ -42,6 +42,8 @@ public:
 
 	WEngine::WArray<LightInfo*> GetLightInfos() const { return m_lights; }
 
+	LightInfo* GetMainLightInfo() const { return m_pMainLight; }
+
 	void* operator new(size_t size)
 	{
 		return WEngine::Allocator::Get()->Allocate(size);
@@ -75,6 +77,8 @@ private:
 	WEngine::WSet<PrimitiveInfo*> m_removedPrimitives;
 
 	WEngine::WArray<LightInfo*> m_lights;
+
+	LightInfo *m_pMainLight;
 
 	WEngine::WSet<LightInfo*> m_addedLights;
 

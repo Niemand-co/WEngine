@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene/Components/Public/Component.h"
 #include "Scene/Components/Public/TransformComponent.h"
+#include "Render/Renderer/Public/DeferredRenderer.h"
 
 class GameObject;
 class ScriptableRenderer;
@@ -38,7 +39,8 @@ public:
 
 	glm::vec3 GetForward() const { return m_forward; }
 
-	void SetRenderer(ScriptableRenderer *renderer);
+	template<typename T>
+	void SetRenderer();
 
 	inline CameraRenderTarget& GetRenderTarget(unsigned int index) { return m_rendertargets[index]; }
 
@@ -51,8 +53,6 @@ public:
 	void Move(Direction dir, float dis);
 
 	void Rotate(RotateDirection dir, float dis);
-
-	void RecreateRenderTarget(unsigned int width, unsigned int height);
 
 private:
 
@@ -108,9 +108,21 @@ struct CameraInfo
 		  NearClip(camera->m_nearPlane),
 		  Aspect(camera->m_aspect),
 		  Renderer(camera->m_renderer),
-		  Owner(camera->GetOwner())
+		  Owner(camera->GetOwner()),
+		  bMarkedDirty(false)
 	{
 
+	}
+
+	void MarkDirty() { bMarkedDirty = true; }
+
+	void UpdateInfo()
+	{
+		if(!bMarkedDirty)
+			return;
+
+		::new (this) CameraInfo(Owner->GetComponent<CameraComponent>());
+		bMarkedDirty = false;
 	}
 
 	enum { type = 0 };
@@ -136,7 +148,19 @@ struct CameraInfo
 	ScriptableRenderer* Renderer;
 
 	GameObject *Owner;
+
+	uint8 bMarkedDirty : 1;
 };
+
+template<typename T>
+void CameraComponent::SetRenderer()
+{
+	m_renderer = new T(this);
+	SceneRenderer* renderer = dynamic_cast<SceneRenderer*>(m_renderer);
+	if (renderer != nullptr)
+		renderer->SetScene(RScene::GetActiveScene());
+	m_pInfo->MarkDirty();
+}
 
 //namespace WEngine
 //{

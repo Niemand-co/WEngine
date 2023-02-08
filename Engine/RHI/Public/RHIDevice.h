@@ -52,11 +52,13 @@ public:
 
 	virtual RHIEvent* GetEvent() = 0;
 
-	virtual RHIShader* CreateVertexShader(RHIShaderDescriptor* descriptor) = 0;
+	virtual WVertexShaderRHIRef CreateVertexShader(RHIShaderDescriptor* descriptor) = 0;
 
-	virtual RHIShader* CreateGeometryShader(RHIShaderDescriptor* descriptor) = 0;
+	virtual WPixelShaderRHIRef CreatePixelShader(RHIShaderDescriptor* descriptor) = 0;
 
-	virtual RHIShader* CreatePixelShader(RHIShaderDescriptor* descriptor) = 0;
+	virtual WGeometryShaderRHIRef CreateGeometryShader(RHIShaderDescriptor* descriptor) = 0;
+
+	virtual WComputeShaderRHIRef CreateComputeShader(RHIShaderDescriptor* descriptor) = 0;
 
 	virtual RHIRenderPass* CreateRenderPass(RHIRenderPassDescriptor *descriptor) = 0;
 
@@ -68,15 +70,15 @@ public:
 
 	virtual RHIRenderTarget* CreateRenderTarget(RHIRenderTargetDescriptor *descriptor) = 0;
 
-	virtual class RHIBuffer* CreateVertexBuffer(RHIBufferDescriptor* descriptor) = 0;
+	virtual WVertexBufferRHIRef CreateVertexBuffer(RHIBufferDescriptor* descriptor) = 0;
 
-	virtual class RHIBuffer* CreateDynamicVertexBuffer(RHIBufferDescriptor* descriptor) = 0;
+	virtual WDynamicVertexBufferRHIRef CreateDynamicVertexBuffer(RHIBufferDescriptor* descriptor) = 0;
 
-	virtual class RHIBuffer* CreateIndexBuffer(RHIBufferDescriptor* descriptor) = 0;
+	virtual WIndexBufferRHIRef CreateIndexBuffer(RHIBufferDescriptor* descriptor) = 0;
 
-	virtual class RHIBuffer* CreateUniformBuffer(RHIBufferDescriptor* descriptor) = 0;
+	virtual WUniformBufferRHIRef CreateUniformBuffer(RHIBufferDescriptor* descriptor) = 0;
 
-	virtual class RHIBuffer* CreateDynamicUniformBuffer(RHIBufferDescriptor* descriptor) = 0;
+	virtual WDynamicUniformBufferRHIRef CreateDynamicUniformBuffer(RHIBufferDescriptor* descriptor) = 0;
 
 	virtual RHIGroup* CreateResourceGroup(RHIGroupDescriptor *descriptor) = 0;
 

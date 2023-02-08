@@ -51,6 +51,28 @@ namespace WEngine
 
 		bool Find(const k& key);
 
+		v operator[](const k& key)
+		{
+			size_t id = Hash(key);
+			size_t index = GetIndex(id);
+			Entry<v>* head = m_table[index];
+			if (head == nullptr)
+			{
+				return v(NULL);
+			}
+
+			while (head)
+			{
+				if (head->id == id)
+				{
+					return head->pair.Second();
+				}
+				head = head->next;
+			}
+
+			return v(NULL);
+		}
+
 	private:
 
 		size_t GetIndex(const size_t& index);

@@ -10,6 +10,7 @@
 #include "Framework/Public/LayerStack.h"
 #include "Framework/Public/GuiLayer.h"
 #include "Event/Public/TimeStep.h"
+#include "Scene/Public/World.h"
 
 namespace WEngine
 {
@@ -34,6 +35,7 @@ namespace WEngine
 	void GEngine::Init()
 	{
 		//LayerStack::Get()->PushLayer(new GuiLayer("Gui"));
+		GWorld::CreateWorld();
 	}
 
 	void GEngine::Tick(const TimeStep& timeStep)

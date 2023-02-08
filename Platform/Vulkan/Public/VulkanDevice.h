@@ -28,11 +28,13 @@ namespace Vulkan
 
 		virtual RHIEvent* GetEvent() override;
 
-		virtual RHIShader* CreateVertexShader(RHIShaderDescriptor* descriptor) override;
+		virtual WVertexShaderRHIRef CreateVertexShader(RHIShaderDescriptor* descriptor) override;
 
-		virtual RHIShader* CreateGeometryShader(RHIShaderDescriptor* descriptor) override;
+		virtual WPixelShaderRHIRef CreatePixelShader(RHIShaderDescriptor* descriptor) override;
 
-		virtual RHIShader* CreatePixelShader(RHIShaderDescriptor* descriptor) override;
+		virtual WGeometryShaderRHIRef CreateGeometryShader(RHIShaderDescriptor* descriptor) override;
+
+		virtual WComputeShaderRHIRef CreateComputeShader(RHIShaderDescriptor* descriptor) override;
 
 		virtual RHIRenderPass* CreateRenderPass(RHIRenderPassDescriptor *descriptor) override;
 
@@ -44,15 +46,15 @@ namespace Vulkan
 
 		virtual RHIRenderTarget* CreateRenderTarget(RHIRenderTargetDescriptor *descriptor) override;
 
-		virtual RHIBuffer* CreateVertexBuffer(RHIBufferDescriptor* descriptor) override;
+		virtual WVertexBufferRHIRef CreateVertexBuffer(RHIBufferDescriptor* descriptor) override;
 
-		virtual RHIBuffer* CreateDynamicVertexBuffer(RHIBufferDescriptor* descriptor) override;
+		virtual WDynamicVertexBufferRHIRef CreateDynamicVertexBuffer(RHIBufferDescriptor* descriptor) override;
 
-		virtual RHIBuffer* CreateIndexBuffer(RHIBufferDescriptor* descriptor) override;
+		virtual WIndexBufferRHIRef CreateIndexBuffer(RHIBufferDescriptor* descriptor) override;
 
-		virtual RHIBuffer* CreateUniformBuffer(RHIBufferDescriptor* descriptor) override;
+		virtual WUniformBufferRHIRef CreateUniformBuffer(RHIBufferDescriptor* descriptor) override;
 
-		virtual RHIBuffer* CreateDynamicUniformBuffer(RHIBufferDescriptor *descriptor) override;
+		virtual WDynamicUniformBufferRHIRef CreateDynamicUniformBuffer(RHIBufferDescriptor *descriptor) override;
 
 		virtual RHIGroup* CreateResourceGroup(RHIGroupDescriptor *descriptor) override;
 

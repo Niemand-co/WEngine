@@ -5,7 +5,6 @@
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Utils/Public/Window.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
-#include "Render/Public/Buffer.h"
 
 unsigned int RHIContext::g_maxFrames = 3;
 
@@ -311,7 +310,7 @@ void RHIContext::ResourceBarrier(RHIBarrierDescriptor *pDescriptor)
 	WEngine::Allocator::Get()->Deallocate(cmd);
 }
 
-RHIBuffer* RHIContext::CreateVertexBuffer(size_t stride, size_t count)
+WVertexBufferRHIRef RHIContext::CreateVertexBuffer(size_t stride, size_t count)
 {
 	RHIBufferDescriptor descriptor = {};
 	{
@@ -321,7 +320,7 @@ RHIBuffer* RHIContext::CreateVertexBuffer(size_t stride, size_t count)
 	return g_pDevice->CreateVertexBuffer(&descriptor);
 }
 
-RHIBuffer* RHIContext::CreateIndexBuffer(size_t count)
+WIndexBufferRHIRef RHIContext::CreateIndexBuffer(size_t count)
 {
 	RHIBufferDescriptor descriptor = {};
 	{
@@ -331,7 +330,7 @@ RHIBuffer* RHIContext::CreateIndexBuffer(size_t count)
 	return g_pDevice->CreateIndexBuffer(&descriptor);
 }
 
-RHIBuffer* RHIContext::CreateUniformBuffer(size_t stride, size_t count)
+WUniformBufferRHIRef RHIContext::CreateUniformBuffer(size_t stride, size_t count)
 {
 	RHIBufferDescriptor descriptor = {};
 	{
@@ -341,7 +340,7 @@ RHIBuffer* RHIContext::CreateUniformBuffer(size_t stride, size_t count)
 	return g_pDevice->CreateUniformBuffer(&descriptor);
 }
 
-RHIBuffer* RHIContext::CreateDynamicUniformBuffer(size_t stride, size_t count)
+WDynamicUniformBufferRHIRef* RHIContext::CreateDynamicUniformBuffer(size_t stride, size_t count)
 {
 	return nullptr;
 }
@@ -351,6 +350,50 @@ RHIBuffer* RHIContext::CreateTextureBuffer(RHIBufferDescriptor* descriptor)
 	//descriptor->bufferType = BUFFER_USAGE_TRANSFER_SRC;
 	//return g_pDevice->CreateBuffer(descriptor);
 	return nullptr;
+}
+
+WVertexShaderRHIRef RHIContext::CreateVertexShader(ShaderCodeBlob& blob)
+{
+	RHIShaderDescriptor descriptor = {};
+	{
+		descriptor.codeSize = blob.GetSize();
+		descriptor.pCode = blob.GetCode();
+		descriptor.entryName = "VSMain";
+	}
+	return g_pDevice->CreateVertexShader(&descriptor);
+}
+
+WPixelShaderRHIRef RHIContext::CreatePixelShader(ShaderCodeBlob& blob)
+{
+	RHIShaderDescriptor descriptor = {};
+	{
+		descriptor.codeSize = blob.GetSize();
+		descriptor.pCode = blob.GetCode();
+		descriptor.entryName = "PSMain";
+	}
+	return g_pDevice->CreatePixelShader(&descriptor);
+}
+
+WGeometryShaderRHIRef RHIContext::CreateGeometryShader(ShaderCodeBlob& blob)
+{
+	RHIShaderDescriptor descriptor = {};
+	{
+		descriptor.codeSize = blob.GetSize();
+		descriptor.pCode = blob.GetCode();
+		descriptor.entryName = "GSMain";
+	}
+	return g_pDevice->CreateGeometryShader(&descriptor);
+}
+
+WComputeShaderRHIRef RHIContext::CreateComputeShader(ShaderCodeBlob& blob)
+{
+	RHIShaderDescriptor descriptor = {};
+	{
+		descriptor.codeSize = blob.GetSize();
+		descriptor.pCode = blob.GetCode();
+		descriptor.entryName = "CSMain";
+	}
+	return g_pDevice->CreateComputeShader(&descriptor);
 }
 
 RHIScissor* RHIContext::CreateScissor(RHIScissorDescriptor* descriptor)

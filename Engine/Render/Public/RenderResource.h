@@ -37,4 +37,12 @@ private:
 * @param resource The resource wating for initialization
 * @return void
 */
-void BeginInitResource(RenderResource* resource);
+void BeginInitResource(RenderResource *resource);
+
+/**
+* To enque resource waiting for releasing.
+* 
+* @param resource The resource waiting for releasing
+* @return void
+*/
+void BeginReleasResource(RenderResource *resource);

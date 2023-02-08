@@ -108,6 +108,11 @@ namespace WEngine
 			m_event->Wait();
 		}
 
+		void Reset()
+		{
+			m_event->Reset();
+		}
+
 		void Trigger()
 		{
 			m_event->Trigger();
@@ -190,6 +195,7 @@ namespace WEngine
 		void Wait()
 		{
 			m_pTaskEvent->Wait();
+			m_pTaskEvent->Reset();
 		}
 
 	};

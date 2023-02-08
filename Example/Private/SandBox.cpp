@@ -55,6 +55,8 @@ void GameScene::Tick(WEngine::TimeStep timeStep)
 		scene.UpdateLightInfosForScene();
 
 		scene.UpdatePrimitiveInfosForScene();
+
+		scene.UpdateCameraInfoForScene();
 	}
 	), WEngine::EThreadProperty::RenderThread);
 
@@ -84,6 +86,9 @@ SandBox::SandBox()
 	WEngine::LayerStack::Get()->PushLayer(new GameScene("Game Scene"));
 	RScene::SetActiveScene(new RScene);
 
+	GameObject *go = GWorld::GetWorld()->CreateGameObject("Camera");
+	CameraComponent *camera = go->AddComponent<CameraComponent>();
+	camera->SetRenderer<DeferredRenderer>();
 }
 
 SandBox::~SandBox()

@@ -1,4 +1,6 @@
 #pragma once
+#include "RHI/Public/RHICore.h"
+#include "Utils/Public/ShaderCodeBlob.h"
 
 class RenderTarget;
 class RHIGraphicsEncoder;
@@ -45,11 +47,19 @@ public:
 
 	void DrawIndexedPrimitive(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount);
 
-	class WVertexBuffer* CreateVertexBuffer(size_t stride, size_t count);
+	WVertexBufferRHIRef CreateVertexBuffer(size_t stride, size_t count);
 
-	class WIndexBuffer* CreateIndexBuffer(size_t count);
+	WIndexBufferRHIRef CreateIndexBuffer(size_t count);
 
-	class WUniformBuffer* CreateUniformBuffer(size_t stride, size_t count);
+	WUniformBufferRHIRef CreateUniformBuffer(size_t stride, size_t count);
+
+	WVertexShaderRHIRef CreateVertexShader(ShaderCodeBlob& blob);
+
+	WPixelShaderRHIRef CreatePixelShader(ShaderCodeBlob& blob);
+
+	WGeometryShaderRHIRef CreateGeometryShader(ShaderCodeBlob& blob);
+
+	WComputeShaderRHIRef CreateComputeShader(ShaderCodeBlob& blob);
 
 public:
 

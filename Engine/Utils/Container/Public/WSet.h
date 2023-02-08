@@ -59,6 +59,8 @@ namespace WEngine
 		{
 			m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
 			m_pData[0] = element;
+			m_count = 1;
+			m_size = 1;
 		}
 		else if (m_count == m_size)
 		{

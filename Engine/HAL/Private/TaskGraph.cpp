@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "HAL/Public/TaskGraph.h"
-#include <thread>
+#include "Core/Public/AnyThread.h"
+#include "HAL/Public/WThread.h"
 
 namespace WEngine
 {
@@ -19,8 +20,18 @@ namespace WEngine
 
 	unsigned int GetQueueIndex(EThreadProperty property)
 	{
-		unsigned int index = (EThreadProperty::ThreadIndexMask & property);
-		return index > 3 ? 3 : index;
+		EThreadProperty index = (EThreadProperty)(property & EThreadProperty::ThreadIndexMask);
+		switch (index)
+		{
+		case WEngine::GameThread:
+			return 0;
+		case WEngine::RenderThread:
+			return 1;
+		case WEngine::RHIThread:
+			return 2;
+		default:
+			return index - 5;
+		}
 	}
 
 	WTaskGraph::WTaskGraph()
@@ -32,9 +43,10 @@ namespace WEngine
 			m_threads[threadIndex]->pTaskThread = new WNamedTaskThread();
 			m_threads[threadIndex]->pTaskThread->m_threadId = (EThreadProperty)threadIndex;
 		}
-		for (unsigned int threadIndex = EThreadProperty::NamedThreadNum; threadIndex < NUM_WORKING_THREAD; ++threadIndex)
+		for (unsigned int threadIndex = EThreadProperty::AnyThread; threadIndex < EThreadProperty::AnyThread + 4; ++threadIndex)
 		{
-			m_threads[threadIndex]->pTaskThread->ProcessUntilQuit();
+			WAnyThread *thread = new WAnyThread((EThreadProperty)threadIndex);
+			WThread::Create(thread, "Rendering_Thread");
 		}
 	}
 

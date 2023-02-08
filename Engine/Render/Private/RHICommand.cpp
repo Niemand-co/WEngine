@@ -6,21 +6,21 @@
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
 #include "RHI/Encoder/Public/RHIComputeEncoder.h"
 
-#define ENCODER_EXECUTE(command) static_cast<RHIRenderCommandList*>(CmdList)->GetEncoder()->command
+#define ENCODER_EXECUTE(command) static_cast<RHIRenderCommandList*>(CmdList)->command
 
 void RHICommandBeginRenderPass::Execute(RHICommandListBase* CmdList)
 {
-	ENCODER_EXECUTE(BeginPass)(descriptor);
+	ENCODER_EXECUTE(BeginRenderPass)(descriptor);
 }
 
 void RHICommandEndRenderPass::Execute(RHICommandListBase* CmdList)
 {
-	ENCODER_EXECUTE(EndPass)();
+	ENCODER_EXECUTE(EndRenderPass)();
 }
 
 void RHICommandDrawIndexedPrimitive::Execute(RHICommandListBase* CmdList)
 {
-	ENCODER_EXECUTE(DrawIndexed)(indexCount, firstIndex, instanceCount);
+	ENCODER_EXECUTE(DrawIndexedPrimitive)(indexCount, firstIndex, instanceCount);
 }
 
 void RHICommandSetViewport::Execute(RHICommandListBase* CmdList)

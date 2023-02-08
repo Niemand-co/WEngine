@@ -24,7 +24,7 @@ namespace WEngine
 			B = 0xefcdab89;
 			C = 0x98badcfe;
 			D = 0x10325476;
-			MD5((const remove_const_and_referencet<T>::type&)data, A, B, C, D);
+			MD5((const remove_const_and_reference<T>::type&)data, A, B, C, D);
 		}
 
 		WGuid(const WGuid&) = default;

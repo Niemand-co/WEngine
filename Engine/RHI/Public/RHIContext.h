@@ -77,15 +77,23 @@ public:
 
 	virtual void ResourceBarrier(RHIBarrierDescriptor* pDescriptor);
 
-	virtual class RHIBuffer* CreateVertexBuffer(size_t stride, size_t count);
+	WVertexBufferRHIRef CreateVertexBuffer(size_t stride, size_t count);
 
-	virtual class RHIBuffer* CreateIndexBuffer(size_t count);
+	WIndexBufferRHIRef CreateIndexBuffer(size_t count);
 
-	virtual class RHIBuffer* CreateUniformBuffer(size_t stride, size_t count);
+	WUniformBufferRHIRef CreateUniformBuffer(size_t stride, size_t count);
 
-	virtual class RHIBuffer* CreateDynamicUniformBuffer(size_t stride, size_t count);
+	WDynamicUniformBufferRHIRef* CreateDynamicUniformBuffer(size_t stride, size_t count);
 
-	virtual RHIBuffer* CreateTextureBuffer(RHIBufferDescriptor *descriptor);
+	RHIBuffer* CreateTextureBuffer(RHIBufferDescriptor *descriptor);
+
+	WVertexShaderRHIRef CreateVertexShader(ShaderCodeBlob& blob);
+
+	WPixelShaderRHIRef CreatePixelShader(ShaderCodeBlob& blob);
+
+	WGeometryShaderRHIRef CreateGeometryShader(ShaderCodeBlob& blob);
+
+	WComputeShaderRHIRef CreateComputeShader(ShaderCodeBlob& blob);
 
 	virtual RHIScissor* CreateScissor(RHIScissorDescriptor *descriptor);
 

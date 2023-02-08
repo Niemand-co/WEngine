@@ -38,11 +38,11 @@ namespace Vulkan
 
 		virtual ~VulkanVertexBuffer();
 
-		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override;
+		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override {}
 
-		virtual void Flush(size_t range) override;
+		virtual void Flush(size_t range) override {}
 
-		virtual void Resize(size_t count) override;
+		virtual void Resize(size_t count) override {}
 
 	};
 
@@ -54,11 +54,11 @@ namespace Vulkan
 
 		virtual ~VulkanDynamicVertexBuffer();
 
-		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override;
+		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override {}
 
-		virtual void Flush(size_t range) override;
+		virtual void Flush(size_t range) override {}
 
-		virtual void Resize(size_t count) override;
+		virtual void Resize(size_t count) override {}
 	};
 
 	class VulkanIndexBuffer : public RHIIndexBuffer, public VulkanBufferBase
@@ -69,11 +69,11 @@ namespace Vulkan
 
 		virtual ~VulkanIndexBuffer();
 
-		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override;
+		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override {}
 
-		virtual void Flush(size_t range) override;
+		virtual void Flush(size_t range) override {}
 
-		virtual void Resize(size_t count) override;
+		virtual void Resize(size_t count) override {}
 
 	};
 
@@ -85,11 +85,11 @@ namespace Vulkan
 
 		virtual ~VulkanUniformBuffer();
 
-		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override;
+		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override {}
 
-		virtual void Flush(size_t range) override;
+		virtual void Flush(size_t range) override {}
 
-		virtual void Resize(size_t count) override;
+		virtual void Resize(size_t count) override {}
 
 	};
 
@@ -101,22 +101,22 @@ namespace Vulkan
 
 		virtual ~VulkanDynamicUniformBuffer();
 
-		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override;
+		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override {}
 
-		virtual void Flush(size_t range) override;
+		virtual void Flush(size_t range) override {}
 
-		virtual void Resize(size_t count) override;
+		virtual void Resize(size_t count) override {}
 	};
 
 	class VulkanTextureBuffer : public RHITextureBuffer, public VulkanBufferBase
 	{
 	public:
 		
-		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override;
+		virtual void LoadData(void* pData, size_t size, size_t offset = 0) override {}
 
-		virtual void Flush(size_t range) override;
+		virtual void Flush(size_t range) override {}
 
-		virtual void Resize(size_t count) override;
+		virtual void Resize(size_t count) override {}
 
 	};
 

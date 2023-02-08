@@ -36,9 +36,9 @@ namespace WEngine
 	}
 
 	template<typename k, typename v>
-	WPair<k, v>&& MakePiar(k key, v val)
+	WPair<k, remove_const_and_reference<v>> MakePiar(k key, remove_const_and_reference<v> val)
 	{
-		return (WPair<k, v>&&)WPair(key, val);
+		return WPair(key, val);
 	}
 
 }

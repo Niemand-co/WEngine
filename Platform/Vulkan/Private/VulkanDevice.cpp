@@ -3,6 +3,7 @@
 #include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "Utils/Public/Window.h"
 #include "Render/Mesh/Public/Vertex.h"
+#include "RHI/Public/RHIBuffer.h"
 
 namespace Vulkan
 {
@@ -110,7 +111,7 @@ namespace Vulkan
 		return event;
 	}
 
-	RHIShader* VulkanDevice::CreateVertexShader(RHIShaderDescriptor* descriptor)
+	WVertexShaderRHIRef VulkanDevice::CreateVertexShader(RHIShaderDescriptor* descriptor)
 	{
 		VkShaderModuleCreateInfo shaderModuleCreateInfo = {};
 		shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -123,7 +124,20 @@ namespace Vulkan
 		return new VulkanVertexShader(pShaderModule);
 	}
 
-	RHIShader* VulkanDevice::CreateGeometryShader(RHIShaderDescriptor* descriptor)
+	WPixelShaderRHIRef VulkanDevice::CreatePixelShader(RHIShaderDescriptor* descriptor)
+	{
+		VkShaderModuleCreateInfo shaderModuleCreateInfo = {};
+		shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+		shaderModuleCreateInfo.codeSize = descriptor->codeSize;
+		shaderModuleCreateInfo.pCode = descriptor->pCode;
+
+		VkShaderModule* pShaderModule = (VkShaderModule*)WEngine::Allocator::Get()->Allocate(sizeof(VkShaderModule));
+		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pShaderModule);
+
+		return new VulkanPixelShader(pShaderModule);
+	}
+
+	WGeometryShaderRHIRef VulkanDevice::CreateGeometryShader(RHIShaderDescriptor* descriptor)
 	{
 		VkShaderModuleCreateInfo shaderModuleCreateInfo = {};
 		shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -136,7 +150,7 @@ namespace Vulkan
 		return new VulkanGeometryShader(pShaderModule);
 	}
 
-	RHIShader* VulkanDevice::CreatePixelShader(RHIShaderDescriptor* descriptor)
+	WComputeShaderRHIRef VulkanDevice::CreateComputeShader(RHIShaderDescriptor* descriptor)
 	{
 		VkShaderModuleCreateInfo shaderModuleCreateInfo = {};
 		shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -146,7 +160,7 @@ namespace Vulkan
 		VkShaderModule* pShaderModule = (VkShaderModule*)WEngine::Allocator::Get()->Allocate(sizeof(VkShaderModule));
 		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pShaderModule);
 
-		return new VulkanPixelShader(pShaderModule);
+		return new VulkanComputeShader(pShaderModule);
 	}
 
 	RHIRenderPass* VulkanDevice::CreateRenderPass(RHIRenderPassDescriptor* descriptor)
@@ -507,7 +521,7 @@ namespace Vulkan
 		return renderTarget;
 	}
 
-	RHIBuffer* VulkanDevice::CreateVertexBuffer(RHIBufferDescriptor* descriptor)
+	WVertexBufferRHIRef VulkanDevice::CreateVertexBuffer(RHIBufferDescriptor* descriptor)
 	{
 		size_t bufferSize = descriptor->stride * descriptor->count;
 		VkBufferCreateInfo info = {};
@@ -521,7 +535,7 @@ namespace Vulkan
 		return new VulkanVertexBuffer(this, &info, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	}
 
-	RHIBuffer* VulkanDevice::CreateDynamicVertexBuffer(RHIBufferDescriptor* descriptor)
+	WDynamicVertexBufferRHIRef VulkanDevice::CreateDynamicVertexBuffer(RHIBufferDescriptor* descriptor)
 	{
 		size_t bufferSize = descriptor->stride * descriptor->count;
 		size_t minUBOSize = m_pGPU->GetFeature().minUBOAlignment;
@@ -537,7 +551,7 @@ namespace Vulkan
 		return new VulkanDynamicVertexBuffer(this, &info, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 	}
 
-	RHIBuffer* VulkanDevice::CreateIndexBuffer(RHIBufferDescriptor* descriptor)
+	WIndexBufferRHIRef VulkanDevice::CreateIndexBuffer(RHIBufferDescriptor* descriptor)
 	{
 		size_t bufferSize = descriptor->stride * descriptor->count;
 		VkBufferCreateInfo info = {};
@@ -551,7 +565,7 @@ namespace Vulkan
 		return new VulkanIndexBuffer(this, &info, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	}
 
-	RHIBuffer* VulkanDevice::CreateUniformBuffer(RHIBufferDescriptor* descriptor)
+	WUniformBufferRHIRef VulkanDevice::CreateUniformBuffer(RHIBufferDescriptor* descriptor)
 	{
 		size_t bufferSize = descriptor->stride * descriptor->count;
 		VkBufferCreateInfo info = {};
@@ -565,7 +579,7 @@ namespace Vulkan
 		return new VulkanUniformBuffer(this, &info, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	}
 
-	RHIBuffer* VulkanDevice::CreateDynamicUniformBuffer(RHIBufferDescriptor* descriptor)
+	WDynamicUniformBufferRHIRef VulkanDevice::CreateDynamicUniformBuffer(RHIBufferDescriptor* descriptor)
 	{
 		size_t bufferSize = descriptor->stride * descriptor->count;
 		size_t minUBOSize = m_pGPU->GetFeature().minUBOAlignment;

@@ -14,12 +14,12 @@ WVertexBuffer::~WVertexBuffer()
 
 void WVertexBuffer::InitRHIResource()
 {
-	pBuffer = (RHIBuffer*)RHIContext::GetContext()->CreateVertexBuffer(Stride, Count);
+	Buffer = GetRenderCommandList()->CreateVertexBuffer(Stride, Count);
 }
 
 void WVertexBuffer::ReleaseRHIResource()
 {
-	pBuffer = nullptr;
+	Buffer = nullptr;
 }
 
 void WVertexBuffer::UpdateRHIResource()
@@ -37,12 +37,12 @@ WIndexBuffer::~WIndexBuffer()
 
 void WIndexBuffer::InitRHIResource()
 {
-	pBuffer = (RHIBuffer*)RHIContext::GetContext()->CreateIndexBuffer(Count);
+	Buffer = GetRenderCommandList()->CreateIndexBuffer(Count);
 }
 
 void WIndexBuffer::ReleaseRHIResource()
 {
-	pBuffer = nullptr;
+	Buffer = nullptr;
 }
 
 void WIndexBuffer::UpdateRHIResource()
@@ -60,12 +60,12 @@ WUniformBuffer::~WUniformBuffer()
 
 void WUniformBuffer::InitRHIResource()
 {
-	pBuffer = (RHIBuffer*)RHIContext::GetContext()->CreateUniformBuffer(Stride, Count);
+	Buffer = GetRenderCommandList()->CreateUniformBuffer(Stride, Count);
 }
 
 void WUniformBuffer::ReleaseRHIResource()
 {
-	pBuffer = nullptr;
+	Buffer = nullptr;
 }
 
 void WUniformBuffer::UpdateRHIResource()

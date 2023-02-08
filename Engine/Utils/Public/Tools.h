@@ -70,22 +70,22 @@ namespace WEngine
 	struct remove_const<const T> { typedef T type; };
 
 	template<typename T>
-	struct remove_const_and_referencet { typedef T type; };
+	struct remove_const_and_reference { typedef T type; };
 
 	template<typename T>
-	struct remove_const_and_referencet<const T> { typedef T type; };
+	struct remove_const_and_reference<const T> { typedef T type; };
 
 	template<typename T>
-	struct remove_const_and_referencet<const T&> { typedef T type; };
+	struct remove_const_and_reference<const T&> { typedef T type; };
 
 	template<typename T>
-	struct remove_const_and_referencet<const T&&> { typedef T type; };
+	struct remove_const_and_reference<const T&&> { typedef T type; };
 
 	template<typename T>
-	struct remove_const_and_referencet<T&> { typedef T type; };
+	struct remove_const_and_reference<T&> { typedef T type; };
 
 	template<typename T>
-	struct remove_const_and_referencet<T&&> { typedef T type; };
+	struct remove_const_and_reference<T&&> { typedef T type; };
 
 	template<typename T>
 	constexpr remove_reference<T>::type&& move(T&& _Val) noexcept

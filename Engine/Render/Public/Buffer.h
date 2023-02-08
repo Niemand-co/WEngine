@@ -6,10 +6,6 @@ public:
 
 	virtual ~WBuffer() = default;
 
-protected:
-
-	WEngine::WSharedPtr<class RHIBuffer> pBuffer;
-
 };
 
 class WVertexBuffer : public WBuffer
@@ -28,11 +24,15 @@ public:
 
 private:
 
+	WVertexBufferRHIRef Buffer;
+
 	size_t Stride;
 
 	size_t Count;
 
 };
+
+typedef WEngine::WSharedPtr<WVertexBuffer> WVertexBufferRef;
 
 class WIndexBuffer : public WBuffer
 {
@@ -50,9 +50,13 @@ public:
 
 private:
 
+	WIndexBufferRHIRef Buffer;
+
 	size_t Count;
 
 };
+
+typedef WEngine::WSharedPtr<WIndexBuffer> WIndexBufferRef;
 
 class WUniformBuffer : public WBuffer
 {
@@ -70,11 +74,15 @@ public:
 
 private:
 
+	WUniformBufferRHIRef Buffer;
+
 	size_t Stride;
 
 	size_t Count;
 
 };
+
+typedef WEngine::WSharedPtr<WUniformBuffer> WUniformBufferRef;
 
 class WDynamicUniform : public WUniformBuffer
 {
@@ -89,4 +97,11 @@ public:
 	virtual void ReleaseRHIResource() override;
 
 	virtual void UpdateRHIResource() override;
+
+private:
+
+	WDynamicUniformBufferRHIRef Buffer;
+
 };
+
+typedef WEngine::WSharedPtr<WDynamicUniform> WDynamicUniformRef;

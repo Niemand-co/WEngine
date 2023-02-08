@@ -9,3 +9,12 @@ void BeginInitResource(RenderResource* resource)
 		}
 	), WEngine::EThreadProperty::RenderThread);
 }
+
+void BeginReleasResource(RenderResource* resource)
+{
+	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [&resource]()
+		{
+			resource->ReleaseRHIResource();
+		}
+	), WEngine::EThreadProperty::RenderThread);
+}

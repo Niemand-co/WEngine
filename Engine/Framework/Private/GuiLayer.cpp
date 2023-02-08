@@ -119,7 +119,6 @@ namespace WEngine
 				Screen::SetHeight(m_displayArea.Second().y - m_displayArea.First().y);
 				if (Screen::SizeChanged())
 				{
-					Screen::g_displayingCamera->RecreateRenderTarget(Screen::GetWidth(), Screen::GetHeight());
 					for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 					{
 						//Gui::g_pGui->RemoveTexture(m_imageID[i]);

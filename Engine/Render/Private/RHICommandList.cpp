@@ -2,6 +2,7 @@
 #include "Render/Public/RHICommandList.h"
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
 #include "Render/Public/Buffer.h"
+#include "RHI/Public/RHIHeads.h"
 
 RHIRenderCommandList* RHIRenderCommandList::g_instance = nullptr;
 
@@ -21,19 +22,39 @@ void RHIRenderCommandList::DrawIndexedPrimitive(unsigned int indexCount, unsigne
 {
 }
 
-WVertexBuffer* RHIRenderCommandList::CreateVertexBuffer(size_t stride, size_t count)
+WVertexBufferRHIRef RHIRenderCommandList::CreateVertexBuffer(size_t stride, size_t count)
 {
-    return new WVertexBuffer(stride, count);
+    return RHIContext::GetContext()->CreateVertexBuffer(stride, count);
 }
 
-WIndexBuffer* RHIRenderCommandList::CreateIndexBuffer(size_t count)
+WIndexBufferRHIRef RHIRenderCommandList::CreateIndexBuffer(size_t count)
 {
-    return new WIndexBuffer(count);
+    return RHIContext::GetContext()->CreateIndexBuffer(count);
 }
 
-WUniformBuffer* RHIRenderCommandList::CreateUniformBuffer(size_t stride, size_t count)
+WUniformBufferRHIRef RHIRenderCommandList::CreateUniformBuffer(size_t stride, size_t count)
 {
-    return new WUniformBuffer(stride, count);
+    return RHIContext::GetContext()->CreateUniformBuffer(stride, count);
+}
+
+WVertexShaderRHIRef RHIRenderCommandList::CreateVertexShader(ShaderCodeBlob& blob)
+{
+    return RHIContext::GetContext()->CreateVertexShader(blob);
+}
+
+WPixelShaderRHIRef RHIRenderCommandList::CreatePixelShader(ShaderCodeBlob& blob)
+{
+    return RHIContext::GetContext()->CreatePixelShader(blob);
+}
+
+WGeometryShaderRHIRef RHIRenderCommandList::CreateGeometryShader(ShaderCodeBlob& blob)
+{
+    return RHIContext::GetContext()->CreateGeometryShader(blob);
+}
+
+WComputeShaderRHIRef RHIRenderCommandList::CreateComputeShader(ShaderCodeBlob& blob)
+{
+    return RHIContext::GetContext()->CreateComputeShader(blob);
 }
 
 RHIRenderCommandList* GetRenderCommandList()
