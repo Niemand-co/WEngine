@@ -19,6 +19,9 @@ namespace WEngine
 
 		static unsigned long GetCurrentThreadId() {}
 
+		template<typename LAMBDA>
+		static void IterateFiles(const char* Path, LAMBDA lambda) {}
+
 	};
 
 }

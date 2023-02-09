@@ -3,7 +3,7 @@
 
 void BeginInitResource(RenderResource* resource)
 {
-	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [&resource]()
+	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [resource]()
 		{
 			resource->InitRHIResource();
 		}
@@ -12,7 +12,7 @@ void BeginInitResource(RenderResource* resource)
 
 void BeginReleasResource(RenderResource* resource)
 {
-	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [&resource]()
+	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [resource]()
 		{
 			resource->ReleaseRHIResource();
 		}

@@ -1,5 +1,6 @@
 #pragma once
 #include "HAL/Public/PlatformProcess.h"
+#include "Utils/Container/Public/WString.h"
 
 namespace WEngine
 {
@@ -19,6 +20,9 @@ namespace WEngine
 
 		template<typename T, typename X, typename Y>
 		static bool CAS128(T* Destination, X HightValue, Y LowValue, T* CompareValue);
+
+		template<typename LAMBDA>
+		static void IterateFiles(const char* Path, LAMBDA lambda);
 	};
 
 #if defined(WINDOWS) || defined(_WIN32)
@@ -35,6 +39,22 @@ namespace WEngine
 	inline bool WindowsPlatformProcess::CAS128(T* Destination, X HightValue, Y LowValue, T* CompareValue)
 	{
 		return InterlockedCompareExchange128((volatile long long*)Destination, (long long)HightValue, (long long)LowValue, (long long*)CompareValue);
+	}
+
+	template<typename LAMBDA>
+	inline void WindowsPlatformProcess::IterateFiles(const char* Path, LAMBDA lambda)
+	{
+		_finddata_t file;
+		intptr_t handle;
+		handle = _findfirst(Path, &file);
+		if(handle == -1)
+			return;
+		lambda(file.name);
+		while (!_findnext(handle, &file))
+		{
+			lambda(file.name);
+		}
+		_findclose(handle);
 	}
 
 }

@@ -5,7 +5,7 @@ class RHIGroup;
 class RHIBuffer;
 class RHIPipelineResourceLayout;
 class RHIBuffer;
-class StaticMesh;
+class WStaticMesh;
 class RHITexture;
 class RHITextureView;
 
@@ -45,6 +45,6 @@ private:
 
 	WEngine::WArray<RHIRenderTarget*> m_pStencilRenderTargets;
 
-	StaticMesh *m_pAxisMesh;
+	WStaticMesh *m_pAxisMesh;
 
 };

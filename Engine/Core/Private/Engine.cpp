@@ -12,6 +12,7 @@
 #include "Event/Public/TimeStep.h"
 #include "Scene/Public/World.h"
 #include "Render/Public/Shader.h"
+#include "Render/Mesh/Public/Mesh.h"
 
 namespace WEngine
 {
@@ -83,11 +84,16 @@ namespace WEngine
 
 	void REngine::ResourceLoading()
 	{
-		_finddata_t file;
-		while (_findfirst("assets\\*.*", &file) == 0)
+		PlatformProcess::IterateFiles("assets/*.*", [](const WEngine::WString& name)
 		{
-			WShaderLibrary::LoadShader(file.name);
-		}
+			if(name == "." || name == "..")
+				return;
+			WEngine::WString ResourceName ="assets/" + name;
+			if(WShaderLibrary::LoadShader(ResourceName))
+				return;
+			if(WMeshLibrary::LoadMesh(ResourceName))
+				return;
+		});
 	}
 
 	void REngine::StartRenderingThread()

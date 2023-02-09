@@ -17,7 +17,7 @@ struct SceneData
 
 cbuffer sceneData : register(b0) { SceneData sceneData; }
 
-VSOutput vert(VSInput input)
+VSOutput VSMain(VSInput input)
 {
 	VSOutput output;
 	output.Position = mul(sceneData.VP, float4(input.Position, 1.0));
@@ -26,7 +26,7 @@ VSOutput vert(VSInput input)
 	return output;
 }
 
-float4 frag(VSOutput input) : SV_Target
+float4 PSMain(VSOutput input) : SV_Target
 {
     return float4(input.Color, 1.0);
 }

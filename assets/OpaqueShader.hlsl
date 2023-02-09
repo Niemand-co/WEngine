@@ -72,7 +72,7 @@ float4 PBRLighting(float3 light, float3 albedo, float NoL, float NoH, float NoV,
     return float4((diffuse + saturate(specular)) * (NoL * light * shadow) + ambient * diffuse, 1.0f);
 }
 
-VSOutput vert(VSInput vin)
+VSOutput VSMain(VSInput vin)
 {
 	VSOutput vout = (VSOutput)0;
 
@@ -92,7 +92,7 @@ float GetShadowBias(float3 normal, float3 lightDir)
     return (1.0 - factor) * 0.0001f;
 }
 
-float4 frag(VSOutput pin) : SV_TARGET
+float4 PSMain(VSOutput pin) : SV_TARGET
 {
     float3 L = normalize(-sceneData.lightDir.xyz);
     float3 V = normalize(sceneData.cameraPos.xyz - pin.WorldPos);

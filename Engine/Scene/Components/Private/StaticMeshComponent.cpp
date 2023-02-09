@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Scene/Components/Public/StaticMeshComponent.h"
 
-StaticMeshComponent::StaticMeshComponent(GameObject* pGameObject, StaticMesh* pMesh)
+StaticMeshComponent::StaticMeshComponent(GameObject* pGameObject, WStaticMesh* pMesh)
 	: PrimitiveComponent(pGameObject), m_pMesh(pMesh)
 {
 	if (pMesh != nullptr)

@@ -1,4 +1,5 @@
 #pragma once
+#include "Editor/Public/Ray.h"
 
 struct VertexComponent;
 class RHIBuffer;
@@ -9,25 +10,47 @@ struct BoundingBox
 	glm::vec3 BoxMax;
 };
 
-class StaticMesh : public WEngine::NamingSystem, public RenderResource
+class WStaticMesh : public RenderResource
 {
 public:
 
-	StaticMesh(const char *name);
+	friend class WMeshLibrary;
 
-	StaticMesh(const WEngine::WString& name);
+	friend class WEngine::Ray;
 
-	~StaticMesh();
+	WStaticMesh(const char* name);
 
-	RHIBuffer* GetVertexBuffer();
+	WStaticMesh(const WEngine::WString& name);
 
-	RHIBuffer* GetIndexBuffer();
+	~WStaticMesh();
+
+	WVertexBufferRHIRef GetVertexBuffer();
+
+	WIndexBufferRHIRef GetIndexBuffer();
 
 	void GenerateBoundingBox();
 
 	const BoundingBox& GetBoundingBox() { return m_boundingBox; }
 
+	virtual void InitRHIResource() override;
+
+	virtual void ReleaseRHIResource() override;
+
+	virtual void UpdateRHIResource() override;
+
+	void* operator new(size_t size)
+	{
+		return WEngine::Allocator::Get()->Allocate(size);
+	}
+
+	void operator delete(void* pData)
+	{
+		WEngine::Allocator::Get()->Deallocate(pData);
+	}
+
 public:
+
+	static WStaticMesh* GetSphere();
 
 	//static StaticMesh* GetCube();
 
@@ -39,40 +62,39 @@ private:
 
 	WEngine::WString m_name;
 
-	RHIBuffer *m_pVertexBuffer;
+	WVertexBufferRHIRef VertexBuffer;
 
-	RHIBuffer *m_pIndexBuffer;
-
-public:
+	WIndexBufferRHIRef IndexBuffer;
 
 	const WEngine::WGuid<WEngine::WString> m_id;
 
 	WEngine::WArray<VertexComponent> m_vertices;
 
-	unsigned int m_vertexCount;
-
-	unsigned int *m_pIndices;
-
-	unsigned int m_indexCount;
+	WEngine::WArray<uint32> m_indices;
 
 	BoundingBox m_boundingBox;
 
 };
 
-class MeshLibrary
+size_t MeshHash(WEngine::WGuid<WEngine::WString> key);
+
+class WMeshLibrary
 {
 public:
 
-	MeshLibrary();
+	static WStaticMesh* GetMesh(const WEngine::WString& Name)
+	{ 
+		return Meshes[WEngine::WGuid(Name)];
+	}
 
-	~MeshLibrary();
+	static bool LoadMesh(const WEngine::WString& Path);
 
-	void AddMesh(const WEngine::WGuid<WEngine::WString>& id, StaticMesh*pMesh);
+	static bool ProcessNode(const aiNode *Node, const aiScene *ObjectScene, WStaticMesh *Mesh);
 
-	StaticMesh* GetMesh(const WEngine::WGuid<WEngine::WString>& id);
+	static bool ProcessPrimitive(const aiMesh *Primitive, const aiScene *ObjectScene, WStaticMesh *Mesh);
 
 private:
 
-	WEngine::WArray<WEngine::WPair<WEngine::WGuid<WEngine::WString>, StaticMesh*>> m_meshes;
+	static WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WStaticMesh*, MeshHash> Meshes;
 
 };

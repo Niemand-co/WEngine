@@ -1,7 +1,7 @@
 #pragma once
 #include "Render/Passes/Public/ScriptableRenderPass.h"
 
-class StaticMesh;
+class WStaticMesh;
 class RHIBuffer;
 class RHITexture;
 class RHIGroup;
@@ -29,7 +29,7 @@ private:
 
 	WEngine::WArray<RHITexture*> m_pCubemap;
 
-	StaticMesh *m_pMesh;
+	WStaticMesh *m_pMesh;
 
 	WEngine::WArray<RHIGroup*> m_pGroup;
 

@@ -11,12 +11,12 @@ void MeshFilter::ShowInInspector()
 {
 }
 
-void MeshFilter::SetStaticMesh(StaticMesh* pStaticMesh)
+void MeshFilter::SetStaticMesh(WStaticMesh* pStaticMesh)
 {
 	m_pStaticMesh = pStaticMesh;
 }
 
-StaticMesh* MeshFilter::GetStaticMesh()
+WStaticMesh* MeshFilter::GetStaticMesh()
 {
 	return m_pStaticMesh;
 }

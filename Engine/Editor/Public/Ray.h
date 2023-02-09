@@ -1,6 +1,6 @@
 #pragma once
 
-class StaticMesh;
+class WStaticMesh;
 class GameObject;
 
 namespace WEngine
@@ -16,7 +16,7 @@ namespace WEngine
 
 		bool IsIntersectWithTriangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c);
 
-		bool IsIntersectWithMesh(StaticMesh *pMesh);
+		bool IsIntersectWithMesh(WStaticMesh *pMesh);
 
 		bool IsIntersectWithGameObject(GameObject *pGameObject);
 

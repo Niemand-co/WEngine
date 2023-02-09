@@ -58,42 +58,51 @@ void WComputeShader::UpdateRHIResource()
 {
 }
 
-size_t Hash(WEngine::WGuid<WEngine::WString> key)
+size_t ShaderHash(WEngine::WGuid<WEngine::WString> key)
 {
 	return (size_t(key.A) << 32) | (size_t(key.B));
 }
 
-WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WShader*, Hash> WShaderLibrary::Shaders = WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WShader*, Hash>();
+WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WShader*, ShaderHash> WShaderLibrary::Shaders = WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WShader*, ShaderHash>();
 
-void WShaderLibrary::LoadShader(const WEngine::WString& path)
+bool WShaderLibrary::LoadShader(const WEngine::WString& path)
 {
-	ShaderCodeBlob Blob(path);
-	size_t start = path.find_last_of('/') + 1;
-	size_t end = path.find_last_of('.');
+	int32 start = path.find_last_of('/') + 1;
+	int32 end = path.find_last_of('.');
+	if(end == -1)return false;
 	WEngine::WString ShaderName = path.Substr(start, end - start);
-	WEngine::WString ShaderType = path.Substr(end + 1, 2);
+	WEngine::WString ShaderType = path.Substr(end + 1, path.Size() - end - 1);
 	if (ShaderType == "vs")
 	{
+		ShaderCodeBlob Blob(path);
 		WShader *shader = new WVertexShader(Blob);
 		Shaders.Insert(ShaderName, shader);
 		BeginInitResource(shader);
+		return true;
 	}
 	else if (ShaderType == "ps")
 	{
+		ShaderCodeBlob Blob(path);
 		WShader *shader = new WPixelShader(Blob);
 		Shaders.Insert(ShaderName, shader);
 		BeginInitResource(shader);
+		return true;
 	}
 	else if (ShaderType == "gs")
 	{
+		ShaderCodeBlob Blob(path);
 		WShader* shader = new WGeometryShader(Blob);
 		Shaders.Insert(ShaderName, shader);
 		BeginInitResource(shader);
+		return true;
 	}
 	else if (ShaderType == "cs")
 	{
+		ShaderCodeBlob Blob(path);
 		WShader* shader = new WComputeShader(Blob);
 		Shaders.Insert(ShaderName, shader);
 		BeginInitResource(shader);
+		return true;
 	}
+	return false;
 }

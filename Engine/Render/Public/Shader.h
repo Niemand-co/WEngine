@@ -106,7 +106,7 @@ private:
 
 };
 
-size_t Hash(WEngine::WGuid<WEngine::WString> key);
+size_t ShaderHash(WEngine::WGuid<WEngine::WString> key);
 
 class WShaderLibrary : public WEngine::NamingSystem
 {
@@ -117,10 +117,10 @@ public:
 		return Shaders[WEngine::WGuid(name)];
 	}
 
-	static void LoadShader(const WEngine::WString& path);
+	static bool LoadShader(const WEngine::WString& path);
 
 private:
 
-	static WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WShader*, Hash> Shaders;
+	static WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WShader*, ShaderHash> Shaders;
 
 };

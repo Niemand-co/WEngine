@@ -22,7 +22,7 @@ cbuffer sceneData : register(b0) { SceneData sceneData; }
 
 cbuffer objectData : register(b1) { ObjectData objectData; }
 
-VSOutput vert(VSInput input)
+VSOutput VSMain(VSInput input)
 {
 	VSOutput output;
 	output.Position = mul(sceneData.VP, mul(objectData.M, float4(input.Position, 1.0)));
@@ -30,7 +30,7 @@ VSOutput vert(VSInput input)
 	return output;
 }
 
-void frag(VSOutput input)
+void PSMain(VSOutput input)
 {
 	
 }

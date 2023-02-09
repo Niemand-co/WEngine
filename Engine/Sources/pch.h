@@ -41,6 +41,13 @@
 #include "imgui/backends/imgui_impl_glfw.h"
 //-------------------------------------------------------------
 
+//------------------------Assimp-------------------------------
+#include "Assimp/Include/config.h"
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
+//-------------------------------------------------------------
+
 #include "Core/Core.h"
 #include "Math/Common.h"
 #include "Math/Vector.h"

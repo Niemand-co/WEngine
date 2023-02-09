@@ -21,17 +21,17 @@ namespace WEngine
 
 		const char* Data() const { return m_pData; }
 
-		size_t find(const char& c) const;
+		int32 find(const char& c) const;
 
-		size_t find(const char* str) const;
+		int32 find(const char* str) const;
 
-		size_t find(const WString& string) const;
+		int32 find(const WString& string) const;
 
-		size_t find_last_of(const char& c) const;
+		int32 find_last_of(const char& c) const;
 
-		WString&& Substr(size_t length) const;
+		WString Substr(size_t length) const;
 
-		WString&& Substr(size_t start, size_t length) const;
+		WString Substr(size_t start, size_t length) const;
 
 		void* operator new(size_t size)
 		{
@@ -69,7 +69,7 @@ namespace WEngine
 			return m_pData[index];
 		}
 
-		bool operator==(WString& string)
+		bool operator==(WString& string) const
 		{
 			if(m_size != string.m_size)
 				return false;
@@ -81,7 +81,7 @@ namespace WEngine
 			return true;
 		}
 
-		bool operator==(const char* str)
+		bool operator==(const char* str) const
 		{
 			if (m_size != strlen(str))
 				return false;
@@ -145,7 +145,7 @@ namespace WEngine
 			m_size += length;
 		}
 
-		friend WString&& operator+(const char* str, const WString& string);
+		friend WString operator+(const char* str, const WString& string);
 
 		friend std::ostream& operator<<(std::ostream& o, const WString& string);
 

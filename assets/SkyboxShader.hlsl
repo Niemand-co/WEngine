@@ -29,7 +29,7 @@ SamplerState cubemapSampler : register(s1, space0);
 
 Texture2D cubemap[6] : register(t2, space0);
 
-VSOutput vert(VSInput input)
+VSOutput VSMain(VSInput input)
 {
 	VSOutput output;
 	output.WorldPos = input.Position;
@@ -40,7 +40,7 @@ VSOutput vert(VSInput input)
 	return output;
 }
 
-float4 frag(VSOutput input) : SV_Target
+float4 PSMain(VSOutput input) : SV_Target
 {
 	float factor = saturate(dot(normalize(input.WorldPos), float3(0.0, 1.0, 0.0)));
 	//float3 color = uniformData.TopColor.rgb * factor + uniformData.BottomColor.rgb * (1.0 - factor);

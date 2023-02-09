@@ -8,54 +8,39 @@
 
 #define PI 3.1415926535
 
-StaticMesh::StaticMesh(const char *name)
-	: m_name(name), m_id(m_name)
+WStaticMesh::WStaticMesh(const char *name)
+	: m_name(name), m_id(m_name),
+	  VertexBuffer(nullptr),
+	  IndexBuffer(nullptr)
 {
-	m_vertexCount = 0;
-	m_pIndices = nullptr;
-	m_indexCount = 0;
-	m_pVertexBuffer = nullptr;
-	m_pIndexBuffer = nullptr;
 	m_boundingBox.BoxMax = glm::vec3(FLOAT_MIN, FLOAT_MIN, FLOAT_MIN);
 	m_boundingBox.BoxMin = glm::vec3(FLOAT_MAX, FLOAT_MAX, FLOAT_MAX);
 }
 
-StaticMesh::StaticMesh(const WEngine::WString& name)
-	: m_name(name), m_id(name)
+WStaticMesh::WStaticMesh(const WEngine::WString& name)
+	: m_name(name), m_id(name),
+	  VertexBuffer(nullptr),
+	  IndexBuffer(nullptr)
 {
-	m_vertexCount = 0;
-	m_pIndices = nullptr;
-	m_indexCount = 0;
-	m_pVertexBuffer = nullptr;
-	m_pIndexBuffer = nullptr;
 	m_boundingBox.BoxMax = glm::vec3(FLOAT_MIN, FLOAT_MIN, FLOAT_MIN);
 	m_boundingBox.BoxMin = glm::vec3(FLOAT_MAX, FLOAT_MAX, FLOAT_MAX);
 }
 
-StaticMesh::~StaticMesh()
+WStaticMesh::~WStaticMesh()
 {
 }
 
-RHIBuffer* StaticMesh::GetVertexBuffer()
+WVertexBufferRHIRef WStaticMesh::GetVertexBuffer()
 {
-	if(m_pVertexBuffer != nullptr)
-		return m_pVertexBuffer;
-	
-	
-
-	return m_pVertexBuffer;
+	return VertexBuffer;
 }
 
-RHIBuffer* StaticMesh::GetIndexBuffer()
+WIndexBufferRHIRef WStaticMesh::GetIndexBuffer()
 {
-	if(m_pIndexBuffer != nullptr)
-		return m_pIndexBuffer;
-
-
-	return m_pIndexBuffer;
+	return IndexBuffer;
 }
 
-void StaticMesh::GenerateBoundingBox()
+void WStaticMesh::GenerateBoundingBox()
 {
 	for (VertexComponent& vertex : m_vertices)
 	{
@@ -67,6 +52,27 @@ void StaticMesh::GenerateBoundingBox()
 		m_boundingBox.BoxMin.y = m_boundingBox.BoxMin.y > vertex.Position.y ? vertex.Position.y : m_boundingBox.BoxMin.y;
 		m_boundingBox.BoxMin.z = m_boundingBox.BoxMin.z > vertex.Position.z ? vertex.Position.z : m_boundingBox.BoxMin.z;
 	}
+}
+
+void WStaticMesh::InitRHIResource()
+{
+	VertexBuffer = GetRenderCommandList()->CreateVertexBuffer(sizeof(VertexComponent), m_vertices.Size());
+	IndexBuffer = GetRenderCommandList()->CreateIndexBuffer(m_indices.Size());
+}
+
+void WStaticMesh::ReleaseRHIResource()
+{
+	VertexBuffer = nullptr;
+	IndexBuffer = nullptr;
+}
+
+void WStaticMesh::UpdateRHIResource()
+{
+}
+
+WStaticMesh* WStaticMesh::GetSphere()
+{
+	return WMeshLibrary::GetMesh("sphere");
 }
 
 //StaticMesh* StaticMesh::GetCube()
@@ -224,27 +230,84 @@ void StaticMesh::GenerateBoundingBox()
 //	return mesh;
 //}
 
-MeshLibrary::MeshLibrary()
+size_t MeshHash(WEngine::WGuid<WEngine::WString> key)
 {
+	return (size_t(key.A) << 32) | (size_t(key.B));
 }
 
-MeshLibrary::~MeshLibrary()
-{
-}
+WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WStaticMesh*, MeshHash> WMeshLibrary::Meshes = WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WStaticMesh*, MeshHash>();
 
-void MeshLibrary::AddMesh(const WEngine::WGuid<WEngine::WString>& id, StaticMesh* pMesh)
+bool WMeshLibrary::LoadMesh(const WEngine::WString& Path)
 {
-	
-	m_meshes.Push(WEngine::MakePair(id, pMesh));
-}
+	int32 start = Path.find_last_of('/') + 1;
+	int32 end = Path.find_last_of('.');
+	if (end == -1)return false;
+	WEngine::WString MeshName = Path.Substr(start, end - start);
+	WEngine::WString MeshType = Path.Substr(end + 1, Path.Size() - end - 1);
 
-StaticMesh* MeshLibrary::GetMesh(const WEngine::WGuid<WEngine::WString>& id)
-{
-	for (auto& p : m_meshes)
+	if (MeshType == "obj")
 	{
-		if(p.First() == id)
-			return p.Second();
-	}
+		Assimp::Importer Importer;
+		const aiScene *objectScene = Importer.ReadFile(Path.Data(), aiProcess_Triangulate | aiProcess_FlipUVs);
+		if(!objectScene || objectScene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !objectScene->mRootNode)
+			return false;
 
-	return nullptr;
+		WStaticMesh *mesh = new WStaticMesh(MeshName);
+		ProcessNode(objectScene->mRootNode, objectScene, mesh);
+		BeginInitResource(mesh);
+		Meshes.Insert(MeshName, mesh);
+	}
+}
+
+bool WMeshLibrary::ProcessNode(const aiNode* Node, const aiScene* ObjectScene, WStaticMesh* Mesh)
+{
+	for (size_t PrimitiveIndex = 0; PrimitiveIndex < Node->mNumMeshes; ++PrimitiveIndex)
+	{
+		const aiMesh *primitive = ObjectScene->mMeshes[PrimitiveIndex];
+		RE_ASSERT(ProcessPrimitive(primitive, ObjectScene, Mesh), "Failed to process object mesh.")
+	}
+	for (size_t ChildIndex = 0; ChildIndex < Node->mNumChildren; ++ChildIndex)
+	{
+		RE_ASSERT(ProcessNode(Node->mChildren[ChildIndex], ObjectScene, Mesh), "Failed to process object node.");
+	}
+	return true;
+}
+
+bool WMeshLibrary::ProcessPrimitive(const aiMesh* Primitive, const aiScene* ObjectScene, WStaticMesh* Mesh)
+{
+	for (size_t VertexIndex = 0; VertexIndex < Primitive->mNumVertices; ++VertexIndex)
+	{
+		aiVector3D& position = Primitive->mVertices[VertexIndex];
+		bool bHasNormal = Primitive->HasNormals();
+		bool bHasTangent = Primitive->HasTangentsAndBitangents();
+		VertexComponent vertex;
+		{
+			vertex.Position = glm::vec3(position.x, position.y, position.z);
+			if (bHasNormal)
+			{
+				aiVector3D& normal = Primitive->mNormals[VertexIndex];
+				vertex.Normal = glm::vec3(normal.x, normal.y, normal.z);
+			}
+			if (bHasTangent)
+			{
+				aiVector3D& tangent = Primitive->mTangents[VertexIndex];
+				aiVector3D& bitangent = Primitive->mBitangents[VertexIndex];
+				vertex.Tangent = glm::vec3(tangent.x, tangent.y, tangent.z);
+				vertex.BiTangent = glm::vec3(bitangent.x, bitangent.y, bitangent.z);
+			}
+			if (Primitive->HasTextureCoords(VertexIndex))
+			{
+				aiVector3D* uv = Primitive->mTextureCoords[VertexIndex];
+				vertex.UV = glm::vec3(uv->x, uv->y, uv->z);
+			}
+		}
+		Mesh->m_vertices.Push(vertex);
+	}
+	for (size_t FaceIndex = 0; FaceIndex < Primitive->mNumFaces; ++FaceIndex)
+	{
+		aiFace& face = Primitive->mFaces[FaceIndex];
+		for(size_t i = 0; i < face.mNumIndices; ++i)
+			Mesh->m_indices.Push(face.mIndices[i]);
+	}
+	return true;
 }

@@ -3,13 +3,13 @@
 
 class RHITexture;
 
-class Texture : public RenderResource
+class WTexture : public RenderResource
 {
 public:
 
-	Texture();
+	WTexture();
 
-	virtual ~Texture();
+	virtual ~WTexture();
 
 private:
 
@@ -25,22 +25,36 @@ private:
 
 };
 
-class TextureWithSRV : public Texture
+class WTexture2D : public WTexture
 {
 public:
 
-	TextureWithSRV();
+	WTexture2D();
 
-	virtual ~TextureWithSRV();
+	virtual ~WTexture2D();
+
+protected:
+
+	RHITexture2D
 
 };
 
-class TextureWithRTV : public Texture
+class WTextureWithSRV : public WTexture2D
 {
 public:
 
-	TextureWithRTV();
+	WTextureWithSRV();
 
-	virtual ~TextureWithRTV();
+	virtual ~WTextureWithSRV();
+
+};
+
+class WTextureWithRTV : public WTexture2D
+{
+public:
+
+	WTextureWithRTV();
+
+	virtual ~WTextureWithRTV();
 
 };

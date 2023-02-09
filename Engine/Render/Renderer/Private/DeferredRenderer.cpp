@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Render/Renderer/Public/DeferredRenderer.h"
 #include "Render/Public/Scene.h"
+#include "Render/Public/Shader.h"
 #include "Scene/Components/Public/CameraComponent.h"
 #include "Scene/Components/Public/PrimitiveComponent.h"
 #include "Scene/Components/Public/DirectionalLightComponent.h"
@@ -50,6 +51,7 @@ void DeferredRenderer::InitView()
 
 void DeferredRenderer::RenderPrePass()
 {
+	
 }
 
 void DeferredRenderer::RenderBasePass()

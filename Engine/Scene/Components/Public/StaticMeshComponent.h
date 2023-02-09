@@ -10,19 +10,19 @@ public:
 	
 	enum { type = 6 };
 
-	StaticMeshComponent(GameObject *pGameObject, StaticMesh *pMesh = nullptr);
+	StaticMeshComponent(GameObject *pGameObject, WStaticMesh *pMesh = nullptr);
 
 	virtual ~StaticMeshComponent();
 
 	virtual PrimitiveProxy* GetPrimitiveProxy() override;
 
-	StaticMesh* GetStaticMesh() const { return m_pMesh; }
+	WStaticMesh* GetStaticMesh() const { return m_pMesh; }
 
 	uint8_t IsCastShadow() const { return m_bCastShadow; }
 
 protected:
 
-	StaticMesh *m_pMesh;
+	WStaticMesh*m_pMesh;
 
 	uint8_t m_bCastShadow : 1;
 
@@ -47,6 +47,6 @@ struct StaticMeshProxy : public PrimitiveProxy
 
 	enum { type = 1 };
 
-	StaticMesh *Mesh;
+	WStaticMesh*Mesh;
 
 };
