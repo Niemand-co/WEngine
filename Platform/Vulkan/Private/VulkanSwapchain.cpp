@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanSwapchain.h"
 #include "Platform/Vulkan/Public/VulkanTexture.h"
+#include "Render/Public/RenderTarget.h"
 
 namespace Vulkan
 {
@@ -13,20 +14,19 @@ namespace Vulkan
 		VkImage *pImages = (VkImage*)WEngine::Allocator::Get()->Allocate(imageCount * sizeof(VkImage));
 		vkGetSwapchainImagesKHR(*m_pDevice, *pSwapchain, &imageCount, pImages);
 
-		m_textures.Resize(imageCount);
+		RenderTargets.Resize(imageCount);
 		for (unsigned int i = 0; i < imageCount; ++i)
 		{
-			m_textures[i] = new  VulkanTexture2D(pImages + i, 0, 0);
+			RenderTargets[i] = new  WRenderTarget();
 		}
 	}
 
 	VulkanSwapchain::~VulkanSwapchain()
 	{
 		vkDestroySwapchainKHR(*m_pDevice, *pSwapchain, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
-		for (int i = 0; i < m_textures.Size(); ++i)
+		for (int i = 0; i < RenderTargets.Size(); ++i)
 		{
-			m_textures[i]->~RHITexture();
-			WEngine::Allocator::Get()->Deallocate(m_textures[i]);
+			BeginReleaseResource(RenderTargets[i]);
 		}
 	}
 

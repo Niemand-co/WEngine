@@ -10,11 +10,26 @@ void BeginInitResource(RenderResource* resource)
 	), WEngine::EThreadProperty::RenderThread);
 }
 
-void BeginReleasResource(RenderResource* resource)
+void BeginReleaseResource(RenderResource* resource)
 {
 	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [resource]()
 		{
 			resource->ReleaseRHIResource();
 		}
 	), WEngine::EThreadProperty::RenderThread);
+}
+
+void EnqueInitResource(RenderResource* resource)
+{
+	ResourcesWitingToInit.Push(resource);
+}
+
+void EnqueReleasResource(RenderResource* resource)
+{
+	ResourcesWaitingToRelease.Push(resource);
+}
+
+void EnqueUpdateResource(RenderResource* resource)
+{
+	ResourcesWaitingToUpdate.Push(resource);
 }

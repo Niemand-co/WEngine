@@ -1,14 +1,14 @@
 #pragma once
-#include "Render/Public/RenderResource.h"
+#include "Render/Public/Texture.h"
 
 class RHIRenderTarget;
 class RenderTexture;
 
-class RenderTarget : public RenderResource
+class WRenderTarget : public WTexture2D
 {
 public:
 
-	RenderTarget(uint32 width, uint32 height, Format format);
+	WRenderTarget(uint32 inWidth, uint32 inHeight, Format inFormat);
 
 	virtual void InitRHIResource() override;
 
@@ -16,12 +16,10 @@ public:
 
 	virtual void UpdateRHIResource() override;
 
-	~RenderTarget() = default;
+	~WRenderTarget() = default;
 
 private:
 
-	WEngine::WSharedPtr<class RHITexture> m_pTexture;
-
-	class RHITextureDescriptor *m_pDescriptor;
+	WTexture2DRHIRef Texture;
 
 };

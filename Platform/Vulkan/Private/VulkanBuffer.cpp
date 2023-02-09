@@ -8,14 +8,11 @@ namespace Vulkan
 {
 
 	VulkanBufferBase::VulkanBufferBase(VulkanDevice *pInDevice, VkBufferCreateInfo *pInfo, uint32 memoryType)
+		: pDevice(pInDevice)
 	{
-		VkDevice& device = *pInDevice->GetHandle();
+		vkCreateBuffer(*pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), &Buffer);
 
-		pBuffer = (VkBuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkBuffer));
-		vkCreateBuffer(device, pInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pBuffer);
-
-		pMemoryRequirements = (VkMemoryRequirements*)WEngine::Allocator::Get()->Allocate(sizeof(VkMemoryRequirements));
-		vkGetBufferMemoryRequirements(device, *pBuffer, pMemoryRequirements);
+		vkGetBufferMemoryRequirements(*pInDevice->GetHandle(), Buffer, &MemoryRequirements);
 
 		unsigned int index = 0;
 		GPUFeature feature = pInDevice->GetGPU()->GetFeature();
@@ -28,26 +25,22 @@ namespace Vulkan
 		}
 		RE_ASSERT(feature.memorySupports.Size() > index, "No Suitable Memory Heap Exists.");
 
-		VkMemoryAllocateInfo memoryAllocateInfo = {};
-		memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		memoryAllocateInfo.allocationSize = pMemoryRequirements->size;
-		memoryAllocateInfo.memoryTypeIndex = index;
+		VkMemoryAllocateInfo MemoryAllocateInfo = {};
+		{
+			MemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+			MemoryAllocateInfo.allocationSize = MemoryRequirements.size;
+			MemoryAllocateInfo.memoryTypeIndex = index;
+		}
 
-		pDeviceMemory = (VkDeviceMemory*)WEngine::Allocator::Get()->Allocate(sizeof(VkDeviceMemory));
-		RE_ASSERT(vkAllocateMemory(device, &memoryAllocateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pDeviceMemory) == VK_SUCCESS, "Failed to Allocate Memory.");
+		RE_ASSERT(vkAllocateMemory(*pInDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), &DeviceMemory) == VK_SUCCESS, "Failed to Allocate Memory.");
 
-		vkBindBufferMemory(*pDevice, *pBuffer, *pDeviceMemory, 0);
+		vkBindBufferMemory(*pInDevice->GetHandle(), Buffer, DeviceMemory, 0);
 	}
 
 	VulkanBufferBase::~VulkanBufferBase()
 	{
-		vkDestroyBuffer(*pDevice, *pBuffer, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
-		vkFreeMemory(*pDevice, *pDeviceMemory, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
-	}
-
-	VkBuffer* VulkanBufferBase::GetHandle()
-	{
-		return pBuffer;
+		vkDestroyBuffer(*pDevice->GetHandle(), Buffer, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
+		vkFreeMemory(*pDevice->GetHandle(), DeviceMemory, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
 	}
 
 	VulkanVertexBuffer::VulkanVertexBuffer(VulkanDevice* pInDevice, VkBufferCreateInfo *pInfo, uint32 memoryType)

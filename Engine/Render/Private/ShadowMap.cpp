@@ -1,22 +1,25 @@
 #include "pch.h"
 #include "Render/Public/ShadowMap.h"
 
-ShadowMap2D::ShadowMap2D()
+WShadowMap2D::WShadowMap2D(uint32 inWidth, uint32 inHeight, Format format)
+	: WTexture2D(inWidth, inHeight, format)
 {
 }
 
-ShadowMap2D::~ShadowMap2D()
+WShadowMap2D::~WShadowMap2D()
 {
 }
 
-void ShadowMap2D::InitRHIResource()
+void WShadowMap2D::InitRHIResource()
 {
+	Texture = GetRenderCommandList()->CreateTexture2D(Width, Height, format, IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT, IMAGE_ASPECT_DEPTH | IMAGE_ASPECT_STENCIL);
 }
 
-void ShadowMap2D::ReleaseRHIResource()
+void WShadowMap2D::ReleaseRHIResource()
 {
+	Texture = nullptr;
 }
 
-void ShadowMap2D::UpdateRHIResource()
+void WShadowMap2D::UpdateRHIResource()
 {
 }

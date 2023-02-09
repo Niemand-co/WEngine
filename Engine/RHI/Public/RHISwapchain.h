@@ -18,7 +18,7 @@ public:
 
 protected:
 
-	WEngine::WArray<RHITexture*> m_textures;
+	WEngine::WArray<class WRenderTarget*> RenderTargets;
 
 	WEngine::WArray<RHISemaphore*> ImageAcquireSemaphore;
 

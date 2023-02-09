@@ -106,21 +106,6 @@ void RHIContext::Init()
 	//g_pTextureViews.Push(g_pSwapchain->GetTexture(1)->CreateTextureView(&textureViewDescriptor));
 	//g_pTextureViews.Push(g_pSwapchain->GetTexture(2)->CreateTextureView(&textureViewDescriptor));
 
-	g_pDepthTextures.Resize(3);
-	g_pDepthTextureViews.Resize(3);
-	RHITextureDescriptor depthTextureDescriptor = {};
-	{
-		depthTextureDescriptor.format = Format::D16_Unorm;
-		depthTextureDescriptor.height = Window::cur_window->GetHeight();
-		depthTextureDescriptor.width = Window::cur_window->GetWidth();
-		depthTextureDescriptor.usage = IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT;
-		depthTextureDescriptor.mipCount = 1;
-		depthTextureDescriptor.layout = AttachmentLayout::Undefined;
-	}
-	g_pDepthTextures[0] = g_pDevice->CreateTexture(&depthTextureDescriptor);
-	g_pDepthTextures[1] = g_pDevice->CreateTexture(&depthTextureDescriptor);
-	g_pDepthTextures[2] = g_pDevice->CreateTexture(&depthTextureDescriptor);
-
 	for(int i = 0; i < 3; ++i)
 	{
 		TextureBarrier textureBarrier = { g_pDepthTextures[i], AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE, IMAGE_ASPECT_DEPTH };
@@ -394,6 +379,52 @@ WComputeShaderRHIRef RHIContext::CreateComputeShader(ShaderCodeBlob& blob)
 		descriptor.entryName = "CSMain";
 	}
 	return g_pDevice->CreateComputeShader(&descriptor);
+}
+
+WTexture2DRHIRef RHIContext::CreateTexture2D(uint32 width, uint32 height, Format format, uint32 usage, uint32 aspect)
+{
+	RHITextureDescriptor descriptor = {};
+	{
+		descriptor.width = width;
+		descriptor.height = height;
+		descriptor.format = format;
+		descriptor.layerCount = 1;
+		descriptor.mipCount = 1;
+		descriptor.usage = usage;
+		descriptor.aspect = aspect;
+	}
+	return g_pDevice->CreateTexture2D(&descriptor);
+}
+
+WTexture2DArrayRHIRef RHIContext::CreateTexture2DArray(uint32 width, uint32 height, Format format, uint32 layerCount, uint32 usage, uint32 aspect)
+{
+	RHITextureDescriptor descriptor = {};
+	{
+		descriptor.width = width;
+		descriptor.height = height;
+		descriptor.format = format;
+		descriptor.layerCount = layerCount;
+		descriptor.mipCount = 1;
+		descriptor.usage = usage;
+		descriptor.aspect = aspect;
+	}
+	return g_pDevice->CreateTexture2DArray(&descriptor);
+}
+
+WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 width, uint32 height, uint32 depth, Format format, uint32 usage, uint32 aspect)
+{
+	RHITextureDescriptor descriptor = {};
+	{
+		descriptor.width = width;
+		descriptor.height = height;
+		descriptor.depth = depth;
+		descriptor.format = format;
+		descriptor.layerCount = 1;
+		descriptor.mipCount = 1;
+		descriptor.usage = usage;
+		descriptor.aspect = aspect;
+	}
+	return g_pDevice->CreateTexture3D(&descriptor);
 }
 
 RHIScissor* RHIContext::CreateScissor(RHIScissorDescriptor* descriptor)

@@ -4,24 +4,26 @@ class RHITextureDescriptor
 {
 public:
 
-	RHITextureDescriptor();
+	RHITextureDescriptor() = default;
 
 	~RHITextureDescriptor() = default;
 
 public:
 
-	Format format;
+	Format format = Format::A16R16G16B16_SFloat;
 
-	unsigned int width;
+	uint32 width = 0;
 
-	unsigned int height;
+	uint32 height = 0;
 
-	unsigned int mipCount;
+	uint32 depth = 0;
 
-	unsigned int layerCount;
+	uint32 mipCount = 1;
 
-	unsigned int usage;
+	uint32 layerCount = 1;
 
-	AttachmentLayout layout;
+	uint32 usage = IMAGE_USAGE_COLOR_ATTACHMENT;
+
+	uint32 aspect = IMAGE_ASPECT_COLOR;
 
 };

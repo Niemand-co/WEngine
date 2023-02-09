@@ -11,8 +11,6 @@ public:
 
 	virtual ~RHITexture() = default;
 
-	virtual RHITextureView* CreateTextureView(RHITextureViewDescriptor* descriptor) = 0;
-
 	//virtual void LoadData(const WEngine::WString& path, RHIContext *context) = 0;
 
 };
@@ -29,8 +27,8 @@ public:
 
 protected:
 
-	RHITexture2D(uint32 width, uint32 height)
-		: Width(width), Height(height)
+	RHITexture2D(uint32 inWidth, uint32 inHeight)
+		: Width(inWidth), Height(inHeight)
 	{
 	}
 
@@ -39,6 +37,27 @@ protected:
 	uint32 Width;
 
 	uint32 Height;
+
+};
+
+class RHITexture2DArray : public RHITexture2D
+{
+public:
+
+	virtual ~RHITexture2DArray() = default;
+
+	uint32 GetLayerCount() const { return LayerCount; }
+
+protected:
+
+	RHITexture2DArray(uint32 inWidth, uint32 inHeight, uint32 inLayerCount)
+		: RHITexture2D(inWidth, inHeight), LayerCount(inLayerCount)
+	{
+	}
+
+protected:
+
+	uint32 LayerCount;
 
 };
 
@@ -50,39 +69,17 @@ public:
 
 protected:
 
-	uint32 Width;
-
-	uint32 Height;
-
-	uint32 Depth;
-
-};
-
-class RHITexture2DArray : public RHITexture2D
-{
-public:
-
-	virtual ~RHITexture2DArray() = default;
-
-	uint32 GetDepth() const { return Depth; }
-
-protected:
-
-	RHITexture2DArray(uint32 width, uint32 height, uint32 depth)
-		: RHITexture2D(width, height), Depth(depth)
+	RHITexture3D(uint32 inWidth, uint32 inHeight, uint32 inDepth)
+		: Width(inWidth), Height(inHeight), Depth(inDepth)
 	{
 	}
 
 protected:
 
+	uint32 Width;
+
+	uint32 Height;
+
 	uint32 Depth;
-
-};
-
-class RHITexture3DArray : public RHITexture
-{
-public:
-
-	virtual ~RHITexture3DArray() = default;
 
 };

@@ -1,8 +1,6 @@
 #pragma once
 #include "RHI/Public/RHITexture.h"
 
-class RHIDevice;
-
 namespace Vulkan
 {
 
@@ -10,19 +8,25 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTextureBase(VkImage* pInImage);
+		VulkanTextureBase(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo);
 
 		virtual ~VulkanTextureBase();
 
-		VkImage* GetHandle() const { return pImage; }
+		VkImage GetHandle() const { return Image; }
 
-	private:
+		void CreateTextureView(VkImageViewCreateInfo* pInfo);
 
-		VkMemoryRequirements *pMemoryRequirements;
+	protected:
 
-		VkDeviceMemory *pDeviceMemory;
+		VkMemoryRequirements MemoryRequirements;
 
-		VkImage *pImage;
+		VkDeviceMemory DeviceMemory;
+
+		VkImage Image;
+
+		VkImageView ImageView;
+
+		class VulkanDevice *pDevice;
 
 	};
 
@@ -30,26 +34,29 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTexture2D(VkImage *pImage, uint32 width, uint32 height);
+		VulkanTexture2D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, uint32 Aspect);
 
 		virtual ~VulkanTexture2D();
 
-		virtual RHITextureView* CreateTextureView(RHITextureViewDescriptor* descriptor) override;
+	};
+
+	class VulkanTexture2DArray : public RHITexture2DArray, public VulkanTextureBase
+	{
+	public:
+
+		VulkanTexture2DArray(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, uint32 Aspect);
+
+		virtual ~VulkanTexture2DArray();
 
 	};
 
-	class VulkanTexture3D : public RHITexture3D
+	class VulkanTexture3D : public RHITexture3D, public VulkanTextureBase
 	{
+	public:
 
-	};
+		VulkanTexture3D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, uint32 Aspect);
 
-	class VulkanTexture2DArray : public RHITexture2DArray
-	{
-
-	};
-
-	class VulkanTexture3DArray : public RHITexture3DArray
-	{
+		virtual ~VulkanTexture3D();
 
 	};
 

@@ -14,19 +14,19 @@ namespace Vulkan
 
 		virtual ~VulkanBufferBase();
 
-		VkBuffer* GetHandle();
+		VkBuffer GetHandle() const { return Buffer; }
 
 	protected:
 
-		VkBuffer *pBuffer;
+		VkBuffer Buffer;
 
-		VkMemoryRequirements *pMemoryRequirements;
+		VkMemoryRequirements MemoryRequirements;
 
-		VkDeviceMemory *pDeviceMemory;
+		VkDeviceMemory DeviceMemory;
 
 		void *pData;
 
-		VkDevice *pDevice;
+		VulkanDevice *pDevice;
 
 	};
 

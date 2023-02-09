@@ -95,6 +95,12 @@ public:
 
 	WComputeShaderRHIRef CreateComputeShader(ShaderCodeBlob& blob);
 
+	WTexture2DRHIRef CreateTexture2D(uint32 width, uint32 height, Format format, uint32 usage, uint32 aspect);
+
+	WTexture2DArrayRHIRef CreateTexture2DArray(uint32 width, uint32 height, Format format, uint32 layerCount, uint32 usage, uint32 aspect);
+
+	WTexture3DRHIRef CreateTexture3D(uint32 width, uint32 height, uint32 depth, Format format, uint32 usage, uint32 aspect);
+
 	virtual RHIScissor* CreateScissor(RHIScissorDescriptor *descriptor);
 
 	virtual RHIViewport* CreateViewport(RHIViewportDescriptor *descriptor);

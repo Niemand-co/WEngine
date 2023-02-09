@@ -40,7 +40,11 @@ namespace Vulkan
 
 		virtual RHIPipelineStateObject* CreatePipelineStateObject(RHIPipelineStateObjectDescriptor *descriptor) override;
 
-		virtual RHITexture* CreateTexture(RHITextureDescriptor *descriptor) override;
+		virtual WTexture2DRHIRef CreateTexture2D(RHITextureDescriptor* descriptor) override;
+
+		virtual WTexture2DArrayRHIRef CreateTexture2DArray(RHITextureDescriptor* descriptor) override;
+
+		virtual WTexture3DRHIRef CreateTexture3D(RHITextureDescriptor* descriptor) override;
 
 		virtual RHISampler* CreateSampler(RHISamplerDescriptor * descriptor) override;
 

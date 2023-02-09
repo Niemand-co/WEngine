@@ -1,13 +1,13 @@
 #pragma once
 #include "Render/Public/Texture.h"
 
-class ShadowMap2D : public WTexture2D
+class WShadowMap2D : public WTexture2D
 {
 public:
 
-	ShadowMap2D();
+	WShadowMap2D(uint32 inWidth, uint32 inHeight, Format format);
 
-	virtual ~ShadowMap2D();
+	virtual ~WShadowMap2D();
 
 	virtual void InitRHIResource() override;
 

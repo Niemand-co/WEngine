@@ -64,7 +64,11 @@ public:
 
 	virtual RHIPipelineStateObject* CreatePipelineStateObject(RHIPipelineStateObjectDescriptor *descriptor) = 0;
 
-	virtual RHITexture* CreateTexture(RHITextureDescriptor *descriptor) = 0;
+	virtual WTexture2DRHIRef CreateTexture2D(RHITextureDescriptor* descriptor) = 0;
+
+	virtual WTexture2DArrayRHIRef CreateTexture2DArray(RHITextureDescriptor* descriptor) = 0;
+
+	virtual WTexture3DRHIRef CreateTexture3D(RHITextureDescriptor* descriptor) = 0;
 
 	virtual RHISampler* CreateSampler(RHISamplerDescriptor * descriptor) = 0;
 

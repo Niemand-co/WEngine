@@ -57,6 +57,21 @@ WComputeShaderRHIRef RHIRenderCommandList::CreateComputeShader(ShaderCodeBlob& b
     return RHIContext::GetContext()->CreateComputeShader(blob);
 }
 
+WTexture2DRHIRef RHIRenderCommandList::CreateTexture2D(uint32 width, uint32 height, Format format, uint32 usage, uint32 aspect)
+{
+    return RHIContext::GetContext()->CreateTexture2D(width, height, format, usage, aspect);
+}
+
+WTexture2DArrayRHIRef RHIRenderCommandList::CreateTexture2DArray(uint32 width, uint32 height, Format format, uint32 layerCount, uint32 usage, uint32 aspect)
+{
+    return RHIContext::GetContext()->CreateTexture2DArray(width, height, format, layerCount, usage, aspect);
+}
+
+WTexture3DRHIRef RHIRenderCommandList::CreateTexture3D(uint32 width, uint32 height, uint32 depth, Format format, uint32 usage, uint32 aspect)
+{
+    return RHIContext::GetContext()->CreateTexture3D(width, height, depth, format, usage, aspect);
+}
+
 RHIRenderCommandList* GetRenderCommandList()
 {
     static RHIRenderCommandList* list = new RHIRenderCommandList;

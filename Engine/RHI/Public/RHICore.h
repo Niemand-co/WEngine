@@ -413,8 +413,13 @@ typedef WEngine::WSharedPtr<class RHIDynamicVertexBuffer> WDynamicVertexBufferRH
 typedef WEngine::WSharedPtr<class RHIIndexBuffer> WIndexBufferRHIRef;
 typedef WEngine::WSharedPtr<class RHIUniformBuffer> WUniformBufferRHIRef;
 typedef WEngine::WSharedPtr<class RHIDynamicUniformBuffer> WDynamicUniformBufferRHIRef;
+typedef WEngine::WSharedPtr<class RHITextureBuffer> WTextureBufferRHIRef;
 
 typedef WEngine::WSharedPtr<class RHIVertexShader> WVertexShaderRHIRef;
 typedef WEngine::WSharedPtr<class RHIPixelShader> WPixelShaderRHIRef;
 typedef WEngine::WSharedPtr<class RHIGeometryShader> WGeometryShaderRHIRef;
 typedef WEngine::WSharedPtr<class RHIComputeShader> WComputeShaderRHIRef;
+
+typedef WEngine::WSharedPtr<class RHITexture2D> WTexture2DRHIRef;
+typedef WEngine::WSharedPtr<class RHITexture2DArray> WTexture2DArrayRHIRef;
+typedef WEngine::WSharedPtr<class RHITexture3D> WTexture3DRHIRef;

@@ -420,7 +420,7 @@ namespace Vulkan
 		return pipeline;
 	}
 
-	RHITexture* VulkanDevice::CreateTexture(RHITextureDescriptor* descriptor)
+	WTexture2DRHIRef VulkanDevice::CreateTexture2D(RHITextureDescriptor* descriptor)
 	{
 		VkImageCreateInfo imageCreateInfo = {};
 		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -429,40 +429,49 @@ namespace Vulkan
 		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
 		imageCreateInfo.usage = descriptor->usage;
 		imageCreateInfo.arrayLayers = 1;
-		imageCreateInfo.initialLayout = WEngine::ToVulkan(descriptor->layout);
+		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		imageCreateInfo.mipLevels = descriptor->mipCount;
-		imageCreateInfo.samples = WEngine::ToVulkan(1);
+		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 
-		VkImage *image = (VkImage*)WEngine::Allocator::Get()->Allocate(sizeof(VkImage));
-		vkCreateImage(*m_pDevice, &imageCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), image);
+		return new VulkanTexture2D(this, &imageCreateInfo, descriptor->aspect);
+	}
 
-		VkMemoryRequirements *memoryRequirements = (VkMemoryRequirements*)WEngine::Allocator::Get()->Allocate(sizeof(VkMemoryRequirements));
-		::new (memoryRequirements) VkMemoryRequirements();
-		vkGetImageMemoryRequirements(*m_pDevice, *image, memoryRequirements);
+	WTexture2DArrayRHIRef VulkanDevice::CreateTexture2DArray(RHITextureDescriptor* descriptor)
+	{
+		VkImageCreateInfo imageCreateInfo = {};
+		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		imageCreateInfo.extent = { descriptor->width, descriptor->height, 1 };
+		imageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
+		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+		imageCreateInfo.usage = descriptor->usage;
+		imageCreateInfo.arrayLayers = descriptor->layerCount;
+		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		imageCreateInfo.mipLevels = descriptor->mipCount;
+		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 
-		unsigned int index = 0;
-		GPUFeature feature = m_pGPU->GetFeature();
-		for (; index < feature.memorySupports.Size(); ++index)
-		{
-			if((memoryRequirements->memoryTypeBits & 1) && (feature.memorySupports[index]->properties & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) == VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT )
-				break;
-			memoryRequirements->memoryTypeBits >>= 1;
-		}
+		return new VulkanTexture2DArray(this, &imageCreateInfo, descriptor->aspect);
+	}
 
-		VkMemoryAllocateInfo memoryAllocateInfo = {};
-		{
-			memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-			memoryAllocateInfo.allocationSize = memoryRequirements->size;
-			memoryAllocateInfo.memoryTypeIndex = index;
-		}
-		VkDeviceMemory *pMemory = (VkDeviceMemory*)WEngine::Allocator::Get()->Allocate(sizeof(VkDeviceMemory));
-		vkAllocateMemory(*m_pDevice, &memoryAllocateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pMemory);
+	WTexture3DRHIRef VulkanDevice::CreateTexture3D(RHITextureDescriptor* descriptor)
+	{
+		VkImageCreateInfo imageCreateInfo = {};
+		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		imageCreateInfo.extent = { descriptor->width, descriptor->height, descriptor->depth };
+		imageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
+		imageCreateInfo.imageType = VK_IMAGE_TYPE_3D;
+		imageCreateInfo.usage = descriptor->usage;
+		imageCreateInfo.arrayLayers = 1;
+		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		imageCreateInfo.mipLevels = descriptor->mipCount;
+		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 
-		vkBindImageMemory(*m_pDevice, *image, *pMemory, 0);
-
-		return new VulkanTexture2D(image, descriptor->width, descriptor->height);
+		return new VulkanTexture3D(this, &imageCreateInfo, descriptor->aspect);
 	}
 
 	RHISampler* VulkanDevice::CreateSampler(RHISamplerDescriptor* descriptor)

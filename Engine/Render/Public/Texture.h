@@ -7,21 +7,13 @@ class WTexture : public RenderResource
 {
 public:
 
-	WTexture();
+	WTexture() = default;
 
-	virtual ~WTexture();
+	virtual ~WTexture() = default;
 
 private:
 
-	WEngine::WString m_name;
-
-	unsigned int m_width;
-
-	unsigned int m_height;
-
-	unsigned int m_depth;
-
-	RHITexture *m_pRHITexture;
+	WEngine::WString Name;
 
 };
 
@@ -29,13 +21,22 @@ class WTexture2D : public WTexture
 {
 public:
 
-	WTexture2D();
+	WTexture2D(uint32 inWidth, uint32 inHeight, Format inFormat)
+		: Width(inWidth), Height(inHeight), format(inFormat)
+	{
+	}
 
-	virtual ~WTexture2D();
+	virtual ~WTexture2D() = default;
 
 protected:
 
-	RHITexture2D
+	uint32 Width;
+
+	uint32 Height;
+
+	Format format;
+
+	WTexture2DRHIRef Texture;
 
 };
 
@@ -43,9 +44,15 @@ class WTextureWithSRV : public WTexture2D
 {
 public:
 
-	WTextureWithSRV();
+	WTextureWithSRV(uint32 inWidth, uint32 inHeight, Format inFormat);
 
-	virtual ~WTextureWithSRV();
+	virtual ~WTextureWithSRV() = default;
+
+	virtual void InitRHIResource() override;
+
+	virtual void ReleaseRHIResource() override;
+
+	virtual void UpdateRHIResource() override;
 
 };
 
