@@ -10,7 +10,7 @@
 namespace Vulkan
 {
 
-	VulkanGPU::VulkanGPU(VkPhysicalDevice * pPhysicalDevice, VkSurfaceKHR *surface)
+	VulkanGPU::VulkanGPU(VkPhysicalDevice * pPhysicalDevice)
 	{
 		m_pPhysicalDevice = pPhysicalDevice;
 
@@ -41,19 +41,6 @@ namespace Vulkan
 		vkGetPhysicalDeviceQueueFamilyProperties(*m_pPhysicalDevice, &queueFamilyPropertyCount, nullptr);
 		WEngine::WArray<VkQueueFamilyProperties> queueFamilyProperties(queueFamilyPropertyCount);
 		vkGetPhysicalDeviceQueueFamilyProperties(*m_pPhysicalDevice, &queueFamilyPropertyCount, queueFamilyProperties.GetData());
-
-		VkBool32 isPresentSupported;
-		for (unsigned int i = 0; i < queueFamilyPropertyCount; ++i)
-		{
-			VkQueueFamilyProperties properties = queueFamilyProperties[i];
-			vkGetPhysicalDeviceSurfaceSupportKHR(*m_pPhysicalDevice, i, *surface, &isPresentSupported);
-			QueueProperty* queueProperty = new QueueProperty();
-			queueProperty->count = properties.queueCount;
-			queueProperty->QUEUE_SUPPORT = properties.queueFlags;
-			if (isPresentSupported)
-				queueProperty->QUEUE_SUPPORT |= QUEUE_PROPERTY_PRESENT;
-			m_feature.queueProperties.Push(queueProperty);
-		}
 
 		VkPhysicalDeviceMemoryProperties memoryProperties;
 		vkGetPhysicalDeviceMemoryProperties(*m_pPhysicalDevice, &memoryProperties);
@@ -90,85 +77,58 @@ namespace Vulkan
 
 	RHIDevice* VulkanGPU::CreateDevice(RHIDeviceDescriptor *descriptor)
 	{
-		WEngine::WArray<VkDeviceQueueCreateInfo> queueCreateInfos(descriptor->queueInfoCount);
+		WEngine::WArray<VkDeviceQueueCreateInfo> QueueCreateInfos(descriptor->queueInfoCount);
 		WEngine::WArray<QueueStack> queueStack;
 		queueStack.Reserve(descriptor->queueInfoCount);
 		unsigned int size = 0;
 		for (unsigned int i = 0; i < descriptor->queueInfoCount; ++i)
 		{
 			RHIQueueDescriptor queueDescriptor = descriptor->queueInfos[i];
-			unsigned int queueFamilyIndex = 0;
-			unsigned int flag = 0u;
-			switch (queueDescriptor.type)
+			unsigned int QueueFamilyIndex = 0;
+			for (; QueueFamilyIndex < m_feature.queueProperties.Size(); ++QueueFamilyIndex)
 			{
-				case RHIQueueType::Graphics:
-					flag |= QUEUE_PROPERTY_GRAPHICS;
-					break;
-				case RHIQueueType::Compute:
-					flag |= QUEUE_PROPERTY_COMPUTE;
-					break;
-				case RHIQueueType::Blit:
-					flag |= QUEUE_PROPERTY_BLIT;
-					break;
-				case RHIQueueType::Present:
-					flag |= QUEUE_PROPERTY_PRESENT;
+				QueueProperty *queueProperty = m_feature.queueProperties[QueueFamilyIndex];
+				if ((queueProperty->QUEUE_SUPPORT & (uint8)queueDescriptor.type) > 0 && queueDescriptor.count <= queueProperty->count)
 					break;
 			}
-			for (; queueFamilyIndex < m_feature.queueProperties.Size(); ++queueFamilyIndex)
-			{
-				QueueProperty *queueProperty = m_feature.queueProperties[queueFamilyIndex];
-				if ((queueProperty->QUEUE_SUPPORT & flag) > 0 && queueDescriptor.count <= queueProperty->count)
-					break;
-			}
-			if(queueFamilyIndex >= m_feature.queueProperties.Size())
+			if(QueueFamilyIndex >= m_feature.queueProperties.Size())
 				RE_ASSERT(false, "GPU does not support queue specified.")
 			else
 			{
-				queueStack.Push({queueDescriptor.count, queueFamilyIndex, queueDescriptor.type});
+				queueStack.Push({queueDescriptor.count, QueueFamilyIndex, queueDescriptor.type});
 				size += queueDescriptor.count;
 			}
 
 			VkDeviceQueueCreateInfo queueCreateInfo = {};
 			queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-			queueCreateInfo.queueFamilyIndex = queueFamilyIndex;
+			queueCreateInfo.queueFamilyIndex = QueueFamilyIndex;
 			queueCreateInfo.queueCount = queueDescriptor.count;
 			float queuePriority = 1.0f;
 			queueCreateInfo.pQueuePriorities = &queuePriority;
-			queueCreateInfos[i] = queueCreateInfo;
+			QueueCreateInfos[i] = queueCreateInfo;
 		}
 
 		VkPhysicalDeviceFeatures deviceFeatures = {};
 
-		VkDeviceCreateInfo deviceCreateInfo = {};
+		VkDeviceCreateInfo DeviceCreateInfo = {};
 		WEngine::WArray<const char*> extensionNames = { "VK_KHR_swapchain" };
-		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.GetData();
-		deviceCreateInfo.queueCreateInfoCount = queueCreateInfos.Size();
-		deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
-		deviceCreateInfo.ppEnabledExtensionNames = extensionNames.GetData();
-		deviceCreateInfo.enabledExtensionCount = extensionNames.Size();
+		DeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		DeviceCreateInfo.pQueueCreateInfos = QueueCreateInfos.GetData();
+		DeviceCreateInfo.queueCreateInfoCount = QueueCreateInfos.Size();
+		DeviceCreateInfo.pEnabledFeatures = &deviceFeatures;
+		DeviceCreateInfo.ppEnabledExtensionNames = extensionNames.GetData();
+		DeviceCreateInfo.enabledExtensionCount = extensionNames.Size();
 		if (descriptor->enableDebugLayer)
 		{
-			deviceCreateInfo.enabledLayerCount = static_cast<unsigned int>(VulkanInstance::g_validationLayers.Size());
-			deviceCreateInfo.ppEnabledLayerNames = VulkanInstance::g_validationLayers.GetData();
+			DeviceCreateInfo.enabledLayerCount = static_cast<unsigned int>(VulkanInstance::g_validationLayers.Size());
+			DeviceCreateInfo.ppEnabledLayerNames = VulkanInstance::g_validationLayers.GetData();
 		}
 		else
 		{
-			deviceCreateInfo.enabledLayerCount = 0u;
+			DeviceCreateInfo.enabledLayerCount = 0u;
 		}
 
-		VkDevice *pDevice = (VkDevice*)WEngine::Allocator::Get()->Allocate(sizeof(VkDevice));
-		RE_ASSERT(vkCreateDevice(*m_pPhysicalDevice, &deviceCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pDevice) == VK_SUCCESS, "Failed to Create Device.");
-
-		RHIDevice* device = (RHIDevice*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanDevice));
-		::new (device) VulkanDevice(pDevice, this, queueStack);
-
-		return device;
-	}
-
-	VkPhysicalDevice* VulkanGPU::GetHandle()
-	{
-		return m_pPhysicalDevice;
+		return new VulkanDevice(this, &DeviceCreateInfo);
 	}
 
 }

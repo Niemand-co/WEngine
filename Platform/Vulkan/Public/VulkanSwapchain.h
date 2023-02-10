@@ -1,5 +1,7 @@
 #pragma once
 #include "RHI/Public/RHISwapchain.h"
+#include "Platform/Vulkan/Public/VulkanSemaphore.h"
+#include "Platform/Vulkan/Public/VulkanFence.h"
 
 namespace Vulkan
 {
@@ -8,31 +10,39 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanSwapchain(VkSwapchainKHR *swapchain, VkDevice *device, unsigned int familyIndex);
+		VulkanSwapchain(class VulkanDevice *pInDevice, class VulkanInstance *pInInstance, VkSwapchainCreateInfoKHR* pInfo);
 
 		virtual ~VulkanSwapchain();
 
-		virtual int32 AcquireImageIndex(RHISemaphore** outSemaphore) override;
+		virtual int32 AcquireImageIndex(RHISemaphore** OutSemaphore) override;
 
-		virtual void Present(RHIQueue *queue, RHISemaphore *renderingDoneSemaphore) override;
+		virtual int32 Present(RHIQueue *Queue, RHISemaphore *RenderingDoneSemaphore) override;
 
-		void SetHandle(VkSwapchainKHR *swapchain);
-
-		VkSwapchainKHR* GetHandle();
-
-		unsigned int GetQueueFamilyIndex();
+		VkSwapchainKHR GetHandle() const { return Swapchain; }
 
 	private:
 
-		VkDevice *pDevice;
+		VulkanDevice *pDevice;
 
-		VkSwapchainKHR *pSwapchain;
+		VulkanInstance *pInstance;
 
-		VkSurfaceKHR *pSurface;
+		VkSwapchainKHR Swapchain;
 
-		VkDevice *m_pDevice;
+		VkSurfaceKHR Surface;
 
-		unsigned int m_familyIndex;
+		VkSwapchainCreateInfoKHR RecreateInfo;
+
+		VkSurfaceCapabilitiesKHR SurfaceCapabilities;
+
+		WEngine::WArray<WSemaphoreRHIRef> ImageAcquireSemaphore;
+
+		WEngine::WArray<WFenceRHIRef> ImageAcquireFence;
+
+		uint32 PresentID;
+
+		uint32 SemaphoreID;
+
+		int32 CurrentImageIndex;
 
 	};
 

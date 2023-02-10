@@ -1,18 +1,29 @@
 #pragma once
 #include "RHI/Public/RHIFence.h"
 
-class VulkanFence : public RHIFence
+namespace Vulkan
 {
-public:
 
-	VulkanFence(VkFence *fence);
+	class VulkanFence : public RHIFence
+	{
+	public:
 
-	virtual ~VulkanFence();
+		VulkanFence(class VulkanDevice *pInDevice);
 
-	VkFence* GetHandle();
+		virtual ~VulkanFence();
 
-private:
+		virtual void Reset() override;
 
-	VkFence *m_fence;
+		virtual int32 Wait(double Time = UINT64_MAX) override;
 
-};
+		VkFence GetHandle() const { return Fence; }
+
+	private:
+
+		VkFence Fence;
+
+		VulkanDevice *pDevice;
+
+	};
+
+}

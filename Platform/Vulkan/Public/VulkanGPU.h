@@ -13,7 +13,7 @@ namespace Vulkan
 
 		VulkanGPU() = delete;
 
-		VulkanGPU(VkPhysicalDevice *pPhysicalDevice, VkSurfaceKHR *surface);
+		VulkanGPU(VkPhysicalDevice *pPhysicalDevice);
 
 		virtual ~VulkanGPU();
 
@@ -23,7 +23,7 @@ namespace Vulkan
 
 		virtual RHIDevice* CreateDevice(RHIDeviceDescriptor *descriptor) override;
 
-		VkPhysicalDevice* GetHandle();
+		VkPhysicalDevice* GetHandle() const { return m_pPhysicalDevice; }
 
 	private:
 

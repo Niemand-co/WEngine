@@ -4,15 +4,15 @@
 #include "Utils/Public/Window.h"
 #include "Render/Mesh/Public/Vertex.h"
 #include "RHI/Public/RHIBuffer.h"
+#include "RHI/Public/RHIContext.h"
 
 namespace Vulkan
 {
 
-	VulkanDevice::VulkanDevice(VkDevice *device, VulkanGPU *pGPU, WEngine::WArray<QueueStack> stacks)
+	VulkanDevice::VulkanDevice(VulkanGPU *pInGPU, VkDeviceCreateInfo* pInfo)
+		: pGPU(pInGPU)
 	{
-		m_pDevice = device;
-		m_queues = stacks;
-		m_pGPU = pGPU;
+		RE_ASSERT(vkCreateDevice(*pInGPU->GetHandle(), pInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), &pDevice) == VK_SUCCESS, "Failed to Create Device.");
 	}
 
 	VulkanDevice::~VulkanDevice()
@@ -30,18 +30,12 @@ namespace Vulkan
 
 	RHIQueue* VulkanDevice::GetQueue(RHIQueueType type, unsigned int count)
 	{
-		VkQueue *pQueue = (VkQueue*)WEngine::Allocator::Get()->Allocate(sizeof(VkQueue));
-		::new (pQueue) VkQueue();
 		unsigned int queueFamilyID = 0;
-		for(; queueFamilyID < m_queues.Size(); ++queueFamilyID)
-			if(m_queues[queueFamilyID].type == type)
+		for (; queueFamilyID < m_queues.Size(); ++queueFamilyID)
+			if (((uint8)m_queues[queueFamilyID].type & (uint8)type) > 0)
 				break;
-		vkGetDeviceQueue(*m_pDevice, m_queues[queueFamilyID].index, 0, pQueue);
 
-		RHIQueue *queue = (RHIQueue*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanQueue));
-		:: new (queue) VulkanQueue(pQueue, queueFamilyID, m_pDevice);
-
-		return queue;
+		return new VulkanQueue(this, queueFamilyID);
 	}
 
 	RHISwapchain* VulkanDevice::CreateSwapchain(RHISwapchainDescriptor* descriptor)
@@ -65,32 +59,16 @@ namespace Vulkan
 		swapchainCreateInfo.clipped = VK_TRUE;
 		swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-		VkSwapchainKHR* pSwapchain = (VkSwapchainKHR*)WEngine::Allocator::Get()->Allocate(sizeof(VkSwapchainKHR));
-		RE_ASSERT(vkCreateSwapchainKHR(*m_pDevice, &swapchainCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pSwapchain) == VK_SUCCESS, "Failed to Create Swapchain.");
-
-		RHISwapchain *swapchain = (RHISwapchain*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanSwapchain));
-		::new (swapchain) VulkanSwapchain(pSwapchain, m_pDevice, 0);
-
-		return swapchain;
+		return new VulkanSwapchain(this, static_cast<VulkanInstance*>(RHIContext::GetInstance()), &swapchainCreateInfo);
 	}
 
 	WEngine::WArray<RHIFence*> VulkanDevice::CreateFence(unsigned int count)
 	{
-		VulkanFence *pFences = (VulkanFence*)WEngine::Allocator::Get()->Allocate(count * sizeof(VulkanFence));
 		WEngine::WArray<RHIFence*> fences(count);
-
-		VkFenceCreateInfo fenceCreateInfo = {};
-		fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-		fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-
-		VkFence *fence = (VkFence*)WEngine::Allocator::Get()->Allocate(count * sizeof(VkFence));
 		for (unsigned int i = 0; i < count; ++i)
 		{
-			vkCreateFence(*m_pDevice, &fenceCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), fence + i);
-			::new (pFences + i) VulkanFence(fence + i);
-			fences[i] = pFences + i;
+			fences[i] = new VulkanFence(this);
 		}
-
 
 		return fences;
 	}

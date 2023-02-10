@@ -1,8 +1,6 @@
 #pragma once
 #include "RHI/Public/RHIQueue.h"
 
-enum class RHIQueueType;
-
 namespace Vulkan
 {
 
@@ -10,29 +8,27 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanQueue(VkQueue *queue, int queueFamilyIndex, VkDevice *device);
+		VulkanQueue(class VulkanDevice* pInDevice, uint32 inQueueFamilyIndex);
 
 		virtual ~VulkanQueue();
 
-		virtual int GetIndex() override;
+		virtual int32 GetIndex() override;
 
-		virtual RHICommandPool* GetCommandPool() override;
+		virtual class RHICommandPool* GetCommandPool() override;
 
-		virtual void Submit(RHISubmitDescriptor* descriptor) override;
+		void Submit(class VulkanCommandBuffer* CmdBuffer, WEngine::WArray<VkSemaphore>& SignalSemaphores);
 
-		virtual bool Present(RHISwapchain *swapchain, unsigned int index, RHISemaphore *semaphore) override;
-
-		VkQueue* GetHandle();
+		VkQueue GetHandle() const { return Queue; }
 
 	private:
 
-		VkQueue *m_queue;
+		VkQueue Queue;
 
-		VkDevice *m_device;
+		VulkanDevice* pDevice;
 
 		RHIQueueType m_type;
 
-		int m_queueFamilyIndex;
+		uint32 QueueFamilyIndex;
 
 	};
 

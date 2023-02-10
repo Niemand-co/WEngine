@@ -99,7 +99,7 @@ namespace Vulkan
 
 		for (unsigned int i = 0; i < physicalDeviceCount; ++i)
 		{
-			m_gpus[i] = new VulkanGPU(pPhysicalDevices + i, m_pSurface);
+			m_gpus[i] = new VulkanGPU(pPhysicalDevices + i);
 		}
 	}
 
@@ -140,15 +140,7 @@ namespace Vulkan
 
 	void VulkanInstance::CreateWin32Surface()
 	{
-		VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
-		surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-		surfaceCreateInfo.hinstance = GetModuleHandle(0);
-		surfaceCreateInfo.hwnd = glfwGetWin32Window((GLFWwindow*)Window::Get()->GetHandle());
-
-		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(*m_pInstance, "vkCreateWin32SurfaceKHR");
-
-		m_pSurface = (VkSurfaceKHR*)WEngine::Allocator::Get()->Allocate(sizeof(VkSurfaceKHR));
-		RE_ASSERT(CreateWin32SurfaceKHR(*m_pInstance, &surfaceCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), m_pSurface) == VK_SUCCESS, "Failed to Create Win32 Surface.");
+		
 	}
 
 	bool VulkanInstance::CheckLayerAvailability(const WEngine::WArray<const char*>& layers)

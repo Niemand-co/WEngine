@@ -8,19 +8,17 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanCommandPool(VkCommandPool *commandPool, VkDevice *device);
+		VulkanCommandPool(class VulkanDevice* pInDevice, VkCommandPoolCreateInfo* pInfo);
 
 		virtual ~VulkanCommandPool();
 
-		virtual RHICommandBuffer* GetCommandBuffer(bool isPrimary = true) override;
-
-		virtual WEngine::WArray<RHICommandBuffer*> GetCommandBuffer(unsigned int count, bool isPrimary = true) override;
+		virtual class RHICommandBuffer* GetCommandBuffer(bool bPrimary = true) override;
 
 	private:
 
-		VkCommandPool *m_commandPool;
+		VkCommandPool CommandPool;
 
-		VkDevice *m_device;
+		VulkanDevice *pDevice;
 
 	};
 

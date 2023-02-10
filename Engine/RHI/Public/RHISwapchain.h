@@ -14,7 +14,7 @@ public:
 
 	virtual int32 AcquireImageIndex(RHISemaphore** outSemaphore) = 0;
 
-	virtual void Present(class RHIQueue *queue, RHISemaphore *renderingDoneSemaphore) = 0;
+	virtual int32 Present(class RHIQueue *queue, RHISemaphore *renderingDoneSemaphore) = 0;
 
 protected:
 

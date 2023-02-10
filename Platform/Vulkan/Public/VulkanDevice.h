@@ -8,13 +8,11 @@ struct QueueStack;
 namespace Vulkan
 {
 
-	class VulkanGPU;
-
 	class VulkanDevice : public RHIDevice
 	{
 	public:
 	
-		VulkanDevice(VkDevice *device, VulkanGPU *pGPU, WEngine::WArray<QueueStack> stacks);
+		VulkanDevice(class VulkanGPU* pInGPU, VkDeviceCreateInfo *pInfo);
 
 		virtual ~VulkanDevice();
 
@@ -86,17 +84,17 @@ namespace Vulkan
 
 		virtual void Wait() override;
 
-		VulkanGPU* GetGPU() const { return m_pGPU; }
+		VulkanGPU* GetGPU() const { return pGPU; }
 
-		VkDevice* GetHandle() const { return m_pDevice; }
+		VkDevice GetHandle() const { return pDevice; }
 
 	private:
 
-		VkDevice *m_pDevice;
+		VkDevice pDevice;
 
 		WEngine::WArray<QueueStack> m_queues;
 
-		VulkanGPU *m_pGPU;
+		VulkanGPU *pGPU;
 
 	};
 

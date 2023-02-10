@@ -132,7 +132,7 @@ void RHIContext::Init()
 	//for(int i = 0; i < 3; ++i)
 	//	g_pDepthTextureViews[i] = g_pDepthTextures[i]->CreateTextureView(&depthViewDescriptor);
 
-	g_pPrimaryCommandBuffers = g_pPool->GetCommandBuffer(3u, true);
+	g_pPrimaryCommandBuffers = g_pPool->GetCommandBuffer(true);
 
 	g_pFences = g_pDevice->CreateFence(g_maxFrames);
 	g_pImageAvailibleSemaphores = g_pDevice->GetSemaphore(g_maxFrames);

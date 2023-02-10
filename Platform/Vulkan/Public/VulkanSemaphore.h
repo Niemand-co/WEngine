@@ -1,18 +1,25 @@
 #pragma once
 #include "RHI/Public/RHISemaphore.h"
 
-class VulkanSemaphore : public RHISemaphore
+namespace Vulkan
 {
-public:
 
-	VulkanSemaphore(VkSemaphore *semaphore);
+	class VulkanSemaphore : public RHISemaphore
+	{
+	public:
 
-	virtual ~VulkanSemaphore();
+		VulkanSemaphore(class VulkanDevice *pInDevice);
 
-	VkSemaphore* GetHandle();
+		virtual ~VulkanSemaphore();
 
-private:
+		VkSemaphore GetHandle() const { return Semaphore; }
 
-	VkSemaphore *m_semaphore;
+	private:
+
+		VkSemaphore Semaphore;
+
+		VulkanDevice *pDevice;
 
 };
+
+}

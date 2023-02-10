@@ -406,6 +406,15 @@ namespace WEngine
 		return VK_PRIMITIVE_TOPOLOGY_MAX_ENUM;
 	}
 
+	enum class EState : int32
+	{
+		None = 0,
+
+		OutofData = -1,
+		SurfaceLost = -2,
+		Healthy = None,
+	};
+
 }
 
 typedef WEngine::WSharedPtr<class RHIVertexBuffer> WVertexBufferRHIRef;

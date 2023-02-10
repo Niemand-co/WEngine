@@ -25,18 +25,7 @@ void RHICommandDrawIndexedPrimitive::Execute(RHICommandListBase* CmdList)
 
 void RHICommandSetViewport::Execute(RHICommandListBase* CmdList)
 {
-	RHIViewportDescriptor descriptor = {};
-	{
-		descriptor.x = MinX;
-		descriptor.y = MinY;
-		descriptor.width = MaxX - MinX;
-		descriptor.height = MaxY - MinY;
-		descriptor.minDepth = MinZ;
-		descriptor.maxDepth = MinZ == MaxZ ? (MinZ + 1.0f) : MaxZ;
-	}
-	//RHIContext::CreateViewport(&descriptor);
-	
-	//ENCODER_EXECUTE(SetViewport)(viewport);
+	ENCODER_EXECUTE(SetViewport)({});
 }
 
 void RHICommandSetScissor::Execute(RHICommandListBase* CmdList)

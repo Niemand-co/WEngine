@@ -4,7 +4,7 @@
 
 namespace WEngine
 {
-	Allocator *Allocator::g_pInstance = nullptr;
+	Allocator *Allocator::g_pInstance = new VulkanAllocator();
 
 	BYTE GetIndex(size_t blockSize)
 	{
@@ -83,10 +83,6 @@ namespace WEngine
 
 	Allocator* Allocator::Get()
 	{
-		if (g_pInstance == nullptr)
-		{
-			g_pInstance = new Vulkan::VulkanAllocator();
-		}
 		return g_pInstance;
 	}
 

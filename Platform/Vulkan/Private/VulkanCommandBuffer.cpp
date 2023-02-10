@@ -1,57 +1,58 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
-#include "Platform/Vulkan/Public/VulkanRenderPass.h"
-#include "Platform/Vulkan/Public/VulkanRenderTarget.h"
+#include "Platform/Vulkan/Public/VulkanDevice.h"
+#include "Platform/Vulkan/Public/VulkanQueue.h"
+#include "Platform/Vulkan/Public/VulkanCommandPool.h"
+#include "Platform/Vulkan/Public/VulkanSemaphore.h"
+#include "Platform/Vulkan/Public/VulkanFence.h"
 #include "Platform/Vulkan/Encoder/Public/VulkanGraphicsEncoder.h"
 #include "Platform/Vulkan/Encoder/Public/VulkanComputeEncoder.h"
 
 namespace Vulkan
 {
 
-	VulkanCommandBuffer::VulkanCommandBuffer(VkCommandBuffer *commandBuffer, VkCommandPool *pCommandPool, bool isSecondary, VkDevice *pDevice)
-		: m_commandBuffer(commandBuffer), m_pCommandPool(pCommandPool), m_isSecondary(isSecondary), m_pDevice(pDevice)
+	VulkanCommandBuffer::VulkanCommandBuffer(VulkanDevice* pInDevice, VulkanCommandPool *pInCommandPool, VkCommandBufferAllocateInfo* pInfo)
+		: pDevice(pInDevice)
 	{
+		vkAllocateCommandBuffers(pDevice->GetHandle(), pInfo, &CommandBuffer);
+		pFence = new VulkanFence(pDevice);
 	}
 
 	VulkanCommandBuffer::~VulkanCommandBuffer()
 	{
-		vkFreeCommandBuffers(*m_pDevice, *m_pCommandPool, 1, m_commandBuffer);
+		vkFreeCommandBuffers(pDevice->GetHandle(), *pCommandPool, 1, &CommandBuffer);
 	}
 
-	void VulkanCommandBuffer::BeginScopePass(const WEngine::WString& passName, RHIRenderPass* pRenderPass, unsigned int subpass, RHIRenderTarget* pRenderTarget)
+	void VulkanCommandBuffer::BeginScopePass(const WEngine::WString& passName)
 	{
-		VkCommandBufferBeginInfo commandbufferBeginInfo = {};
-		commandbufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		commandbufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+		VkCommandBufferBeginInfo CommandbufferBeginInfo = {};
+		CommandbufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		CommandbufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 		VkCommandBufferInheritanceInfo inheritanceInfo = {};
 
-		if (m_isSecondary)
-		{
-			inheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
-			if(pRenderPass != nullptr)
-				inheritanceInfo.renderPass = *static_cast<VulkanRenderPass*>(pRenderPass)->GetHandle();
-			inheritanceInfo.subpass = subpass;
-			if(pRenderTarget != nullptr)
-				inheritanceInfo.framebuffer = *static_cast<VulkanRenderTarget*>(pRenderTarget)->GetHandle();
-			commandbufferBeginInfo.pInheritanceInfo = &inheritanceInfo;
-		}
-
-		RE_ASSERT(vkBeginCommandBuffer(*m_commandBuffer, &commandbufferBeginInfo) == VK_SUCCESS, "Failed to Begin Command Buffer.");
+		RE_ASSERT(vkBeginCommandBuffer(CommandBuffer, &CommandbufferBeginInfo) == VK_SUCCESS, "Failed to Begin Command Buffer.");
 	}
 
 	void VulkanCommandBuffer::EndScopePass()
 	{
-		vkEndCommandBuffer(*m_commandBuffer);
+		vkEndCommandBuffer(CommandBuffer);
 	}
 
 	void VulkanCommandBuffer::ExecuteCommandBuffer(RHICommandBuffer* pCommandBuffer)
 	{
-		vkCmdExecuteCommands(*m_commandBuffer, 1, static_cast<VulkanCommandBuffer*>(pCommandBuffer)->GetHandle());
+		VkCommandBuffer CmdBuffer = static_cast<VulkanCommandBuffer*>(pCommandBuffer)->GetHandle();
+		vkCmdExecuteCommands(CommandBuffer, 1, &CmdBuffer);
+	}
+
+	void VulkanCommandBuffer::AddWaitingSemaphore(uint32 WaitingStageMask, VulkanSemaphore* pSemaphore)
+	{
+		WaitingStageMasks.Push(WaitingStageMask);
+		WaitingSemaphores.Push(pSemaphore->GetHandle());
 	}
 
 	RHIGraphicsEncoder* VulkanCommandBuffer::GetGraphicsEncoder()
 	{
-		return new VulkanGraphicsEncoder(m_commandBuffer);
+		return new VulkanGraphicsEncoder(&CommandBuffer);
 	}
 
 	RHIComputeEncoder* VulkanCommandBuffer::GetComputeEncoder()
@@ -61,12 +62,54 @@ namespace Vulkan
 
 	void VulkanCommandBuffer::Clear()
 	{
-		vkResetCommandBuffer(*m_commandBuffer, 0);
+		vkResetCommandBuffer(CommandBuffer, 0);
 	}
 
-	VkCommandBuffer* VulkanCommandBuffer::GetHandle()
+	VulkanCommandBufferManager::VulkanCommandBufferManager(VulkanDevice* pInDevice)
+		: pDevice(pInDevice)
 	{
-		return m_commandBuffer;
+		pQueue = (VulkanQueue*)pInDevice->GetQueue(RHIQueueType((uint8)RHIQueueType::Graphics | (uint8)RHIQueueType::Present), 1);
+		pCommandPool = (VulkanCommandPool*)pQueue->GetCommandPool();
+		ActiveCmdBuffer = (VulkanCommandBuffer*)pCommandPool->GetCommandBuffer(true);
+		ImmediateCmdBuffer = (VulkanCommandBuffer*)pCommandPool->GetCommandBuffer(true);
+	}
+
+	VulkanCommandBufferManager::~VulkanCommandBufferManager()
+	{
+		delete ActiveCmdBuffer;
+		delete ImmediateCmdBuffer;
+		delete pCommandPool;
+		delete pQueue;
+	}
+
+	void VulkanCommandBufferManager::SubmitActiveCommandBuffer(WEngine::WArray<VulkanSemaphore*>& SignalSemaphores)
+	{
+		for(VulkanSemaphore *IMSemaphore : )
+		ActiveCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, pImmediateSemaphore);
+
+		WEngine::WArray<VkSemaphore> Semaphores(SignalSemaphores.Size());
+		for (VulkanSemaphore* pSemaphore : SignalSemaphores)
+		{
+			Semaphores.Push(pSemaphore->GetHandle());
+		}
+		Semaphores.Push(pActiveSemaphore->GetHandle());
+
+		pQueue->Submit(ActiveCmdBuffer, Semaphores);
+	}
+
+	void VulkanCommandBufferManager::SubmitImmediateCommandBuffer(WEngine::WArray<VulkanSemaphore*>& SignalSemaphores)
+	{
+		WEngine::WArray<VkSemaphore> Semaphores(SignalSemaphores.Size());
+		for (VulkanSemaphore* pSemaphore : SignalSemaphores)
+		{
+			Semaphores.Push(pSemaphore->GetHandle());
+		}
+		pQueue->Submit(ImmediateCmdBuffer, Semaphores);
+	}
+
+	void VulkanCommandBufferManager::WaitForCommandBuffer(VulkanCommandBuffer* CmdBuffer, double Time)
+	{
+		CmdBuffer->GetFence()->Wait(Time);
 	}
 
 }

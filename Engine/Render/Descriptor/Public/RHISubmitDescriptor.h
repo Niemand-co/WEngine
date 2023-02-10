@@ -14,22 +14,10 @@ public:
 
 public:
 
-	WEngine::WString submissionName;
-
-	RHISemaphore **pWaitSemaphores;
-
-	unsigned int waitSemaphoreCount;
-
 	RHISemaphore **pSignalSemaphores;
 
 	unsigned int signalSemaphoreCount;
 
-	unsigned int waitStage;
-
-	unsigned int commandBufferCount;
-
-	RHICommandBuffer **pCommandBuffers;
-
-	RHIFence *pFence;
+	RHICommandBuffer *pCommandBuffer;
 
 };

@@ -116,12 +116,12 @@ struct GPUFeature
 	size_t minUBOAlignment;
 };
 
-enum class RHIQueueType
+enum class RHIQueueType : uint8
 {
-	Graphics = 0,
-	Present,
-	Compute,
-	Blit,
+	Graphics = 0x01 << 0,
+	Compute  = 0x01 << 1,
+	Blit     = 0x01 << 2,
+	Present  = 0x10 << 1,
 };
 
 struct QueueStack
