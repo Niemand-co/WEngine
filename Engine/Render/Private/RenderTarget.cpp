@@ -12,6 +12,7 @@ WRenderTarget::WRenderTarget(uint32 inWidth, uint32 inHeight, Format inFormat)
 void WRenderTarget::InitRHIResource()
 {
 	Texture = GetRenderCommandList()->CreateTexture2D(Width, Height, format, IMAGE_USAGE_COLOR_ATTACHMENT | IMAGE_USAGE_SAMPLED, IMAGE_ASPECT_COLOR);
+	ReasourceReadyEvent->Trigger();
 }
 
 void WRenderTarget::ReleaseRHIResource()

@@ -21,7 +21,7 @@ namespace WEngine
 
 		virtual const WString& GetName() const
 		{
-			return m_debugName;
+			return DebugName;
 		}
 
 		void* operator new(size_t size)
@@ -42,9 +42,11 @@ namespace WEngine
 
 	protected:
 
-		WString m_debugName;
+		WString DebugName;
 
-		WViewport *m_pViewport;
+		WEngine::WSharedPtr<WViewport> Viewport;
+
+		WEngine::WSharedPtr<RScene> Scene;
 
 	};
 

@@ -52,13 +52,13 @@ namespace Vulkan
 		pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
 		pool_info.pPoolSizes = pool_sizes;
 		VkDescriptorPool *pool = (VkDescriptorPool*)WEngine::Allocator::Get()->Allocate(sizeof(VkDescriptorPool));
-		vkCreateDescriptorPool(*static_cast<VulkanDevice*>(pConfigure->pDevice)->GetHandle(), &pool_info, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pool);
+		vkCreateDescriptorPool(static_cast<VulkanDevice*>(pConfigure->pDevice)->GetHandle(), &pool_info, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pool);
 
 		{
 			m_vulkanInitInfo.Instance = *static_cast<VulkanInstance*>(pConfigure->pInstance)->GetHandle();
 			m_vulkanInitInfo.PhysicalDevice = *static_cast<VulkanGPU*>(pConfigure->pGPU)->GetHandle();
-			m_vulkanInitInfo.Device = *static_cast<VulkanDevice*>(pConfigure->pDevice)->GetHandle();
-			m_vulkanInitInfo.Queue = *static_cast<VulkanQueue*>(pConfigure->pQueue)->GetHandle();
+			m_vulkanInitInfo.Device = static_cast<VulkanDevice*>(pConfigure->pDevice)->GetHandle();
+			m_vulkanInitInfo.Queue = static_cast<VulkanQueue*>(pConfigure->pQueue)->GetHandle();
 			m_vulkanInitInfo.QueueFamily = static_cast<VulkanQueue*>(pConfigure->pQueue)->GetIndex();
 			m_vulkanInitInfo.PipelineCache = VK_NULL_HANDLE;
 			m_vulkanInitInfo.DescriptorPool = *pool;
@@ -145,7 +145,7 @@ namespace Vulkan
 	{
 		ImGui::Render();
 		ImDrawData* data = ImGui::GetDrawData();
-		ImGui_ImplVulkan_RenderDrawData(data, *static_cast<VulkanCommandBuffer*>(pCommandBuffer)->GetHandle(), nullptr);
+		ImGui_ImplVulkan_RenderDrawData(data, static_cast<VulkanCommandBuffer*>(pCommandBuffer)->GetHandle(), nullptr);
 	}
 
 	void VulkanGui::ShowInspector()

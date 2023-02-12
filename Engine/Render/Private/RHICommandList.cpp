@@ -22,6 +22,11 @@ void RHIRenderCommandList::DrawIndexedPrimitive(unsigned int indexCount, unsigne
 {
 }
 
+uint32 RHIRenderCommandList::AcquireImageIndex()
+{
+    return return RHIContext::GetContext->AcquireImageIndex();
+}
+
 WVertexBufferRHIRef RHIRenderCommandList::CreateVertexBuffer(size_t stride, size_t count)
 {
     return RHIContext::GetContext()->CreateVertexBuffer(stride, count);
@@ -70,6 +75,11 @@ WTexture2DArrayRHIRef RHIRenderCommandList::CreateTexture2DArray(uint32 width, u
 WTexture3DRHIRef RHIRenderCommandList::CreateTexture3D(uint32 width, uint32 height, uint32 depth, Format format, uint32 usage, uint32 aspect)
 {
     return RHIContext::GetContext()->CreateTexture3D(width, height, depth, format, usage, aspect);
+}
+
+WRenderPassRHIRef RHIRenderCommandList::CreateRenderPass(RHIRenderPassDescriptor *descriptor)
+{
+    return RHIContext::GetContext()->CreateRenderPass();
 }
 
 RHIRenderCommandList* GetRenderCommandList()

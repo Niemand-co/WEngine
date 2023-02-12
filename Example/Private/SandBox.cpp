@@ -46,23 +46,27 @@ void GameScene::OnEvent(WEngine::Event* pEvent)
 
 void GameScene::Tick(WEngine::TimeStep timeStep)
 {
-	m_pViewport->ProcessInput();
+	Viewport->ProcessInput();
 	
-	RScene& scene = *RScene::GetActiveScene();
-
-	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [&scene]()
+	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [this]()
 	{
-		scene.UpdateLightInfosForScene();
+		Scene->UpdateLightInfosForScene();
 
-		scene.UpdatePrimitiveInfosForScene();
+		Scene->UpdatePrimitiveInfosForScene();
 
-		scene.UpdateCameraInfoForScene();
+		Scene->UpdateCameraInfoForScene();
 	}
 	), WEngine::EThreadProperty::RenderThread);
 
-	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [&scene]()
+	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [this]()
 	{
-		scene.StartFrame();
+		Scene->StartFrame(Viewport);
+	}
+	), WEngine::EThreadProperty::RenderThread);
+
+	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [this]()
+	{
+		Scene->StartRendering(Viewport);
 	}
 	), WEngine::EThreadProperty::RenderThread);
 	

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Framework/Public/GuiLayer.h"
+#include "Framework/Public/SlateLayer.h"
 #include "Utils/ImGui/Public/Gui.h"
 #include "Render/RenderPipeline/Public/GuiRenderPipeline.h"
 #include "RHI/Public/RHIHeads.h"
@@ -20,7 +20,7 @@
 
 namespace WEngine
 {
-	GuiLayer::GuiLayer(const WString& name)
+	SlateLayer::SlateLayer(const WString& name)
 		: Layer(name)
 	{
 		GuiConfigure guiConfigure = {};
@@ -35,50 +35,30 @@ namespace WEngine
 		Gui* pGui = Gui::CreateGui(WEngine::Backend::Vulkan);
 		pGui->Init(&guiConfigure);
 
-		m_pViewport = new WEditorViewport(1920, 1080, Format::A16R16G16B16_SFloat);
-
-		RHISamplerDescriptor samplerDescriptor = {};
-		{
-			samplerDescriptor.minFilter = Filter::Linear;
-			samplerDescriptor.magFilter = Filter::Linear;
-		}
-		m_pSampler = RHIContext::GetDevice()->CreateSampler(&samplerDescriptor);
-
-		RHITextureViewDescriptor uvd = {};
-		{
-			uvd.format = Format::A8R8G8B8_UNorm;
-			uvd.arrayLayerCount = 1;
-			uvd.baseArrayLayer = 0;
-			uvd.mipCount = 1;
-			uvd.baseMipLevel = 0;
-			uvd.dimension = Dimension::Texture2D;
-			uvd.imageAspect = IMAGE_ASPECT_COLOR;
-		}
+		Viewport = new WEditorViewport(1920, 1080, Format::A16R16G16B16_SFloat);
 
 		m_imageID.Resize(RHIContext::g_maxFrames);
 		//for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 			//m_imageID[i] = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(i).pColorTexture, m_pSampler);
 	}
 
-	GuiLayer::~GuiLayer()
+	SlateLayer::~SlateLayer()
 	{
 	}
 
-	void GuiLayer::OnAttach()
+	void SlateLayer::OnAttach()
 	{
 		m_pHierarchyPanel = new SceneHierarchyPanel();
 
 		m_pInspectorPanel = new InspectorPanel();
-
-
 		
 	}
 
-	void GuiLayer::OnDettach()
+	void SlateLayer::OnDettach()
 	{
 	}
 
-	void GuiLayer::OnEvent(WEngine::Event* pEvent)
+	void SlateLayer::OnEvent(WEngine::Event* pEvent)
 	{
 		WEngine::EventDispatcher dispatcher(pEvent);
 
@@ -148,85 +128,85 @@ namespace WEngine
 		});
 	}
 
-	void GuiLayer::Tick(WEngine::TimeStep timeStep)
+	void SlateLayer::Tick(WEngine::TimeStep timeStep)
 	{
-		ImGui_ImplVulkan_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
+		ENQUEUE_RENDERER_COMMAND([this]()
 		{
-
-
-			ImGui::DockSpaceOverViewport();
-			if (ImGui::BeginMainMenuBar())
-			{
-				if (ImGui::BeginMenu("File"))
+				ImGui_ImplVulkan_NewFrame();
+				ImGui_ImplGlfw_NewFrame();
+				ImGui::NewFrame();
 				{
-					ImGui::EndMenu();
+					ImGui::DockSpaceOverViewport();
+					if (ImGui::BeginMainMenuBar())
+					{
+						if (ImGui::BeginMenu("File"))
+						{
+							ImGui::EndMenu();
+						}
+						if (ImGui::BeginMenu("Edit"))
+						{
+							ImGui::EndMenu();
+						}
+						if (ImGui::BeginMenu("View"))
+						{
+							ImGui::MenuItem("Hierarchy", "", &m_isHierarchyShowed);
+							ImGui::MenuItem("Console", "", &m_isConsoleShowed);
+							ImGui::MenuItem("Settings", "", &m_isSettingsShowed);
+							ImGui::EndMenu();
+						}
+						ImGui::EndMainMenuBar();
+					}
+
+					if (ImGui::Begin("Inspector"))
+					{
+						m_pInspectorPanel->DrawGameObject();
+					}
+					ImGui::End();
+
+					if (ImGui::Begin("Display"))
+					{
+						ImVec2 viewportMin = ImGui::GetWindowContentRegionMin();
+						ImVec2 viewportMax = ImGui::GetWindowContentRegionMax();
+						ImVec2 viewportOffset = ImGui::GetWindowPos();
+						//m_displayArea.First() = { viewportMin.x + viewportOffset.x, viewportMin.y + viewportOffset.y };
+						//m_displayArea.Second() = { viewportMax.x + viewportOffset.x, viewportMax.y + viewportOffset.y };
+						//m_displayArea.second.y -= 50;
+						Screen::SetWidth(m_displayArea.Second().x - m_displayArea.Second().x);
+						Screen::SetHeight(m_displayArea.Second().y - m_displayArea.Second().y);
+
+						//ImGui::ImageButton(m_imageID[0], ImVec2(25, 25));
+						ImGui::Image(m_imageID[RHIContext::g_currentFrame], { (float)Screen::GetWidth(), (float)Screen::GetHeight() });
+					}
+					ImGui::End();
+
+					if (m_isHierarchyShowed)
+					{
+						if (ImGui::Begin("Hierarchy", &m_isHierarchyShowed))
+						{
+							m_pHierarchyPanel->DrawNodes();
+						}
+						ImGui::End();
+					}
+
+					if (m_isConsoleShowed)
+					{
+						if (ImGui::Begin("Console", &m_isConsoleShowed))
+						{
+						}
+						ImGui::End();
+					}
+
+					if (m_isSettingsShowed)
+					{
+						if (ImGui::Begin("Settings", &m_isSettingsShowed))
+						{
+						}
+						ImGui::End();
+					}
+
 				}
-				if (ImGui::BeginMenu("Edit"))
-				{
-					ImGui::EndMenu();
-				}
-				if (ImGui::BeginMenu("View"))
-				{
-					ImGui::MenuItem("Hierarchy", "", &m_isHierarchyShowed);
-					ImGui::MenuItem("Console", "", &m_isConsoleShowed);
-					ImGui::MenuItem("Settings", "", &m_isSettingsShowed);
-					ImGui::EndMenu();
-				}
-				ImGui::EndMainMenuBar();
-			}
-
-			if (ImGui::Begin("Inspector"))
-			{
-				m_pInspectorPanel->DrawGameObject();
-			}
-			ImGui::End();
-
-			if(ImGui::Begin("Display"))
-			{
-				ImVec2 viewportMin = ImGui::GetWindowContentRegionMin();
-				ImVec2 viewportMax = ImGui::GetWindowContentRegionMax();
-				ImVec2 viewportOffset = ImGui::GetWindowPos();
-				m_displayArea.First() = { viewportMin.x + viewportOffset.x, viewportMin.y + viewportOffset.y };
-				m_displayArea.Second() = { viewportMax.x + viewportOffset.x, viewportMax.y + viewportOffset.y };
-				//m_displayArea.second.y -= 50;
-				Screen::SetWidth(m_displayArea.Second().x - m_displayArea.Second().x);
-				Screen::SetHeight(m_displayArea.Second().y - m_displayArea.Second().y);
-
-				//ImGui::ImageButton(m_imageID[0], ImVec2(25, 25));
-				ImGui::Image(m_imageID[RHIContext::g_currentFrame], { (float)Screen::GetWidth(), (float)Screen::GetHeight() });
-			}
-			ImGui::End();
-
-			if (m_isHierarchyShowed)
-			{
-				if (ImGui::Begin("Hierarchy", &m_isHierarchyShowed))
-				{
-					m_pHierarchyPanel->DrawNodes();
-				}
-				ImGui::End();
-			}
-
-			if (m_isConsoleShowed)
-			{
-				if (ImGui::Begin("Console", &m_isConsoleShowed))
-				{
-				}
-				ImGui::End();
-			}
-
-			if (m_isSettingsShowed)
-			{
-				if (ImGui::Begin("Settings", &m_isSettingsShowed))
-				{
-				}
-				ImGui::End();
-			}
-
-		}
-		ImGui::EndFrame();
-
+				ImGui::EndFrame();
+		});
 
 		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
@@ -236,7 +216,13 @@ namespace WEngine
 			glfwMakeContextCurrent(window);
 		}
 
-		m_pViewport->ProcessInput();
+		ENQUEUE_RENDERER_COMMAND([]()
+		{
+			ImDrawData *Data = ImGui::GetDrawData();
+			{
+
+			}
+		});
 
 	}
 }

@@ -8,15 +8,19 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanViewport(VkViewport *pViewport);
+		VulkanViewport(class VulkanDevice* pInDevice);
 
 		virtual ~VulkanViewport();
 
-		const VkViewport* GetHandle() const { return m_pViewport; }
+		virtual void Tick() override;
+
+		virtual uint32 AcquireImageIndex() override;
+
+		virtual void Present() override;
 
 	private:
 
-		VkViewport *m_pViewport;
+		VulkanDevice *pDevice;
 
 	};
 

@@ -1,52 +1,19 @@
 #pragma once
 
-class RHIDevice;
-class RHIContext;
-class RHIPipelineStateObject;
-class RHIRenderPass;
-class RHIGroup;
-class RHICommandBuffer;
-class RHISemaphore;
-class RHIRenderTarget;
-class ScriptableRenderer;
-struct CameraInfo;
-
-class ScriptableRenderPass
+class ScriptableRenderPass : public RenderResource
 {
 public:
 
-	ScriptableRenderPass(ScriptableRenderer* pRenderer);
+	ScriptableRenderPass() = default;
 
-	virtual ~ScriptableRenderPass();
-
-	virtual void Setup() = 0;
-
-	virtual void Execute() = 0;
-
-	void* operator new(size_t size)
-	{
-		return WEngine::Allocator::Get()->Allocate(size);
-	}
-
-	void operator delete(void* pData)
-	{
-		WEngine::Allocator::Get()->Deallocate(pData);
-	}
+	virtual ~ScriptableRenderPass() = default;
 
 protected:
 
-	WEngine::WArray<RHIRenderTarget*> m_pRenderTargets;
+	WRenderPassRHIRef RenderPass = nullptr;
 
-	RHIDevice *m_pDevice;
+protected:
 
-	RHIRenderPass *m_pRenderPass;
-
-	RHIGroup *m_pResource;
-
-	RHIPipelineStateObject *m_pPSO;
-
-	WEngine::WArray<RHICommandBuffer*> m_pCommandBuffers;
-
-	ScriptableRenderer *m_pRenderer;
+	static WEngine::WHashMap<int32, WRenderPassRHIRef> Passes;
 
 };

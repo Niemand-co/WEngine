@@ -17,12 +17,12 @@ namespace Vulkan
 		vkDestroyCommandPool(pDevice->GetHandle(), CommandPool, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
 	}
 
-	RHICommandBuffer* VulkanCommandPool::GetCommandBuffer(bool bPrimary)
+	RHICommandBuffer* VulkanCommandPool::GetCommandBuffer()
 	{
 		VkCommandBufferAllocateInfo CommandBufferAllocateInfo = {};
 		CommandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		CommandBufferAllocateInfo.commandPool = CommandPool;
-		CommandBufferAllocateInfo.level = bPrimary ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+		CommandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		CommandBufferAllocateInfo.commandBufferCount = 1;
 
 		return new VulkanCommandBuffer(pDevice, this, &CommandBufferAllocateInfo);

@@ -76,16 +76,30 @@ namespace Vulkan
 
 	VulkanCommandBufferManager::~VulkanCommandBufferManager()
 	{
-		delete ActiveCmdBuffer;
-		delete ImmediateCmdBuffer;
 		delete pCommandPool;
 		delete pQueue;
 	}
 
+	VulkanCommandBuffer* VulkanCommandBufferManager::GetActiveCommandBuffer()
+	{
+		if (!ActiveCmdBuffer)
+		{
+			ActiveCmdBuffer
+		}
+	}
+
+	VulkanCommandBuffer* VulkanCommandBufferManager::GetImmediateCommandBuffer()
+	{
+		return nullptr;
+	}
+
 	void VulkanCommandBufferManager::SubmitActiveCommandBuffer(WEngine::WArray<VulkanSemaphore*>& SignalSemaphores)
 	{
-		for(VulkanSemaphore *IMSemaphore : )
-		ActiveCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, pImmediateSemaphore);
+		for (VulkanSemaphore* IMSemaphore : ImmediateDoneSemaphores)
+		{
+			ActiveCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, IMSemaphore);
+		}
+		ImmediateDoneSemaphores.Clear();
 
 		WEngine::WArray<VkSemaphore> Semaphores(SignalSemaphores.Size());
 		for (VulkanSemaphore* pSemaphore : SignalSemaphores)

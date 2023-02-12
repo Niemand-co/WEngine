@@ -4,15 +4,28 @@
 namespace Vulkan
 {
 
-	VulkanViewport::VulkanViewport(VkViewport *pViewport)
-		: m_pViewport(pViewport)
+	VulkanViewport::VulkanViewport(VulkanDevice *pInDevice)
+		: pDevice(pInDevice)
 	{
 		
 	}
 
 	VulkanViewport::~VulkanViewport()
 	{
-		WEngine::Allocator::Get()->Deallocate(m_pViewport);
+		
+	}
+
+	void VulkanViewport::Tick()
+	{
+	}
+
+	uint32 VulkanViewport::AcquireImageIndex()
+	{
+		return uint32();
+	}
+
+	void VulkanViewport::Present()
+	{
 	}
 
 }

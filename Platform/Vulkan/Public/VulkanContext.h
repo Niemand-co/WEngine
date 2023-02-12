@@ -4,14 +4,14 @@
 namespace Vulkan
 {
 
-	//class VulkanContext : public RHIContext
-	//{
-	//public:
+	class VulkanContext : public RHIContext
+	{
+	public:
 
-	//	VulkanContext();
+		VulkanContext();
 
-	//	virtual ~VulkanContext();
+		virtual ~VulkanContext();
 
-	//};
+	};
 
 }

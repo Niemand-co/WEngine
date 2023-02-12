@@ -6,12 +6,12 @@
 namespace Vulkan
 {
 
-	//VulkanContext::VulkanContext()
-	//{
-	//}
+	VulkanContext::VulkanContext()
+	{
+	}
 
-	//VulkanContext::~VulkanContext()
-	//{
-	//}
+	VulkanContext::~VulkanContext()
+	{
+	}
 
 }

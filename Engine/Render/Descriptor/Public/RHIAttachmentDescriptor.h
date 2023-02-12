@@ -22,6 +22,4 @@ public:
 
 	AttachmentLayout initialLayout;
 
-	AttachmentLayout finalLayout;
-
 };

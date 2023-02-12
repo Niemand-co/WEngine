@@ -61,7 +61,9 @@ public:
 
 	virtual void Submit(RHISubmitDescriptor *descriptor);
 
-	virtual int GetNextImage();
+	virtual int32 AcquireImageIndex(RHISemaphore** OutSemaphore) = 0;
+
+	virtual void Present(unsigned int imageIndex) = 0;
 
 	virtual RHISemaphore* GetImageVailableSemaphore() { return g_pImageAvailibleSemaphores[g_currentFrame]; }
 
@@ -69,13 +71,9 @@ public:
 
 	virtual RHIFence* GetFence() { return g_pFences[g_currentFrame]; }
 
-	virtual void Present(unsigned int imageIndex);
-
 	virtual bool IsDisplayChanged();
 
 	virtual void ResetDisplayState();
-
-	virtual void ResourceBarrier(RHIBarrierDescriptor* pDescriptor);
 
 	WVertexBufferRHIRef CreateVertexBuffer(size_t stride, size_t count);
 
@@ -100,6 +98,8 @@ public:
 	WTexture2DArrayRHIRef CreateTexture2DArray(uint32 width, uint32 height, Format format, uint32 layerCount, uint32 usage, uint32 aspect);
 
 	WTexture3DRHIRef CreateTexture3D(uint32 width, uint32 height, uint32 depth, Format format, uint32 usage, uint32 aspect);
+
+	WRenderPassRHIRef CreateRenderPass(class RHIRenderPassDescriptor *descriptor);
 
 	virtual RHIScissor* CreateScissor(RHIScissorDescriptor *descriptor);
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#define MaxSimultaneousRenderTargets 8
+
 struct SubPassAttachment
 {
 	unsigned int attachmentIndex;
@@ -17,15 +19,17 @@ public:
 
 public:
 
-	unsigned int colorAttachmentCount;
+	unsigned int ColorAttachmentCount;
 
-	SubPassAttachment *pColorAttachments;
+	SubPassAttachment ColorAttachments[MaxSimultaneousRenderTargets];
 
-	SubPassAttachment *pDepthStencilAttachment;
+	uint8 bHasDepthAttachment : 1;
 
-	unsigned int inputAttachmentCount;
+	SubPassAttachment DepthStencilAttachment;
 
-	SubPassAttachment *pInputAttachments;
+	unsigned int InputAttachmentCount;
+
+	SubPassAttachment InputAttachments[MaxSimultaneousRenderTargets + 1];
 
 };
 

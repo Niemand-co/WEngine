@@ -24,7 +24,7 @@ namespace Vulkan
 
 		const WEngine::WArray<uint32> GetWaitingStageMasks() { return WaitingStageMasks; }
 
-		const VulkanFence* GetFence() { return pFence; }
+		const class VulkanFence* GetFence() { return pFence; }
 
 		virtual RHIGraphicsEncoder* GetGraphicsEncoder() override;
 
@@ -50,7 +50,7 @@ namespace Vulkan
 
 		WEngine::WArray<uint32> WaitingStageMasks;
 
-		class VulkanFence *pFence;
+		VulkanFence *pFence;
 
 	};
 
@@ -61,6 +61,10 @@ namespace Vulkan
 		VulkanCommandBufferManager(class VulkanDevice *pInDevice);
 
 		~VulkanCommandBufferManager();
+
+		VulkanCommandBuffer* GetActiveCommandBuffer();
+
+		VulkanCommandBuffer* GetImmediateCommandBuffer();
 
 		void SubmitActiveCommandBuffer(WEngine::WArray<class VulkanSemaphore*>& SignalSemaphores);
 

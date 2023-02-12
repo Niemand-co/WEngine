@@ -47,6 +47,8 @@ public:
 
 	void DrawIndexedPrimitive(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount);
 
+	uint32 AcquireImageIndex();
+
 	WVertexBufferRHIRef CreateVertexBuffer(size_t stride, size_t count);
 
 	WIndexBufferRHIRef CreateIndexBuffer(size_t count);
@@ -66,6 +68,8 @@ public:
 	WTexture2DArrayRHIRef CreateTexture2DArray(uint32 width, uint32 height, Format format, uint32 layerCount, uint32 usage = IMAGE_USAGE_COLOR_ATTACHMENT, uint32 aspect = IMAGE_ASPECT_COLOR);
 
 	WTexture3DRHIRef CreateTexture3D(uint32 width, uint32 height, uint32 depth, Format format, uint32 usage = IMAGE_USAGE_COLOR_ATTACHMENT, uint32 aspect = IMAGE_ASPECT_COLOR);
+
+	WRenderPassRHIRef CreateRenderPass(class RHIRenderPassDescriptor* descriptor);
 
 public:
 

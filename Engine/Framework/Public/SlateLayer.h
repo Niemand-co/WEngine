@@ -12,13 +12,13 @@ namespace WEngine
 	class SceneHierarchyPanel;
 	class InspectorPanel;
 
-	class GuiLayer : public Layer
+	class SlateLayer : public Layer
 	{
 	public:
 
-		GuiLayer(const WString& name);
+		SlateLayer(const WString& name);
 
-		virtual ~GuiLayer();
+		virtual ~SlateLayer();
 
 		virtual void OnAttach() override;
 

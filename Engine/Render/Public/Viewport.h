@@ -2,14 +2,16 @@
 #include "Render/Public/RenderResource.h"
 #include "Render/Public/RenderTarget.h"
 
-class WViewport : public RenderTarget
+class WViewport : public WRenderTarget
 {
 public:
 
 	WViewport(uint32 width, uint32 height, Format format)
-		: RenderTarget(width, height, format)
+		: WRenderTarget(width, height, format)
 	{
 	}
+
+	void AcquireImageIndex(uint32 ImageIndex) { AcquiredImageIndex = ImageIndex; }
 
 	virtual ~WViewport() = default;
 
@@ -17,9 +19,13 @@ public:
 
 protected:
 
-	glm::vec2 m_minPos = glm::vec2(0, 0);
+	glm::vec2 MinPos = glm::vec2(0, 0);
 
-	glm::vec2 m_maxPos = glm::vec2(0, 0);
+	glm::vec2 MaxPos = glm::vec2(0, 0);
+
+	uint32 AcquiredImageIndex = 0;
+
+	
 
 };
 

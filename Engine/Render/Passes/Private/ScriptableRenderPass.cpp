@@ -3,12 +3,4 @@
 #include "RHI/Public/RHIGroup.h"
 #include "RHI/Public/RHIContext.h"
 
-ScriptableRenderPass::ScriptableRenderPass(ScriptableRenderer *pRenderer)
-	: m_pRenderer(pRenderer)
-{
-	m_pDevice = RHIContext::GetDevice();
-}
-
-ScriptableRenderPass::~ScriptableRenderPass()
-{
-}
+WEngine::WHashMap<int32, WRenderPassRHIRef> ScriptableRenderPass::Passes = WEngine::WHashMap<int32, WRenderPassRHIRef>();

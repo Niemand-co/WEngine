@@ -184,10 +184,11 @@ void RScene::UpdateCameraInfoForScene()
 	}
 }
 
-void RScene::StartFrame()
+void RScene::StartFrame(WViewport* viewport)
 {
-	for (CameraInfo* info : m_cameras)
-	{
-		info->Renderer->Render();
-	}
+	viewport->AcquireImageIndex(GetRenderCommandList()->AcquireImageIndex());
+}
+
+void RScene::StartRendering(WViewport* viewport)
+{
 }

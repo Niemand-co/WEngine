@@ -6,12 +6,6 @@
 #include "Utils/Public/Window.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
 
-unsigned int RHIContext::g_maxFrames = 3;
-
-unsigned int RHIContext::g_currentFrame = 0;
-
-int RHIContext::g_currentImage = 0;
-
 RHIInstance* RHIContext::g_pInstance = nullptr;
 
 RHIDevice* RHIContext::g_pDevice = nullptr;
@@ -21,26 +15,6 @@ RHISwapchain* RHIContext::g_pSwapchain = nullptr;
 RHIContext* RHIContext::g_pContext = nullptr;
 
 RHIQueue* RHIContext::g_pQueue = nullptr;
-
-RHISurface* RHIContext::g_pSurface = nullptr;
-
-RHICommandPool* RHIContext::g_pPool = nullptr;
-
-WEngine::WArray<RHISemaphore*> RHIContext::g_pImageAvailibleSemaphores = WEngine::WArray<RHISemaphore*>();
-
-WEngine::WArray<RHISemaphore*> RHIContext::g_pPresentAVailibleSemaphores = WEngine::WArray<RHISemaphore*>();
-
-WEngine::WArray<RHIFence*> RHIContext::g_pFences = WEngine::WArray<RHIFence*>();
-
-WEngine::WArray<RHITextureView*> RHIContext::g_pTextureViews = WEngine::WArray<RHITextureView*>();
-
-WEngine::WArray<RHITexture*> RHIContext::g_pDepthTextures = WEngine::WArray<RHITexture*>();
-
-WEngine::WArray<RHITextureView*> RHIContext::g_pDepthTextureViews = WEngine::WArray<RHITextureView*>();
-
-WEngine::WArray<RHICommandBuffer*> RHIContext::g_pCommandBuffers = WEngine::WArray<RHICommandBuffer*>();
-
-WEngine::WArray<RHICommandBuffer*> RHIContext::g_pPrimaryCommandBuffers = WEngine::WArray<RHICommandBuffer*>();
 
 bool RHIContext::m_isDisplayChagned = false;
 
@@ -231,19 +205,9 @@ void RHIContext::Submit(RHISubmitDescriptor* descriptor)
 	g_pCommandBuffers.Clear();
 }
 
-int RHIContext::GetNextImage()
+int32 RHIContext::AcquireImageIndex(RHISemaphore **OutSemaphore)
 {
-	g_pDevice->WaitForFences(g_pFences[g_currentFrame], 1);
-
-	g_currentImage = GetNextImage(g_pImageAvailibleSemaphores[g_currentFrame]);
-	if (g_currentImage < 0)
-	{
-		g_pContext->RecreateSwapchain();
-		return -1;
-	}
-	g_pDevice->ResetFences(g_pFences[g_currentFrame], 1);
-
-	return g_currentImage;
+	return g_pSwapchain->AcquireImageIndex(OutSemaphore);
 }
 
 void RHIContext::Present(unsigned int imageIndex)
@@ -264,35 +228,6 @@ bool RHIContext::IsDisplayChanged()
 void RHIContext::ResetDisplayState()
 {
 	m_isDisplayChagned = false;
-}
-
-void RHIContext::ResourceBarrier(RHIBarrierDescriptor *pDescriptor)
-{
-	RHICommandBuffer *cmd = g_pPool->GetCommandBuffer(true);
-	
-	cmd->BeginScopePass("Layout Transition");
-	{
-		RHIGraphicsEncoder *encoder = cmd->GetGraphicsEncoder();
-		encoder->ResourceBarrier(pDescriptor);
-		encoder->~RHIGraphicsEncoder();
-		WEngine::Allocator::Get()->Deallocate(encoder);
-	}
-	cmd->EndScopePass();
-	RHISubmitDescriptor submitDescriptor = {};
-	{
-		submitDescriptor.pFence = nullptr;
-		submitDescriptor.waitSemaphoreCount = 0;
-		submitDescriptor.pWaitSemaphores = nullptr;
-		submitDescriptor.signalSemaphoreCount = 0;
-		submitDescriptor.pSignalSemaphores = nullptr;
-		submitDescriptor.waitStage = PIPELINE_STAGE_ALL_COMMANDS;
-		submitDescriptor.commandBufferCount = 1;
-		submitDescriptor.pCommandBuffers = &cmd;
-	}
-	g_pQueue->Submit(&submitDescriptor);
-	g_pDevice->Wait();
-	cmd->~RHICommandBuffer();
-	WEngine::Allocator::Get()->Deallocate(cmd);
 }
 
 WVertexBufferRHIRef RHIContext::CreateVertexBuffer(size_t stride, size_t count)
@@ -425,6 +360,11 @@ WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 width, uint32 height, uint32
 		descriptor.aspect = aspect;
 	}
 	return g_pDevice->CreateTexture3D(&descriptor);
+}
+
+WRenderPassRHIRef RHIContext::CreateRenderPass(RHIRenderPassDescriptor* descriptor)
+{
+	return g_pDevice->CreateRenderPass(descriptor);
 }
 
 RHIScissor* RHIContext::CreateScissor(RHIScissorDescriptor* descriptor)

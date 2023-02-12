@@ -32,7 +32,9 @@ public:
 
 	void UpdateCameraInfoForScene();
 
-	void StartFrame();
+	void StartFrame(class WViewport *viewport);
+
+	void StartRendering(class WViewport *viewport);
 
 	WEngine::WArray<PrimitiveInfo*> GetOpaqueAndMaskPrimitives() const { return m_opaqueAndMaskPrimitives; }
 

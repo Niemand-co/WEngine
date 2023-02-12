@@ -13,11 +13,11 @@ WEditorViewport::~WEditorViewport()
 
 void WEditorViewport::ProcessInput()
 {
-	m_minPos = WEngine::Input::GetWindowPos();
-	m_maxPos = m_minPos + WEngine::Input::GetWindowSize();
+	MinPos = WEngine::Input::GetWindowPos();
+	MaxPos = MinPos + WEngine::Input::GetWindowSize();
 
 	glm::vec2 mousePos = WEngine::Input::GetMousePosition();
-	if (mousePos.x < m_minPos.x && mousePos.y < m_minPos.y && mousePos.x > m_maxPos.x && mousePos.y > m_maxPos.y)
+	if (mousePos.x < MinPos.x && mousePos.y < MinPos.y && mousePos.x > MaxPos.x && mousePos.y > MaxPos.y)
 	{
 		m_bHovered = false;
 		return;

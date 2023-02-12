@@ -56,7 +56,7 @@ void DeferredRenderer::RenderPrePass()
 
 void DeferredRenderer::RenderBasePass()
 {
-	RE_LOG("Render Base Pass");
+	
 }
 
 void DeferredRenderer::RenderShadowPass()

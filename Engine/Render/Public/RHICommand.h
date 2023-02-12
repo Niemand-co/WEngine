@@ -1,5 +1,7 @@
 #pragma once
 
+#define ENCODER_EXECUTE(command) static_cast<RHIRenderCommandList*>(CmdList)->command
+
 class RHICommandListBase;
 
 class RHICommandBase

@@ -5,6 +5,7 @@
 #include "HAL/Public/Platform.h"
 
 #define NUM_WORKING_THREAD 8
+#define ENQUEUE_RENDERER_COMMAND(LAMBDA) WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, LAMBDA), WEngine::EThreadProperty::RenderThread)
 
 namespace WEngine
 {

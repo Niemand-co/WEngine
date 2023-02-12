@@ -16,10 +16,6 @@ public:
 
 	virtual ~DrawOpaquePass();
 
-	virtual void Setup() override;
-
-	virtual void Execute() override;
-
 private:
 
 	RHISampler *m_pSampler;

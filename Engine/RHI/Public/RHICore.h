@@ -432,3 +432,7 @@ typedef WEngine::WSharedPtr<class RHIComputeShader> WComputeShaderRHIRef;
 typedef WEngine::WSharedPtr<class RHITexture2D> WTexture2DRHIRef;
 typedef WEngine::WSharedPtr<class RHITexture2DArray> WTexture2DArrayRHIRef;
 typedef WEngine::WSharedPtr<class RHITexture3D> WTexture3DRHIRef;
+
+typedef WEngine::WSharedPtr<class RHIViewport> WViewportRHIRef;
+
+typedef WEngine::WSharedPtr<class RHIRenderPass> WRenderPassRHIRef;

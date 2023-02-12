@@ -1,4 +1,9 @@
 #pragma once
+#include "Render/Descriptor/Public/RHIAttachmentDescriptor.h"
+#include "Render/Descriptor/Public/RHISubPassDescriptor.h"
+
+
+#define MaxSubPasses                 1
 
 class RHIAttachmentDescriptor;
 class RHISubPassDescriptor;
@@ -12,18 +17,23 @@ public:
 
 	~RHIRenderPassDescriptor() = default;
 
+	int32 GetRenderPassHash()
+	{
+		return WEngine::MemCrc32(this, sizeof(RHIRenderPassDescriptor));
+	}
+
 public:
 
-	unsigned int attachmentCount;
+	unsigned int AttachmentCount;
 
-	RHIAttachmentDescriptor *pAttachmentDescriptors;
+	RHIAttachmentDescriptor AttachmentDescriptors[MaxSimultaneousRenderTargets + 3];
 
-	unsigned int subpassCount;
+	unsigned int SubpassCount;
 
-	RHISubPassDescriptor *pSubPassDescriptors;
+	RHISubPassDescriptor SubPassDescriptors[MaxSubPasses];
 
-	unsigned int dependencyCount;
+	unsigned int DependencyCount;
 
-	RHISubPassDependencyDescriptor *pDependencyDescriptors;
+	RHISubPassDependencyDescriptor DependencyDescriptors[MaxSubPasses + 1];
 
 };

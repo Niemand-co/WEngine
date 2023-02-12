@@ -13,6 +13,8 @@ namespace WEngine
 		MD5Internal((byte*)&data, sizeof(data), A, B, C, D);
 	}
 
+	uint32 MemCrc32(const void* InData, int32 Length, uint32 CRC = 0);
+
 	template<typename T>
 	class WGuid
 	{

@@ -12,7 +12,7 @@ namespace Vulkan
 
 		virtual ~VulkanCommandPool();
 
-		virtual class RHICommandBuffer* GetCommandBuffer(bool bPrimary = true) override;
+		virtual RHICommandBuffer* GetCommandBuffer() override;
 
 	private:
 

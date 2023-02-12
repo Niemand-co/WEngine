@@ -6,8 +6,6 @@
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
 #include "RHI/Encoder/Public/RHIComputeEncoder.h"
 
-#define ENCODER_EXECUTE(command) static_cast<RHIRenderCommandList*>(CmdList)->command
-
 void RHICommandBeginRenderPass::Execute(RHICommandListBase* CmdList)
 {
 	ENCODER_EXECUTE(BeginRenderPass)(descriptor);

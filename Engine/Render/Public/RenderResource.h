@@ -31,8 +31,6 @@ protected:
 
 	uint8 bMarkedDirty : 1;
 
-private:
-
 	WEngine::WSharedPtr<WEngine::WGraphEvent> ReasourceReadyEvent;
 
 };

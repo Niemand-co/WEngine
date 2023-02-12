@@ -31,6 +31,8 @@ namespace WEngine
 
 		void PushForward(const T& var);
 
+		void RemoveAndSwap(size_t index);
+
 		//template<typename... Args>
 		//void Push(Args... args);
 
@@ -256,6 +258,14 @@ namespace WEngine
 
 		::new (m_pData + m_size) T(var);
 		m_size++;
+	}
+
+	template<typename T>
+	inline void WArray<T>::RemoveAndSwap(size_t index)
+	{
+		(m_pData + index)->~T();
+		--m_size;
+		memcpy(m_pData + index, m_pData + m_size, sizeof(T));
 	}
 
 	template<typename T>

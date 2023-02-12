@@ -5,12 +5,14 @@ class DeferredBasePass : public ScriptableRenderPass
 {
 public:
 
-	DeferredBasePass(ScriptableRenderer *pRenderer);
+	DeferredBasePass();
 
 	virtual ~DeferredBasePass();
 
-	virtual void Setup() override;
+	virtual void InitRHIResource() override;
 
-	virtual void Execute() override;
+	virtual void ReleaseRHIResource() override;
+
+	virtual void UpdateRHIResource() override;
 
 };
