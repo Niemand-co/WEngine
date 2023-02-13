@@ -6,10 +6,13 @@
 #include "Scene/Components/Public/PrimitiveComponent.h"
 #include "Scene/Components/Public/DirectionalLightComponent.h"
 #include "Render/Public/SceneVisibility.h"
+#include "Render/Passes/Public/DeferredBasePass.h"
 
 DeferredRenderer::DeferredRenderer(CameraComponent* pCamera)
 	: SceneRenderer(pCamera), GBuffer(pCamera->GetResolution().x, pCamera->GetResolution().y)
 {
+	BasePass = new DeferredBasePass();
+	BeginInitResource(BasePass);
 }
 
 DeferredRenderer::~DeferredRenderer()

@@ -62,4 +62,6 @@ private:
 
 	float MaxDrawDistance;
 
+	class DeferredBasePass *BasePass;
+
 };
