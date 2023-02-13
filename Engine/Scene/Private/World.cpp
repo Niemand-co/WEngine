@@ -59,7 +59,7 @@ GWorld* GWorld::CreateWorld()
 {
 	if (g_pInstance == nullptr)
 	{
-		g_pInstance = (GWorld*)WEngine::Allocator::Get()->Allocate(sizeof(GWorld));
+		g_pInstance = (GWorld*)NormalAllocator::Get()->Allocate(sizeof(GWorld));
 		::new (g_pInstance) GWorld();
 		return g_pInstance;
 	}

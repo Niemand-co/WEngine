@@ -11,7 +11,7 @@ namespace Vulkan
 
 	VulkanFramebuffer::~VulkanFramebuffer()
 	{
-		  vkDestroyFramebuffer(*m_pDevice, *m_pFramebuffer, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
+		  vkDestroyFramebuffer(*m_pDevice, *m_pFramebuffer, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
 	VkFramebuffer* VulkanFramebuffer::GetHandle()

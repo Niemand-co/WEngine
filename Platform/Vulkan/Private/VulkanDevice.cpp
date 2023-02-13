@@ -12,7 +12,7 @@ namespace Vulkan
 	VulkanDevice::VulkanDevice(VulkanGPU *pInGPU, VkDeviceCreateInfo* pInfo)
 		: pGPU(pInGPU)
 	{
-		RE_ASSERT(vkCreateDevice(*pInGPU->GetHandle(), pInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), &pDevice) == VK_SUCCESS, "Failed to Create Device.");
+		RE_ASSERT(vkCreateDevice(*pInGPU->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &pDevice) == VK_SUCCESS, "Failed to Create Device.");
 	}
 
 	VulkanDevice::~VulkanDevice()
@@ -80,10 +80,10 @@ namespace Vulkan
 			eventCreateInfo.sType = VK_STRUCTURE_TYPE_EVENT_CREATE_INFO;
 		}
 
-		VkEvent* pEvent = (VkEvent*)WEngine::Allocator::Get()->Allocate(sizeof(VkEvent));
-		vkCreateEvent(*m_pDevice, &eventCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pEvent);
+		VkEvent* pEvent = (VkEvent*)NormalAllocator::Get()->Allocate(sizeof(VkEvent));
+		vkCreateEvent(*m_pDevice, &eventCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pEvent);
 		
-		RHIEvent *event = (RHIEvent*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanEvent));
+		RHIEvent *event = (RHIEvent*)NormalAllocator::Get()->Allocate(sizeof(VulkanEvent));
 		::new (event) VulkanEvent(pEvent);
 
 		return event;
@@ -96,8 +96,8 @@ namespace Vulkan
 		shaderModuleCreateInfo.codeSize = descriptor->codeSize;
 		shaderModuleCreateInfo.pCode = descriptor->pCode;
 
-		VkShaderModule* pShaderModule = (VkShaderModule*)WEngine::Allocator::Get()->Allocate(sizeof(VkShaderModule));
-		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pShaderModule);
+		VkShaderModule* pShaderModule = (VkShaderModule*)NormalAllocator::Get()->Allocate(sizeof(VkShaderModule));
+		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pShaderModule);
 
 		return new VulkanVertexShader(pShaderModule);
 	}
@@ -109,8 +109,8 @@ namespace Vulkan
 		shaderModuleCreateInfo.codeSize = descriptor->codeSize;
 		shaderModuleCreateInfo.pCode = descriptor->pCode;
 
-		VkShaderModule* pShaderModule = (VkShaderModule*)WEngine::Allocator::Get()->Allocate(sizeof(VkShaderModule));
-		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pShaderModule);
+		VkShaderModule* pShaderModule = (VkShaderModule*)NormalAllocator::Get()->Allocate(sizeof(VkShaderModule));
+		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pShaderModule);
 
 		return new VulkanPixelShader(pShaderModule);
 	}
@@ -122,8 +122,8 @@ namespace Vulkan
 		shaderModuleCreateInfo.codeSize = descriptor->codeSize;
 		shaderModuleCreateInfo.pCode = descriptor->pCode;
 
-		VkShaderModule* pShaderModule = (VkShaderModule*)WEngine::Allocator::Get()->Allocate(sizeof(VkShaderModule));
-		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pShaderModule);
+		VkShaderModule* pShaderModule = (VkShaderModule*)NormalAllocator::Get()->Allocate(sizeof(VkShaderModule));
+		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pShaderModule);
 
 		return new VulkanGeometryShader(pShaderModule);
 	}
@@ -135,15 +135,15 @@ namespace Vulkan
 		shaderModuleCreateInfo.codeSize = descriptor->codeSize;
 		shaderModuleCreateInfo.pCode = descriptor->pCode;
 
-		VkShaderModule* pShaderModule = (VkShaderModule*)WEngine::Allocator::Get()->Allocate(sizeof(VkShaderModule));
-		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pShaderModule);
+		VkShaderModule* pShaderModule = (VkShaderModule*)NormalAllocator::Get()->Allocate(sizeof(VkShaderModule));
+		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pShaderModule);
 
 		return new VulkanComputeShader(pShaderModule);
 	}
 
 	RHIRenderPass* VulkanDevice::CreateRenderPass(RHIRenderPassDescriptor* descriptor)
 	{
-		VkAttachmentDescription *pAttachmentDescriptions = (VkAttachmentDescription*)WEngine::Allocator::Get()->Allocate(descriptor->attachmentCount * sizeof(VkAttachmentDescription));
+		VkAttachmentDescription *pAttachmentDescriptions = (VkAttachmentDescription*)NormalAllocator::Get()->Allocate(descriptor->attachmentCount * sizeof(VkAttachmentDescription));
 		for (unsigned int i = 0; i < descriptor->AttachmentCount; ++i)
 		{
 			RHIAttachmentDescriptor *pAttachmentDescriptor = descriptor->AttachmentDescriptors + i;
@@ -166,7 +166,7 @@ namespace Vulkan
 		{
 			RHISubPassDescriptor& SubpassDescriptor = descriptor->SubPassDescriptors[i];
 
-			pColorAttachmentReferences[i] = (VkAttachmentReference*)WEngine::Allocator::Get()->Allocate(SubpassDescriptor.ColorAttachmentCount * sizeof(VkAttachmentReference));
+			pColorAttachmentReferences[i] = (VkAttachmentReference*)NormalAllocator::Get()->Allocate(SubpassDescriptor.ColorAttachmentCount * sizeof(VkAttachmentReference));
 			for (unsigned int j = 0; j < SubpassDescriptor.ColorAttachmentCount; ++j)
 			{
 				::new (pColorAttachmentReferences[i] + j) VkAttachmentReference();
@@ -177,14 +177,14 @@ namespace Vulkan
 
 			if (SubpassDescriptor.bHasDepthAttachment)
 			{
-				pDepthAttachmentReferences[i] = (VkAttachmentReference*)WEngine::Allocator::Get()->Allocate(sizeof(VkAttachmentReference));
+				pDepthAttachmentReferences[i] = (VkAttachmentReference*)NormalAllocator::Get()->Allocate(sizeof(VkAttachmentReference));
 				::new (pDepthAttachmentReferences[i]) VkAttachmentReference();
 				pDepthAttachmentReferences[i]->attachment = SubpassDescriptor.DepthStencilAttachment.attachmentIndex;
 				pDepthAttachmentReferences[i]->layout = WEngine::ToVulkan(SubpassDescriptor.DepthStencilAttachment.attachmentLayout);
 				pAttachmentDescriptions[SubpassDescriptor.DepthStencilAttachment.attachmentIndex].finalLayout = pDepthAttachmentReferences[i]->layout;
 			}
 
-			pInputAttachmentReferences[i] = (VkAttachmentReference*)WEngine::Allocator::Get()->Allocate(SubpassDescriptor.InputAttachmentCount * sizeof(VkAttachmentReference));
+			pInputAttachmentReferences[i] = (VkAttachmentReference*)NormalAllocator::Get()->Allocate(SubpassDescriptor.InputAttachmentCount * sizeof(VkAttachmentReference));
 			for (unsigned int j = 0; j < SubpassDescriptor.InputAttachmentCount; ++j)
 			{
 				::new (pInputAttachmentReferences[i] + j) VkAttachmentReference();
@@ -224,10 +224,10 @@ namespace Vulkan
 		renderPassCreateInfo.dependencyCount = descriptor->DependencyCount;
 		renderPassCreateInfo.pDependencies = pSubpassDependencies.GetData();
 
-		VkRenderPass *pRenderPass = (VkRenderPass*)WEngine::Allocator::Get()->Allocate(sizeof(VkRenderPass));
-   		RE_ASSERT(vkCreateRenderPass(pDevice, &renderPassCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pRenderPass) == VK_SUCCESS, "Failed to Create Render Pass.");
+		VkRenderPass *pRenderPass = (VkRenderPass*)NormalAllocator::Get()->Allocate(sizeof(VkRenderPass));
+   		RE_ASSERT(vkCreateRenderPass(pDevice, &renderPassCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pRenderPass) == VK_SUCCESS, "Failed to Create Render Pass.");
 
-		RHIRenderPass *renderPass = (RHIRenderPass*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanRenderPass));
+		RHIRenderPass *renderPass = (RHIRenderPass*)NormalAllocator::Get()->Allocate(sizeof(VulkanRenderPass));
 		::new (renderPass) VulkanRenderPass(pRenderPass);
 
 		return renderPass;
@@ -252,7 +252,7 @@ namespace Vulkan
 			vertexInputBindgDescription.stride = descriptor->vertexDescriptor->bindingDescription->stride;
 			vertexInputBindgDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 		}
-		VkVertexInputAttributeDescription *pVertexInputAttributeDescriptions = (VkVertexInputAttributeDescription*)WEngine::Allocator::Get()->Allocate(descriptor->vertexDescriptor->attributeDescriptionCount * sizeof(VkVertexInputAttributeDescription));
+		VkVertexInputAttributeDescription *pVertexInputAttributeDescriptions = (VkVertexInputAttributeDescription*)NormalAllocator::Get()->Allocate(descriptor->vertexDescriptor->attributeDescriptionCount * sizeof(VkVertexInputAttributeDescription));
 		for(unsigned int i = 0; i < descriptor->vertexDescriptor->attributeDescriptionCount; ++i)
 		{
 			pVertexInputAttributeDescriptions[i].binding = descriptor->vertexDescriptor->pAttributeDescription[i]->slot;
@@ -385,16 +385,16 @@ namespace Vulkan
 			//graphicsPipelineCreateInfo.basePipelineIndex = -1;
 		}
 
-		VkPipeline *pPipeline = (VkPipeline*)WEngine::Allocator::Get()->Allocate(sizeof(VkPipeline));
-		RE_ASSERT(vkCreateGraphicsPipelines(pDevice, VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pPipeline) == VK_SUCCESS, "Failed to Create Pipeline.");
+		VkPipeline *pPipeline = (VkPipeline*)NormalAllocator::Get()->Allocate(sizeof(VkPipeline));
+		RE_ASSERT(vkCreateGraphicsPipelines(pDevice, VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pPipeline) == VK_SUCCESS, "Failed to Create Pipeline.");
 
 		for (unsigned int i = 0; i < descriptor->vertexDescriptor->attributeDescriptionCount; ++i)
 		{
 			pVertexInputAttributeDescriptions[i].~VkVertexInputAttributeDescription();
 		}
-		WEngine::Allocator::Get()->Deallocate(pVertexInputAttributeDescriptions);
+		NormalAllocator::Get()->Deallocate(pVertexInputAttributeDescriptions);
 
-		RHIPipelineStateObject *pipeline = (RHIPipelineStateObject*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanAllocator));
+		RHIPipelineStateObject *pipeline = (RHIPipelineStateObject*)NormalAllocator::Get()->Allocate(sizeof(VulkanAllocator));
 		::new (pipeline) VulkanPipelineStateObject(pPipeline);
 
 		return pipeline;
@@ -475,10 +475,10 @@ namespace Vulkan
 			samplerCreateInfo.mipLodBias = 0;
 		}
 
-		VkSampler *pSampler = (VkSampler*)WEngine::Allocator::Get()->Allocate(sizeof(VkSampler));
-		RE_ASSERT(vkCreateSampler(pDevice, &samplerCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pSampler) == VK_SUCCESS, "Failed to Create Sampler.");
+		VkSampler *pSampler = (VkSampler*)NormalAllocator::Get()->Allocate(sizeof(VkSampler));
+		RE_ASSERT(vkCreateSampler(pDevice, &samplerCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pSampler) == VK_SUCCESS, "Failed to Create Sampler.");
 		
-		VulkanSampler *sampler = (VulkanSampler*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanSampler));
+		VulkanSampler *sampler = (VulkanSampler*)NormalAllocator::Get()->Allocate(sizeof(VulkanSampler));
 		::new (sampler) VulkanSampler(pSampler);
 
 		return sampler;
@@ -501,10 +501,10 @@ namespace Vulkan
 		framebufferCreateInfo.height = descriptor->height;
 		framebufferCreateInfo.layers = 1;
 
-		VkFramebuffer *framebuffer = (VkFramebuffer*)WEngine::Allocator::Get()->Allocate(sizeof(VkFramebuffer));
-		RE_ASSERT(vkCreateFramebuffer(pDevice, &framebufferCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), framebuffer) == VK_SUCCESS, "Failed to Create Framebuffer.");
+		VkFramebuffer *framebuffer = (VkFramebuffer*)NormalAllocator::Get()->Allocate(sizeof(VkFramebuffer));
+		RE_ASSERT(vkCreateFramebuffer(pDevice, &framebufferCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), framebuffer) == VK_SUCCESS, "Failed to Create Framebuffer.");
 
-		VulkanRenderTarget *renderTarget = (VulkanRenderTarget*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanRenderTarget));
+		VulkanRenderTarget *renderTarget = (VulkanRenderTarget*)NormalAllocator::Get()->Allocate(sizeof(VulkanRenderTarget));
 		::new (renderTarget) VulkanRenderTarget(framebuffer, descriptor->width, descriptor->height, &pDevice);
 
 		return renderTarget;
@@ -592,7 +592,7 @@ namespace Vulkan
 
 	RHIGroupLayout* VulkanDevice::CreateGroupLayout(RHIGroupLayoutDescriptor *descriptor)
 	{
-		VkDescriptorSetLayoutBinding *pDescriptorSetLayoutBindings = (VkDescriptorSetLayoutBinding*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkDescriptorSetLayoutBinding));
+		VkDescriptorSetLayoutBinding *pDescriptorSetLayoutBindings = (VkDescriptorSetLayoutBinding*)NormalAllocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkDescriptorSetLayoutBinding));
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
 			::new (pDescriptorSetLayoutBindings + i) VkDescriptorSetLayoutBinding();
@@ -611,11 +611,11 @@ namespace Vulkan
 			descriptorSetLayoutCreateInfo.pBindings = pDescriptorSetLayoutBindings;
 		}
 
-		VkDescriptorSetLayout *pDescriptorSetLayout = (VkDescriptorSetLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VkDescriptorSetLayout));
+		VkDescriptorSetLayout *pDescriptorSetLayout = (VkDescriptorSetLayout*)NormalAllocator::Get()->Allocate(sizeof(VkDescriptorSetLayout));
 		::new (pDescriptorSetLayout) VkDescriptorSetLayout();
-		RE_ASSERT(vkCreateDescriptorSetLayout(pDevice, &descriptorSetLayoutCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pDescriptorSetLayout) == VK_SUCCESS, "Failed to Create Descriptor Set Layout.");
+		RE_ASSERT(vkCreateDescriptorSetLayout(pDevice, &descriptorSetLayoutCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pDescriptorSetLayout) == VK_SUCCESS, "Failed to Create Descriptor Set Layout.");
 
-		VulkanGroupLayout *groupLayout = (VulkanGroupLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanGroupLayout));
+		VulkanGroupLayout *groupLayout = (VulkanGroupLayout*)NormalAllocator::Get()->Allocate(sizeof(VulkanGroupLayout));
 		::new (groupLayout) VulkanGroupLayout(pDescriptorSetLayout, descriptor->bindingCount);
 
 		groupLayout->bindingCount = descriptor->bindingCount;
@@ -625,7 +625,7 @@ namespace Vulkan
 			BindingResource* resource = (descriptor->pBindingResources) + i;
 			pDescriptorSetLayoutBindings[i].~VkDescriptorSetLayoutBinding();
 		}
-		WEngine::Allocator::Get()->Deallocate(pDescriptorSetLayoutBindings);
+		NormalAllocator::Get()->Deallocate(pDescriptorSetLayoutBindings);
 
 		return groupLayout;
 	}
@@ -640,10 +640,10 @@ namespace Vulkan
 			layoutCreateInfo.pushConstantRangeCount = 0;
 			layoutCreateInfo.pPushConstantRanges = nullptr;
 		}
-		VkPipelineLayout* pLayout = (VkPipelineLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VkPipelineLayout));
-		RE_ASSERT(vkCreatePipelineLayout(pDevice, &layoutCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pLayout) == VK_SUCCESS, "Failed to Create Pipeline Layout.");
+		VkPipelineLayout* pLayout = (VkPipelineLayout*)NormalAllocator::Get()->Allocate(sizeof(VkPipelineLayout));
+		RE_ASSERT(vkCreatePipelineLayout(pDevice, &layoutCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pLayout) == VK_SUCCESS, "Failed to Create Pipeline Layout.");
 
-		RHIPipelineResourceLayout *pPipelineResourceLayout = (RHIPipelineResourceLayout*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanPipelineResourceLayout));
+		RHIPipelineResourceLayout *pPipelineResourceLayout = (RHIPipelineResourceLayout*)NormalAllocator::Get()->Allocate(sizeof(VulkanPipelineResourceLayout));
 		::new (pPipelineResourceLayout) VulkanPipelineResourceLayout(pLayout);
 
 		return pPipelineResourceLayout;
@@ -651,7 +651,7 @@ namespace Vulkan
 
 	RHIGroupPool* VulkanDevice::CreateGroupPool(RHIGroupPoolDescriptor* descriptor)
 	{
-		VkDescriptorPoolSize *pDescriptorPoolSizes = (VkDescriptorPoolSize*)WEngine::Allocator::Get()->Allocate(descriptor->pGroupLayout->bindingCount * sizeof(VkDescriptorPoolSize));
+		VkDescriptorPoolSize *pDescriptorPoolSizes = (VkDescriptorPoolSize*)NormalAllocator::Get()->Allocate(descriptor->pGroupLayout->bindingCount * sizeof(VkDescriptorPoolSize));
 		for (unsigned int i = 0; i < descriptor->pGroupLayout->bindingCount; ++i)
 		{
 			::new (pDescriptorPoolSizes + i) VkDescriptorPoolSize();
@@ -667,10 +667,10 @@ namespace Vulkan
 			descriptorPoolCreateInfo.pPoolSizes = pDescriptorPoolSizes;
 		}
 
-		VkDescriptorPool *pDescriptorPool = (VkDescriptorPool*)WEngine::Allocator::Get()->Allocate(sizeof(VkDescriptorPool));
-		RE_ASSERT(vkCreateDescriptorPool(pDevice, &descriptorPoolCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pDescriptorPool) == VK_SUCCESS, "Failed to Create Descriptor Pool.");
+		VkDescriptorPool *pDescriptorPool = (VkDescriptorPool*)NormalAllocator::Get()->Allocate(sizeof(VkDescriptorPool));
+		RE_ASSERT(vkCreateDescriptorPool(pDevice, &descriptorPoolCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pDescriptorPool) == VK_SUCCESS, "Failed to Create Descriptor Pool.");
 
-		RHIGroupPool *groupPool = (RHIGroupPool*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanGroupPool));
+		RHIGroupPool *groupPool = (RHIGroupPool*)NormalAllocator::Get()->Allocate(sizeof(VulkanGroupPool));
 		::new (groupPool) VulkanGroupPool(pDescriptorPool, descriptor->pGroupLayout, m_pDevice);
 
 		return groupPool;
@@ -678,13 +678,13 @@ namespace Vulkan
 
 	RHIScissor* VulkanDevice::CreateScissor(RHIScissorDescriptor* descriptor)
 	{
-		VkRect2D *pScissor = (VkRect2D*)WEngine::Allocator::Get()->Allocate(sizeof(VkRect2D));
+		VkRect2D *pScissor = (VkRect2D*)NormalAllocator::Get()->Allocate(sizeof(VkRect2D));
 		pScissor->offset.x = descriptor->offsetX;
 		pScissor->offset.y = descriptor->offsetY;
 		pScissor->extent.width = descriptor->width;
 		pScissor->extent.height = descriptor->height;
 
-		VulkanScissor *scissor = (VulkanScissor*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanScissor));
+		VulkanScissor *scissor = (VulkanScissor*)NormalAllocator::Get()->Allocate(sizeof(VulkanScissor));
 		::new (scissor) VulkanScissor(pScissor);
 
 		return scissor;
@@ -692,7 +692,7 @@ namespace Vulkan
 
 	RHIViewport* VulkanDevice::CreateViewport(RHIViewportDescriptor* descriptor)
 	{
-		VkViewport *pViewport = (VkViewport*)WEngine::Allocator::Get()->Allocate(sizeof(VkViewport));
+		VkViewport *pViewport = (VkViewport*)NormalAllocator::Get()->Allocate(sizeof(VkViewport));
 		pViewport->x = descriptor->x;
 		pViewport->y = descriptor->y;
 		pViewport->width = descriptor->width;
@@ -700,7 +700,7 @@ namespace Vulkan
 		pViewport->minDepth = descriptor->minDepth;
 		pViewport->maxDepth = descriptor->maxDepth;
 
-		VulkanViewport *viewport = (VulkanViewport*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanViewport));
+		VulkanViewport *viewport = (VulkanViewport*)NormalAllocator::Get()->Allocate(sizeof(VulkanViewport));
 		::new (viewport) VulkanViewport(pViewport);
 
 		return viewport;
@@ -708,11 +708,11 @@ namespace Vulkan
 
 	void VulkanDevice::UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
 	{
-		VkWriteDescriptorSet *pWriteDescriptorSets = (VkWriteDescriptorSet*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkWriteDescriptorSet));
+		VkWriteDescriptorSet *pWriteDescriptorSets = (VkWriteDescriptorSet*)NormalAllocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkWriteDescriptorSet));
 		WEngine::WArray<VkDescriptorBufferInfo*> pDescriptorBufferInfos(descriptor->bindingCount);
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
-			pDescriptorBufferInfos[i] = (VkDescriptorBufferInfo*)WEngine::Allocator::Get()->Allocate(descriptor->pBindingDescriptors[i].bufferResourceCount * sizeof(VkDescriptorBufferInfo));
+			pDescriptorBufferInfos[i] = (VkDescriptorBufferInfo*)NormalAllocator::Get()->Allocate(descriptor->pBindingDescriptors[i].bufferResourceCount * sizeof(VkDescriptorBufferInfo));
 			for (unsigned int j = 0; j < descriptor->pBindingDescriptors[i].bufferResourceCount; ++j)
 			{
 				::new (pDescriptorBufferInfos[i] + j) VkDescriptorBufferInfo();
@@ -738,19 +738,19 @@ namespace Vulkan
 				pDescriptorBufferInfos[i][j].~VkDescriptorBufferInfo();
 			}
 			(pWriteDescriptorSets + i)->~VkWriteDescriptorSet();
-			WEngine::Allocator::Get()->Deallocate(pDescriptorBufferInfos[i]);
+			NormalAllocator::Get()->Deallocate(pDescriptorBufferInfos[i]);
 		}
 
-		WEngine::Allocator::Get()->Deallocate(pWriteDescriptorSets);
+		NormalAllocator::Get()->Deallocate(pWriteDescriptorSets);
 	}
 
 	void VulkanDevice::UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
 	{
-		VkWriteDescriptorSet *pWriteDescriptorSets = (VkWriteDescriptorSet*)WEngine::Allocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkWriteDescriptorSet));
+		VkWriteDescriptorSet *pWriteDescriptorSets = (VkWriteDescriptorSet*)NormalAllocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkWriteDescriptorSet));
 		WEngine::WArray<VkDescriptorImageInfo*> pDescriptorImageInfos(descriptor->bindingCount, nullptr);
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
-			pDescriptorImageInfos[i] = (VkDescriptorImageInfo*)WEngine::Allocator::Get()->Allocate(descriptor->textureResourceCount * sizeof(VkDescriptorImageInfo));
+			pDescriptorImageInfos[i] = (VkDescriptorImageInfo*)NormalAllocator::Get()->Allocate(descriptor->textureResourceCount * sizeof(VkDescriptorImageInfo));
 			for (int j = 0; j < descriptor->textureResourceCount; ++j)
 			{
 				::new (pDescriptorImageInfos[i] + j) VkDescriptorImageInfo();
@@ -777,16 +777,16 @@ namespace Vulkan
 				pDescriptorImageInfos[i][j].~VkDescriptorImageInfo();
 			}
 			(pWriteDescriptorSets + i)->~VkWriteDescriptorSet();
-			WEngine::Allocator::Get()->Deallocate(pDescriptorImageInfos[i]);
+			NormalAllocator::Get()->Deallocate(pDescriptorImageInfos[i]);
 		}
 
-		WEngine::Allocator::Get()->Deallocate(pWriteDescriptorSets);
+		NormalAllocator::Get()->Deallocate(pWriteDescriptorSets);
 	}
 
 	WEngine::WArray<RHISemaphore*> VulkanDevice::GetSemaphore(unsigned int count)
 	{
-		VkSemaphore *pSemaphore = (VkSemaphore*)WEngine::Allocator::Get()->Allocate(count * sizeof(VkSemaphore));
-		VulkanSemaphore *semaphore = (VulkanSemaphore*)WEngine::Allocator::Get()->Allocate(count * sizeof(VulkanSemaphore));
+		VkSemaphore *pSemaphore = (VkSemaphore*)NormalAllocator::Get()->Allocate(count * sizeof(VkSemaphore));
+		VulkanSemaphore *semaphore = (VulkanSemaphore*)NormalAllocator::Get()->Allocate(count * sizeof(VulkanSemaphore));
 		WEngine::WArray<RHISemaphore*> semaphores(count);
 		
 		VkSemaphoreCreateInfo semaphoreCreateInfo = {};
@@ -794,7 +794,7 @@ namespace Vulkan
 		semaphoreCreateInfo.flags = VK_PIPELINE_STAGE_HOST_BIT;
 		for (int i = 0; i < count; ++i)
 		{
-			RE_ASSERT(vkCreateSemaphore(*m_pDevice, &semaphoreCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), pSemaphore + i) == VK_SUCCESS, "Failed to Create Semaphore.");
+			RE_ASSERT(vkCreateSemaphore(*m_pDevice, &semaphoreCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pSemaphore + i) == VK_SUCCESS, "Failed to Create Semaphore.");
 			::new (semaphore + i) VulkanSemaphore(pSemaphore + i);
 			semaphores[i] = semaphore + i;
 		}

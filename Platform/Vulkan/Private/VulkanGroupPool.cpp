@@ -24,13 +24,13 @@ WEngine::WArray<RHIGroup*> VulkanGroupPool::GetGroup(unsigned int count)
 		descriptorSetAllocateInfo.descriptorSetCount = count;
 		descriptorSetAllocateInfo.pSetLayouts = layouts.GetData();
 	}
-	VkDescriptorSet *pDescriptorSets = (VkDescriptorSet*)WEngine::Allocator::Get()->Allocate(count * sizeof(VkDescriptorSet));
+	VkDescriptorSet *pDescriptorSets = (VkDescriptorSet*)NormalAllocator::Get()->Allocate(count * sizeof(VkDescriptorSet));
 	vkAllocateDescriptorSets(*m_pDevice, &descriptorSetAllocateInfo, pDescriptorSets);
 
 	WEngine::WArray<RHIGroup*> groups(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		groups[i] = (VulkanGroup*)WEngine::Allocator::Get()->Allocate(sizeof(VulkanGroup));
+		groups[i] = (VulkanGroup*)NormalAllocator::Get()->Allocate(sizeof(VulkanGroup));
 		::new (groups[i]) VulkanGroup(pDescriptorSets + i);
 	}
 

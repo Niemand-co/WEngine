@@ -40,7 +40,7 @@ CameraInfo* CameraComponent::GetCameraInfo()
 	{
 		if (m_pInfo == nullptr)
 		{
-			m_pInfo = (CameraInfo*)WEngine::Allocator::Get()->Allocate(sizeof(CameraInfo));
+			m_pInfo = (CameraInfo*)NormalAllocator::Get()->Allocate(sizeof(CameraInfo));
 		}
 		::new (m_pInfo) CameraInfo(this);
 		m_bMarkedDirty = false;

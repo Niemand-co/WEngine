@@ -67,9 +67,9 @@ namespace Vulkan
 		instanceCreateInfo.enabledExtensionCount = extensions.Size();
 		instanceCreateInfo.enabledLayerCount = 0;
 
-		m_pInstance = (VkInstance*)WEngine::Allocator::Get()->Allocate(sizeof(VkInstance));
-		Vulkan::VulkanAllocatorData userData = { WEngine::Allocator::Get()->Get() };
-		VkAllocationCallbacks* callbacks = static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(&userData);
+		m_pInstance = (VkInstance*)NormalAllocator::Get()->Allocate(sizeof(VkInstance));
+		Vulkan::VulkanAllocatorData userData = { NormalAllocator::Get()->Get() };
+		VkAllocationCallbacks* callbacks = static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(&userData);
 		RE_ASSERT(vkCreateInstance(&instanceCreateInfo, callbacks, m_pInstance) == VK_SUCCESS, "Failed to Create Vulkan Instance.");
 
 		if (enableDebugLayer)
@@ -83,8 +83,8 @@ namespace Vulkan
 	VulkanInstance::~VulkanInstance()
 	{
 		DestroyDebugUtilsMessengerEXT(*m_pInstance, m_debugUtilsMessenger, nullptr);
-		Vulkan::VulkanAllocatorData userData = { WEngine::Allocator::Get()->Get() };
-		VkAllocationCallbacks *callbacks = static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(&userData);
+		Vulkan::VulkanAllocatorData userData = { NormalAllocator::Get()->Get() };
+		VkAllocationCallbacks *callbacks = static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(&userData);
 		vkDestroyInstance(*m_pInstance, callbacks);
 	}
 
@@ -92,7 +92,7 @@ namespace Vulkan
 	{
 		unsigned int physicalDeviceCount = 0;
 		vkEnumeratePhysicalDevices(*m_pInstance, &physicalDeviceCount, nullptr);
-		VkPhysicalDevice *pPhysicalDevices = (VkPhysicalDevice*)WEngine::Allocator::Get()->Allocate(physicalDeviceCount * sizeof(VkPhysicalDevice));
+		VkPhysicalDevice *pPhysicalDevices = (VkPhysicalDevice*)NormalAllocator::Get()->Allocate(physicalDeviceCount * sizeof(VkPhysicalDevice));
 		vkEnumeratePhysicalDevices(*m_pInstance, &physicalDeviceCount, pPhysicalDevices);
 
 		m_gpus.Resize(physicalDeviceCount);
@@ -105,7 +105,7 @@ namespace Vulkan
 
 	void VulkanInstance::UpdateSurface()
 	{
-		vkDestroySurfaceKHR(*m_pInstance, *m_pSurface, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
+		vkDestroySurfaceKHR(*m_pInstance, *m_pSurface, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 
 		VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
 		surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
@@ -114,7 +114,7 @@ namespace Vulkan
 
 		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(*m_pInstance, "vkCreateWin32SurfaceKHR");
 
-		RE_ASSERT(CreateWin32SurfaceKHR(*m_pInstance, &surfaceCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), m_pSurface) == VK_SUCCESS, "Failed to Recreate Win32 Surface.");
+		RE_ASSERT(CreateWin32SurfaceKHR(*m_pInstance, &surfaceCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), m_pSurface) == VK_SUCCESS, "Failed to Recreate Win32 Surface.");
 	}
 
 	VkInstance* VulkanInstance::GetHandle()

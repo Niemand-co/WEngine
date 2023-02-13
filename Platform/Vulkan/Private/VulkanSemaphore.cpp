@@ -12,12 +12,12 @@ namespace Vulkan
 		{
 			info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 		}
-		RE_ASSERT(vkCreateSemaphore(pInDevice->GetHandle(), &info, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), &Semaphore) == VK_SUCCESS, "Failed to create semaphore.");
+		RE_ASSERT(vkCreateSemaphore(pInDevice->GetHandle(), &info, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Semaphore) == VK_SUCCESS, "Failed to create semaphore.");
 	}
 
 	VulkanSemaphore::~VulkanSemaphore()
 	{
-		vkDestroySemaphore(pDevice->GetHandle(), Semaphore, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
+		vkDestroySemaphore(pDevice->GetHandle(), Semaphore, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
 }

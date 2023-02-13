@@ -15,7 +15,7 @@ namespace Vulkan
 	VulkanTextureBase::VulkanTextureBase(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo)
 		: pDevice(pInDevice)
 	{
-		vkCreateImage(*pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), &Image);
+		vkCreateImage(*pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Image);
 
 		vkGetImageMemoryRequirements(*pInDevice->GetHandle(), Image, &MemoryRequirements);
 
@@ -34,21 +34,21 @@ namespace Vulkan
 			MemoryAllocateInfo.allocationSize = MemoryRequirements.size;
 			MemoryAllocateInfo.memoryTypeIndex = index;
 		}
-		vkAllocateMemory(*pInDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), &DeviceMemory);
+		vkAllocateMemory(*pInDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DeviceMemory);
 
 		vkBindImageMemory(*pInDevice->GetHandle(), Image, DeviceMemory, 0);
 	}
 
 	VulkanTextureBase::~VulkanTextureBase()
 	{
-		vkDestroyImage(*pDevice->GetHandle(), Image, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
-		vkFreeMemory(*pDevice->GetHandle(), DeviceMemory, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
-		vkDestroyImageView(*pDevice->GetHandle(), ImageView, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
+		vkDestroyImage(*pDevice->GetHandle(), Image, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkFreeMemory(*pDevice->GetHandle(), DeviceMemory, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkDestroyImageView(*pDevice->GetHandle(), ImageView, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
 	void VulkanTextureBase::CreateTextureView(VkImageViewCreateInfo* pInfo)
 	{
-		vkCreateImageView(*pDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), &ImageView);
+		vkCreateImageView(*pDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &ImageView);
 	}
 
 	VulkanTexture2D::VulkanTexture2D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, uint32 Aspect)

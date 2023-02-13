@@ -82,7 +82,7 @@ namespace WEngine
 		size_t rest = byteLength % 64;
 		size_t addLength = rest < 56 ? 64 - rest : 128 - rest;
 		size_t length = byteLength + addLength;
-		byte *byteArr = (byte*)WEngine::Allocator::Get()->Allocate(length);
+		byte *byteArr = (byte*)NormalAllocator::Get()->Allocate(length);
 
 		size_t index = 0;
 		for (; index < byteLength; ++index)

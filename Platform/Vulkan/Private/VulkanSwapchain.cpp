@@ -20,7 +20,7 @@ namespace Vulkan
 
 		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(*pInstance->GetHandle(), "vkCreateWin32SurfaceKHR");
 
-		RE_ASSERT(CreateWin32SurfaceKHR(*pInstance->GetHandle(), &surfaceCreateInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), &Surface) == VK_SUCCESS, "Failed to Create Win32 Surface.");
+		RE_ASSERT(CreateWin32SurfaceKHR(*pInstance->GetHandle(), &surfaceCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Surface) == VK_SUCCESS, "Failed to Create Win32 Surface.");
 
 		VulkanGPU *gpu = pDevice->GetGPU();
 
@@ -105,7 +105,7 @@ namespace Vulkan
 		pInfo->clipped = VK_TRUE;
 		pInfo->oldSwapchain = VK_NULL_HANDLE;
 
-		vkCreateSwapchainKHR(pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks(), &Swapchain);
+		vkCreateSwapchainKHR(pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Swapchain);
 
 		RecreateInfo = *pInfo;
 
@@ -123,8 +123,8 @@ namespace Vulkan
 
 	VulkanSwapchain::~VulkanSwapchain()
 	{
-		vkDestroySwapchainKHR(pDevice->GetHandle(), Swapchain, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
-		vkDestroySurfaceKHR(*pInstance->GetHandle(), Surface, static_cast<VulkanAllocator*>(WEngine::Allocator::Get())->GetCallbacks());
+		vkDestroySwapchainKHR(pDevice->GetHandle(), Swapchain, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkDestroySurfaceKHR(*pInstance->GetHandle(), Surface, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
 	int32 VulkanSwapchain::AcquireImageIndex(RHISemaphore** OutSemaphore)

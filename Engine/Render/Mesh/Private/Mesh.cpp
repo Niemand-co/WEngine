@@ -78,7 +78,7 @@ WStaticMesh* WStaticMesh::GetSphere()
 //StaticMesh* StaticMesh::GetCube()
 //{
 //	StaticMesh *mesh = new StaticMesh("Cube");
-//	Vertex *pVertices = (Vertex*)WEngine::Allocator::Get()->Allocate(24 * sizeof(Vertex));
+//	Vertex *pVertices = (Vertex*)NormalAllocator::Get()->Allocate(24 * sizeof(Vertex));
 //	{
 //		pVertices[0] = { { -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f} };
 //		pVertices[1] = { { 1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f} };
@@ -112,7 +112,7 @@ WStaticMesh* WStaticMesh::GetSphere()
 //	}
 //	mesh->m_vertexCount = 24;
 //	mesh->m_pVertices = pVertices;
-//	unsigned int *pIndices = (unsigned int*)WEngine::Allocator::Get()->Allocate(36 * sizeof(unsigned int));
+//	unsigned int *pIndices = (unsigned int*)NormalAllocator::Get()->Allocate(36 * sizeof(unsigned int));
 //	{
 //		pIndices[0] = 3, pIndices[1] = 2, pIndices[2] = 1, pIndices[3] = 1, pIndices[4] = 0, pIndices[5] = 3,
 //		pIndices[6] = 4, pIndices[7] = 5, pIndices[8] = 6, pIndices[9] = 6, pIndices[10] = 7, pIndices[11] = 4,
@@ -133,7 +133,7 @@ WStaticMesh* WStaticMesh::GetSphere()
 //StaticMesh* StaticMesh::GetPlane()
 //{
 //	StaticMesh *mesh = new StaticMesh("Plane");
-//	Vertex* pVertices = (Vertex*)WEngine::Allocator::Get()->Allocate(4 * sizeof(Vertex));
+//	Vertex* pVertices = (Vertex*)NormalAllocator::Get()->Allocate(4 * sizeof(Vertex));
 //	{
 //		pVertices[0] = { { -1.0f, 0.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f} };
 //		pVertices[1] = { { 1.0f, 0.0f, -1.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f} };
@@ -142,7 +142,7 @@ WStaticMesh* WStaticMesh::GetSphere()
 //	}
 //	mesh->m_vertexCount = 4;
 //	mesh->m_pVertices = pVertices;
-//	unsigned int* pIndices = (unsigned int*)WEngine::Allocator::Get()->Allocate(6 * sizeof(unsigned int));
+//	unsigned int* pIndices = (unsigned int*)NormalAllocator::Get()->Allocate(6 * sizeof(unsigned int));
 //	{
 //		pIndices[0] = 0, pIndices[1] = 1, pIndices[2] = 2, pIndices[3] = 2, pIndices[4] = 3, pIndices[5] = 0;
 //	}
@@ -160,7 +160,7 @@ WStaticMesh* WStaticMesh::GetSphere()
 //	float sqrt2frag2 = std::sin(PI / 4.0f) * 0.02f;
 //	float sqrt2 = 2.0f * sqrt2frag2;
 //	StaticMesh *mesh = new StaticMesh("Arrow_Gui");
-//	VertexComponent *pVertices = (VertexComponent*)WEngine::Allocator::Get()->Allocate(27 * sizeof(VertexComponent));
+//	VertexComponent *pVertices = (VertexComponent*)NormalAllocator::Get()->Allocate(27 * sizeof(VertexComponent));
 //	{
 //		pVertices[0] = { { 0.0f, 0.0f, 0.02f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
 //		pVertices[1] = { { sqrt2frag2, 0.0f, sqrt2frag2 }, { 1.0f, 1.0f, 1.0f }, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f} };
@@ -195,7 +195,7 @@ WStaticMesh* WStaticMesh::GetSphere()
 //	}
 //	mesh->m_vertexCount = 27;
 //	mesh->m_vertices = pVertices;
-//	unsigned int *pIndices = (unsigned int*)WEngine::Allocator::Get()->Allocate(96 * sizeof(unsigned int));
+//	unsigned int *pIndices = (unsigned int*)NormalAllocator::Get()->Allocate(96 * sizeof(unsigned int));
 //	{
 //		pIndices[0] = 0, pIndices[1] = 1, pIndices[2] = 24, pIndices[3] = 1, pIndices[4] = 2, pIndices[5] = 24,
 //		pIndices[6] = 2, pIndices[7] = 3, pIndices[8] = 24, pIndices[9] = 3, pIndices[10] = 4, pIndices[11] = 24,

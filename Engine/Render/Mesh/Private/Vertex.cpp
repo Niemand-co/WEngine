@@ -5,8 +5,8 @@
 
 //void Vertex::GenerateVertexInputDescription()
 //{
-//	m_bindingDescription = (VertexBindingDescription*)WEngine::Allocator::Get()->Allocate(sizeof(VertexBindingDescription));
-//	VertexAttributeDescription* attributeDescription = (VertexAttributeDescription*)WEngine::Allocator::Get()->Allocate(4 * sizeof(VertexAttributeDescription));
+//	m_bindingDescription = (VertexBindingDescription*)NormalAllocator::Get()->Allocate(sizeof(VertexBindingDescription));
+//	VertexAttributeDescription* attributeDescription = (VertexAttributeDescription*)NormalAllocator::Get()->Allocate(4 * sizeof(VertexAttributeDescription));
 //	m_attributeDescriptions.Resize(4);
 //	for (int i = 0; i < 4; ++i)
 //	{

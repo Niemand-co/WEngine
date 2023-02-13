@@ -354,7 +354,7 @@
 //
 //		encoder->EndPass();
 //		encoder->~RHIGraphicsEncoder();
-//		WEngine::Allocator::Get()->Deallocate(encoder);
+//		NormalAllocator::Get()->Deallocate(encoder);
 //	}
 //	cmd->EndScopePass();
 //	context->ExecuteCommandBuffer(cmd);

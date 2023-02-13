@@ -129,7 +129,7 @@ namespace WEngine
 		{
 			T* newPtr = (T*)Allocator::Get()->Allocate(2 * m_capasity * sizeof(T));
 			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			WEngine::Allocator::Get()->Deallocate(m_pData);
+			NormalAllocator::Get()->Deallocate(m_pData);
 			m_pData = newPtr;
 			m_capasity *= 2;
 		}

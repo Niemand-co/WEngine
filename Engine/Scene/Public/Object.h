@@ -20,12 +20,12 @@ protected:
 
 	void* operator new(size_t size)
 	{
-		return WEngine::Allocator::Get()->Allocate(size);
+		return NormalAllocator::Get()->Allocate(size);
 	}
 
 	void operator delete(void *ptr)
 	{
-		WEngine::Allocator::Get()->Deallocate(ptr);
+		NormalAllocator::Get()->Deallocate(ptr);
 	}
 
 };
@@ -33,7 +33,7 @@ protected:
 template<typename T>
 T* GetCopy(T* object)
 {
-	T *copy = (T*)WEngine::Allocator::Get()->Allocate(sizeof(T));
+	T *copy = (T*)NormalAllocator::Get()->Allocate(sizeof(T));
 	memcpy(copy, object, sizeof(T));
 	return copy;
 }

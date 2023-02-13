@@ -129,7 +129,7 @@ namespace Vulkan
 
 	void VulkanGraphicsEncoder::ResourceBarrier(RHIBarrierDescriptor* pDescriptor)
 	{
-		VkBufferMemoryBarrier *pBufferBarriers = (VkBufferMemoryBarrier*)WEngine::Allocator::Get()->Allocate(pDescriptor->bufferCount * sizeof(VkBufferMemoryBarrier));
+		VkBufferMemoryBarrier *pBufferBarriers = (VkBufferMemoryBarrier*)NormalAllocator::Get()->Allocate(pDescriptor->bufferCount * sizeof(VkBufferMemoryBarrier));
 		for (unsigned int i = 0; i < pDescriptor->bufferCount; ++i)
 		{
 			::new (pBufferBarriers + i) VkBufferMemoryBarrier();
@@ -142,7 +142,7 @@ namespace Vulkan
 			pBufferBarriers[i].dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
 		}
 
-		VkImageMemoryBarrier *pImageBarriers = (VkImageMemoryBarrier*)WEngine::Allocator::Get()->Allocate(pDescriptor->textureCount * sizeof(VkImageMemoryBarrier));
+		VkImageMemoryBarrier *pImageBarriers = (VkImageMemoryBarrier*)NormalAllocator::Get()->Allocate(pDescriptor->textureCount * sizeof(VkImageMemoryBarrier));
 		for (unsigned int i = 0; i < pDescriptor->textureCount; ++i)
 		{
 			::new (pImageBarriers + i) VkImageMemoryBarrier();

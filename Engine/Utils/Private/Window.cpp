@@ -40,7 +40,7 @@ Window* Window::Get()
 	//{
 	//	case RenderAPI::API::None:
 	//	{
-			cur_window = (Window*)WEngine::Allocator::Get()->Allocate(sizeof(GLFWWindow));
+			cur_window = (Window*)NormalAllocator::Get()->Allocate(sizeof(GLFWWindow));
 			::new (cur_window) GLFWWindow(proc);
 			return cur_window;
 	//	}
@@ -61,7 +61,7 @@ Window* Window::Get(WinProc* proc)
 	//{
 	//	case RenderAPI::API::None:
 	//	{
-			cur_window = (Window*)WEngine::Allocator::Get()->Allocate(sizeof(GLFWWindow));
+			cur_window = (Window*)NormalAllocator::Get()->Allocate(sizeof(GLFWWindow));
 			::new (cur_window) GLFWWindow(proc);
 			return cur_window;
 	//	}

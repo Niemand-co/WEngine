@@ -23,7 +23,7 @@ BufferResourceInfo* RHIBuffer::GetBufferInfo()
     {
         if (!m_isDynamic)
         {
-            m_pInfos = (BufferResourceInfo*)WEngine::Allocator::Get()->Allocate(sizeof(BufferResourceInfo));
+            m_pInfos = (BufferResourceInfo*)NormalAllocator::Get()->Allocate(sizeof(BufferResourceInfo));
             m_pInfos->pBuffer = this;
             m_pInfos->offset = 0;
             m_pInfos->range = m_dataSize;
@@ -31,7 +31,7 @@ BufferResourceInfo* RHIBuffer::GetBufferInfo()
         else
         {
             RE_ASSERT(m_dynamicAlignment > 0, "Dynamic Buffer Not Be Set.");
-            m_pInfos = (BufferResourceInfo*)WEngine::Allocator::Get()->Allocate(m_size * sizeof(BufferResourceInfo));
+            m_pInfos = (BufferResourceInfo*)NormalAllocator::Get()->Allocate(m_size * sizeof(BufferResourceInfo));
             for (unsigned int i = 0; i < m_size; ++i)
             {
                 m_pInfos[i] = { this, i * m_dynamicAlignment, m_dataSize };

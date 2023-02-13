@@ -102,4 +102,64 @@ namespace WEngine
 		memcpy(&val2, &tmp, sizeof(T));
 	}
 
+	template<typename NumericType>
+	struct NumericLimits
+	{
+	};
+
+	template<>
+	struct NumericLimits<uint8>
+	{
+		enum { Min = 0x00 };
+		enum { Max = UINT8_MAX };
+	};
+
+	template<>
+	struct NumericLimits<uint16>
+	{
+		enum { Min = 0x0000 };
+		enum { Max = UINT16_MAX };
+	};
+
+	template<>
+	struct NumericLimits<uint32>
+	{
+		enum { Min = 0x00000000 };
+		enum { Max = UINT32_MAX };
+	};
+
+	template<>
+	struct NumericLimits<uint64>
+	{
+		enum { Min = 0x0000000000000000 };
+		enum { Max = UINT64_MAX };
+	};
+
+	template<>
+	struct NumericLimits<int8>
+	{
+		enum { Min = INT8_MIN };
+		enum { Max = INT8_MAX };
+	};
+
+	template<>
+	struct NumericLimits<int16>
+	{
+		enum { Min = INT16_MIN };
+		enum { Max = INT16_MAX };
+	};
+
+	template<>
+	struct NumericLimits<int32>
+	{
+		enum { Min = INT32_MIN };
+		enum { Max = INT32_MAX };
+	};
+
+	template<>
+	struct NumericLimits<int64>
+	{
+		enum { Min = INT64_MIN };
+		enum { Max = INT64_MAX };
+	};
 }

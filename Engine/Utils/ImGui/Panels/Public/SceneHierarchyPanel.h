@@ -19,12 +19,12 @@ namespace WEngine
 
 		void* operator new(size_t size)
 		{
-			return WEngine::Allocator::Get()->Allocate(size);
+			return NormalAllocator::Get()->Allocate(size);
 		}
 
 		void operator delete(void* pData)
 		{
-			WEngine::Allocator::Get()->Deallocate(pData);
+			NormalAllocator::Get()->Deallocate(pData);
 		}
 
 	private:

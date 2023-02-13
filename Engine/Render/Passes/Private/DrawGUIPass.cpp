@@ -88,7 +88,7 @@
 //	}
 //	context->Submit(&submitDescriptor);
 //	cmd->~RHICommandBuffer();
-//	WEngine::Allocator::Get()->Deallocate(cmd);
+//	NormalAllocator::Get()->Deallocate(cmd);
 //
 //	m_pCommandBuffers = context->GetCommandBuffer(RHIContext::g_maxFrames, false);
 //
@@ -135,7 +135,7 @@
 //
 //		encoder->EndPass();
 //		encoder->~RHIGraphicsEncoder();
-//		WEngine::Allocator::Get()->Deallocate(encoder);
+//		NormalAllocator::Get()->Deallocate(encoder);
 //	}
 //	cmd->EndScopePass();
 //	context->ExecuteCommandBuffer(cmd);

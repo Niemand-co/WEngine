@@ -4,7 +4,7 @@
 namespace Vulkan
 {
 
-	class VulkanAllocator : public WEngine::Allocator
+	class VulkanAllocator : public NormalAllocator
 	{
 	public:
 
@@ -18,11 +18,6 @@ namespace Vulkan
 
 		VkAllocationCallbacks *m_pAllocationCallbacks;
 
-	};
-
-	struct VulkanAllocatorData
-	{
-		WEngine::Allocator *allocator;
 	};
 
 }

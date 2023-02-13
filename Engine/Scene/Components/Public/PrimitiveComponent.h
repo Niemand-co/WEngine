@@ -63,12 +63,12 @@ struct PrimitiveProxy
 
 	void* operator new(size_t size)
 	{
-		return WEngine::Allocator::Get()->Allocate(size);
+		return NormalAllocator::Get()->Allocate(size);
 	}
 
 	void operator delete(void* pData)
 	{
-		WEngine::Allocator::Get()->Deallocate(pData);
+		NormalAllocator::Get()->Deallocate(pData);
 	}
 
 	enum { type = 0 };
@@ -130,12 +130,12 @@ struct PrimitiveInfo
 
 	void* operator new(size_t size)
 	{
-		return WEngine::Allocator::Get()->Allocate(size);
+		return NormalAllocator::Get()->Allocate(size);
 	}
 
 	void operator delete(void* pData)
 	{
-		WEngine::Allocator::Get()->Deallocate(pData);
+		NormalAllocator::Get()->Deallocate(pData);
 	}
 
 	GameObject *Owner;

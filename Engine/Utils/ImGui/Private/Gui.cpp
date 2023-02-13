@@ -12,7 +12,7 @@ Gui* Gui::CreateGui(WEngine::Backend backend)
 		break;
 	case WEngine::Backend::Vulkan:
 	{
-		g_pGui = (Gui*)WEngine::Allocator::Get()->Allocate(sizeof(Vulkan::VulkanGui));
+		g_pGui = (Gui*)NormalAllocator::Get()->Allocate(sizeof(Vulkan::VulkanGui));
 		::new (g_pGui) Vulkan::VulkanGui();
 		return g_pGui;
 	}

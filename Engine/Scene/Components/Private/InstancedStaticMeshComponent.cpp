@@ -21,7 +21,7 @@ PrimitiveProxy* InstancedStaticMeshComponent::GetPrimitiveProxy()
 	{
 		if (m_pProxy == nullptr)
 		{
-			m_pProxy = (InstancedStaticMeshProxy*)WEngine::Allocator::Get()->Allocate(sizeof(InstancedStaticMeshProxy));
+			m_pProxy = (InstancedStaticMeshProxy*)NormalAllocator::Get()->Allocate(sizeof(InstancedStaticMeshProxy));
 		}
 		::new (m_pProxy) InstancedStaticMeshProxy(this);
 		m_bMarkedDirty = false;

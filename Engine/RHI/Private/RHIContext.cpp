@@ -118,7 +118,7 @@ void RHIContext::Init()
 void RHIContext::RecreateSwapchain()
 {
 	g_pSwapchain->~RHISwapchain();
-	WEngine::Allocator::Get()->Deallocate(g_pSwapchain);
+	NormalAllocator::Get()->Deallocate(g_pSwapchain);
 
 	g_pInstance->UpdateSurface();
 
@@ -147,7 +147,7 @@ void RHIContext::RecreateSwapchain()
 	for (int i = 0; i < 3; ++i)
 	{
 		g_pTextureViews[i]->~RHITextureView();
-		WEngine::Allocator::Get()->Deallocate(g_pTextureViews[i]);
+		NormalAllocator::Get()->Deallocate(g_pTextureViews[i]);
 		//g_pTextureViews[i] = g_pSwapchain->GetTexture(i)->CreateTextureView(&textureViewDescriptor);
 	}
 
@@ -419,7 +419,7 @@ void RHIContext::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, uns
 	g_pQueue->Submit(&submitDescriptor);
 	g_pDevice->Wait();
 	cmd->~RHICommandBuffer();
-	WEngine::Allocator::Get()->Deallocate(cmd);
+	NormalAllocator::Get()->Deallocate(cmd);
 
 }
 

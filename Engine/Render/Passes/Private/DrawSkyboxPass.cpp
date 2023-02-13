@@ -323,7 +323,7 @@
 //		encoder->DrawIndexed(m_pMesh->m_indexCount, 0);
 //		encoder->EndPass();
 //		encoder->~RHIGraphicsEncoder();
-//		WEngine::Allocator::Get()->Deallocate(encoder);
+//		NormalAllocator::Get()->Deallocate(encoder);
 //	}
 //	cmd->EndScopePass();
 //	context->ExecuteCommandBuffer(cmd);
