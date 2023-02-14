@@ -143,7 +143,7 @@ namespace Vulkan
 
 	RHIRenderPass* VulkanDevice::CreateRenderPass(RHIRenderPassDescriptor* descriptor)
 	{
-		VkAttachmentDescription *pAttachmentDescriptions = (VkAttachmentDescription*)NormalAllocator::Get()->Allocate(descriptor->attachmentCount * sizeof(VkAttachmentDescription));
+		VkAttachmentDescription *pAttachmentDescriptions = (VkAttachmentDescription*)NormalAllocator::Get()->Allocate(descriptor->AttachmentCount * sizeof(VkAttachmentDescription));
 		for (unsigned int i = 0; i < descriptor->AttachmentCount; ++i)
 		{
 			RHIAttachmentDescriptor *pAttachmentDescriptor = descriptor->AttachmentDescriptors + i;

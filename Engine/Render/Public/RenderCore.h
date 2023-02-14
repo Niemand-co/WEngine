@@ -69,8 +69,9 @@ enum class PresentMode
 
 struct Extent
 {
-	unsigned int width;
-	unsigned int height;
+	uint32 width = 0;
+	uint32 height = 0;
+	uint32 depth = 0;
 };
 
 enum class Dimension

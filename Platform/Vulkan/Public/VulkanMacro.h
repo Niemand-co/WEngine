@@ -28,16 +28,19 @@
 #define MEMORY_PROPERTY_DEVICE_UNCACHED     0x0080
 #define MEMORY_PROPERTY_RDMA_CAPABLE        0x0100
 
-#define BUFFER_USAGE_TRANSFER_SRC             0x00000001
-#define BUFFER_USAGE_TRANSFER_DST             0x00000002
-#define BUFFER_USAGE_UNIFORM_TEXEL_BUFFER     0x00000004
-#define BUFFER_USAGE_STORAGE_TEXEL_BUFFER     0x00000008
-#define BUFFER_USAGE_UNIFORM_BUFFER           0x00000010
-#define BUFFER_USAGE_STORAGE_BUFFER           0x00000020
-#define BUFFER_USAGE_INDEX_BUFFER             0x00000040
-#define BUFFER_USAGE_VERTEX_BUFFER            0x00000080
-#define BUFFER_USAGE_INDIRECT_BUFFER          0x00000100
-#define BUFFER_USAGE_SHADER_DEVICE_ADDRESS    0x00020000
+enum class EBufferUsageFlags : uint32
+{
+	BF_TransferSrc     = 0x00000001,
+	BF_TransferDst     = 0x00000002,
+	BF_UniformTexel    = 0x00000004,
+	BF_StorageTexel    = 0x00000008,
+	BF_UniformBuffer   = 0x00000010,
+	BF_StorageBuffer   = 0x00000020,
+	BF_IndexBuffer     = 0x00000040,
+	BF_VertexBuffer    = 0x00000080,
+	BF_IndirectBuffer  = 0x00000100,
+	BF_SRV             = 0x00020000,
+};
 
 #define IMAGE_USAGE_TRANSFER_SRC                0x00000001
 #define IMAGE_USAGE_TRANSFER_DST                0x00000002

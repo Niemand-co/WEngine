@@ -79,7 +79,7 @@ WTexture3DRHIRef RHIRenderCommandList::CreateTexture3D(uint32 width, uint32 heig
 
 WRenderPassRHIRef RHIRenderCommandList::CreateRenderPass(RHIRenderPassDescriptor *descriptor)
 {
-    return RHIContext::GetContext()->CreateRenderPass();
+    return RHIContext::GetContext()->CreateRenderPass(descriptor);
 }
 
 RHIRenderCommandList* GetRenderCommandList()

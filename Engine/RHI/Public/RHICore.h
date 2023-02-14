@@ -415,6 +415,15 @@ namespace WEngine
 		Healthy = None,
 	};
 
+	struct ClearValue
+	{
+		union
+		{
+			float Color[4];
+			struct { float Depth; uint32 Stencil; };
+		};
+	};
+
 }
 
 typedef WEngine::WSharedPtr<class RHIVertexBuffer> WVertexBufferRHIRef;

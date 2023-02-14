@@ -3,12 +3,6 @@
 class RHIRenderPass;
 class RHIRenderTarget;
 
-struct ClearValue
-{
-	glm::vec4 value;
-	bool color;
-};
-
 class RHIRenderPassBeginDescriptor
 {
 public:
