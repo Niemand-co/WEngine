@@ -10,9 +10,9 @@ namespace Vulkan
 	VulkanBufferBase::VulkanBufferBase(VulkanDevice *pInDevice, VkBufferCreateInfo *pInfo, uint32 memoryType)
 		: pDevice(pInDevice)
 	{
-		vkCreateBuffer(*pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Buffer);
+		vkCreateBuffer(pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Buffer);
 
-		vkGetBufferMemoryRequirements(*pInDevice->GetHandle(), Buffer, &MemoryRequirements);
+		vkGetBufferMemoryRequirements(pInDevice->GetHandle(), Buffer, &MemoryRequirements);
 
 		unsigned int index = 0;
 		GPUFeature feature = pInDevice->GetGPU()->GetFeature();
@@ -32,15 +32,15 @@ namespace Vulkan
 			MemoryAllocateInfo.memoryTypeIndex = index;
 		}
 
-		RE_ASSERT(vkAllocateMemory(*pInDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DeviceMemory) == VK_SUCCESS, "Failed to Allocate Memory.");
+		RE_ASSERT(vkAllocateMemory(pInDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DeviceMemory) == VK_SUCCESS, "Failed to Allocate Memory.");
 
-		vkBindBufferMemory(*pInDevice->GetHandle(), Buffer, DeviceMemory, 0);
+		vkBindBufferMemory(pInDevice->GetHandle(), Buffer, DeviceMemory, 0);
 	}
 
 	VulkanBufferBase::~VulkanBufferBase()
 	{
-		vkDestroyBuffer(*pDevice->GetHandle(), Buffer, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
-		vkFreeMemory(*pDevice->GetHandle(), DeviceMemory, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkDestroyBuffer(pDevice->GetHandle(), Buffer, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkFreeMemory(pDevice->GetHandle(), DeviceMemory, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
 	VulkanVertexBuffer::VulkanVertexBuffer(VulkanDevice* pInDevice, VkBufferCreateInfo *pInfo, uint32 memoryType)

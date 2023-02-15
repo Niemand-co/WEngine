@@ -1,6 +1,15 @@
 #pragma once
 #include "Render/Public/RenderDependencyGraph.h"
 
+struct WRDGResourceState
+{
+	static bool IsTransitionRequired();
+
+	static bool IsMergeAllowed();
+
+
+};
+
 class WRDGResource
 {
 public:

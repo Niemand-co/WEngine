@@ -42,14 +42,17 @@ enum class EBufferUsageFlags : uint32
 	BF_SRV             = 0x00020000,
 };
 
-#define IMAGE_USAGE_TRANSFER_SRC                0x00000001
-#define IMAGE_USAGE_TRANSFER_DST                0x00000002
-#define IMAGE_USAGE_SAMPLED                     0x00000004
-#define IMAGE_USAGE_STORAGE                     0x00000008
-#define IMAGE_USAGE_COLOR_ATTACHMENT            0x00000010
-#define IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT    0x00000020
-#define IMAGE_USAGE_TRANSIENT_ATTACHMENT        0x00000040
-#define IMAGE_USAGE_INPUT_ATTACHMENT            0x00000080
+enum class EImageUsageFlags : uint32
+{
+	IM_CopySrc                = 0x00000001,
+	IM_CopyDst                = 0x00000002,
+	IM_Sempled                = 0x00000004,
+	IM_Storage                = 0x00000008,
+	IM_ColorAttachment        = 0x00000010,
+	IM_DepthStencilAttachment = 0x00000020,
+	IM_TransientAttachment    = 0x00000040,
+	IM_InputAttachment        = 0x00000080,
+};
 
 #define IMAGE_ASPECT_COLOR       0x00000001
 #define IMAGE_ASPECT_DEPTH       0x00000002

@@ -15,6 +15,7 @@ class WRDGPass;
 typedef WRDGHandle<WRDGPass, uint16> WRDGPassHandle;
 typedef WEngine::WArray<WRDGHandle<WRDGPass, uint16>> WRDGPassHandleArray;
 typedef WRDGHandleRegistry<WRDGPassHandle> WRDGPassRegistry;
+typedef WRDGHandleBitArray<WRDGPassHandle> WRDGPassBitArray;
 
 class WRDGTexture;
 typedef WRDGHandle<WRDGTexture, uint16> WRDGTextureHandle;
@@ -28,7 +29,42 @@ typedef WRDGHandleRegistry<WRDGBufferHandle> WRDGBufferRegistry;
 
 enum class EAccess : uint16
 {
-	
+	Unknown             = 0,
+
+	HostVisible         = 1 << 0,
+	Present             = 1 << 1,
+	VertexOrIndexBuffer = 1 << 2,
+	SRVCompute          = 1 << 3,
+	SRVGraphics         = 1 << 4,
+	CopySrc             = 1 << 5,
+
+	UAVCompute          = 1 << 6,
+	UAVGraphics         = 1 << 7,
+	RTV                 = 1 << 8,
+	CopyDst             = 1 << 9,
+
+	SRV                 = SRVCompute | SRVGraphics,
+	UAV                 = UAVCompute | UAVGraphics,
+
+	ReadOnly            = HostVisible | Present | VertexOrIndexBuffer | SRVCompute | SRVGraphics | CopySrc,
+	WriteOnly           = RTV | CopyDst,
+
+	Readable            = ReadOnly | UAV,
+	Writable            = WriteOnly | UAV,
+};
+
+enum class EPassFlag : uint16
+{
+	None = 0,
+
+	Raster = 1 << 0,
+	Compute = 1 << 1,
+	AsyncCompute = 1 <<2,
+	Copy = 1 << 3,
+
+	NeverCull = 1 << 4,
+	Skip = 1 << 5,
+
 };
 
 struct WRDGTextureDesc

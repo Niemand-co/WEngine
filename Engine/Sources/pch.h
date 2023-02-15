@@ -74,6 +74,7 @@
 #include "Utils/Container/Public/WDeque.h"
 #include "Utils/Container/Public/WQueue.h"
 #include "Utils/Container/Public/WStack.h"
+#include "Utils/Container/Public/WBitArray.h"
 #include "Utils/Public/NamingSystem.h"
 #include "HAL/Public/TaskGraph.h"
 

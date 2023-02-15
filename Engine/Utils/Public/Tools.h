@@ -88,9 +88,15 @@ namespace WEngine
 	struct remove_const_and_reference<T&&> { typedef T type; };
 
 	template<typename T>
-	constexpr remove_reference<T>::type&& move(T&& _Val) noexcept
+	constexpr remove_reference<T>::type&& Move(T&& _Val) noexcept
 	{
 		return static_cast<remove_reference<T>::type&&>(_Val);
+	}
+
+	template<typename T>
+	constexpr remove_reference<T>::type RemoveTemp(T&& _Val) noexcept
+	{
+		return static_cast<remove_reference<T>::type>(_Val);
 	}
 
 	template<typename T>
@@ -162,4 +168,10 @@ namespace WEngine
 		enum { Min = INT64_MIN };
 		enum { Max = INT64_MAX };
 	};
+
+	template<typename Enum>
+	constexpr bool EnumHasFlags(Enum Flags, Enum Contains)
+	{
+		return ((__underlying_type(Enum))Flags & (__underlying_type(Enum))Contains) != 0;
+	}
 }

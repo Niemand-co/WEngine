@@ -1,4 +1,5 @@
 #pragma once
+#include "Utils/Public/Tools.h"
 #include <initializer_list>
 
 namespace WEngine
@@ -30,6 +31,10 @@ namespace WEngine
 		void PushForward(T& var);
 
 		void PushForward(const T& var);
+
+		T Pop();
+
+		void Append(const WArray<T>& other);
 
 		void RemoveAndSwap(size_t index);
 
@@ -258,6 +263,30 @@ namespace WEngine
 
 		::new (m_pData + m_size) T(var);
 		m_size++;
+	}
+
+	template<typename T>
+	inline T WArray<T>::Pop()
+	{
+		--m_size;
+		T Result = RemoveTemp(*(m_pData + m_size));
+		(m_pData + m_size)->~T();
+		return Result;
+	}
+
+	template<typename T>
+	inline void WArray<T>::Append(const WArray<T>& other)
+	{
+		if (m_size + other.Size() > m_capasity)
+		{
+			T* newPtr = (T*)Allocator::Get()->Allocate((m_size + other.m_size) * sizeof(T));
+			memcpy(newPtr, m_pData, sizeof(T) * m_size);
+			Allocator::Get()->Deallocate(m_pData);
+			m_pData = newPtr;
+			m_capasity = m_size + other.m_size;
+		}
+		memcpy(m_pData + m_size, other.m_pData, other.m_size * sizeof(T));
+		m_size += other.m_size;
 	}
 
 	template<typename T>

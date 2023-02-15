@@ -81,7 +81,7 @@ namespace Vulkan
 		}
 
 		VkEvent* pEvent = (VkEvent*)NormalAllocator::Get()->Allocate(sizeof(VkEvent));
-		vkCreateEvent(*m_pDevice, &eventCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pEvent);
+		vkCreateEvent(pDevice, &eventCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pEvent);
 		
 		RHIEvent *event = (RHIEvent*)NormalAllocator::Get()->Allocate(sizeof(VulkanEvent));
 		::new (event) VulkanEvent(pEvent);
@@ -97,7 +97,7 @@ namespace Vulkan
 		shaderModuleCreateInfo.pCode = descriptor->pCode;
 
 		VkShaderModule* pShaderModule = (VkShaderModule*)NormalAllocator::Get()->Allocate(sizeof(VkShaderModule));
-		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pShaderModule);
+		vkCreateShaderModule(pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pShaderModule);
 
 		return new VulkanVertexShader(pShaderModule);
 	}
@@ -110,7 +110,7 @@ namespace Vulkan
 		shaderModuleCreateInfo.pCode = descriptor->pCode;
 
 		VkShaderModule* pShaderModule = (VkShaderModule*)NormalAllocator::Get()->Allocate(sizeof(VkShaderModule));
-		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pShaderModule);
+		vkCreateShaderModule(pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pShaderModule);
 
 		return new VulkanPixelShader(pShaderModule);
 	}
@@ -123,7 +123,7 @@ namespace Vulkan
 		shaderModuleCreateInfo.pCode = descriptor->pCode;
 
 		VkShaderModule* pShaderModule = (VkShaderModule*)NormalAllocator::Get()->Allocate(sizeof(VkShaderModule));
-		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pShaderModule);
+		vkCreateShaderModule(pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pShaderModule);
 
 		return new VulkanGeometryShader(pShaderModule);
 	}
@@ -136,7 +136,7 @@ namespace Vulkan
 		shaderModuleCreateInfo.pCode = descriptor->pCode;
 
 		VkShaderModule* pShaderModule = (VkShaderModule*)NormalAllocator::Get()->Allocate(sizeof(VkShaderModule));
-		vkCreateShaderModule(*m_pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pShaderModule);
+		vkCreateShaderModule(pDevice, &shaderModuleCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pShaderModule);
 
 		return new VulkanComputeShader(pShaderModule);
 	}
@@ -671,7 +671,7 @@ namespace Vulkan
 		RE_ASSERT(vkCreateDescriptorPool(pDevice, &descriptorPoolCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pDescriptorPool) == VK_SUCCESS, "Failed to Create Descriptor Pool.");
 
 		RHIGroupPool *groupPool = (RHIGroupPool*)NormalAllocator::Get()->Allocate(sizeof(VulkanGroupPool));
-		::new (groupPool) VulkanGroupPool(pDescriptorPool, descriptor->pGroupLayout, m_pDevice);
+		::new (groupPool) VulkanGroupPool(pDescriptorPool, descriptor->pGroupLayout, &pDevice);
 
 		return groupPool;
 	}

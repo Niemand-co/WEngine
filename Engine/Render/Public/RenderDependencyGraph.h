@@ -25,6 +25,11 @@ public:
 	bool operator<(const WRDGHandle& other) { RE_ASSERT(IsValid, "Handle Invalid."); return Index < other.Index; }
 	bool operator>(const WRDGHandle& other) { RE_ASSERT(IsValid, "Handle Invalid."); return Index > other.Index; }
 
+	IndexType operator-(const WRDGHandle& other)
+	{
+		return Index - other.Index;
+	}
+
 	WRDGHandle& operator++()
 	{
 		Index++;
@@ -42,6 +47,30 @@ public:
 	static constexpr IndexType NullIndex = WEngine::NumericLimits<IndexType>::Max;
 
 	IndexType Index = NullIndex;
+
+};
+
+template<typename HandleType>
+class WRDGHandleBitArray : public WEngine::WBitArray
+{
+public:
+
+	WRDGHandleBitArray() = default;
+
+	WRDGHandleBitArray(uint32 Count, bool Value)
+		: WEngine::WBitArray(Count, Value)
+	{
+	}
+
+	WBitReference operator[](HandleType Handle)
+	{
+		return WEngine::WBitArray::operator[](Handle.Index);
+	}
+
+	WConstBitReference operator[](HandleType Handle) const
+	{
+		return WENgine::WBitArray::operator[](Handle.Index);
+	}
 
 };
 
@@ -97,22 +126,11 @@ private:
 
 };
 
-struct WRDGRenderTargetBinding
-{
-	WRDGTexture *Texture;
-	AttachmentLoadOP LoadOp;
-};
-
-struct WRDGParameters
-{
-	WEngine::WArray<WRDGRenderTargetBinding> RenderTargets;
-};
-
 class WRDGPass
 {
 public:
 
-	WRDGPass(WEngine::WString&& inName, const WRDGParameters* inParameters)
+	WRDGPass(WEngine::WString&& inName, const class WRDGParameterStruct* inParameters)
 		: Name(inName),
 		  Parameters(inParameters)
 	{
@@ -122,25 +140,27 @@ public:
 
 	virtual void Execute() = 0;
 
-	void MarkCulling(bool inCulling) { bCulling = inCulling; }
+	void SetNeverCulling(bool bInCulling) { Flag = (EPassFlag)((uint16)Flag | (uint16)EPassFlag::NeverCull); }
 
-	bool IsCulling() const { return bCulling; }
+	bool IsNeverCulling() const { return ((uint16)Flag & (uint16)EPassFlag::NeverCull) != 0; }
 
 private:
+
+
 
 	WRDGPassHandle Handle;
 
 	WEngine::WString Name;
 
-	const WRDGParameters* Parameters;
+	const WRDGParameterStruct* Parameters;
 
 	WRDGPassHandleArray Producers;
 
-	WEngine::WArray<class WRDGBuffer*> Buffers;
+	WEngine::WArray<WEngine::WPair<class WRDGBuffer*, struct WRDGResourceState>> BufferStates;
 
-	WEngine::WArray<class WRDGTexture*> Textures;
+	WEngine::WArray<WEngine::WPair<class WRDGTexture*, struct WRDGResourceState>> TextureStates;
 
-	uint8 bCulling : 1;
+	EPassFlag Flag;
 
 	friend WRDGPassRegistry;
 
@@ -181,12 +201,15 @@ public:
 
 	void Execute();
 
-	template<typename LAMBDA>
-	void AddPass(WEngine::WString inName, const WRDGParameters* inParameters, LAMBDA inLambda);
+	template<typename ParameterStructType>
+	ParameterStructType* AllocateParameterStruct();
 
 	class WRDGTexture* CreateTexture(const WRDGTextureDesc& inDesc, const char* inName);
 
 	class WRDGBuffer* CreateBuffer(const WRDGBufferDesc& inDesc, const char* inName);
+
+	template<typename LAMBDA>
+	WRDGPass* AddPass(WEngine::WString inName, const WRDGParameterStruct* inParameters, LAMBDA inLambda);
 
 private:
 
@@ -202,9 +225,21 @@ private:
 
 	WRDGBufferRegistry Buffers;
 
+	WRDGPassBitArray PassesToCull;
+
+	WRDGPassBitArray PassesWithEmptyParameters;
+
 };
 
-template<typename LAMBDA>
-inline void WRDGBuilder::AddPass(WEngine::WString inName, const WRDGParameters* inParameters, LAMBDA inLambda)
+template<typename ParameterStructType>
+inline ParameterStructType* WRDGBuilder::AllocateParameterStruct()
 {
+	return (ParameterStructType*)WRDGAllocator::Allocate(sizeof(ParameterStructType));
+}
+
+template<typename LAMBDA>
+inline WRDGPass* WRDGBuilder::AddPass(WEngine::WString inName, const WRDGParameterStruct* inParameters, LAMBDA inLambda)
+{
+	WRDGLambdaPass *Pass = Passes.Allocate(inName, inParameters, inLambda);
+	return Pass;
 }
