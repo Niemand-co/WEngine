@@ -62,6 +62,8 @@ private:
 
 	float MaxDrawDistance;
 
+	class WRDGBuilder* GraphBuilder;
+
 	class DeferredBasePass *BasePass;
 
 };

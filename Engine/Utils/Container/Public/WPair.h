@@ -21,7 +21,11 @@ namespace WEngine
 
 		k& First() { return m_key; }
 
+		const k& First() const { return m_key; }
+
 		v& Second() { return m_val; }
+
+		const v& Second() const { return m_val; }
 
 	private:
 

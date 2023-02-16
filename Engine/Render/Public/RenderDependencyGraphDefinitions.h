@@ -13,18 +13,24 @@ class WRDGHandleRegistry;
 
 class WRDGPass;
 typedef WRDGHandle<WRDGPass, uint16> WRDGPassHandle;
-typedef WEngine::WArray<WRDGHandle<WRDGPass, uint16>> WRDGPassHandleArray;
+typedef WEngine::WArray<WRDGPassHandle> WRDGPassHandleArray;
 typedef WRDGHandleRegistry<WRDGPassHandle> WRDGPassRegistry;
 typedef WRDGHandleBitArray<WRDGPassHandle> WRDGPassBitArray;
 
 class WRDGTexture;
 typedef WRDGHandle<WRDGTexture, uint16> WRDGTextureHandle;
-typedef WEngine::WArray<WRDGHandle<WRDGTexture, uint16>> WRDGTextureHandleArray;
+typedef WEngine::WArray<WRDGTextureHandle> WRDGTextureHandleArray;
 typedef WRDGHandleRegistry<WRDGTextureHandle> WRDGTextureRegistry;
+
+class WRDGView;
+typedef WRDGHandle<WRDGView, uint16> WRDGViewHandle;
+typedef WEngine::WArray<WRDGViewHandle> WRDGViewHandleArray;
+typedef WRDGHandleRegistry<WRDGViewHandle> WRDGViewRegistry;
+typedef WRDGHandleBitArray<WRDGViewHandle> WRDGViewBitArray;
 
 class WRDGBuffer;
 typedef WRDGHandle<WRDGBuffer, uint16> WRDGBufferHandle;
-typedef WEngine::WArray<WRDGHandle<WRDGBuffer, uint16>> WRDGBufferHandleArray;
+typedef WEngine::WArray<WRDGBufferHandle> WRDGBufferHandleArray;
 typedef WRDGHandleRegistry<WRDGBufferHandle> WRDGBufferRegistry;
 
 enum class EAccess : uint16
@@ -53,6 +59,25 @@ enum class EAccess : uint16
 	Writable            = WriteOnly | UAV,
 };
 
+enum class EUniformBaseType : uint16
+{
+	UB_INVALID = 0,
+	
+	UB_BOOL,
+	UB_INT32,
+	UB_UINT32,
+	UB_FLOAT32,
+	
+	UB_SRV,
+	UB_UAV,
+	UB_SAMPLER,
+
+	UB_RDG_TEXTURE_SRV,
+	UB_RDG_TEXTURE_UAV,
+	UB_RDG_BUFFER_SRV,
+	UB_RDG_BUFFER_UAV,
+};
+
 enum class EPassFlag : uint16
 {
 	None = 0,
@@ -65,6 +90,13 @@ enum class EPassFlag : uint16
 	NeverCull = 1 << 4,
 	Skip = 1 << 5,
 
+};
+
+enum class EPipeline : uint8
+{
+	None = 0,
+	Graphics = 1 << 0,
+	AsyncCompute = 1 << 1,
 };
 
 struct WRDGTextureDesc

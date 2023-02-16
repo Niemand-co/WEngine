@@ -15,6 +15,51 @@ WRDGBuilder::~WRDGBuilder()
 
 void WRDGBuilder::Compile()
 {
+	PassCulling();
+
+	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
+	{
+		if (PassesToCull(Handle))
+		{
+			continue;
+		}
+
+		WRDGPass* Pass = Passes[Handle];
+		bool bWithAsyncCompute = WEngine::EnumHasFlags(Pass->Flag, EPassFlag::AsyncCompute);
+
+		for (const auto& TexturePair : Pass->TextureStates)
+		{
+			WRDGTexture* Texture = TexturePair.First();
+			auto PassNeedState = TexturePair.Second();
+			WEngine::WArray<WRDGResourceState*>& TextureState = Texture->GetMergeState();
+
+			uint32 SubresourceCount = PassNeedState.States.Size();
+			PassNeedState.MergeStates.Resize(SubresourceCount);
+			if (TextureState.Size() != SubresourceCount)
+			{
+				InitResource(TextureState, SubresourceCount);
+			}
+
+			for (uint32 Index = 0; Index < SubresourceCount; ++Index)
+			{
+				if (!TextureState[Index] || !WRDGResourceState::IsMergeAllowed(*TextureState[Index], PassNeedState.States[Index]))
+				{
+					if (TextureState[Index] && TextureState[Index]->Pipeline != PassNeedState.States[Index].Pipeline)
+					{
+
+					}
+
+					memcpy(&TextureState[Index], &PassNeedState.States[Index], sizeof(WRDGResourceState));
+					TextureState[Index]->FirstPass = TextureState[Index]->LastPass = Handle;
+				}
+				else
+				{
+					TextureState[Index]->Access |= PassNeedState.States[Index].Access;
+					TextureState[Index]->LastPass = Handle;
+				}
+			}
+		}
+	}
 }
 
 void WRDGBuilder::Execute()
@@ -44,13 +89,13 @@ void WRDGBuilder::PassCulling()
 	{
 		WRDGPass *Pass = Passes[Handle];
 		bool bUntrackedOutput = false;
-		for (const WRDGTexture* Texture : Pass->Textures)
+		for (const auto& TexturePair : Pass->TextureStates)
 		{
-			bUntrackedOutput |= Texture->IsExternal();
+			bUntrackedOutput |= TexturePair.First()->IsExternal();
 		}
-		for (const WRDGBuffer* Buffer : Pass->Buffers)
+		for (const auto& BufferPair : Pass->BufferStates)
 		{
-			bUntrackedOutput |= Buffer->IsExternal();
+			bUntrackedOutput |= BufferPair.First()->IsExternal();
 		}
 
 		PassesNeverCull[Handle] = Pass->IsNeverCulling();
@@ -78,14 +123,10 @@ void WRDGBuilder::PassCulling()
 
 void WRDGBuilder::PassMerging()
 {
-	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
-	{
-		if (PassesToCull(Handle) || WEngine::EnumHasFlags(Passes[Handle]->Flag, EPassFlag::AsyncCompute))
-		{
-			continue;
-		}
 
-		WRDGPass *Pass = Passes[Handle];
-		for(Pass->Textures)
-	}
+}
+
+void WRDGBuilder::SetupPass(WRDGPass* Pass)
+{
+	
 }

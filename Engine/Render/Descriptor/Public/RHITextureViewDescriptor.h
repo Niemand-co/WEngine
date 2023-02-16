@@ -6,22 +6,22 @@ public:
 
 	RHITextureViewDescriptor();
 
-	~RHITextureViewDescriptor() = default;
+	virtual ~RHITextureViewDescriptor() = default;
 
 public:
 
-	Format format;
+	Format format = Format::A16R16G16B16_SFloat;
 
-	unsigned int imageAspect;
+	unsigned int imageAspect = IMAGE_ASPECT_COLOR;
 
-	unsigned int mipCount;
+	unsigned int mipCount = 1;
 
-	unsigned int baseMipLevel;
+	unsigned int baseMipLevel = 0;
 
-	unsigned int arrayLayerCount;
+	unsigned int arrayLayerCount = 1;
 
-	unsigned int baseArrayLayer;
+	unsigned int baseArrayLayer = 0;
 
-	Dimension dimension;
+	Dimension dimension = Dimension::Texture2D;
 
 };

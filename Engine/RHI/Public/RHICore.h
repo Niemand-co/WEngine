@@ -424,6 +424,14 @@ namespace WEngine
 		};
 	};
 
+	struct WResolveRect
+	{
+		int32 X1;
+		int32 Y1;
+		int32 X2;
+		int32 Y2;
+	};
+
 }
 
 typedef WEngine::WSharedPtr<class RHIVertexBuffer> WVertexBufferRHIRef;

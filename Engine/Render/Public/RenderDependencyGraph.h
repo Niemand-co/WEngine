@@ -146,7 +146,18 @@ public:
 
 private:
 
+	struct TextureState
+	{
+		WEngine::WArray<WRDGResourceState> States;
+		WEngine::WArray<WRDGResourceState> MergeStates;
+		uint32 ReferenceCount;
+	};
 
+	struct BufferState
+	{
+		WEngine::WArray<WRDGResourceState> States;
+		uint32 ReferenceCount;
+	};
 
 	WRDGPassHandle Handle;
 
@@ -156,9 +167,13 @@ private:
 
 	WRDGPassHandleArray Producers;
 
-	WEngine::WArray<WEngine::WPair<class WRDGBuffer*, struct WRDGResourceState>> BufferStates;
+	WEngine::WArray<WEngine::WPair<class WRDGBuffer*, BufferState>> BufferStates;
 
-	WEngine::WArray<WEngine::WPair<class WRDGTexture*, struct WRDGResourceState>> TextureStates;
+	WEngine::WArray<WEngine::WPair<class WRDGTexture*, TextureState>> TextureStates;
+
+	WEngine::WArray<class RHITexture*> TexturesToAcquire;
+
+	WEngine::WArray<class RHITexture*> TexturesToDiscard;
 
 	EPassFlag Flag;
 
@@ -208,14 +223,16 @@ public:
 
 	class WRDGBuffer* CreateBuffer(const WRDGBufferDesc& inDesc, const char* inName);
 
-	template<typename LAMBDA>
-	WRDGPass* AddPass(WEngine::WString inName, const WRDGParameterStruct* inParameters, LAMBDA inLambda);
+	template<typename ParameterStructType, typename LAMBDA>
+	WRDGPass* AddPass(WEngine::WString inName, const ParameterStructType* inParameters, LAMBDA inLambda);
 
 private:
 
 	void PassCulling();
 
 	void PassMerging();
+
+	void SetupPass(WRDGPass *Pass);
 
 private:
 
@@ -237,9 +254,10 @@ inline ParameterStructType* WRDGBuilder::AllocateParameterStruct()
 	return (ParameterStructType*)WRDGAllocator::Allocate(sizeof(ParameterStructType));
 }
 
-template<typename LAMBDA>
-inline WRDGPass* WRDGBuilder::AddPass(WEngine::WString inName, const WRDGParameterStruct* inParameters, LAMBDA inLambda)
+template<typename ParameterStructType, typename LAMBDA>
+inline WRDGPass* WRDGBuilder::AddPass(WEngine::WString inName, const ParameterStructType* inParameters, LAMBDA inLambda)
 {
 	WRDGLambdaPass *Pass = Passes.Allocate(inName, inParameters, inLambda);
+	SetupPass(Pass);
 	return Pass;
 }

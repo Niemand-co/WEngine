@@ -7,11 +7,15 @@
 #include "Scene/Components/Public/DirectionalLightComponent.h"
 #include "Render/Public/SceneVisibility.h"
 #include "Render/Passes/Public/DeferredBasePass.h"
+#include "Render/Public/RenderDependencyGraph.h"
+#include "Render/Public/RenderDependencyGraphResource.h"
+#include "Render/Public/RenderDependencyGraphParameter.h"
 
 DeferredRenderer::DeferredRenderer(CameraComponent* pCamera)
 	: SceneRenderer(pCamera), GBuffer(pCamera->GetResolution().x, pCamera->GetResolution().y)
 {
 	BasePass = new DeferredBasePass();
+	GraphBuilder = new WRDGBuilder();
 	BeginInitResource(BasePass);
 }
 
@@ -56,10 +60,27 @@ void DeferredRenderer::RenderPrePass()
 {
 	
 }
-
+BEGIN_SHADER_PARAMETERS_STRUCT(WRendeTargetParameter)
+	SHADER_PARAMETER(glm::vec3, Color)
+	RENDER_TARGET_SLOTS
+END_SHADER_PARAMETERS_STRUCT
 void DeferredRenderer::RenderBasePass()
 {
-	
+	glm::vec2 Resolution = m_pCamera->GetResolution();
+	const WRDGTextureDesc GBufferDesc = WRDGTextureDesc::GetTexture2DDesc(Format::A16R16G16B16_SFloat, { (uint32)Resolution.x, (uint32)Resolution.y, 0u }, {0.0f, 0.0f, 0.0f, 0.0f});
+	WRDGTexture* GBuffer0 = GraphBuilder->CreateTexture(GBufferDesc, "GBuffer0");
+
+	const WRDGTextureDesc DepthDesc = WRDGTextureDesc::GetTexture2DDesc(Format::D16_Unorm, { (uint32)Resolution.x, (uint32)Resolution.y, 0u }, { 0.0f, 0.0f, 0.0f, 0.0f });
+	WRDGTexture* DepthBuffer = GraphBuilder->CreateTexture(DepthDesc, "Depth");
+
+	const WRendeTargetParameter* Parameters = GraphBuilder->AllocateParameterStruct<WRendeTargetParameter>();
+	Parameters->RenderTarget->ColorTextures[0] = GBuffer0;
+	Parameters->RenderTarget->DepthStencilTexture = DepthBuffer;
+
+	GraphBuilder->AddPass("BasePass", Parameters, [](RHIRenderCommandList& CmdList)
+	{
+		CmdList.DrawIndexedPrimitive(3, 0, 1);
+	});
 }
 
 void DeferredRenderer::RenderShadowPass()

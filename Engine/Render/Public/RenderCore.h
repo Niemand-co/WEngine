@@ -1,6 +1,8 @@
 #pragma once
 #include "Utils/Container/Public/WArray.h"
 
+#define MaxSimultaneousRenderTargets 8
+
 enum class Format
 {
 	R8_SInt = 0,

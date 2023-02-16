@@ -1,7 +1,5 @@
 #pragma once
 
-#define MaxSimultaneousRenderTargets 8
-
 struct SubPassAttachment
 {
 	unsigned int attachmentIndex;
