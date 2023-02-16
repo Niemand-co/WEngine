@@ -126,6 +126,22 @@ private:
 
 };
 
+class WRDGBarrier
+{
+public:
+
+	WRDGBarrier();
+
+	~WRDGBarrier();
+
+	void Submit();
+
+private:
+
+	WEngine::WArray<class RHIBarrierDescriptor> BarrierDesc;
+
+};
+
 class WRDGPass
 {
 public:
