@@ -138,6 +138,8 @@ namespace WEngine
 
 		void Push(const bool NewValue);
 
+		void Resize(uint32 Length);
+
 		WBitReference operator[](uint32 Index);
 
 		WConstBitReference operator[](uint32 Index) const;

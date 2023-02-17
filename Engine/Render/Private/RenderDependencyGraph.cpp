@@ -57,6 +57,7 @@ void WRDGBuilder::Compile()
 					TextureState[Index]->Access |= PassNeedState.States[Index].Access;
 					TextureState[Index]->LastPass = Handle;
 				}
+				PassNeedState.MergeStates = TextureState;
 			}
 		}
 	}
@@ -128,5 +129,10 @@ void WRDGBuilder::PassMerging()
 
 void WRDGBuilder::SetupPass(WRDGPass* Pass)
 {
-	
+	const WRDGParameterStruct &Parameters = *Pass->Parameters;
+	Parameters.GetRenderTarget
+}
+
+void WRDGBarrierBatch::Submit(RHIRenderCommandList& CmdList)
+{
 }

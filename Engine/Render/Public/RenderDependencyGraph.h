@@ -1,5 +1,6 @@
 #pragma once
 #include "Render/Public/RenderDependencyGraphDefinitions.h"
+#include "Render/Descriptor/Public/RHIBarrierDescriptor.h"
 
 template<typename InObjectType, typename IndexType>
 class WRDGHandle
@@ -91,12 +92,12 @@ public:
 		Array.Push(Object);
 	}
 
-	template<typename... Args>
-	ObjectType* Allocate(Args... args)
+	template<typename AllocObjectType, typename... Args>
+	AllocObjectType* Allocate(Args... args)
 	{
-		ObjectType *object = (ObjectType*)WRDGAllocator::Get()->Allocate(sizeof(ObjectType));
+		AllocObjectType *object = (AllocObjectType*)WRDGAllocator::Get()->Allocate(sizeof(AllocObjectType));
 		::new (object) Object(args...);
-		Insert(object);
+		Insert(static_cast<ObjectType*>(object));
 		return object;
 	}
 
@@ -126,15 +127,15 @@ private:
 
 };
 
-class WRDGBarrier
+class WRDGBarrierBatch : public RHIBarrierBatch
 {
 public:
 
-	WRDGBarrier();
+	WRDGBarrierBatch() = default;
 
-	~WRDGBarrier();
+	virtual ~WRDGBarrierBatch() = default;
 
-	void Submit();
+	void Submit(RHIRenderCommandList& CmdList);
 
 private:
 
@@ -146,7 +147,7 @@ class WRDGPass
 {
 public:
 
-	WRDGPass(WEngine::WString&& inName, const class WRDGParameterStruct* inParameters)
+	WRDGPass(WEngine::WString&& inName,  WRDGParameterStruct inParameters)
 		: Name(inName),
 		  Parameters(inParameters)
 	{
@@ -179,7 +180,7 @@ private:
 
 	WEngine::WString Name;
 
-	const WRDGParameterStruct* Parameters;
+	const WRDGParameterStruct Parameters;
 
 	WRDGPassHandleArray Producers;
 
@@ -199,13 +200,13 @@ private:
 
 };
 
-template<typename LAMBDA>
+template<typename ParameterStructType, typename LAMBDA>
 class WRDGLambdaPass : public WRDGPass
 {
 public:
 
-	WRDGLambdaPass(WEngine::WString&& inName, const WRDGParameters* inParameters, LAMBDA inLambda)
-		: WRDGPass(inName, inParameters),
+	WRDGLambdaPass(WEngine::WString&& inName, const ParameterStructType* inParameters, LAMBDA inLambda)
+		: WRDGPass(inName, WRDGParameterStruct(inParameters)),
 		  Lambda(inLambda)
 	{
 	}
@@ -273,7 +274,7 @@ inline ParameterStructType* WRDGBuilder::AllocateParameterStruct()
 template<typename ParameterStructType, typename LAMBDA>
 inline WRDGPass* WRDGBuilder::AddPass(WEngine::WString inName, const ParameterStructType* inParameters, LAMBDA inLambda)
 {
-	WRDGLambdaPass *Pass = Passes.Allocate(inName, inParameters, inLambda);
+	WRDGLambdaPass<ParameterStructType, LAMBDA> *Pass = Passes.Allocate<WRDGLambdaPass<ParameterStructType, LAMBDA>>(inName, inParameters, inLambda);
 	SetupPass(Pass);
 	return Pass;
 }

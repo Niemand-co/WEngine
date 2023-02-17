@@ -1,15 +1,7 @@
 #pragma once
 #include "Render/Public/RenderDependencyGraphDefinitions.h"
 
-class RHIBuffer;
-class RHITexture;
-
-struct BufferBarrier
-{
-	RHIBuffer* pBuffer;
-};
-
-struct RHISubresource
+struct RHISubresource : public RHIResource
 {
 public:
 
@@ -24,6 +16,12 @@ public:
 		: MipLevel(inMipLevel),
 		  ArrayLayer(inArrayLayer),
   		  PlaneSlice(inPlaneSlice)
+	{
+	}
+
+	RHISubresource(uint32 inOffset, uint32 inRange)
+		: Offset(inOffset),
+		  Range(inRange)
 	{
 	}
 
@@ -43,9 +41,17 @@ public:
 
 public:
 
-	uint32 MipLevel = kAllResource;
+	union
+	{
+		uint32 MipLevel = kAllResource;
+		uint32 Offset;
+	};
 
-	uint32 ArrayLayer = kAllResource;
+	union
+	{
+		uint32 ArrayLayer = kAllResource;
+		uint32 Range;
+	};
 
 	uint32 PlaneSlice = kAllResource;
 
@@ -66,12 +72,12 @@ public:
 	{
 	}
 
-	RHIBarrierDescriptor(class RHIBuffer* inBuffer, EAccess inAccessBefore, EAccess inAccessAfter, uint32 inMipLevel, uint32 inArrayLayer, uint32 inPlaneSlice)
+	RHIBarrierDescriptor(class RHIBuffer* inBuffer, EAccess inAccessBefore, EAccess inAccessAfter, uint32 inOffset, uint32 inRange)
 		: Buffer(inBuffer),
 		  Type(EType::Buffer),
 		  AccessBefore(inAccessBefore),
 		  AccessAfter(inAccessAfter),
-		  RHISubresource(inMipLevel, inArrayLayer, inPlaneSlice)
+		  RHISubresource(inOffset, inRange)
 	{
 	}
 
@@ -99,5 +105,25 @@ public:
 		class RHITexture* Texture;
 		class RHIBuffer* Buffer;
 	};
+
+};
+
+class RHIBarrierBatch : public RHIResource
+{
+public:
+
+	RHIBarrierBatch();
+
+	virtual ~RHIBarrierBatch();
+
+	void AddBarrier(const RHIBarrierDescriptor& Barrier);
+
+	WEngine::WArray<WEngine::WPair<class RHIResource*, RHIBarrierDescriptor>>& GetBarrierBatches() { return Batches; }
+
+	const WEngine::WArray<WEngine::WPair<class RHIResource*, RHIBarrierDescriptor>>& GetBarrierBatches() const { return Batches; }
+
+private:
+
+	WEngine::WArray<WEngine::WPair<class RHIResource*, RHIBarrierDescriptor>> Batches;
 
 };

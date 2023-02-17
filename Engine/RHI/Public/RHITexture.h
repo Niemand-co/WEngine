@@ -11,7 +11,18 @@ public:
 
 	virtual ~RHITexture() = default;
 
-	//virtual void LoadData(const WEngine::WString& path, RHIContext *context) = 0;
+	uint32 GetMipCount() const { return MipCount; }
+
+protected:
+
+	RHITexture(uint32 inMipCount)
+		: MipCount(inMipCount)
+	{
+	}
+
+protected:
+
+	uint32 MipCount;
 
 };
 
@@ -27,8 +38,8 @@ public:
 
 protected:
 
-	RHITexture2D(uint32 inWidth, uint32 inHeight)
-		: Width(inWidth), Height(inHeight)
+	RHITexture2D(uint32 inWidth, uint32 inHeight, uint32 inMipCount)
+		: Width(inWidth), Height(inHeight), RHITexture(inMipCount)
 	{
 	}
 
@@ -50,8 +61,8 @@ public:
 
 protected:
 
-	RHITexture2DArray(uint32 inWidth, uint32 inHeight, uint32 inLayerCount)
-		: RHITexture2D(inWidth, inHeight), LayerCount(inLayerCount)
+	RHITexture2DArray(uint32 inWidth, uint32 inHeight, uint32 inMipCount, uint32 inLayerCount)
+		: RHITexture2D(inWidth, inHeight, inMipCount), LayerCount(inLayerCount)
 	{
 	}
 
@@ -69,8 +80,8 @@ public:
 
 protected:
 
-	RHITexture3D(uint32 inWidth, uint32 inHeight, uint32 inDepth)
-		: Width(inWidth), Height(inHeight), Depth(inDepth)
+	RHITexture3D(uint32 inWidth, uint32 inHeight, uint32 inDepth, uint32 inMipCount)
+		: Width(inWidth), Height(inHeight), Depth(inDepth), RHITexture(inMipCount)
 	{
 	}
 

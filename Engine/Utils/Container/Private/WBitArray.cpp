@@ -75,6 +75,13 @@ namespace WEngine
 		}
 	}
 
+	void WBitArray::Resize(uint32 Length)
+	{
+		NumBits = Length;
+		Array.Resize(Length / 32 + (Length % 32 == 0) ? 0 : 1);
+		memset(Array.GetData(), 0, sizeof(uint32) * Array.Size());
+	}
+
 	WBitReference WBitArray::operator[](uint32 Index)
 	{
 		RE_ASSERT(Index < NumBits, "Out of array.");

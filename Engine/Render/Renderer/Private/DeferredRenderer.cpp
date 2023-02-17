@@ -60,8 +60,8 @@ void DeferredRenderer::RenderPrePass()
 {
 	
 }
+
 BEGIN_SHADER_PARAMETERS_STRUCT(WRendeTargetParameter)
-	SHADER_PARAMETER(glm::vec3, Color)
 	RENDER_TARGET_SLOTS
 END_SHADER_PARAMETERS_STRUCT
 void DeferredRenderer::RenderBasePass()

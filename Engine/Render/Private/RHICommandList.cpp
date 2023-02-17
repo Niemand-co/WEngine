@@ -24,7 +24,7 @@ void RHIRenderCommandList::DrawIndexedPrimitive(unsigned int indexCount, unsigne
 
 uint32 RHIRenderCommandList::AcquireImageIndex()
 {
-    return return RHIContext::GetContext->AcquireImageIndex();
+    return RHIContext::GetContext()->AcquireImageIndex();
 }
 
 WVertexBufferRHIRef RHIRenderCommandList::CreateVertexBuffer(size_t stride, size_t count)
