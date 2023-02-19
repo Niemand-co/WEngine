@@ -1,5 +1,8 @@
 #pragma once
+#include "Render/Public/RenderDependencyGraphDefinitions.h"
 #include "Render/Descriptor/Public/RHIRenderPassDescriptor.h"
+
+inline EAccess GetPassAccess(EPassFlag Flag, EAccess& SRVAccess, EAccess& UAVAccess);
 
 struct WRDGRenderTargetBinding
 {
@@ -42,6 +45,8 @@ public:
 
 	uint16 GetRenderTargetOffset() const { return RenderTargetOffset; }
 
+	bool HasRenderTarget() const { return RenderTargetOffset != kInvalidOffset; }
+
 private:
 
 	static const uint16 kInvalidOffset = WEngine::NumericLimits<uint16>::Max();
@@ -50,62 +55,31 @@ private:
 
 	WEngine::WArray<ResourceInfo> Resources;
 
+	WEngine::WArray<ResourceInfo> GraphResources;
+
 	WEngine::WArray<ResourceInfo> GraphTextures;
 
 	WEngine::WArray<ResourceInfo> GraphBuffers;
-};
 
-class WRDGParameterStruct
-{
-public:
+	WEngine::WArray<ResourceInfo> UniformBuffers;
 
-	WRDGParameterStruct(const uint8* inContents, const ShaderParametersLayout* inLayout)
-		: Contents(inContents), Layout(inLayout)
-	{
-	}
-
-	template<typename ParameterStructType>
-	WRDGParameterStruct(const ParameterStructType* Parameters)
-	{
-
-	}
-
-	~WRDGParameterStruct();
-
-	void InitializeLayout();
-
-	RHIRenderPassDescriptor GetRenderPassInfo() const;
-
-	bool HasRenderTargets() const;
-
-	bool HasExternalOutput() const;
-
-	const WRDGRenderTargetBinding& GetRenderTarget() const
-	{
-		return *reinterpret_cast<const WRDGRenderTargetBinding*>(Contents + Layout->GetRenderTargetOffset());
-	}
-
-private:
-
-	const uint8* Contents;
-
-	const ShaderParametersLayout *Layout;
-
+	friend struct WShaderParameterMetaData;
 };
 
 struct WShaderParameterMetaData
 {
 public:
 
+	WShaderParameterMetaData(const char* InName, const WEngine::WArray<WParameterMember>& InMembers)
+		: Name(InName),
+		  Members(InMembers)
+	{
+		InitializeLayout();
+	}
+
 	WEngine::WString GetName() const { return Name; }
 
-	int32 GetRowsNum() const { return NumRows; }
-
-	int32 GetColumnsNum() const { return NumColumns; }
-
-	int32 GetElementNum() const { return NumElements; }
-
-	ShaderParametersLayout* GetLayout() const { return Layout; }
+	const ShaderParametersLayout& GetLayout() const { return Layout; }
 
 private:
 
@@ -115,15 +89,130 @@ private:
 
 	WEngine::WString Name;
 
-	int32 NumRows = 0;
+	ShaderParametersLayout Layout;
 
-	int32 NumColumns = 0;
+	WEngine::WArray<WParameterMember> Members;
 
-	int32 NumElements = 0;
-
-	ShaderParametersLayout *Layout;
-	
 };
+
+class WRDGParameterStruct
+{
+public:
+
+	WRDGParameterStruct(const uint8* inContents, const ShaderParametersLayout* inLayout)
+		: Contents(inContents), Layout(inLayout)
+	{
+		const WRDGRenderTargetBinding& RenderTarget = *reinterpret_cast<const WRDGRenderTargetBinding*>(Contents + Layout->GetRenderTargetOffset());
+		for (uint32 ColorAttachmentIndex = 0; ColorAttachmentIndex < MaxSimultaneousRenderTargets; ++ColorAttachmentIndex)
+		{
+			if (RenderTarget.ColorTextures[ColorAttachmentIndex] != nullptr)
+			{
+				WRDGTexture* Texture = RenderTarget.ColorTextures[ColorAttachmentIndex];
+				if (Texture->IsExternal())
+				{
+					bHasExternalOutput = true;
+					return;
+				}
+			}
+		}
+		if(RenderTarget.DepthStencilTexture->IsExternal())
+			bHasExternalOutput = true;
+		bHasExternalOutput = false;
+	}
+
+	template<typename ParameterStructType>
+	WRDGParameterStruct(const ParameterStructType* Parameters)
+		: WRDGParameterStruct(reinterpret_cast<const uint8*>(Parameters), &Parameters->GetStructMetaData()->GetLayout())
+	{
+	}
+
+	~WRDGParameterStruct() = default;
+
+	RHIRenderPassDescriptor GetRenderPassInfo() const;
+
+	bool HasRenderTargets() const { Layout->HasRenderTarget(); }
+
+	bool HasExternalOutput() const;
+
+	const WRDGRenderTargetBinding& GetRenderTarget() const
+	{
+		return *reinterpret_cast<const WRDGRenderTargetBinding*>(Contents + Layout->GetRenderTargetOffset());
+	}
+
+	const uint8* GetContents() const { return Contents; }
+
+	const ShaderParametersLayout* GetLayout() const { return Layout; }
+
+	template<typename LAMBDA>
+	void EnumerateTextures(EPassFlag PassFlag, LAMBDA lambda) const;
+
+	template<typename LAMBDA>
+	void EnumerateBuffers(EPassFlag PassFlag, LAMBDA lambda) const;
+
+private:
+
+	const uint8* Contents;
+
+	const ShaderParametersLayout *Layout;
+
+	uint8 bHasExternalOutput : 1;
+
+};
+
+template<typename LAMBDA>
+inline void WRDGParameterStruct::EnumerateTextures(EPassFlag PassFlag, LAMBDA lambda) const
+{
+	for (uint32 Index; Index < Layout->GraphTextures.Size(); ++Index)
+	{
+		EAccess SRVAccess = EAccess::Unknown;
+		EAccess UAVAccess = EAccess::Unknown;
+		GetPassAccess(PassFlag, SRVAccess, UAVAccess);
+
+		switch (Layout->GraphTextures[Index].Type)
+		{
+		case EUniformBaseType::UB_RDG_TEXTURE:
+			lambda(Layout->GraphTextures[Index].Type, (WRDGTexture*)(Contents + Layout->GraphTextures[Index].Offset), SRVAccess);
+			break;
+		case EUniformBaseType::UB_RDG_TEXTURE_SRV:
+			lambda(Layout->GraphTextures[Index].Type, (WRDGTexture*)(Contents + Layout->GraphTextures[Index].Offset), SRVAccess);
+			break;
+		case EUniformBaseType::UB_RDG_BUFFER_UAV:
+			lambda(Layout->GraphTextures[Index].Type, (WRDGTexture*)(Contents + Layout->GraphTextures[Index].Offset), UAVAccess);
+			break;
+		case EUniformBaseType::UB_RTV:
+			lambda(Layout->GraphTextures[Index].Type, (WRDGTexture*)(Contents + Layout->GraphTextures[Index].Offset), EAccess::RTV);
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+template<typename LAMBDA>
+inline void WRDGParameterStruct::EnumerateBuffers(EPassFlag PassFlag, LAMBDA lambda) const
+{
+	for (uint32 Index; Index < Layout->GraphBuffers.Size(); ++Index)
+	{
+		EAccess SRVAccess = EAccess::Unknown;
+		EAccess UAVAccess = EAccess::Unknown;
+		GetPassAccess(PassFlag, SRVAccess, UAVAccess);
+
+		switch (Layout->GraphBuffers[Index].Type)
+		{
+		case EUniformBaseType::UB_RDG_BUFFER:
+			lambda(Layout->GraphBuffers[Index].Type, (WRDGBuffer*)(Contents + Layout->GraphBuffers[Index].Offset), SRVAccess);
+			break;	
+		case EUniformBaseType::UB_RDG_BUFFER_SRV:
+			lambda(Layout->GraphBuffers[Index].Type, (WRDGBuffer*)(Contents + Layout->GraphBuffers[Index].Offset), SRVAccess);
+			break;
+		case EUniformBaseType::UB_RDG_BUFFER_UAV:
+			lambda(Layout->GraphBuffers[Index].Type, (WRDGBuffer*)(Contents + Layout->GraphBuffers[Index].Offset), UAVAccess);
+			break;
+		default:
+			break;
+		}
+	}
+}
 
 template<typename ParameterType>
 struct WParameterTypeInfo
@@ -278,57 +367,77 @@ struct WParameterTypeInfo<glm::mat4>
 	static constexpr WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
 };
 
+template<>
+struct WParameterTypeInfo<WRDGRenderTargetBinding*>
+{
+	typedef WRDGRenderTargetBinding* Type;
+
+	static constexpr EUniformBaseType BaseType = EUniformBaseType::UB__SRV;
+
+	static constexpr int32 NumElements = MaxSimultaneousRenderTargets + 1;
+	static constexpr int32 NumRows = 1;
+	static constexpr int32 NumColumns = 1;
+	static constexpr int32 Alignment = 8;
+
+	typedef __declspec(align(8)) WRDGRenderTargetBinding* AlignType;
+
+	static constexpr WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
+};
+
 #define BEGIN_SHADER_PARAMETERS_STRUCT(STRUCT_NAME)\
 	__declspec(align(16)) struct STRUCT_NAME\
 	{\
+	public:\
+		STRUCT_NAME() = default;\
+		static WShaderParameterMetaData* GetStructMetaData()\
+		{\
+			static WShaderParameterMetaData MetaData(#STRUCT_NAME, GetMembers());\
+			return &MetaData;\
+		}\
 	private:\
-		typedef STRUCT_NAME ThisStruct;
+		typedef STRUCT_NAME ThisStruct;\
 		typedef void* FuncPtr;\
-		\
-		template<uint32 FuncIndex>\
-		static FuncPtr AppendMember(WEngine::WArray<WParameterMember>& Members)\
+		struct FuncPtrIdentity {};\
+		static FuncPtr AppendMember(FuncPtrIdentity, WEngine::WArray<WParameterMember>& Members)\
 		{\
 			return nullptr; \
 		}\
-		\
-		template<>\
-		static FuncPtr AppendMember<0>(WEngine::WArray<WParameterMember>& Members)\
-		{\
-			return nullptr;\
-		}\
-		typedef FuncPtr(*AppenMemberFunc)<0>(WEngine::WArray<WParameterMember>&);\
-		typedef AppendMember
+		typedef FuncPtr(*AppendMemberType)(FuncPtrIdentity, WEngine::WArray<WParameterMember>&);\
+		typedef FuncPtrIdentity
 
 #define SHADER_PARAMETER_INTERNAL(MEMBER_TYPE, PARAMETER_TYPE, PARAMETER_NAME, DEFAULT_VALUE)\
-	PreFuncPtr##PARAMETER_NAME;\
+	PreFuncPtrIdentity##PARAMETER_NAME;\
 public:\
 	WParameterTypeInfo<PARAMETER_TYPE>::AlignType PARAMETER_NAME DEFAULT_VALUE;\
 private:\
 	struct FuncPtrIdentity##PARAMETER_NAME {};\
 	static FuncPtr AppendMember(FuncPtrIdentity##PARAMETER_NAME, WEngine::WArray<WParameterMember>& Members)\
 	{\
-		Members.Push(WParameterMember(#PARAMETER_NAME, MEMBER_TYPE, offsetof(ThisStruct, PARAMETER_NAME), WParameterTypeInfo<PARAMETER_TYPE>::NumRows, WParameterTypeInfo<PARAMETER_TYPE>::NumColumns, WParameterTypeInfo<PARAMETER_TYPE>::NumElements);\
-		return PreFuncPtr##PARAMETER_NAME;\
+		Members.Push(WParameterMember(#PARAMETER_NAME, MEMBER_TYPE, offsetof(ThisStruct, PARAMETER_NAME), WParameterTypeInfo<PARAMETER_TYPE>::NumRows, WParameterTypeInfo<PARAMETER_TYPE>::NumColumns, WParameterTypeInfo<PARAMETER_TYPE>::NumElements));\
+		FuncPtr(*Ptr)(PreFuncPtrIdentity##PARAMETER_NAME, WEngine::WArray<WParameterMember>&);\
+		Ptr = AppendMember;\
+		return (FuncPtr)Ptr;\
 	}\
-	typedef FuncPtr(*NextFuncPtr##PARAMETER_NAME)(FuncPtrIdentity##PARAMETER_NAME, WEngine::WArray<WParameterMember>& Members);\
-	typedef NextFuncPtr##PARAMETER_NAME
+	typedef FuncPtrIdentity##PARAMETER_NAME
 
 #define END_SHADER_PARAMETERS_STRUCT\
-	FuncPtr_HEAD;\
-		static WEngine::WArray<WParameterMember> AddMember(const WEngine::WString& InName, EUniformBaseType InBaseType, uint32 InOffset, uint32 InNumRows, uint32 InNumColumns, uint32 InNumElements)\
+	LastFuncPtrIdentity;\
+		static WEngine::WArray<WParameterMember> GetMembers()\
 		{\
 			WEngine::WArray<WParameterMember> Members;\
-			FuncPtr ptr = FuncPtr_HEAD;\
+			FuncPtr(*LastPtr)(LastFuncPtrIdentity, WEngine::WArray<WParameterMember>&);\
+			LastPtr = AppendMember;\
+			FuncPtr ptr = (FuncPtr)LastPtr;\
 			do\
 			{\
-				reinterpret_cast<AppendMember>(ptr)();\
+				ptr = reinterpret_cast<AppendMemberType>(ptr)(FuncPtrIdentity(), Members);\
 			}while(ptr);\
 			return Members; \
 		}; \
 	};
 
-#define RENDER_TARGET_SLOTS\
-	WRDGRenderTargetBinding *RenderTarget = nullptr;
+#define RENDER_TARGET_SLOTS()\
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RTV, WRDGRenderTargetBinding*, RenderTarget, = nullptr)
 
 #define SHADER_PARAMETER(PARAMETER_TYPE, PARAMETER_NAME)\
 	SHADER_PARAMETER_INTERNAL(WParameterTypeInfo<PARAMETER_TYPE>::BaseType, PARAMETER_TYPE, PARAMETER_NAME, )
@@ -338,3 +447,20 @@ private:\
 
 #define SHADER_PARAMETER_TEXTURE(PARAMETER_TYPE, PARAMETER_NAME)\
 	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_TEXTURE, PARAMETER_TYPE, PARAMETER_NAME, = nullptr)
+
+#define SHADER_PARAMETER_SRV(PARAMETER_TYPE, PARAMETER_NAME)\
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RDG_TEXTURE_SRV, PARAMETER_TYPE, PARAMETER_NAME, = nullptr)
+
+#define SHADER_PARAMETER_UAV(PARAMETER_TYPE, PARAMETER_NAME)\
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RDG_TEXTURE_UAV, PARAMETER_TYPE, PARAMETER_NAME, = nullptr)
+
+#define SHADER_PARAMETER_RDG_TEXTURE(PARAMETER_TYPE, PARAMETER_NAME)\
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RDG_TEXTURE, PARAMETER_TYPE, PARAMETER_NAME, = nullptr)
+
+BEGIN_SHADER_PARAMETERS_STRUCT(DeferredBasePassParameters)
+	SHADER_PARAMETER_RDG_TEXTURE(WRDGTexture*, GBuffer0)
+	SHADER_PARAMETER_RDG_TEXTURE(WRDGTexture*, GBuffer1)
+	SHADER_PARAMETER_RDG_TEXTURE(WRDGTexture*, GBuffer2)
+	SHADER_PARAMETER_RDG_TEXTURE(WRDGTexture*, GBuffer3)
+	RENDER_TARGET_SLOTS()
+END_SHADER_PARAMETERS_STRUCT

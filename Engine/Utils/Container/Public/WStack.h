@@ -49,7 +49,7 @@ namespace WEngine
 
 	template<typename T>
 	inline WStack<T>::WStack(WStack&& other)
-		: m_queue(WEngine::move(other.m_queue))
+		: m_queue(WEngine::Move(other.m_queue))
 	{
 	}
 

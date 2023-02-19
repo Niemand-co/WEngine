@@ -161,6 +161,8 @@ public:
 
 	bool IsNeverCulling() const { return ((uint16)Flag & (uint16)EPassFlag::NeverCull) != 0; }
 
+	EPipeline GetPipeline() const { if(Flag == EPassFlag::AsyncCompute) return EPipeline::AsyncCompute; else return EPipeline::Graphics; }
+
 private:
 
 	struct TextureState
@@ -172,7 +174,7 @@ private:
 
 	struct BufferState
 	{
-		WEngine::WArray<WRDGResourceState> States;
+		WRDGResourceState State;
 		uint32 ReferenceCount;
 	};
 
@@ -184,15 +186,17 @@ private:
 
 	WRDGPassHandleArray Producers;
 
-	WEngine::WArray<WEngine::WPair<class WRDGBuffer*, BufferState>> BufferStates;
+	WEngine::WHashMap<class WRDGBuffer*, BufferState> BufferStates;
 
-	WEngine::WArray<WEngine::WPair<class WRDGTexture*, TextureState>> TextureStates;
+	WEngine::WHashMap<class WRDGTexture*, TextureState> TextureStates;
 
 	WEngine::WArray<class RHITexture*> TexturesToAcquire;
 
 	WEngine::WArray<class RHITexture*> TexturesToDiscard;
 
 	EPassFlag Flag;
+
+	uint8 bHasUAVResource : 1;
 
 	friend WRDGPassRegistry;
 

@@ -55,25 +55,67 @@ protected:
 
 };
 
-class WRDGTextureSubresource
+struct WRDGTextureSubresource
 {
-public:
-
-	WRDGTextureSubresource(uint32 inMipLevelCount = 1u, uint32 inBaseMipLevel = 0u, uint32 inArrayCount = 1u, uint32 inBaseArray = 0u)
-		: MipLevelCount(inMipLevelCount), BaseMipLevel(inBaseMipLevel), ArrayCount(inArrayCount), BaseArray(inBaseArray)
+	WRDGTextureSubresource(uint32 InMipIndex = 0u, uint32 InLayerIndex = 0u, uint32 InPlaneIndex = 0u)
+		: MipIndex(InMipIndex), LayerIndex(InLayerIndex), PlaneIndex(InPlaneIndex)
 	{
 	}
 
-private:
+	uint32 MipIndex;
 
-	uint32 MipLevelCount;
+	uint32 LayerIndex;
 
-	uint32 BaseMipLevel;
+	uint32 PlaneIndex;
+};
 
-	uint32 ArrayCount;
+struct WRDGTerxtureSubresourceLayout
+{
+	WRDGTerxtureSubresourceLayout(uint32 InMipCount = 1u, uint32 InLayerCount = 1u, uint32 InPlaneCount = 1u)
+		: MipCount(InMipCount), LayerCount(InLayerCount), PlaneCount(InPlaneCount)
+	{
+	}
 
-	uint32 BaseArray;
+	uint32 MipCount;
 
+	uint32 LayerCount;
+
+	uint32 PlaneCount;
+};
+
+struct WRDGTextureSubresourceRange
+{
+	WRDGTextureSubresourceRange()
+		: MipIndex(0),
+		  MipCount(1),
+		  LayerIndex(0),
+		  LayerCount(1),
+		  PlaneIndex(0),
+		  PlaneCount(1)
+	{
+	}
+
+	WRDGTextureSubresourceRange(const WRDGTerxtureSubresourceLayout& Layout)
+		: MipIndex(0),
+		MipCount(Layout.MipCount),
+		LayerIndex(0),
+		LayerCount(Layout.LayerCount),
+		PlaneIndex(0),
+		PlaneCount(Layout.PlaneCount)
+	{
+	}
+
+	uint32 MipIndex;
+
+	uint32 LayerIndex;
+
+	uint32 PlaneIndex;
+
+	uint32 MipCount;
+
+	uint32 LayerCount;
+
+	uint32 PlaneCount;
 };
 
 class WRDGTexture : public WRDGResource
@@ -84,10 +126,29 @@ public:
 
 	WEngine::WArray<WRDGResourceState*>& GetMergeState() { return MergeState; }
 
+	template<typename LAMBDA>
+	void EnumerateSubresource(WRDGTextureSubresourceRange Range, LAMBDA lambda)
+	{
+		for (uint32 MipIndex = 0; MipIndex < Range.MipCount; ++MipIndex)
+		{
+			for (uint32 LayerIndex = 0; LayerIndex < Range.LayerCount; ++LayerIndex)
+			{
+				for(uint32 PlaneIndex = 0; PlaneIndex < Range.PlaneCount; ++PlaneIndex)
+				{
+					lambda(MipIndex + Range.MipIndex + (LayerIndex + Range.LayerIndex) * Range.MipCount + (PlaneIndex + Range.PlaneIndex) * Range.MipCount * Range.LayerCount);
+				}
+			}
+		}
+	}
+
+	WRDGTextureSubresourceRange GetSubresourceRange() { return WRDGTextureSubresourceRange(Layout); }
+
 private:
 
 	WRDGTexture(const WRDGTextureDesc& inDesc, const char* inName)
-		: Desc(inDesc), Name(inName)
+		: Desc(inDesc),
+		  Name(inName),
+		  Layout(inDesc.GetSubresourceLayout())
 	{
 	}
 
@@ -99,10 +160,13 @@ private:
 
 	const WRDGTextureDesc Desc;
 
+	const WRDGTerxtureSubresourceLayout Layout;
+
 	WEngine::WArray<WRDGResourceState*> MergeState;
 
 	friend class WRDGBuilder;
 	friend class WRDGTextureRegistry;
+	friend class WRDGParameterStruct;
 
 };
 

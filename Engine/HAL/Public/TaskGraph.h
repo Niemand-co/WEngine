@@ -69,12 +69,12 @@ namespace WEngine
 
 		void* operator new(size_t size)
 		{
-			return Allocator::Get()->Allocate(size);
+			return NormalAllocator::Get()->Allocate(size);
 		}
 
 		void operator delete(void* pData)
 		{
-			Allocator::Get()->Deallocate(pData);
+			NormalAllocator::Get()->Deallocate(pData);
 		}
 
 	public:
@@ -121,12 +121,12 @@ namespace WEngine
 
 		void* operator new(size_t size)
 		{
-			return Allocator::Get()->Allocate(size);
+			return NormalAllocator::Get()->Allocate(size);
 		}
 
 		void operator delete(void* pData)
 		{
-			Allocator::Get()->Deallocate(pData);
+			NormalAllocator::Get()->Deallocate(pData);
 		}
 
 	private:
@@ -151,12 +151,12 @@ namespace WEngine
 
 		void* operator new(size_t size)
 		{
-			return Allocator::Get()->Allocate(size);
+			return NormalAllocator::Get()->Allocate(size);
 		}
 
 		void operator delete(void* pData)
 		{
-			Allocator::Get()->Deallocate(pData);
+			NormalAllocator::Get()->Deallocate(pData);
 		}
 
 		WGraphTaskBase(bool bInShouldDestroy)

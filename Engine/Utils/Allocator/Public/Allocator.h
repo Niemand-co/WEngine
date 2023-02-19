@@ -26,8 +26,6 @@ namespace WEngine
 
 		virtual ~Allocator();
 
-		static void Init(Backend backend);
-
 		static Allocator* Get();
 
 		virtual void* Allocate(size_t size);
@@ -58,23 +56,6 @@ namespace WEngine
 	template<uint32 NumBlock>
 	Allocator<NumBlock>::~Allocator()
 	{
-	}
-
-	template<uint32 NumBlock>
-	void Allocator<NumBlock>::Init(Backend backend)
-	{
-		switch (backend)
-		{
-		case WEngine::Backend::None:
-			g_pInstance = new Allocator();
-			return;
-		case WEngine::Backend::Vulkan:
-			g_pInstance = new Vulkan::VulkanAllocator();
-			return;
-		default:
-			RE_ASSERT(false, "Error Backend Allocator.");
-			return;
-		}
 	}
 
 	template<uint32 NumBlock>

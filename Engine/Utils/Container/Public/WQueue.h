@@ -53,7 +53,7 @@ namespace WEngine
 
 	template<typename T>
 	inline WQueue<T>::WQueue(WQueue&& other)
-		: m_queue(WEngine::move(other.m_queue))
+		: m_queue(WEngine::Move(other.m_queue))
 	{
 	}
 

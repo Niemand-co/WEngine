@@ -37,7 +37,7 @@ enum class EAccess : uint16
 {
 	Unknown             = 0,
 
-	HostVisible         = 1 << 0,
+	HostReading         = 1 << 0,
 	Present             = 1 << 1,
 	VertexOrIndexBuffer = 1 << 2,
 	SRVCompute          = 1 << 3,
@@ -52,12 +52,13 @@ enum class EAccess : uint16
 	SRV                 = SRVCompute | SRVGraphics,
 	UAV                 = UAVCompute | UAVGraphics,
 
-	ReadOnly            = HostVisible | Present | VertexOrIndexBuffer | SRVCompute | SRVGraphics | CopySrc,
+	ReadOnly            = HostReading | Present | VertexOrIndexBuffer | SRVCompute | SRVGraphics | CopySrc,
 	WriteOnly           = RTV | CopyDst,
 
 	Readable            = ReadOnly | UAV,
 	Writable            = WriteOnly | UAV,
 };
+ENUM_CLASS_FLAGS(EAccess)
 
 enum class EUniformBaseType : uint16
 {
@@ -69,15 +70,19 @@ enum class EUniformBaseType : uint16
 	UB_FLOAT32,
 	
 	UB_TEXTURE,
-	UB__SRV,
-	UB__UAV,
+	UB_SRV,
+	UB_UAV,
 	UB_SAMPLER,
 
 	UB_RDG_TEXTURE,
+	UB_RDG_TEXTURE_ACCESS,
 	UB_RDG_TEXTURE_SRV,
 	UB_RDG_TEXTURE_UAV,
+	UB_RDG_BUFFER,
 	UB_RDG_BUFFER_SRV,
 	UB_RDG_BUFFER_UAV,
+
+	UB_RTV,
 };
 
 enum class EPassFlag : uint16
@@ -112,34 +117,54 @@ struct WRDGTextureDesc
 		TextureCubeArray
 	};
 
-	WRDGTextureDesc(Format inFormat, Extent inExtent, EDimension inDimension, WEngine::ClearValue inClearValue, uint8 inMipCount, uint8 inSampleCount)
-		: format(inFormat), extent(inExtent), dimension(inDimension), clearValue(inClearValue), mipCount(inMipCount), sampleCount(inSampleCount)
+	WRDGTextureDesc(Format inFormat, Extent inExtent, EDimension inDimension, WEngine::ClearValue inClearValue, uint8 inMipCount, uint8 inSampleCount, uint32 inLayerCount)
+		: format(inFormat), extent(inExtent), dimension(inDimension), clearValue(inClearValue), mipCount(inMipCount), sampleCount(inSampleCount), layerCount(inLayerCount)
 	{
 	}
 
 	static WRDGTextureDesc GetTexture2DDesc(Format inFormat, Extent inExtent, WEngine::ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1)
 	{
-		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture2D, inClearValue, inMipCount, inSampleCount);
+		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture2D, inClearValue, inMipCount, inSampleCount, 1);
 	}
 
-	static WRDGTextureDesc GetTexture2DArrayDesc(Format inFormat, Extent inExtent, WEngine::ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1)
+	static WRDGTextureDesc GetTexture2DArrayDesc(Format inFormat, Extent inExtent, WEngine::ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, uint32 inLayerCount = 1)
 	{
-		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture2DArray, inClearValue, inMipCount, inSampleCount);
+		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture2DArray, inClearValue, inMipCount, inSampleCount, inLayerCount);
 	}
 
 	static WRDGTextureDesc GetTexture3DDesc(Format inFormat, Extent inExtent, WEngine::ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1)
 	{
-		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture3D, inClearValue, inMipCount, inSampleCount);
+		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture3D, inClearValue, inMipCount, inSampleCount, 1);
 	}
 
 	static WRDGTextureDesc GetTextureCubeDesc(Format inFormat, Extent inExtent, WEngine::ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1)
 	{
-		return WRDGTextureDesc(inFormat, inExtent, EDimension::TextureCube, inClearValue, inMipCount, inSampleCount);
+		return WRDGTextureDesc(inFormat, inExtent, EDimension::TextureCube, inClearValue, inMipCount, inSampleCount, 1);
 	}
 
-	static WRDGTextureDesc GetTextureCubeArrayDesc(Format inFormat, Extent inExtent, WEngine::ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1)
+	static WRDGTextureDesc GetTextureCubeArrayDesc(Format inFormat, Extent inExtent, WEngine::ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, uint32 inLayerCount = 1)
 	{
-		return WRDGTextureDesc(inFormat, inExtent, EDimension::TextureCubeArray, inClearValue, inMipCount, inSampleCount);
+		return WRDGTextureDesc(inFormat, inExtent, EDimension::TextureCubeArray, inClearValue, inMipCount, inSampleCount, inLayerCount);
+	}
+
+	bool IsTextureCube() const
+	{
+		return dimension == EDimension::TextureCube || dimension == EDimension::TextureCubeArray;
+	}
+
+	bool IsTextureArray() const
+	{
+		return dimension == EDimension::Texture2DArray || dimension == EDimension::TextureCubeArray;
+	}
+
+	bool IsStencilFormat() const
+	{
+		return format == Format::D16_UNORM_S8_UINT || format == Format::D24_UNORM_S8_UINT || format == Format::D32_SFLOAT_S8_UINT;
+	}
+
+	WRDGTerxtureSubresourceLayout GetSubresourceLayout() const
+	{
+		return WRDGTerxtureSubresourceLayout(mipCount, layerCount * (IsTextureCube() ? 6 : 1), IsStencilFormat() ? 2 : 1);
 	}
 
 	Format format;
@@ -148,6 +173,7 @@ struct WRDGTextureDesc
 	WEngine::ClearValue clearValue;
 	uint8 mipCount;
 	uint8 sampleCount;
+	uint32 layerCount;
 };
 
 struct WRDGBufferDesc

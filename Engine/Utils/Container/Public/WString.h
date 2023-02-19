@@ -35,27 +35,27 @@ namespace WEngine
 
 		void* operator new(size_t size)
 		{
-			return Allocator::Get()->Allocate(size);
+			return NormalAllocator::Get()->Allocate(size);
 		}
 
 		void operator delete(void* pData)
 		{
-			Allocator::Get()->Deallocate(pData);
+			NormalAllocator::Get()->Deallocate(pData);
 		}
 
 		void operator=(const WString& string)
 		{
-			Allocator::Get()->Deallocate(m_pData);
+			NormalAllocator::Get()->Deallocate(m_pData);
 			m_size = string.m_size;
-			m_pData = (char*)Allocator::Get()->Allocate(string.m_size + 1);
+			m_pData = (char*)NormalAllocator::Get()->Allocate(string.m_size + 1);
 			memcpy(m_pData, string.m_pData, string.m_size + 1);
 		}
 
 		void operator=(const char* str)
 		{
-			Allocator::Get()->Deallocate(m_pData);
+			NormalAllocator::Get()->Deallocate(m_pData);
 			m_size = strlen(str);
-			m_pData = (char*)Allocator::Get()->Allocate(m_size + 1);
+			m_pData = (char*)NormalAllocator::Get()->Allocate(m_size + 1);
 			memcpy(m_pData, str, m_size + 1);
 		}
 
@@ -95,7 +95,7 @@ namespace WEngine
 
 		WString&& operator+(const WString& string)
 		{
-			char* newPtr = (char*)Allocator::Get()->Allocate(string.m_size + m_size + 1);
+			char* newPtr = (char*)NormalAllocator::Get()->Allocate(string.m_size + m_size + 1);
 			memcpy(newPtr, m_pData, m_size);
 			memcpy(newPtr + m_size, string.m_pData, string.m_size + 1);
 			WString newString = WString();
@@ -111,7 +111,7 @@ namespace WEngine
 				return WString(*this);
 			}
 			size_t length = strlen(str);
-			char* newPtr = (char*)Allocator::Get()->Allocate(length + m_size + 1);
+			char* newPtr = (char*)NormalAllocator::Get()->Allocate(length + m_size + 1);
 			memcpy(newPtr, m_pData, m_size);
 			memcpy(newPtr + m_size, str, length + 1);
 			WString newString = WString();
@@ -122,10 +122,10 @@ namespace WEngine
 
 		void operator+=(const WString& string)
 		{
-			char* newPtr = (char*)Allocator::Get()->Allocate(string.m_size + m_size + 1);
+			char* newPtr = (char*)NormalAllocator::Get()->Allocate(string.m_size + m_size + 1);
 			memcpy(newPtr, m_pData, m_size);
 			memcpy(newPtr + m_size, string.m_pData, string.m_size + 1);
-			Allocator::Get()->Deallocate(m_pData);
+			NormalAllocator::Get()->Deallocate(m_pData);
 			m_pData = newPtr;
 			m_size += string.m_size;
 		}
@@ -137,10 +137,10 @@ namespace WEngine
 				return;
 			}
 			size_t length = strlen(str);
-			char* newPtr = (char*)Allocator::Get()->Allocate(length + m_size + 1);
+			char* newPtr = (char*)NormalAllocator::Get()->Allocate(length + m_size + 1);
 			memcpy(newPtr, m_pData, m_size);
 			memcpy(newPtr + m_size, str, length + 1);
-			Allocator::Get()->Deallocate(m_pData);
+			NormalAllocator::Get()->Deallocate(m_pData);
 			m_pData = newPtr;
 			m_size += length;
 		}

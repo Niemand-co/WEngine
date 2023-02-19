@@ -112,8 +112,8 @@ namespace WEngine
 
 	template<typename T>
 	inline WDeque<T>::WDeque(WDeque&& other)
-		: m_front(WEngine::move(other.m_front)),
-		  m_back(WEngine::move(other.m_back)),
+		: m_front(WEngine::Move(other.m_front)),
+		  m_back(WEngine::Move(other.m_back)),
 		  m_popCount(0)
 	{
 	}

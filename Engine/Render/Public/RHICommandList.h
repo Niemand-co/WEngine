@@ -63,11 +63,11 @@ public:
 
 	WComputeShaderRHIRef CreateComputeShader(ShaderCodeBlob& blob);
 
-	WTexture2DRHIRef CreateTexture2D(uint32 width, uint32 height, Format format, uint32 usage = IMAGE_USAGE_COLOR_ATTACHMENT, uint32 aspect = IMAGE_ASPECT_COLOR);
+	WTexture2DRHIRef CreateTexture2D(uint32 width, uint32 height, Format format, uint32 usage = (uint32)EImageUsageFlags::IM_ColorAttachment, uint32 aspect = IMAGE_ASPECT_COLOR);
 
-	WTexture2DArrayRHIRef CreateTexture2DArray(uint32 width, uint32 height, Format format, uint32 layerCount, uint32 usage = IMAGE_USAGE_COLOR_ATTACHMENT, uint32 aspect = IMAGE_ASPECT_COLOR);
+	WTexture2DArrayRHIRef CreateTexture2DArray(uint32 width, uint32 height, Format format, uint32 layerCount, uint32 usage = (uint32)EImageUsageFlags::IM_ColorAttachment, uint32 aspect = IMAGE_ASPECT_COLOR);
 
-	WTexture3DRHIRef CreateTexture3D(uint32 width, uint32 height, uint32 depth, Format format, uint32 usage = IMAGE_USAGE_COLOR_ATTACHMENT, uint32 aspect = IMAGE_ASPECT_COLOR);
+	WTexture3DRHIRef CreateTexture3D(uint32 width, uint32 height, uint32 depth, Format format, uint32 usage = (uint32)EImageUsageFlags::IM_ColorAttachment, uint32 aspect = IMAGE_ASPECT_COLOR);
 
 	WRenderPassRHIRef CreateRenderPass(class RHIRenderPassDescriptor* descriptor);
 

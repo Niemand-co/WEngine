@@ -61,9 +61,6 @@ void DeferredRenderer::RenderPrePass()
 	
 }
 
-BEGIN_SHADER_PARAMETERS_STRUCT(WRendeTargetParameter)
-	RENDER_TARGET_SLOTS
-END_SHADER_PARAMETERS_STRUCT
 void DeferredRenderer::RenderBasePass()
 {
 	glm::vec2 Resolution = m_pCamera->GetResolution();
@@ -73,7 +70,7 @@ void DeferredRenderer::RenderBasePass()
 	const WRDGTextureDesc DepthDesc = WRDGTextureDesc::GetTexture2DDesc(Format::D16_Unorm, { (uint32)Resolution.x, (uint32)Resolution.y, 0u }, { 0.0f, 0.0f, 0.0f, 0.0f });
 	WRDGTexture* DepthBuffer = GraphBuilder->CreateTexture(DepthDesc, "Depth");
 
-	const WRendeTargetParameter* Parameters = GraphBuilder->AllocateParameterStruct<WRendeTargetParameter>();
+	const DeferredBasePassParameters* Parameters = GraphBuilder->AllocateParameterStruct<DeferredBasePassParameters>();
 	Parameters->RenderTarget->ColorTextures[0] = GBuffer0;
 	Parameters->RenderTarget->DepthStencilTexture = DepthBuffer;
 

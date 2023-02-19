@@ -51,16 +51,24 @@ namespace WEngine
 
 		bool Find(const k& key);
 
-		v operator[](const k& key)
+		template<typename LAMBDA>
+		void Enumerate(LAMBDA lambda)
+		{
+			for (Entry<v>* bucket : m_table)
+			{
+				while (bucket != nullptr)
+				{
+					lambda(bucket->pair);
+					bucket = bucket->next;
+				}
+			}
+		}
+
+		v& operator[](const k& key)
 		{
 			size_t id = Hash(key);
 			size_t index = GetIndex(id);
 			Entry<v>* head = m_table[index];
-			if (head == nullptr)
-			{
-				return v(NULL);
-			}
-
 			while (head)
 			{
 				if (head->id == id)
@@ -70,7 +78,8 @@ namespace WEngine
 				head = head->next;
 			}
 
-			return v(NULL);
+			Insert(key, {});
+			return operator[key];
 		}
 
 	private:
