@@ -297,7 +297,7 @@ namespace WEngine
 		for (T* Index = begin(); Index != end(); ++Index)
 		{
 			if(Val == *Index)
-				return T*;
+				return Index;
 		}
 		return end();
 	}

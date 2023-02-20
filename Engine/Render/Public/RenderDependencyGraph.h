@@ -1,5 +1,5 @@
 #pragma once
-#include "Render/Public/RenderDependencyGraphDefinitions.h"
+#include "Render/Public/RenderDependencyGraphParameter.h"
 #include "Render/Descriptor/Public/RHIBarrierDescriptor.h"
 
 template<typename InObjectType, typename IndexType>

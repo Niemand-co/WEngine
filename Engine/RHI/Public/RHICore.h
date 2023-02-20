@@ -430,6 +430,11 @@ namespace WEngine
 		int32 Y1;
 		int32 X2;
 		int32 Y2;
+
+		bool operator==(const WResolveRect& other) const
+		{
+			return X1 == other.X1 && Y1 == other.Y1 && X2 == other.X2 && Y2 == other.Y2;
+		}
 	};
 
 }

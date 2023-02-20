@@ -9,6 +9,29 @@ struct WRDGRenderTargetBinding
 	WRDGTexture* ColorTextures[MaxSimultaneousRenderTargets];
 	WRDGTexture* DepthStencilTexture;
 	WEngine::WResolveRect ResolveRect;
+
+	bool operator==(const WRDGRenderTargetBinding& other) const
+	{
+		for (uint32 ColorIndex = 0; ColorIndex < MaxSimultaneousRenderTargets; ++ColorIndex)
+		{
+			if (ColorTextures[ColorIndex] != other.ColorTextures[ColorIndex])
+			{
+				return false;
+			}
+		}
+
+		if (DepthStencilTexture != other.DepthStencilTexture)
+		{
+			return false;
+		}
+
+		if (ResolveRect == other.ResolveRect)
+		{
+			return false;
+		}
+
+		return true;
+	}
 };
 
 struct WParameterMember
@@ -372,7 +395,7 @@ struct WParameterTypeInfo<WRDGRenderTargetBinding*>
 {
 	typedef WRDGRenderTargetBinding* Type;
 
-	static constexpr EUniformBaseType BaseType = EUniformBaseType::UB__SRV;
+	static constexpr EUniformBaseType BaseType = EUniformBaseType::UB_SRV;
 
 	static constexpr int32 NumElements = MaxSimultaneousRenderTargets + 1;
 	static constexpr int32 NumRows = 1;

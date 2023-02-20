@@ -117,10 +117,15 @@ void WRDGBuilder::Compile()
 			}
 		});
 	}
+
+	PassMerging();
 }
 
 void WRDGBuilder::Execute()
 {
+	Compile();
+
+
 }
 
 WRDGTexture* WRDGBuilder::CreateTexture(const WRDGTextureDesc& inDesc, const char* inName)
@@ -218,6 +223,15 @@ void WRDGBuilder::PassMerging()
 			FirstPass->bSkipRenderPassBegin = false;
 			FirstPass->PrologueRenderPass = FirstPassHandle;
 			FirstPass->EpilogueRenderPass = LastPassHandle;
+		}
+
+		for (uint32 HandleIndex = 1; HandleIndex < PassesToMerge.Size() - 1; ++HandleIndex)
+		{
+			WRDGPass *Pass = Passes[PassesToMerge[HandleIndex]];
+			Pass->bSkipRenderPassBegin = true;
+			Pass->bSkipRenderPassEnd = true;
+			Pass->PrologueRenderPass = FirstPassHandle;
+			Pass->EpilogueRenderPass = LastPassHandle;
 		}
 
 		{

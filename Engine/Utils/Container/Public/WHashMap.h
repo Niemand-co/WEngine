@@ -79,7 +79,7 @@ namespace WEngine
 			}
 
 			Insert(key, {});
-			return operator[key];
+			return this->operator[](key);
 		}
 
 	private:
