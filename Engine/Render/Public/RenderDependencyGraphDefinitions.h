@@ -213,3 +213,18 @@ struct WRDGBufferDesc
 
 	EBufferUsageFlags BufferUsage;
 };
+
+struct WRDGResourceState
+{
+	static bool IsTransitionRequired();
+
+	static bool IsMergeAllowed(const WRDGResourceState& Previous, const WRDGResourceState& Next);
+
+	EAccess Access = EAccess::Unknown;
+
+	EPipeline Pipeline = EPipeline::Graphics;
+
+	WRDGPassHandle FirstPass;
+
+	WRDGPassHandle LastPass;
+};

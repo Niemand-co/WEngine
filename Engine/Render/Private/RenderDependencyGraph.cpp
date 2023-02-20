@@ -39,10 +39,12 @@ void WRDGBuilder::Compile()
 		WRDGPass* Pass = Passes[Handle];
 		bool bWithAsyncCompute = WEngine::EnumHasFlags(Pass->Flag, EPassFlag::AsyncCompute);
 
-		Pass->TextureStates.Enumerate([&Handle](WEngine::WPair<WRDGTexture*, WRDGPass::TextureState>& TexturePair)
+		Pass->TextureStates.Enumerate([this, &Handle](WEngine::WPair<WRDGTexture*, WRDGPass::TextureState>& TexturePair)
 		{
 			WRDGTexture* Texture = TexturePair.First();
-			auto PassNeedState = TexturePair.Second();
+			auto& PassNeedState = TexturePair.Second();
+			Texture->ReferenceCount+= PassNeedState.ReferenceCount;
+
 			WEngine::WArray<WRDGResourceState*>& TextureState = Texture->GetMergeState();
 
 			uint32 SubresourceCount = PassNeedState.States.Size();
@@ -54,14 +56,23 @@ void WRDGBuilder::Compile()
 
 			for (uint32 Index = 0; Index < SubresourceCount; ++Index)
 			{
+				if (PassNeedState.States[Index].Access == EAccess::Unknown)
+				{
+					continue;
+				}
+
 				if (!TextureState[Index] || !WRDGResourceState::IsMergeAllowed(*TextureState[Index], PassNeedState.States[Index]))
 				{
 					if (TextureState[Index] && TextureState[Index]->Pipeline != PassNeedState.States[Index].Pipeline)
 					{
-
+						if (Passes[Handle]->Producers.Find(TextureState[Index]->LastPass) == Passes[Handle]->Producers.end())
+						{
+							Passes[Handle]->Producers.Push(TextureState[Index]->LastPass);
+						}
 					}
 
-					memcpy(&TextureState[Index], &PassNeedState.States[Index], sizeof(WRDGResourceState));
+					TextureState[Index] = (WRDGResourceState*)(WRDGAllocator::Get()->Allocate(sizeof(WRDGResourceState)));
+					memcpy(TextureState[Index], &PassNeedState.States[Index], sizeof(WRDGResourceState));
 					TextureState[Index]->FirstPass = TextureState[Index]->LastPass = Handle;
 				}
 				else
@@ -70,6 +81,39 @@ void WRDGBuilder::Compile()
 					TextureState[Index]->LastPass = Handle;
 				}
 				PassNeedState.MergeStates = TextureState;
+			}
+		});
+
+		Pass->BufferStates.Enumerate([this, &Handle](WEngine::WPair<WRDGBuffer*, WRDGPass::BufferState>& BufferPair)
+		{
+			WRDGBuffer* Buffer = BufferPair.First();
+			auto& PassNeedState = BufferPair.Second();
+			Buffer->ReferenceCount += PassNeedState.ReferenceCount;
+
+			if (PassNeedState.State.Access == EAccess::Unknown)
+			{
+				return;
+			}
+
+			if (!Buffer->MergeState || !WRDGResourceState::IsMergeAllowed(*Buffer->MergeState, PassNeedState.State))
+			{
+				if (Buffer->MergeState && PassNeedState.State.Pipeline != Buffer->MergeState->Pipeline)
+				{
+					if (Passes[Handle]->Producers.Find(Buffer->MergeState->LastPass) == Passes[Handle]->Producers.end())
+					{
+						Passes[Handle]->Producers.Push(Buffer->MergeState->LastPass);
+					}
+
+					Buffer->MergeState = (WRDGResourceState*)(WRDGAllocator::Get()->Allocate(sizeof(WRDGResourceState)));
+					memcpy(Buffer->MergeState, &PassNeedState.State, sizeof(WRDGResourceState));
+					Buffer->MergeState->FirstPass = Buffer->MergeState->LastPass = Handle;
+				}
+				else
+				{
+					Buffer->MergeState->Access |= PassNeedState.State.Access;
+					Buffer->MergeState->LastPass = Handle;
+				}
+				PassNeedState.MergeState = Buffer->MergeState;
 			}
 		});
 	}
@@ -137,7 +181,54 @@ void WRDGBuilder::PassCulling()
 
 void WRDGBuilder::PassMerging()
 {
+	WEngine::WArray<WRDGPassHandle> PassesToMerge;
 
+	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
+	{
+		if (PassesToCull[Handle])
+		{
+			continue;
+		}
+
+		WRDGPassHandle PrePass = Handle;
+		WRDGPassHandle NextPass = WRDGPassHandle(PrePass.Index + 1);
+		PassesToMerge.Push(PrePass);
+		while (NextPass != Passes.End() && Passes[NextPass]->Parameters.GetRenderTarget() == Passes[NextPass]->Parameters.GetRenderTarget() && Passes[NextPass]->bSkipRenderPass)
+		{
+			PassesToMerge.Push(NextPass);
+			PrePass = NextPass;
+			++NextPass;
+		}
+
+		if (PassesToMerge.Size() == 1)
+		{
+			WRDGPass *Pass = Passes[PassesToMerge[0]];
+			Pass->bSkipRenderPassBegin = false;
+			Pass->bSkipRenderPassEnd = false;
+			Pass->PrologueRenderPass = PassesToMerge[0];
+			Pass->EpilogueRenderPass = PassesToMerge[0];
+		}
+
+		WRDGPassHandle FirstPassHandle = PassesToMerge[0];
+		WRDGPassHandle LastPassHandle = PassesToMerge[PassesToMerge.Size() - 1];
+
+		{
+			WRDGPass *FirstPass = Passes[FirstPassHandle];
+			FirstPass->bSkipRenderPassEnd = true;
+			FirstPass->bSkipRenderPassBegin = false;
+			FirstPass->PrologueRenderPass = FirstPassHandle;
+			FirstPass->EpilogueRenderPass = LastPassHandle;
+		}
+
+		{
+			WRDGPass* LastPass = Passes[FirstPassHandle];
+			LastPass->bSkipRenderPassEnd = false;
+			LastPass->bSkipRenderPassBegin = true;
+			LastPass->PrologueRenderPass = FirstPassHandle;
+			LastPass->EpilogueRenderPass = LastPassHandle;
+		}
+
+	}
 }
 
 void WRDGBuilder::SetupPass(WRDGPass* Pass)

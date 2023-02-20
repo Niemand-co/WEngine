@@ -2,21 +2,6 @@
 #include "Render/Public/RenderDependencyGraph.h"
 #include "Render/Descriptor/Public/RHITextureViewDescriptor.h"
 
-struct WRDGResourceState
-{
-	static bool IsTransitionRequired();
-
-	static bool IsMergeAllowed(const WRDGResourceState& Previous, const WRDGResourceState& Next);
-
-	EAccess Access = EAccess::Unknown;
-
-	EPipeline Pipeline = EPipeline::Graphics;
-
-	WRDGPassHandle FirstPass;
-
-	WRDGPassHandle LastPass;
-};
-
 template<typename ElementType>
 inline void InitResource(WEngine::WArray<ElementType>& ResourceArray, uint32 Num, const ElementType& Element = {})
 {
@@ -49,9 +34,13 @@ protected:
 
 	uint8 bExternal : 1;
 
+	uint16 ReferenceCount = 0;
+
 	WRDGPassHandle LastProducer;
 
 	WEngine::WSharedPtr<class WRHIResource> RHI;
+
+	friend class WRDGBuilder;
 
 };
 
@@ -203,7 +192,7 @@ private:
 
 	const WRDGBufferDesc Desc;
 
-	WEngine::WArray<WEngine::WPair<WRDGPassHandle, uint32>> States;
+	WRDGResourceState *MergeState = nullptr;
 
 	friend class WRDGBuilder;
 	friend class WRDGBufferRegistry;

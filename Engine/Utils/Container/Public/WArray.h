@@ -36,6 +36,8 @@ namespace WEngine
 
 		void Append(const WArray<T>& other);
 
+		T* Find(const T& Val);
+
 		void RemoveAndSwap(size_t index);
 
 		//template<typename... Args>
@@ -287,6 +289,17 @@ namespace WEngine
 		}
 		memcpy(m_pData + m_size, other.m_pData, other.m_size * sizeof(T));
 		m_size += other.m_size;
+	}
+
+	template<typename T>
+	inline T* WArray<T>::Find(const T& Val)
+	{
+		for (T* Index = begin(); Index != end(); ++Index)
+		{
+			if(Val == *Index)
+				return T*;
+		}
+		return end();
 	}
 
 	template<typename T>

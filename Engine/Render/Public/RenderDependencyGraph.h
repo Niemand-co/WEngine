@@ -168,13 +168,14 @@ private:
 	struct TextureState
 	{
 		WEngine::WArray<WRDGResourceState> States;
-		WEngine::WArray<WRDGResourceState> MergeStates;
+		WEngine::WArray<WRDGResourceState*> MergeStates;
 		uint32 ReferenceCount;
 	};
 
 	struct BufferState
 	{
 		WRDGResourceState State;
+		WRDGResourceState* MergeState;
 		uint32 ReferenceCount;
 	};
 
@@ -197,6 +198,16 @@ private:
 	EPassFlag Flag;
 
 	uint8 bHasUAVResource : 1;
+
+	uint8 bSkipRenderPass : 1;
+
+	uint8 bSkipRenderPassBegin : 1;
+
+	uint8 bSkipRenderPassEnd : 1;
+
+	WRDGPassHandle PrologueRenderPass;
+
+	WRDGPassHandle EpilogueRenderPass;
 
 	friend WRDGPassRegistry;
 
