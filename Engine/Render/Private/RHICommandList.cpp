@@ -62,19 +62,19 @@ WComputeShaderRHIRef RHIRenderCommandList::CreateComputeShader(ShaderCodeBlob& b
     return RHIContext::GetContext()->CreateComputeShader(blob);
 }
 
-WTexture2DRHIRef RHIRenderCommandList::CreateTexture2D(uint32 width, uint32 height, Format format, uint32 usage, uint32 aspect)
+WTexture2DRHIRef RHIRenderCommandList::CreateTexture2D(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, EImageUsageFlags InUsage)
 {
-    return RHIContext::GetContext()->CreateTexture2D(width, height, format, usage, aspect);
+    return RHIContext::GetContext()->CreateTexture2D(InWidth, InHeight, InFormat, InMipCount, InUsage);
 }
 
-WTexture2DArrayRHIRef RHIRenderCommandList::CreateTexture2DArray(uint32 width, uint32 height, Format format, uint32 layerCount, uint32 usage, uint32 aspect)
+WTexture2DArrayRHIRef RHIRenderCommandList::CreateTexture2DArray(uint32 InWith, uint32 InHeight, Format InFormat, uint32 InMipCount, uint32 InLayerCount, EImageUsageFlags InUsage)
 {
-    return RHIContext::GetContext()->CreateTexture2DArray(width, height, format, layerCount, usage, aspect);
+    return RHIContext::GetContext()->CreateTexture2DArray(InWith, InHeight, InFormat, InMipCount, InLayerCount, InUsage);
 }
 
-WTexture3DRHIRef RHIRenderCommandList::CreateTexture3D(uint32 width, uint32 height, uint32 depth, Format format, uint32 usage, uint32 aspect)
+WTexture3DRHIRef RHIRenderCommandList::CreateTexture3D(uint32 InWith, uint32 InHeight, uint32 InDepth, Format InFormat, uint32 InMipCount, EImageUsageFlags InUsage)
 {
-    return RHIContext::GetContext()->CreateTexture3D(width, height, depth, format, usage, aspect);
+    return RHIContext::GetContext()->CreateTexture3D(InWith, InHeight, InDepth, InFormat, InMipCount, InUsage);
 }
 
 WRenderPassRHIRef RHIRenderCommandList::CreateRenderPass(RHIRenderPassDescriptor *descriptor)

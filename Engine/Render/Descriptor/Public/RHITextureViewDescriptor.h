@@ -12,8 +12,6 @@ public:
 
 	Format format = Format::A16R16G16B16_SFloat;
 
-	unsigned int imageAspect = IMAGE_ASPECT_COLOR;
-
 	unsigned int mipCount = 1;
 
 	unsigned int baseMipLevel = 0;

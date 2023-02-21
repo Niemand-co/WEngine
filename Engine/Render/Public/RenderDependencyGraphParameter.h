@@ -197,14 +197,26 @@ inline void WRDGParameterStruct::EnumerateTextures(EPassFlag PassFlag, LAMBDA la
 			lambda(Layout->GraphTextures[Index].Type, (WRDGTexture*)(Contents + Layout->GraphTextures[Index].Offset), SRVAccess);
 			break;
 		case EUniformBaseType::UB_RDG_TEXTURE_SRV:
-			lambda(Layout->GraphTextures[Index].Type, (WRDGTexture*)(Contents + Layout->GraphTextures[Index].Offset), SRVAccess);
+			lambda(Layout->GraphTextures[Index].Type, (WRDGTextureSRV*)(Contents + Layout->GraphTextures[Index].Offset), SRVAccess);
 			break;
 		case EUniformBaseType::UB_RDG_BUFFER_UAV:
-			lambda(Layout->GraphTextures[Index].Type, (WRDGTexture*)(Contents + Layout->GraphTextures[Index].Offset), UAVAccess);
+		{
+			lambda(Layout->GraphTextures[Index].Type, (WRDGTextureUAV*)(Contents + Layout->GraphTextures[Index].Offset), UAVAccess);
 			break;
+		}
 		case EUniformBaseType::UB_RTV:
-			lambda(Layout->GraphTextures[Index].Type, (WRDGTexture*)(Contents + Layout->GraphTextures[Index].Offset), EAccess::RTV);
+		{
+			WRDGRenderTargetBinding*  RenderTarget = (WRDGRenderTargetBinding*)(Contents + Layout->GraphTextures[Index].Offset);
+			for (uint32 ColorIndex = 0; ColorIndex < MaxSimultaneousRenderTargets; ++ColorIndex)
+			{
+				lambda(Layout->GraphTextures[Index].Type, RenderTarget->ColorTextures[ColorIndex], EAccess::RTV);
+			}
+			if (RenderTarget->DepthStencilTexture)
+			{
+				lambda(Layout->GraphTextures[Index].Type, RenderTarget->DepthStencilTexture, EAccess::RTV)
+			}
 			break;
+		}
 		default:
 			break;
 		}

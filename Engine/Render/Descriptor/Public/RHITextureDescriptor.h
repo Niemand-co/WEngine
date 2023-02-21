@@ -22,8 +22,6 @@ public:
 
 	uint32 layerCount = 1;
 
-	uint32 usage = IMAGE_USAGE_COLOR_ATTACHMENT;
-
-	uint32 aspect = IMAGE_ASPECT_COLOR;
+	EImageUsageFlags usage = EImageUsageFlags::IM_ColorAttachment;
 
 };

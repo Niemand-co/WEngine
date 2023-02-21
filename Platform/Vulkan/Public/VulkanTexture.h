@@ -14,8 +14,6 @@ namespace Vulkan
 
 		VkImage GetHandle() const { return Image; }
 
-		void CreateTextureView(VkImageViewCreateInfo* pInfo);
-
 	protected:
 
 		VkMemoryRequirements MemoryRequirements;
@@ -23,8 +21,6 @@ namespace Vulkan
 		VkDeviceMemory DeviceMemory;
 
 		VkImage Image;
-
-		VkImageView ImageView;
 
 		class VulkanDevice *pDevice;
 
@@ -34,7 +30,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTexture2D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, uint32 Aspect);
+		VulkanTexture2D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo);
 
 		virtual ~VulkanTexture2D();
 
@@ -44,7 +40,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTexture2DArray(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, uint32 Aspect);
+		VulkanTexture2DArray(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo);
 
 		virtual ~VulkanTexture2DArray();
 
@@ -54,7 +50,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTexture3D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, uint32 Aspect);
+		VulkanTexture3D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo);
 
 		virtual ~VulkanTexture3D();
 

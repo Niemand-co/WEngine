@@ -31,7 +31,7 @@ void WRDGBuilder::Compile()
 
 	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
 	{
-		if (PassesToCull(Handle))
+		if (PassesToCull[Handle])
 		{
 			continue;
 		}
@@ -80,7 +80,7 @@ void WRDGBuilder::Compile()
 					TextureState[Index]->Access |= PassNeedState.States[Index].Access;
 					TextureState[Index]->LastPass = Handle;
 				}
-				PassNeedState.MergeStates = TextureState;
+				PassNeedState.MergeStates[Index] = TextureState[Index];
 			}
 		});
 
@@ -125,7 +125,19 @@ void WRDGBuilder::Execute()
 {
 	Compile();
 
+	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
+	{
+		Passes[Handle]->Parameters.EnumerateTextures(Passes[Handle]->Flag, [](EUniformBaseType Type, auto Texture, EAccess Access)
+		{
+			Texture->BeginResource();
+		});
+	}
 
+	for (WRDGTextureHandle Handle = Textures.Begin(); Handle != Textures.End(); ++Handle)
+	{
+		WRDGTexture* Texture = Textures[Handle];
+		
+	}
 }
 
 WRDGTexture* WRDGBuilder::CreateTexture(const WRDGTextureDesc& inDesc, const char* inName)
@@ -242,16 +254,18 @@ void WRDGBuilder::PassMerging()
 			LastPass->EpilogueRenderPass = LastPassHandle;
 		}
 
+		PassesToMerge.Clear();
+
 	}
 }
 
 void WRDGBuilder::SetupPass(WRDGPass* Pass)
 {
-	const WRDGParameterStruct &Parameters = *Pass->Parameters;
+	const WRDGParameterStruct &Parameters = Pass->Parameters;
 	const WRDGPassHandle& Handle = Pass->Handle;
 	EPipeline Pipeline = Pass->GetPipeline();
 
-	Parameters.EnumerateTextures(Pass->Flag, [&Pass, &Pipeline, &Handle](EUniformBaseType Type, WRDGTexture* Texture, EAccess Access)
+	Parameters.EnumerateTextures(Pass->Flag, [&Pass, &Pipeline, &Handle](EUniformBaseType Type, auto Texture, EAccess Access)
 	{
 		auto& PassState = Pass->TextureStates[Texture];
 		PassState.ReferenceCount++;

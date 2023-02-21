@@ -46,83 +46,27 @@ namespace Vulkan
 		vkDestroyImageView(pDevice->GetHandle(), ImageView, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
-	void VulkanTextureBase::CreateTextureView(VkImageViewCreateInfo* pInfo)
-	{
-		vkCreateImageView(pDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &ImageView);
-	}
-
-	VulkanTexture2D::VulkanTexture2D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, uint32 Aspect)
+	VulkanTexture2D::VulkanTexture2D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo)
 		: VulkanTextureBase(pInDevice, pInfo), RHITexture2D(pInfo->extent.width, pInfo->extent.height, pInfo->mipLevels)
 	{
-		VkImageViewCreateInfo ImageViewCreateInfo = {};
-		{
-			ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-			ImageViewCreateInfo.image = Image;
-			ImageViewCreateInfo.format = pInfo->format;
-			ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-			ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
-			ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;
-			ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_B;
-			ImageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_A;
-			ImageViewCreateInfo.subresourceRange.levelCount = pInfo->mipLevels;
-			ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-			ImageViewCreateInfo.subresourceRange.layerCount = 1;
-			ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-			ImageViewCreateInfo.subresourceRange.aspectMask = Aspect;
-		}
-		CreateTextureView(&ImageViewCreateInfo);
 	}
 
 	VulkanTexture2D::~VulkanTexture2D()
 	{
 	}
 
-	VulkanTexture2DArray::VulkanTexture2DArray(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, uint32 Aspect)
+	VulkanTexture2DArray::VulkanTexture2DArray(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo)
 		: VulkanTextureBase(pInDevice, pInfo), RHITexture2DArray(pInfo->extent.width, pInfo->extent.height, pInfo->mipLevels, pInfo->arrayLayers)
 	{
-		VkImageViewCreateInfo ImageViewCreateInfo = {};
-		{
-			ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-			ImageViewCreateInfo.image = Image;
-			ImageViewCreateInfo.format = pInfo->format;
-			ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
-			ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
-			ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;
-			ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_B;
-			ImageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_A;
-			ImageViewCreateInfo.subresourceRange.levelCount = pInfo->mipLevels;
-			ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-			ImageViewCreateInfo.subresourceRange.layerCount = pInfo->arrayLayers;
-			ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-			ImageViewCreateInfo.subresourceRange.aspectMask = Aspect;
-		}
-		CreateTextureView(&ImageViewCreateInfo);
 	}
 
 	VulkanTexture2DArray::~VulkanTexture2DArray()
 	{
 	}
 
-	VulkanTexture3D::VulkanTexture3D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, uint32 Aspect)
+	VulkanTexture3D::VulkanTexture3D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo)
 		: VulkanTextureBase(pInDevice, pInfo), RHITexture3D(pInfo->extent.width, pInfo->extent.height, pInfo->extent.depth, pInfo->mipLevels)
 	{
-		VkImageViewCreateInfo ImageViewCreateInfo = {};
-		{
-			ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-			ImageViewCreateInfo.image = Image;
-			ImageViewCreateInfo.format = pInfo->format;
-			ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_3D;
-			ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
-			ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;
-			ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_B;
-			ImageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_A;
-			ImageViewCreateInfo.subresourceRange.levelCount = pInfo->mipLevels;
-			ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-			ImageViewCreateInfo.subresourceRange.layerCount = 1;
-			ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-			ImageViewCreateInfo.subresourceRange.aspectMask = Aspect;
-		}
-		CreateTextureView(&ImageViewCreateInfo);
 	}
 
 	VulkanTexture3D::~VulkanTexture3D()

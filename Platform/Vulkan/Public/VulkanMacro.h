@@ -46,7 +46,7 @@ enum class EImageUsageFlags : uint32
 {
 	IM_CopySrc                = 0x00000001,
 	IM_CopyDst                = 0x00000002,
-	IM_Sempled                = 0x00000004,
+	IM_Sampled                = 0x00000004,
 	IM_Storage                = 0x00000008,
 	IM_ColorAttachment        = 0x00000010,
 	IM_DepthStencilAttachment = 0x00000020,

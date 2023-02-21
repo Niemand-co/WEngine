@@ -20,6 +20,10 @@ public:
 
 	bool IsExternal() const { return bExternal; }
 
+	virtual void BeginResource() = 0;
+
+	virtual void EndResource() = 0;
+
 	void* operator new(size_t size)
 	{
 		return WRDGAllocator::Get()->Allocate(size);
@@ -38,9 +42,21 @@ protected:
 
 	WRDGPassHandle LastProducer;
 
-	WEngine::WSharedPtr<class WRHIResource> RHI;
-
 	friend class WRDGBuilder;
+
+};
+
+class WRDGPooledTexture
+{
+public:
+
+	WRDGPooledTexture();
+
+	~WRDGPooledTexture();
+
+private:
+
+	class WRHITexture *TextureRHI;
 
 };
 
@@ -113,6 +129,16 @@ public:
 
 	virtual ~WRDGTexture() = default;
 
+	virtual void BeginResource() override
+	{
+		RHI = GetRenderCommandList()->CreateTexture2D(Desc.extent.width, Desc.extent.height, Desc.format, Desc.mipCount, EImageUsageFlags::IM_);
+	}
+
+	virtual void EndResource() override
+	{
+
+	}
+
 	WEngine::WArray<WRDGResourceState*>& GetMergeState() { return MergeState; }
 
 	template<typename LAMBDA>
@@ -149,6 +175,8 @@ private:
 
 	const WRDGTextureDesc Desc;
 
+	WEngine::WSharedPtr<class RHITexture> RHI;
+
 	const WRDGTerxtureSubresourceLayout Layout;
 
 	WEngine::WArray<WRDGResourceState*> MergeState;
@@ -176,6 +204,10 @@ class WRDGBuffer : public WRDGResource
 public:
 
 	virtual ~WRDGBuffer() = default;
+
+	virtual void BeginResource() override;
+
+	virtual void EndResource() override;
 
 private:
 
@@ -239,7 +271,21 @@ public:
 
 public:
 
-	WRDGTexture* Texture;
+	WRDGTexture *Texture;
+
+};
+
+class WRDGTextureUAVDesc : public RHITextureViewDescriptor
+{
+public:
+
+	WRDGTextureUAVDesc() = default;
+
+	virtual ~WRDGTextureUAVDesc() = default;
+
+public:
+
+	WRDGTexture *Texture;
 
 };
 
@@ -263,5 +309,18 @@ private:
 
 class WRDGTextureUAV : public WRDGUnorderedAccessView
 {
+public:
+
+	const WRDGTextureUAVDesc Desc;
+
+private:
+
+	WRDGTextureUAV(const WRDGTextureUAVDesc& inDesc)
+		: Desc(inDesc)
+	{
+	}
+
+	friend class WRDGBuilder;
+	friend class WRDGViewRegistry;
 
 };

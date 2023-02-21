@@ -5,6 +5,30 @@ class WRDGAllocator : public WEngine::Allocator<6>
 
 };
 
+template<typename HandleType>
+class WRDGHandleBitArray : public WEngine::WBitArray
+{
+public:
+
+	WRDGHandleBitArray() = default;
+
+	WRDGHandleBitArray(uint32 Count, bool Value)
+		: WEngine::WBitArray(Count, Value)
+	{
+	}
+
+	WBitReference operator[](HandleType Handle)
+	{
+		return WEngine::WBitArray::operator[](Handle.Index);
+	}
+
+	WConstBitReference operator[](HandleType Handle) const
+	{
+		return WENgine::WBitArray::operator[](Handle.Index);
+	}
+
+};
+
 template<typename ObjectType, typename IndexType>
 class WRDGHandle;
 

@@ -316,48 +316,45 @@ WComputeShaderRHIRef RHIContext::CreateComputeShader(ShaderCodeBlob& blob)
 	return g_pDevice->CreateComputeShader(&descriptor);
 }
 
-WTexture2DRHIRef RHIContext::CreateTexture2D(uint32 width, uint32 height, Format format, uint32 usage, uint32 aspect)
+WTexture2DRHIRef RHIContext::CreateTexture2D(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, EImageUsageFlags InUsage)
 {
 	RHITextureDescriptor descriptor = {};
 	{
-		descriptor.width = width;
-		descriptor.height = height;
-		descriptor.format = format;
+		descriptor.width = InWidth;
+		descriptor.height = InHeight;
+		descriptor.format = InFormat;
 		descriptor.layerCount = 1;
-		descriptor.mipCount = 1;
-		descriptor.usage = usage;
-		descriptor.aspect = aspect;
+		descriptor.mipCount = InMipCount;
+		descriptor.usage = InUsage;
 	}
 	return g_pDevice->CreateTexture2D(&descriptor);
 }
 
-WTexture2DArrayRHIRef RHIContext::CreateTexture2DArray(uint32 width, uint32 height, Format format, uint32 layerCount, uint32 usage, uint32 aspect)
+WTexture2DArrayRHIRef RHIContext::CreateTexture2DArray(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, uint32 InLayerCount, EImageUsageFlags InUsage)
 {
 	RHITextureDescriptor descriptor = {};
 	{
-		descriptor.width = width;
-		descriptor.height = height;
-		descriptor.format = format;
-		descriptor.layerCount = layerCount;
-		descriptor.mipCount = 1;
-		descriptor.usage = usage;
-		descriptor.aspect = aspect;
+		descriptor.width = InWidth;
+		descriptor.height = InHeight;
+		descriptor.format = InFormat;
+		descriptor.layerCount = InLayerCount;
+		descriptor.mipCount = InMipCount;
+		descriptor.usage = InUsage;
 	}
 	return g_pDevice->CreateTexture2DArray(&descriptor);
 }
 
-WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 width, uint32 height, uint32 depth, Format format, uint32 usage, uint32 aspect)
+WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 InWidth, uint32 InHeight, uint32 InDepth, Format InFormat, uint32 InMipCount, EImageUsageFlags InUsage)
 {
 	RHITextureDescriptor descriptor = {};
 	{
-		descriptor.width = width;
-		descriptor.height = height;
-		descriptor.depth = depth;
-		descriptor.format = format;
+		descriptor.width = InWidth;
+		descriptor.height = InHeight;
+		descriptor.depth = InDepth;
+		descriptor.format = InFormat;
 		descriptor.layerCount = 1;
-		descriptor.mipCount = 1;
-		descriptor.usage = usage;
-		descriptor.aspect = aspect;
+		descriptor.mipCount = InMipCount;
+		descriptor.usage = InUsage;
 	}
 	return g_pDevice->CreateTexture3D(&descriptor);
 }
