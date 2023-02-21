@@ -131,7 +131,7 @@ public:
 
 	virtual void BeginResource() override
 	{
-		RHI = GetRenderCommandList()->CreateTexture2D(Desc.extent.width, Desc.extent.height, Desc.format, Desc.mipCount, EImageUsageFlags::IM_);
+		RHI = GetRenderCommandList()->CreateTexture2D(Desc.extent.width, Desc.extent.height, Desc.format, Desc.mipCount);
 	}
 
 	virtual void EndResource() override

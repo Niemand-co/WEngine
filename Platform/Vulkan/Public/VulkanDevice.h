@@ -90,6 +90,10 @@ namespace Vulkan
 
 	private:
 
+		VkImageUsageFlags GetImageUsage(ETextureCreateFlags Flag);
+
+	private:
+
 		VkDevice pDevice;
 
 		WEngine::WArray<QueueStack> m_queues;

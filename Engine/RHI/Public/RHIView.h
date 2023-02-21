@@ -4,7 +4,7 @@ class RHIView : public RHIResource
 {
 public:
 
-	
+	virtual ~RHIView() = default;
 
 };
 
@@ -14,7 +14,7 @@ public:
 
 	virtual ~RHITextureView() = default;
 
-private:
+protected:
 
 	struct TextureSubresource
 	{
@@ -26,5 +26,10 @@ private:
 		uint32 ArrayCount = kAllResource;
 		uint32 PlaneSlice = kAllResource;
 	};
+
+};
+
+class RHIBufferView : public RHIView
+{
 
 };

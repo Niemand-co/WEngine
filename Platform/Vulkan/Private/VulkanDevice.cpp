@@ -402,20 +402,21 @@ namespace Vulkan
 
 	WTexture2DRHIRef VulkanDevice::CreateTexture2D(RHITextureDescriptor* descriptor)
 	{
-		VkImageCreateInfo imageCreateInfo = {};
-		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		imageCreateInfo.extent = { descriptor->width, descriptor->height, 1 };
-		imageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
-		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-		imageCreateInfo.usage = (VkImageUsageFlags)descriptor->usage;
-		imageCreateInfo.arrayLayers = 1;
-		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		imageCreateInfo.mipLevels = descriptor->mipCount;
-		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+		VkImageCreateInfo ImageCreateInfo = {};
+		ImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		ImageCreateInfo.extent = { descriptor->width, descriptor->height, 1 };
+		ImageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
+		ImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+		ImageCreateInfo.arrayLayers = 1;
+		ImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		ImageCreateInfo.mipLevels = descriptor->mipCount;
+		ImageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		ImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		return new VulkanTexture2D(this, &imageCreateInfo);
+		ImageCreateInfo.usage = GetImageUsage(descriptor->Flag);
+
+		ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+		return new VulkanTexture2D(this, &ImageCreateInfo);
 	}
 
 	WTexture2DArrayRHIRef VulkanDevice::CreateTexture2DArray(RHITextureDescriptor* descriptor)
@@ -425,14 +426,15 @@ namespace Vulkan
 		imageCreateInfo.extent = { descriptor->width, descriptor->height, 1 };
 		imageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
 		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-		imageCreateInfo.usage = (VkImageUsageFlags)descriptor->usage;
 		imageCreateInfo.arrayLayers = descriptor->layerCount;
 		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		imageCreateInfo.mipLevels = descriptor->mipCount;
 		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 
+		imageCreateInfo.usage = GetImageUsage(descriptor->Flag);
+
+		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 		return new VulkanTexture2DArray(this, &imageCreateInfo);
 	}
 
@@ -443,14 +445,15 @@ namespace Vulkan
 		imageCreateInfo.extent = { descriptor->width, descriptor->height, descriptor->depth };
 		imageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
 		imageCreateInfo.imageType = VK_IMAGE_TYPE_3D;
-		imageCreateInfo.usage = (VkImageUsageFlags)descriptor->usage;
 		imageCreateInfo.arrayLayers = 1;
 		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		imageCreateInfo.mipLevels = descriptor->mipCount;
 		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 
+		imageCreateInfo.usage = GetImageUsage(descriptor->Flag);
+
+		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 		return new VulkanTexture3D(this, &imageCreateInfo);
 	}
 
@@ -489,7 +492,7 @@ namespace Vulkan
 		WEngine::WArray<VkImageView> views(descriptor->bufferCount);
 		for (unsigned int i = 0; i < views.Size(); ++i)
 		{
-			views[i] = *(static_cast<VulkanTextureView*>(descriptor->pBufferView[i])->GetHandle());
+			views[i] = (static_cast<VulkanTextureView*>(descriptor->pBufferView[i])->GetHandle());
 		}
 
 		VkFramebufferCreateInfo framebufferCreateInfo = {};
@@ -841,6 +844,39 @@ namespace Vulkan
 	void VulkanDevice::Wait()
 	{
 		vkDeviceWaitIdle(*m_pDevice);
+	}
+
+	VkImageUsageFlags VulkanDevice::GetImageUsage(ETextureCreateFlags Flag)
+	{
+		VkImageUsageFlags Usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+		if ((Flag & ETextureCreateFlags::TextureCreate_Present) != ETextureCreateFlags::None)
+		{
+			Usage |= VK_IMAGE_USAGE_STORAGE_BIT;
+		}
+		else if ((Flag & ETextureCreateFlags::TextureCreate_RenderTarget) != ETextureCreateFlags::None)
+		{
+			if ((Flag & ETextureCreateFlags::TextureCreate_InputAttachmentReadable) != ETextureCreateFlags::None)
+			{
+				Usage |= (VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
+			}
+			else
+			{
+				Usage |= (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
+			}
+		}
+		else if ((Flag & ETextureCreateFlags::TextureCreate_DepthStencil) != ETextureCreateFlags::None)
+		{
+			if ((Flag & ETextureCreateFlags::TextureCreate_InputAttachmentReadable) != ETextureCreateFlags::None)
+			{
+				Usage |= (VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT | VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
+			}
+			else
+			{
+				Usage |= (VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
+			}
+		}
+
+		return Usage;
 	}
 
 }

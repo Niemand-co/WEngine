@@ -22,6 +22,6 @@ public:
 
 	uint32 layerCount = 1;
 
-	EImageUsageFlags usage = EImageUsageFlags::IM_ColorAttachment;
+	ETextureCreateFlags Flag = ETextureCreateFlags::None;
 
 };

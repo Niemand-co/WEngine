@@ -406,38 +406,54 @@ namespace WEngine
 		return VK_PRIMITIVE_TOPOLOGY_MAX_ENUM;
 	}
 
-	enum class EState : int32
-	{
-		None = 0,
-
-		OutofData = -1,
-		SurfaceLost = -2,
-		Healthy = None,
-	};
-
-	struct ClearValue
-	{
-		union
-		{
-			float Color[4];
-			struct { float Depth; uint32 Stencil; };
-		};
-	};
-
-	struct WResolveRect
-	{
-		int32 X1;
-		int32 Y1;
-		int32 X2;
-		int32 Y2;
-
-		bool operator==(const WResolveRect& other) const
-		{
-			return X1 == other.X1 && Y1 == other.Y1 && X2 == other.X2 && Y2 == other.Y2;
-		}
-	};
-
 }
+
+enum class EState : int32
+{
+	None = 0,
+
+	OutofData = -1,
+	SurfaceLost = -2,
+	Healthy = None,
+};
+
+struct ClearValue
+{
+	union
+	{
+		float Color[4];
+		struct { float Depth; uint32 Stencil; };
+	};
+};
+
+struct WResolveRect
+{
+	int32 X1;
+	int32 Y1;
+	int32 X2;
+	int32 Y2;
+
+	bool operator==(const WResolveRect& other) const
+	{
+		return X1 == other.X1 && Y1 == other.Y1 && X2 == other.X2 && Y2 == other.Y2;
+	}
+};
+
+enum class ETextureCreateFlags : uint32
+{
+	None                                  = 0,
+	TextureCreate_RenderTarget            = 1 << 0,
+	TextureCreate_Present                 = 1 << 1,
+	TextureCreate_DepthStencil            = 1 << 2,
+	TextureCreate_SRV                     = 1 << 3,
+	TextureCreate_UAV                     = 1 << 4,
+	TextureCreate_NoTiling                = 1 << 5,
+	TextureCreate_CPUWritable             = 1 << 6,
+	TextureCreate_CPUReadable             = 1 << 7,
+	TextureCreate_Transient               = 1 << 8,
+	TextureCreate_InputAttachmentReadable = 1 << 9,
+};
+ENUM_CLASS_FLAGS(ETextureCreateFlags)
 
 typedef WEngine::WSharedPtr<class RHIVertexBuffer> WVertexBufferRHIRef;
 typedef WEngine::WSharedPtr<class RHIDynamicVertexBuffer> WDynamicVertexBufferRHIRef;

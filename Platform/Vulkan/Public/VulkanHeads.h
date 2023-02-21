@@ -19,7 +19,7 @@
 #include "Platform/Vulkan/Public/VulkanSurface.h"
 #include "Platform/Vulkan/Public/VulkanSwapchain.h"
 #include "Platform/Vulkan/Public/VulkanTexture.h"
-#include "Platform/Vulkan/Public/VulkanTextureView.h"
+#include "Platform/Vulkan/Public/VulkanView.h"
 #include "Platform/Vulkan/Public/VulkanEvent.h"
 #include "Platform/Vulkan/Public/VulkanSampler.h"
 #include "Platform/Vulkan/Public/VulkanScissor.h"

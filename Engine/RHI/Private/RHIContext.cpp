@@ -316,7 +316,7 @@ WComputeShaderRHIRef RHIContext::CreateComputeShader(ShaderCodeBlob& blob)
 	return g_pDevice->CreateComputeShader(&descriptor);
 }
 
-WTexture2DRHIRef RHIContext::CreateTexture2D(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, EImageUsageFlags InUsage)
+WTexture2DRHIRef RHIContext::CreateTexture2D(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, ETextureCreateFlags InFlag)
 {
 	RHITextureDescriptor descriptor = {};
 	{
@@ -325,12 +325,12 @@ WTexture2DRHIRef RHIContext::CreateTexture2D(uint32 InWidth, uint32 InHeight, Fo
 		descriptor.format = InFormat;
 		descriptor.layerCount = 1;
 		descriptor.mipCount = InMipCount;
-		descriptor.usage = InUsage;
+		descriptor.Flag = InFlag;
 	}
 	return g_pDevice->CreateTexture2D(&descriptor);
 }
 
-WTexture2DArrayRHIRef RHIContext::CreateTexture2DArray(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, uint32 InLayerCount, EImageUsageFlags InUsage)
+WTexture2DArrayRHIRef RHIContext::CreateTexture2DArray(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, uint32 InLayerCount, ETextureCreateFlags InFlag)
 {
 	RHITextureDescriptor descriptor = {};
 	{
@@ -339,12 +339,12 @@ WTexture2DArrayRHIRef RHIContext::CreateTexture2DArray(uint32 InWidth, uint32 In
 		descriptor.format = InFormat;
 		descriptor.layerCount = InLayerCount;
 		descriptor.mipCount = InMipCount;
-		descriptor.usage = InUsage;
+		descriptor.Flag = InFlag;
 	}
 	return g_pDevice->CreateTexture2DArray(&descriptor);
 }
 
-WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 InWidth, uint32 InHeight, uint32 InDepth, Format InFormat, uint32 InMipCount, EImageUsageFlags InUsage)
+WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 InWidth, uint32 InHeight, uint32 InDepth, Format InFormat, uint32 InMipCount, ETextureCreateFlags InFlag)
 {
 	RHITextureDescriptor descriptor = {};
 	{
@@ -354,7 +354,7 @@ WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 InWidth, uint32 InHeight, ui
 		descriptor.format = InFormat;
 		descriptor.layerCount = 1;
 		descriptor.mipCount = InMipCount;
-		descriptor.usage = InUsage;
+		descriptor.Flag = InFlag;
 	}
 	return g_pDevice->CreateTexture3D(&descriptor);
 }
