@@ -44,15 +44,9 @@ namespace Vulkan
 
 		virtual WTexture3DRHIRef CreateTexture3D(RHITextureDescriptor* descriptor) override;
 
-		virtual WTextureSRVRHIRef CreateTextureSRV(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture);
-
-		virtual WTextureUAVRHIRef CreateTextureUAV(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture);
-
-		virtual WTextureRTVRHIRef CreateTextureRTV(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture);
+		virtual WTextureViewRHIRef CreateTextureView(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture);
 
 		virtual RHISampler* CreateSampler(RHISamplerDescriptor * descriptor) override;
-
-		virtual RHIRenderTarget* CreateRenderTarget(RHIRenderTargetDescriptor *descriptor) override;
 
 		virtual WVertexBufferRHIRef CreateVertexBuffer(RHIBufferDescriptor* descriptor) override;
 
@@ -80,7 +74,7 @@ namespace Vulkan
 
 		virtual void UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor *descriptor) override;
 
-		virtual WEngine::WArray<RHISemaphore*> GetSemaphore(unsigned int count) override;
+		virtual RHISemaphore* GetSemaphore() override;
 
 		virtual void WaitForFences(RHIFence* pFences, unsigned int count, bool waitForAll = true) override;
 

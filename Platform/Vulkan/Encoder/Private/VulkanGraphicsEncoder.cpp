@@ -35,10 +35,7 @@ namespace Vulkan
 		WEngine::WArray<VkClearValue> values(descriptor->clearCount);
 		for (unsigned int i = 0; i < descriptor->clearCount; ++i)
 		{
-			if(descriptor->pClearValues[i].color)
-				values[i].color = { descriptor->pClearValues[i].value.r, descriptor->pClearValues[i].value.g, descriptor->pClearValues[i].value.b, descriptor->pClearValues[i].value.a };
-			else
-				values[i].depthStencil = { descriptor->pClearValues[i].value.x, (unsigned int)descriptor->pClearValues[i].value.y };
+			values[i] = { descriptor->pClearValues[i].Color[0], descriptor->pClearValues[i].Color[1], descriptor->pClearValues[i].Color[2], descriptor->pClearValues[i].Color[3] };
 		}
 		renderPassBeginInfo.pClearValues = values.GetData();
 
@@ -99,7 +96,8 @@ namespace Vulkan
 	void VulkanGraphicsEncoder::BindVertexBuffer(RHIBuffer* pBuffer)
 	{
 		VkDeviceSize offets[] = {0};
-		vkCmdBindVertexBuffers(*m_cmd, 0, 1, static_cast<VulkanVertexBuffer*>(pBuffer)->GetHandle(), offets);
+		VkBuffer Buffer = static_cast<VulkanVertexBuffer*>(pBuffer)->GetHandle();
+		vkCmdBindVertexBuffers(*m_cmd, 0, 1, &Buffer, offets);
 	}
 
 	void VulkanGraphicsEncoder::BindIndexBuffer(RHIBuffer* pBuffer)
@@ -129,39 +127,7 @@ namespace Vulkan
 
 	void VulkanGraphicsEncoder::ResourceBarrier(RHIBarrierDescriptor* pDescriptor)
 	{
-		VkBufferMemoryBarrier *pBufferBarriers = (VkBufferMemoryBarrier*)NormalAllocator::Get()->Allocate(pDescriptor->bufferCount * sizeof(VkBufferMemoryBarrier));
-		for (unsigned int i = 0; i < pDescriptor->bufferCount; ++i)
-		{
-			::new (pBufferBarriers + i) VkBufferMemoryBarrier();
-			BufferBarrier *pBarrier = pDescriptor->pBufferBarriers + i;
-			pBufferBarriers[i].sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-			pBufferBarriers[i].buffer = static_cast<VulkanUniformBuffer*>(pBarrier->pBuffer)->GetHandle();
-			pBufferBarriers[i].size = pBarrier->pBuffer->Size() * pBarrier->pBuffer->Alignment();
-			pBufferBarriers[i].offset = 0;
-			pBufferBarriers[i].srcAccessMask = VK_ACCESS_HOST_READ_BIT;
-			pBufferBarriers[i].dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
-		}
 
-		VkImageMemoryBarrier *pImageBarriers = (VkImageMemoryBarrier*)NormalAllocator::Get()->Allocate(pDescriptor->textureCount * sizeof(VkImageMemoryBarrier));
-		for (unsigned int i = 0; i < pDescriptor->textureCount; ++i)
-		{
-			::new (pImageBarriers + i) VkImageMemoryBarrier();
-			TextureBarrier *pBarrier = pDescriptor->pTextureBarriers + i;
-			pImageBarriers[i].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-			pImageBarriers[i].pNext = nullptr;
-			pImageBarriers[i].image = static_cast<VulkanTexture2D*>(pBarrier->pTexture)->GetHandle();
-			pImageBarriers[i].oldLayout = WEngine::ToVulkan(pBarrier->oldLayout);
-			pImageBarriers[i].newLayout = WEngine::ToVulkan(pBarrier->newLayout);
-			pImageBarriers[i].srcAccessMask = pBarrier->srcAccess;
-			pImageBarriers[i].dstAccessMask = pBarrier->dstAccess;
-			pImageBarriers[i].subresourceRange.aspectMask = pBarrier->imageAspect;
-			pImageBarriers[i].subresourceRange.baseArrayLayer = 0;
-			pImageBarriers[i].subresourceRange.layerCount = 1;
-			pImageBarriers[i].subresourceRange.baseMipLevel = 0;
-			pImageBarriers[i].subresourceRange.levelCount = 1;
-		}
-
-		vkCmdPipelineBarrier(*m_cmd, pDescriptor->srcStage, pDescriptor->dstStage, 0, 0, nullptr, pDescriptor->bufferCount, pBufferBarriers, pDescriptor->textureCount, pImageBarriers);
 	}
 
 	void VulkanGraphicsEncoder::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height)

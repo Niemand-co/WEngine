@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanTexture.h"
-#include "Platform/Vulkan/Public/VulkanTextureView.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
 #include "Platform/Vulkan/Public/VulkanGPU.h"
 #include "RHI/Public/RHIDevice.h"
@@ -43,7 +42,6 @@ namespace Vulkan
 	{
 		vkDestroyImage(pDevice->GetHandle(), Image, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 		vkFreeMemory(pDevice->GetHandle(), DeviceMemory, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
-		vkDestroyImageView(pDevice->GetHandle(), ImageView, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
 	VulkanTexture2D::VulkanTexture2D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo)

@@ -70,8 +70,8 @@ namespace Vulkan
 	{
 		pQueue = (VulkanQueue*)pInDevice->GetQueue(RHIQueueType((uint8)RHIQueueType::Graphics | (uint8)RHIQueueType::Present), 1);
 		pCommandPool = (VulkanCommandPool*)pQueue->GetCommandPool();
-		ActiveCmdBuffer = (VulkanCommandBuffer*)pCommandPool->GetCommandBuffer(true);
-		ImmediateCmdBuffer = (VulkanCommandBuffer*)pCommandPool->GetCommandBuffer(true);
+		ActiveCmdBuffer = (VulkanCommandBuffer*)pCommandPool->GetCommandBuffer();
+		ImmediateCmdBuffer = (VulkanCommandBuffer*)pCommandPool->GetCommandBuffer();
 	}
 
 	VulkanCommandBufferManager::~VulkanCommandBufferManager()
@@ -84,8 +84,9 @@ namespace Vulkan
 	{
 		if (!ActiveCmdBuffer)
 		{
-			ActiveCmdBuffer
+			//ActiveCmdBuffer
 		}
+		return nullptr;
 	}
 
 	VulkanCommandBuffer* VulkanCommandBufferManager::GetImmediateCommandBuffer()
@@ -123,7 +124,7 @@ namespace Vulkan
 
 	void VulkanCommandBufferManager::WaitForCommandBuffer(VulkanCommandBuffer* CmdBuffer, double Time)
 	{
-		CmdBuffer->GetFence()->Wait(Time);
+		//CmdBuffer->GetFence()->Wait(Time);
 	}
 
 }

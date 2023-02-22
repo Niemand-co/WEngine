@@ -10,8 +10,6 @@ public:
 
 	virtual ~RHISwapchain() = default;
 
-	virtual RHITexture* GetTexture(unsigned int index);
-
 	virtual int32 AcquireImageIndex(RHISemaphore** outSemaphore) = 0;
 
 	virtual int32 Present(class RHIQueue *queue, RHISemaphore *renderingDoneSemaphore) = 0;

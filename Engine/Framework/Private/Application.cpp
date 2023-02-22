@@ -5,7 +5,7 @@
 #include "Event/Public/WindowEvent.h"
 #include "FrameWork/Public/LayerStack.h"
 #include "Event/Public/WindowInput.h"
-#include "Framework/Public/GuiLayer.h"
+#include "Framework/Public/SlateLayer.h"
 #include "RHI/Public/RHIContext.h"
 #include "Scene/Public/World.h"
 #include "Editor/Public/Editor.h"

@@ -145,13 +145,13 @@ namespace Vulkan
 		if (Result = VK_ERROR_OUT_OF_DATE_KHR)
 		{
 			SemaphoreID = PreSemaphoreID;
-			return (int32)WEngine::EState::OutofData;
+			return (int32)EState::OutofData;
 		}
 
 		if (Result = VK_ERROR_SURFACE_LOST_KHR)
 		{
 			SemaphoreID = PreSemaphoreID;
-			return (int32)WEngine::EState::SurfaceLost;
+			return (int32)EState::SurfaceLost;
 		}
 
 		*OutSemaphore = ImageAcquireSemaphore[SemaphoreID].Get();
@@ -186,15 +186,15 @@ namespace Vulkan
 
 		if (Result == VK_ERROR_OUT_OF_DATE_KHR)
 		{
-			return (int32)WEngine::EState::OutofData;
+			return (int32)EState::OutofData;
 		}
 
 		if (Result == VK_ERROR_SURFACE_LOST_KHR)
 		{
-			return (int32)WEngine::EState::SurfaceLost;
+			return (int32)EState::SurfaceLost;
 		}
 
-		return (int32)WEngine::EState::Healthy;
+		return (int32)EState::Healthy;
 	}
 
 }

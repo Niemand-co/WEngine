@@ -1,5 +1,5 @@
 #pragma once
-#include "Render/Public/RenderDependencyGraph.h"
+#include "Render/Public/RenderDependencyGraphDefinitions.h"
 #include "Render/Descriptor/Public/RHITextureViewDescriptor.h"
 
 template<typename ElementType>
@@ -70,20 +70,6 @@ struct WRDGTextureSubresource
 	uint32 LayerIndex;
 
 	uint32 PlaneIndex;
-};
-
-struct WRDGTerxtureSubresourceLayout
-{
-	WRDGTerxtureSubresourceLayout(uint32 InMipCount = 1u, uint32 InLayerCount = 1u, uint32 InPlaneCount = 1u)
-		: MipCount(InMipCount), LayerCount(InLayerCount), PlaneCount(InPlaneCount)
-	{
-	}
-
-	uint32 MipCount;
-
-	uint32 LayerCount;
-
-	uint32 PlaneCount;
 };
 
 struct WRDGTextureSubresourceRange
@@ -170,7 +156,7 @@ private:
 	WEngine::WArray<WRDGResourceState*> MergeState;
 
 	friend class WRDGBuilder;
-	friend class WRDGTextureRegistry;
+	friend WRDGTextureRegistry;
 	friend class WRDGParameterStruct;
 
 };
@@ -211,7 +197,7 @@ private:
 	WRDGResourceState *MergeState = nullptr;
 
 	friend class WRDGBuilder;
-	friend class WRDGBufferRegistry;
+	friend WRDGBufferRegistry;
 
 };
 
@@ -267,6 +253,10 @@ public:
 
 	virtual ~WRDGTextureUAVDesc() = default;
 
+public:
+
+	WRDGTexture *Texture;
+
 };
 
 class WRDGTextureSRV : public WRDGShaderResourceView
@@ -283,7 +273,7 @@ private:
 	}
 
 	friend class WRDGBuilder;
-	friend class WRDGViewRegistry;
+	friend WRDGViewRegistry;
 
 };
 
@@ -301,6 +291,6 @@ private:
 	}
 
 	friend class WRDGBuilder;
-	friend class WRDGViewRegistry;
+	friend WRDGViewRegistry;
 
 };

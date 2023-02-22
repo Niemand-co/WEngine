@@ -4,6 +4,7 @@
 #include "Scene/Components/Public/DirectionalLightComponent.h"
 #include "Scene/Components/Public/CameraComponent.h"
 #include "Render/Renderer/Public/DeferredRenderer.h"
+#include "Render/Public/Viewport.h"
 
 RScene* RScene::g_activeScene = nullptr;
 

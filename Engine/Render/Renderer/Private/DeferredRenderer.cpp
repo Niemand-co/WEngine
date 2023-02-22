@@ -63,21 +63,21 @@ void DeferredRenderer::RenderPrePass()
 
 void DeferredRenderer::RenderBasePass()
 {
-	glm::vec2 Resolution = m_pCamera->GetResolution();
-	const WRDGTextureDesc GBufferDesc = WRDGTextureDesc::GetTexture2DDesc(Format::A16R16G16B16_SFloat, { (uint32)Resolution.x, (uint32)Resolution.y, 0u }, {0.0f, 0.0f, 0.0f, 0.0f});
-	WRDGTexture* GBuffer0 = GraphBuilder->CreateTexture(GBufferDesc, "GBuffer0");
+	//glm::vec2 Resolution = m_pCamera->GetResolution();
+	//const WRDGTextureDesc GBufferDesc = WRDGTextureDesc::GetTexture2DDesc(Format::A16R16G16B16_SFloat, { (uint32)Resolution.x, (uint32)Resolution.y, 0u }, {0.0f, 0.0f, 0.0f, 0.0f});
+	//WRDGTexture* GBuffer0 = GraphBuilder->CreateTexture(GBufferDesc, "GBuffer0");
 
-	const WRDGTextureDesc DepthDesc = WRDGTextureDesc::GetTexture2DDesc(Format::D16_Unorm, { (uint32)Resolution.x, (uint32)Resolution.y, 0u }, { 0.0f, 0.0f, 0.0f, 0.0f });
-	WRDGTexture* DepthBuffer = GraphBuilder->CreateTexture(DepthDesc, "Depth");
+	//const WRDGTextureDesc DepthDesc = WRDGTextureDesc::GetTexture2DDesc(Format::D16_Unorm, { (uint32)Resolution.x, (uint32)Resolution.y, 0u }, { 0.0f, 0.0f, 0.0f, 0.0f });
+	//WRDGTexture* DepthBuffer = GraphBuilder->CreateTexture(DepthDesc, "Depth");
 
-	const DeferredBasePassParameters* Parameters = GraphBuilder->AllocateParameterStruct<DeferredBasePassParameters>();
-	Parameters->RenderTarget->ColorTextures[0] = GBuffer0;
-	Parameters->RenderTarget->DepthStencilTexture = DepthBuffer;
+	//const DeferredBasePassParameters* Parameters = GraphBuilder->AllocateParameterStruct<DeferredBasePassParameters>();
+	//Parameters->RenderTarget->ColorTextures[0].Texture = GBuffer0;
+	//Parameters->RenderTarget->DepthStencilTexture = DepthBuffer;
 
-	GraphBuilder->AddPass("BasePass", Parameters, [](RHIRenderCommandList& CmdList)
-	{
-		CmdList.DrawIndexedPrimitive(3, 0, 1);
-	});
+	//GraphBuilder->AddPass("BasePass", Parameters, [](RHIRenderCommandList& CmdList)
+	//{
+	//	CmdList.DrawIndexedPrimitive(3, 0, 1);
+	//});
 }
 
 void DeferredRenderer::RenderShadowPass()

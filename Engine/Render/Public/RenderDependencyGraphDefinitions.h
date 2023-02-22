@@ -17,23 +17,118 @@ public:
 	{
 	}
 
-	WBitReference operator[](HandleType Handle)
+	WEngine::WBitReference operator[](HandleType Handle)
 	{
 		return WEngine::WBitArray::operator[](Handle.Index);
 	}
 
-	WConstBitReference operator[](HandleType Handle) const
+	WEngine::WConstBitReference operator[](HandleType Handle) const
 	{
-		return WENgine::WBitArray::operator[](Handle.Index);
+		return WEngine::WBitArray::operator[](Handle.Index);
 	}
 
 };
 
-template<typename ObjectType, typename IndexType>
-class WRDGHandle;
+template<typename InObjectType, typename IndexType>
+class WRDGHandle
+{
+public:
+
+	typedef InObjectType ObjectType;
+
+	WRDGHandle() = default;
+
+	explicit WRDGHandle(IndexType inIndex)
+		: Index(inIndex)
+	{
+	}
+
+	~WRDGHandle() = default;
+
+	bool IsValid() { return Index != NullIndex; }
+	bool operator==(const WRDGHandle<InObjectType, IndexType>& other) { RE_ASSERT(IsValid(), "Handle Invalid."); return Index == other.Index; }
+	bool operator!=(const WRDGHandle<InObjectType, IndexType>& other) { RE_ASSERT(IsValid(), "Handle Invalid."); return Index != other.Index; }
+	bool operator<=(const WRDGHandle<InObjectType, IndexType>& other) { RE_ASSERT(IsValid(), "Handle Invalid."); return Index <= other.Index; }
+	bool operator>=(const WRDGHandle<InObjectType, IndexType>& other) { RE_ASSERT(IsValid(), "Handle Invalid."); return Index >= other.Index; }
+	bool operator<(const WRDGHandle<InObjectType, IndexType>& other) { RE_ASSERT(IsValid(), "Handle Invalid."); return Index < other.Index; }
+	bool operator>(const WRDGHandle<InObjectType, IndexType>& other) { RE_ASSERT(IsValid(), "Handle Invalid."); return Index > other.Index; }
+
+	IndexType operator-(const WRDGHandle& other)
+	{
+		return Index - other.Index;
+	}
+
+	WRDGHandle& operator++()
+	{
+		Index++;
+		return *this;
+	}
+
+	WRDGHandle& operator--()
+	{
+		Index--;
+		return *this;
+	}
+
+public:
+
+	static constexpr IndexType NullIndex = WEngine::NumericLimits<IndexType>::Max();
+
+	IndexType Index = NullIndex;
+
+};
 
 template<typename HandleType>
-class WRDGHandleRegistry;
+class WRDGHandleRegistry
+{
+public:
+
+	typedef HandleType::ObjectType ObjectType;
+
+	WRDGHandleRegistry() = default;
+
+	~WRDGHandleRegistry() = default;
+
+	void Insert(ObjectType* Object)
+	{
+		Object->Handle = Array.Size();
+		Array.Push(Object);
+	}
+
+	template<typename AllocObjectType, typename... Args>
+	AllocObjectType* Allocate(Args... args)
+	{
+		AllocObjectType* object = (AllocObjectType*)WRDGAllocator::Get()->Allocate(sizeof(AllocObjectType));
+		::new (object) AllocObjectType(args...);
+		Insert(static_cast<ObjectType*>(object));
+		return object;
+	}
+
+	ObjectType* operator[](HandleType handle)
+	{
+		return Array[handle.Index];
+	}
+
+	const ObjectType* operator[](HandleType handle) const
+	{
+		return Array[handle.Index];
+	}
+
+	HandleType Begin() const
+	{
+		return HandleType(0);
+	}
+
+	HandleType End() const
+	{
+		return HandleType(Array.Size());
+	}
+
+private:
+
+	WEngine::WArray<ObjectType*> Array;
+
+};
 
 class WRDGPass;
 typedef WRDGHandle<WRDGPass, uint16> WRDGPassHandle;
@@ -128,6 +223,20 @@ enum class EPipeline : uint8
 	None = 0,
 	Graphics = 1 << 0,
 	AsyncCompute = 1 << 1,
+};
+
+struct WRDGTerxtureSubresourceLayout
+{
+	WRDGTerxtureSubresourceLayout(uint32 InMipCount = 1u, uint32 InLayerCount = 1u, uint32 InPlaneCount = 1u)
+		: MipCount(InMipCount), LayerCount(InLayerCount), PlaneCount(InPlaneCount)
+	{
+	}
+
+	uint32 MipCount;
+
+	uint32 LayerCount;
+
+	uint32 PlaneCount;
 };
 
 struct WRDGTextureDesc

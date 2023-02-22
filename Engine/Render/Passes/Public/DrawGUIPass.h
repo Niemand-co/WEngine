@@ -13,10 +13,6 @@ public:
 
 	virtual ~DrawGUIPass();
 
-	virtual void Setup() override;
-
-	virtual void Execute() override;
-
 private:
 
 	GameObject *m_currentGo;

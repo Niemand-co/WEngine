@@ -43,16 +43,6 @@ namespace WEngine
 
 	void LayerStack::OnUpdate(TimeStep timeStep)
 	{
-		int currentImage = RHIContext::GetContext()->GetNextImage();
-		if (currentImage < 0)
-		{
-			return;
-		}
-		for (unsigned int i = 0; i < m_pLayers.Size(); ++i)
-		{
-			m_pLayers[i]->Tick(timeStep);
-		}
-		RHIContext::GetContext()->Present(RHIContext::g_currentImage);
 	}
 
 }

@@ -11,7 +11,7 @@ class RHISubPassDescriptor
 {
 public:
 
-	RHISubPassDescriptor();
+	RHISubPassDescriptor() = default;
 
 	~RHISubPassDescriptor() = default;
 

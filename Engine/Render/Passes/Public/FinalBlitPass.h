@@ -5,12 +5,8 @@ class FinalBlitPass : public ScriptableRenderPass
 {
 public:
 
-	FinalBlitPass(ScriptableRenderer* pRenderer);
+	FinalBlitPass(class ScriptableRenderer* pRenderer);
 
 	virtual ~FinalBlitPass();
-
-	virtual void Setup() override;
-
-	virtual void Execute() override;
 
 };

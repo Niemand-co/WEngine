@@ -51,19 +51,17 @@ public:
 
 	virtual RHITextureView* GetDepthView(unsigned int index);
 
-	virtual RHICommandBuffer* GetCommandBuffer(bool isPrimary = true);
-
-	virtual WEngine::WArray<RHICommandBuffer*> GetCommandBuffer(unsigned int count, bool isPrimary);
+	virtual RHICommandBuffer* GetCommandBuffer();
 
 	virtual int GetNextImage(RHISemaphore* pSignalSemaphore);
 
 	virtual void ExecuteCommandBuffer(RHICommandBuffer *cmd);
 
-	virtual void Submit(RHISubmitDescriptor *descriptor);
+	virtual void Submit(RHISubmitDescriptor* descriptor);
 
-	virtual int32 AcquireImageIndex(RHISemaphore** OutSemaphore) = 0;
+	virtual int32 AcquireImageIndex(RHISemaphore** OutSemaphore);
 
-	virtual void Present(unsigned int imageIndex) = 0;
+	virtual void Present(unsigned int imageIndex);
 
 	virtual RHISemaphore* GetImageVailableSemaphore() { return g_pImageAvailibleSemaphores[g_currentFrame]; }
 
@@ -99,11 +97,7 @@ public:
 
 	WTexture3DRHIRef CreateTexture3D(uint32 InWidth, uint32 InHeight, uint32 InDepth, Format InFormat, uint32 InMipCount, ETextureCreateFlags InFlag);
 
-	WTextureSRVRHIRef CreateTextureSRV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture);
-
-	WTextureUAVRHIRef CreateTextureUAV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 LayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture);
-
-	WTextureRTVRHIRef CreateTextureRTV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 LayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture);
+	WTextureViewRHIRef CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture);
 
 	WRenderPassRHIRef CreateRenderPass(class RHIRenderPassDescriptor *descriptor);
 

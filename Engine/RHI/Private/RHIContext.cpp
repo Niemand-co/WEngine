@@ -65,53 +65,6 @@ void RHIContext::Init()
 	}
 	g_pSwapchain = g_pDevice->CreateSwapchain(&swapchainDescriptor);
 
-	g_pTextureViews.Reserve(3);
-	RHITextureViewDescriptor textureViewDescriptor = {};
-	{
-		textureViewDescriptor.format = Format::B8G8R8A8_UNorm;
-		textureViewDescriptor.imageAspect = IMAGE_ASPECT_COLOR;
-		textureViewDescriptor.mipCount = 1;
-		textureViewDescriptor.baseMipLevel = 0;
-		textureViewDescriptor.arrayLayerCount = 1;
-		textureViewDescriptor.baseArrayLayer = 0;
-		textureViewDescriptor.dimension = Dimension::Texture2D;
-	}
-	//g_pTextureViews.Push(g_pSwapchain->GetTexture(0)->CreateTextureView(&textureViewDescriptor));
-	//g_pTextureViews.Push(g_pSwapchain->GetTexture(1)->CreateTextureView(&textureViewDescriptor));
-	//g_pTextureViews.Push(g_pSwapchain->GetTexture(2)->CreateTextureView(&textureViewDescriptor));
-
-	for(int i = 0; i < 3; ++i)
-	{
-		TextureBarrier textureBarrier = { g_pDepthTextures[i], AttachmentLayout::Undefined, AttachmentLayout::DepthBuffer, 0, ACCESS_DEPTH_STENCIL_ATTACHMENT_READ | ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE, IMAGE_ASPECT_DEPTH };
-		RHIBarrierDescriptor barrierDescriptor = {};
-		{
-			barrierDescriptor.textureCount = 1;
-			barrierDescriptor.pTextureBarriers = &textureBarrier;
-			barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
-			barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
-		}
-		g_pContext->ResourceBarrier(&barrierDescriptor);
-	}
-
-	RHITextureViewDescriptor depthViewDescriptor = {};
-	{
-		depthViewDescriptor.format = Format::D16_Unorm;
-		depthViewDescriptor.mipCount = 1;
-		depthViewDescriptor.baseMipLevel = 0;
-		depthViewDescriptor.arrayLayerCount = 1;
-		depthViewDescriptor.baseArrayLayer = 0;
-		depthViewDescriptor.dimension = Dimension::Texture2D;
-		depthViewDescriptor.imageAspect = IMAGE_ASPECT_DEPTH;
-	}
-	//for(int i = 0; i < 3; ++i)
-	//	g_pDepthTextureViews[i] = g_pDepthTextures[i]->CreateTextureView(&depthViewDescriptor);
-
-	g_pPrimaryCommandBuffers = g_pPool->GetCommandBuffer(true);
-
-	g_pFences = g_pDevice->CreateFence(g_maxFrames);
-	g_pImageAvailibleSemaphores = g_pDevice->GetSemaphore(g_maxFrames);
-	g_pPresentAVailibleSemaphores = g_pDevice->GetSemaphore(g_maxFrames);
-
 	m_isDisplayChagned = false;
 }
 
@@ -142,7 +95,8 @@ void RHIContext::RecreateSwapchain()
 		textureViewDescriptor.arrayLayerCount = 1;
 		textureViewDescriptor.baseArrayLayer = 0;
 		textureViewDescriptor.dimension = Dimension::Texture2D;
-		textureViewDescriptor.imageAspect = IMAGE_ASPECT_COLOR;
+		textureViewDescriptor.planeIndex = 0;
+		textureViewDescriptor.planeCount = 1;
 	}
 	for (int i = 0; i < 3; ++i)
 	{
@@ -156,7 +110,7 @@ void RHIContext::RecreateSwapchain()
 
 RHITexture* RHIContext::GetTexture(unsigned int index)
 {
-	return g_pSwapchain->GetTexture(index);
+	return nullptr;
 }
 
 RHITextureView* RHIContext::GetTextureView(unsigned int index)
@@ -169,14 +123,9 @@ RHITextureView* RHIContext::GetDepthView(unsigned int index)
 	return g_pDepthTextureViews[index];
 }
 
-RHICommandBuffer* RHIContext::GetCommandBuffer(bool isPrimary)
+RHICommandBuffer* RHIContext::GetCommandBuffer()
 {
-	return g_pPool->GetCommandBuffer(isPrimary);
-}
-
-WEngine::WArray<RHICommandBuffer*> RHIContext::GetCommandBuffer(unsigned int count, bool isPrimary)
-{
-	return g_pPool->GetCommandBuffer(count, isPrimary);
+	return g_pPool->GetCommandBuffer();
 }
 
 int RHIContext::GetNextImage(RHISemaphore *pSignalSemaphore)
@@ -191,18 +140,6 @@ void RHIContext::ExecuteCommandBuffer(RHICommandBuffer* cmd)
 
 void RHIContext::Submit(RHISubmitDescriptor* descriptor)
 {
-	g_pPrimaryCommandBuffers[g_currentFrame]->Clear();
-	g_pPrimaryCommandBuffers[g_currentFrame]->BeginScopePass("Frame");
-	for(unsigned int i = 0; i < g_pCommandBuffers.Size(); ++i)
-	{
-		g_pPrimaryCommandBuffers[g_currentFrame]->ExecuteCommandBuffer(g_pCommandBuffers[i]);
-	}
-	g_pPrimaryCommandBuffers[g_currentFrame]->EndScopePass();
-
-	descriptor->commandBufferCount = 1;
-	descriptor->pCommandBuffers = &g_pPrimaryCommandBuffers[g_currentFrame];
-	g_pQueue->Submit(descriptor);
-	g_pCommandBuffers.Clear();
 }
 
 int32 RHIContext::AcquireImageIndex(RHISemaphore **OutSemaphore)
@@ -212,12 +149,6 @@ int32 RHIContext::AcquireImageIndex(RHISemaphore **OutSemaphore)
 
 void RHIContext::Present(unsigned int imageIndex)
 {
-	if (!g_pQueue->Present(g_pSwapchain, imageIndex, g_pPresentAVailibleSemaphores[g_currentFrame]))
-	{
-		g_pContext->RecreateSwapchain();
-	}
-
-	g_currentFrame = (g_currentFrame + 1) % g_maxFrames;
 }
 
 bool RHIContext::IsDisplayChanged()
@@ -359,7 +290,7 @@ WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 InWidth, uint32 InHeight, ui
 	return g_pDevice->CreateTexture3D(&descriptor);
 }
 
-WTextureSRVRHIRef RHIContext::CreateTextureSRV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)
+WTextureViewRHIRef RHIContext::CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)
 {
 	RHITextureViewDescriptor descriptor = {};
 	{
@@ -370,17 +301,7 @@ WTextureSRVRHIRef RHIContext::CreateTextureSRV(uint32 InMipIndex, uint32 InMipCo
 		descriptor.arrayLayerCount = InLayerCount;
 		descriptor.dimension = InDimension;
 	}
-	return g_pDevice->CreateTextureSRV(&descriptor, InTexture);
-}
-
-WTextureUAVRHIRef RHIContext::CreateTextureUAV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 LayerCount, uint32 PlaneIndex, uint32 PlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)
-{
-	return WTextureUAVRHIRef();
-}
-
-WTextureRTVRHIRef RHIContext::CreateTextureRTV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 LayerCount, uint32 PlaneIndex, uint32 PlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)
-{
-	return WTextureRTVRHIRef();
+	return g_pDevice->CreateTextureView(&descriptor, InTexture);
 }
 
 WRenderPassRHIRef RHIContext::CreateRenderPass(RHIRenderPassDescriptor* descriptor)
@@ -400,47 +321,6 @@ RHIViewport* RHIContext::CreateViewport(RHIViewportDescriptor* descriptor)
 
 void RHIContext::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height)
 {
-
-	RHICommandBuffer *cmd = GetCommandBuffer(true);
-	cmd->BeginScopePass("Copy Buffer");
-	{
-		RHIGraphicsEncoder *encoder = cmd->GetGraphicsEncoder();
-		TextureBarrier textureBarrier = { pTexture, AttachmentLayout::Undefined, AttachmentLayout::BlitDst, 0, ACCESS_TRANSFER_WRITE, IMAGE_ASPECT_COLOR };
-		RHIBarrierDescriptor barrierDescriptor = {};
-		{
-			barrierDescriptor.srcStage = PIPELINE_STAGE_HOST;
-			barrierDescriptor.dstStage = PIPELINE_STAGE_TRANSFER;
-			barrierDescriptor.textureCount = 1;
-			barrierDescriptor.pTextureBarriers = &textureBarrier;
-		}
-		encoder->ResourceBarrier(&barrierDescriptor);
-		encoder->CopyBufferToImage(pTexture, pBuffer, width, height);
-		{
-			barrierDescriptor.srcStage = PIPELINE_STAGE_TRANSFER;
-			barrierDescriptor.dstStage = PIPELINE_STAGE_FRAGMENT_SHADER;
-			textureBarrier.srcAccess = ACCESS_TRANSFER_WRITE;
-			textureBarrier.dstAccess = ACCESS_SHADER_READ;
-			textureBarrier.oldLayout = AttachmentLayout::BlitDst;
-			textureBarrier.newLayout = AttachmentLayout::ReadOnlyColor;
-		}
-		encoder->ResourceBarrier(&barrierDescriptor);
-	}
-	cmd->EndScopePass();
-	RHISubmitDescriptor submitDescriptor = {};
-	{
-		submitDescriptor.pFence = nullptr;
-		submitDescriptor.waitSemaphoreCount = 0;
-		submitDescriptor.pWaitSemaphores = nullptr;
-		submitDescriptor.signalSemaphoreCount = 0;
-		submitDescriptor.pSignalSemaphores = nullptr;
-		submitDescriptor.waitStage = 0;
-		submitDescriptor.commandBufferCount = 1;
-		submitDescriptor.pCommandBuffers = &cmd;
-	}
-	g_pQueue->Submit(&submitDescriptor);
-	g_pDevice->Wait();
-	cmd->~RHICommandBuffer();
-	NormalAllocator::Get()->Deallocate(cmd);
 
 }
 

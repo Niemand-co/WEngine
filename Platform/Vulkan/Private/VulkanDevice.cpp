@@ -282,7 +282,7 @@ namespace Vulkan
 			viewportStateCreateInfo.scissorCount = descriptor->scissorCount;
 			viewportStateCreateInfo.pScissors = ((VulkanScissor*)descriptor->pScissors)->GetHandle();
 			viewportStateCreateInfo.viewportCount = descriptor->viewportCount;
-			viewportStateCreateInfo.pViewports = ((VulkanViewport*)descriptor->pViewports)->GetHandle();
+			viewportStateCreateInfo.pViewports = {};
 		}
 
 		VkPipelineRasterizationStateCreateInfo rasterizationStateCreateInfo = {};
@@ -457,7 +457,7 @@ namespace Vulkan
 		return new VulkanTexture3D(this, &imageCreateInfo);
 	}
 
-	WTextureSRVRHIRef VulkanDevice::CreateTextureSRV(RHITextureViewDescriptor* descriptor, RHITexture* InTexture)
+	WTextureViewRHIRef VulkanDevice::CreateTextureView(RHITextureViewDescriptor* descriptor, RHITexture* InTexture)
 	{
 		VkImageViewCreateInfo ImageViewCreateInfo = {};
 		{
@@ -484,17 +484,7 @@ namespace Vulkan
 				ImageViewCreateInfo.subresourceRange.aspectMask |= (VkImageAspectFlags)(1 << (PlaneIndex + descriptor->planeIndex));
 			}
 		}
-		return WTextureSRVRHIRef();
-	}
-
-	WTextureUAVRHIRef VulkanDevice::CreateTextureUAV(RHITextureViewDescriptor* descriptor, RHITexture* InTexture)
-	{
-		return WTextureUAVRHIRef();
-	}
-
-	WTextureRTVRHIRef VulkanDevice::CreateTextureRTV(RHITextureViewDescriptor* descriptor, RHITexture* InTexture)
-	{
-		return WTextureRTVRHIRef();
+		return new VulkanTextureView(this, &ImageViewCreateInfo);
 	}
 
 	RHISampler* VulkanDevice::CreateSampler(RHISamplerDescriptor* descriptor)
@@ -525,32 +515,6 @@ namespace Vulkan
 		::new (sampler) VulkanSampler(pSampler);
 
 		return sampler;
-	}
-
-	RHIRenderTarget* VulkanDevice::CreateRenderTarget(RHIRenderTargetDescriptor* descriptor)
-	{
-		WEngine::WArray<VkImageView> views(descriptor->bufferCount);
-		for (unsigned int i = 0; i < views.Size(); ++i)
-		{
-			views[i] = (static_cast<VulkanTextureView*>(descriptor->pBufferView[i])->GetHandle());
-		}
-
-		VkFramebufferCreateInfo framebufferCreateInfo = {};
-		framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferCreateInfo.attachmentCount = views.Size();
-		framebufferCreateInfo.pAttachments = views.GetData();
-		framebufferCreateInfo.renderPass = *static_cast<VulkanRenderPass*>(descriptor->renderPass)->GetHandle();
-		framebufferCreateInfo.width = descriptor->width;
-		framebufferCreateInfo.height = descriptor->height;
-		framebufferCreateInfo.layers = 1;
-
-		VkFramebuffer *framebuffer = (VkFramebuffer*)NormalAllocator::Get()->Allocate(sizeof(VkFramebuffer));
-		RE_ASSERT(vkCreateFramebuffer(pDevice, &framebufferCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), framebuffer) == VK_SUCCESS, "Failed to Create Framebuffer.");
-
-		VulkanRenderTarget *renderTarget = (VulkanRenderTarget*)NormalAllocator::Get()->Allocate(sizeof(VulkanRenderTarget));
-		::new (renderTarget) VulkanRenderTarget(framebuffer, descriptor->width, descriptor->height, &pDevice);
-
-		return renderTarget;
 	}
 
 	WVertexBufferRHIRef VulkanDevice::CreateVertexBuffer(RHIBufferDescriptor* descriptor)
@@ -744,7 +708,7 @@ namespace Vulkan
 		pViewport->maxDepth = descriptor->maxDepth;
 
 		VulkanViewport *viewport = (VulkanViewport*)NormalAllocator::Get()->Allocate(sizeof(VulkanViewport));
-		::new (viewport) VulkanViewport(pViewport);
+		::new (viewport) VulkanViewport(this);
 
 		return viewport;
 	}
@@ -759,7 +723,7 @@ namespace Vulkan
 			for (unsigned int j = 0; j < descriptor->pBindingDescriptors[i].bufferResourceCount; ++j)
 			{
 				::new (pDescriptorBufferInfos[i] + j) VkDescriptorBufferInfo();
-				pDescriptorBufferInfos[i][j].buffer = *static_cast<VulkanUniformBuffer*>((descriptor->pBindingDescriptors[i].pBufferResourceInfo + j)->pBuffer)->GetHandle();
+				pDescriptorBufferInfos[i][j].buffer = static_cast<VulkanUniformBuffer*>((descriptor->pBindingDescriptors[i].pBufferResourceInfo + j)->pBuffer)->GetHandle();
 				pDescriptorBufferInfos[i][j].offset = (descriptor->pBindingDescriptors[i].pBufferResourceInfo + j)->offset;
 				pDescriptorBufferInfos[i][j].range = (descriptor->pBindingDescriptors[i].pBufferResourceInfo + j)->range;
 			}
@@ -798,7 +762,7 @@ namespace Vulkan
 			{
 				::new (pDescriptorImageInfos[i] + j) VkDescriptorImageInfo();
 				TextureResourceInfo *info = descriptor->pTextureInfo + j;
-				pDescriptorImageInfos[i][j].imageView = info->pTextureView ? *static_cast<VulkanTextureView*>(info->pTextureView)->GetHandle() : nullptr;
+				pDescriptorImageInfos[i][j].imageView = info->pTextureView ? static_cast<VulkanTextureView*>(info->pTextureView)->GetHandle() : nullptr;
 				pDescriptorImageInfos[i][j].sampler = info->pSampler ? *static_cast<VulkanSampler*>(info->pSampler)->GetHandle() : nullptr;
 				pDescriptorImageInfos[i][j].imageLayout = WEngine::ToVulkan(info->layout);
 			}
@@ -826,23 +790,9 @@ namespace Vulkan
 		NormalAllocator::Get()->Deallocate(pWriteDescriptorSets);
 	}
 
-	WEngine::WArray<RHISemaphore*> VulkanDevice::GetSemaphore(unsigned int count)
+	RHISemaphore* VulkanDevice::GetSemaphore()
 	{
-		VkSemaphore *pSemaphore = (VkSemaphore*)NormalAllocator::Get()->Allocate(count * sizeof(VkSemaphore));
-		VulkanSemaphore *semaphore = (VulkanSemaphore*)NormalAllocator::Get()->Allocate(count * sizeof(VulkanSemaphore));
-		WEngine::WArray<RHISemaphore*> semaphores(count);
-		
-		VkSemaphoreCreateInfo semaphoreCreateInfo = {};
-		semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-		semaphoreCreateInfo.flags = VK_PIPELINE_STAGE_HOST_BIT;
-		for (int i = 0; i < count; ++i)
-		{
-			RE_ASSERT(vkCreateSemaphore(pDevice, &semaphoreCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pSemaphore + i) == VK_SUCCESS, "Failed to Create Semaphore.");
-			::new (semaphore + i) VulkanSemaphore(pSemaphore + i);
-			semaphores[i] = semaphore + i;
-		}
-
-		return semaphores;
+		return new VulkanSemaphore(this);
 	}
 
 	void VulkanDevice::WaitForFences(RHIFence* pFences, unsigned int count, bool waitForAll)
@@ -872,7 +822,7 @@ namespace Vulkan
 	int VulkanDevice::GetNextImage(RHISwapchain *swapchain, RHISemaphore *semaphore)
 	{
 		unsigned int index;
-		VkResult result = vkAcquireNextImageKHR(pDevice, static_cast<VulkanSwapchain*>(swapchain)->GetHandle(), (std::numeric_limits<uint64_t>::max)(), *static_cast<VulkanSemaphore*>(semaphore)->GetHandle(), VK_NULL_HANDLE, &index);
+		VkResult result = vkAcquireNextImageKHR(pDevice, static_cast<VulkanSwapchain*>(swapchain)->GetHandle(), (std::numeric_limits<uint64_t>::max)(), static_cast<VulkanSemaphore*>(semaphore)->GetHandle(), VK_NULL_HANDLE, &index);
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || Window::cur_window->IsSizeChanged())
 		{
 			vkDeviceWaitIdle(pDevice);
@@ -889,13 +839,13 @@ namespace Vulkan
 	VkImageUsageFlags VulkanDevice::GetImageUsage(ETextureCreateFlags Flag)
 	{
 		VkImageUsageFlags Usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-		if ((Flag & ETextureCreateFlags::TextureCreate_Present) != ETextureCreateFlags::None)
+		if ((Flag & ETextureCreateFlags::TextureCreate_Presentable) != ETextureCreateFlags::TextureCreate_None)
 		{
 			Usage |= VK_IMAGE_USAGE_STORAGE_BIT;
 		}
-		else if ((Flag & ETextureCreateFlags::TextureCreate_RenderTarget) != ETextureCreateFlags::None)
+		else if ((Flag & ETextureCreateFlags::TextureCreate_RenderTarget) != ETextureCreateFlags::TextureCreate_None)
 		{
-			if ((Flag & ETextureCreateFlags::TextureCreate_InputAttachmentReadable) != ETextureCreateFlags::None)
+			if ((Flag & ETextureCreateFlags::TextureCreate_InputAttachmentReadable) != ETextureCreateFlags::TextureCreate_None)
 			{
 				Usage |= (VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
 			}
@@ -904,9 +854,9 @@ namespace Vulkan
 				Usage |= (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
 			}
 		}
-		else if ((Flag & ETextureCreateFlags::TextureCreate_DepthStencil) != ETextureCreateFlags::None)
+		else if ((Flag & ETextureCreateFlags::TextureCreate_DepthStencil) != ETextureCreateFlags::TextureCreate_None)
 		{
-			if ((Flag & ETextureCreateFlags::TextureCreate_InputAttachmentReadable) != ETextureCreateFlags::None)
+			if ((Flag & ETextureCreateFlags::TextureCreate_InputAttachmentReadable) != ETextureCreateFlags::TextureCreate_None)
 			{
 				Usage |= (VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT | VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
 			}
@@ -916,7 +866,7 @@ namespace Vulkan
 			}
 		}
 
-		if ((Flag & ETextureCreateFlags::TextureCreate_UAV) != ETextureCreateFlags::None)
+		if ((Flag & ETextureCreateFlags::TextureCreate_UAV) != ETextureCreateFlags::TextureCreate_None)
 		{
 			Usage |= VK_IMAGE_USAGE_STORAGE_BIT;
 		}

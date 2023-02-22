@@ -19,10 +19,6 @@ public:
 
 	virtual ~DrawSkyboxPass();
 
-	virtual void Setup() override;
-
-	virtual void Execute() override;
-
 private:
 
 	WEngine::WArray<RHICommandBuffer*> m_pCommandBuffers;

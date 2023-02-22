@@ -44,7 +44,7 @@ namespace WEngine
 		{
 			(m_pData + i)->~T();
 		}
-		Allocator::Get()->Deallocate(m_pData);
+		NormalAllocator::Get()->Deallocate(m_pData);
 	}
 
 	template<typename T>
@@ -57,14 +57,14 @@ namespace WEngine
 		}
 		if (m_size == 0)
 		{
-			m_pData = (T*)Allocator::Get()->Allocate(sizeof(T));
+			m_pData = (T*)NormalAllocator::Get()->Allocate(sizeof(T));
 			m_pData[0] = element;
 			m_count = 1;
 			m_size = 1;
 		}
 		else if (m_count == m_size)
 		{
-			T *newPtr = (T*)Allocator::Get()->Allocate(2 * m_size * sizeof(T));
+			T *newPtr = (T*)NormalAllocator::Get()->Allocate(2 * m_size * sizeof(T));
 			memcpy(newPtr, m_pData, sizeof(T) * m_count);
 			newPtr[m_count] = element;
 			m_count++;

@@ -8,7 +8,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTextureBase(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo);
+		VulkanTextureBase(class VulkanDevice* pInDevice, VkImageCreateInfo* pInfo);
 
 		virtual ~VulkanTextureBase();
 
@@ -22,7 +22,7 @@ namespace Vulkan
 
 		VkImage Image;
 
-		class VulkanDevice *pDevice;
+		VulkanDevice *pDevice;
 
 	};
 

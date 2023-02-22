@@ -47,6 +47,8 @@ public:
 
 	void DrawIndexedPrimitive(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount);
 
+	void SetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth);
+
 	uint32 AcquireImageIndex();
 
 	WVertexBufferRHIRef CreateVertexBuffer(size_t stride, size_t count);
@@ -69,11 +71,7 @@ public:
 
 	WTexture3DRHIRef CreateTexture3D(uint32 InWith, uint32 InHeight, uint32 InDepth, Format format, uint32 InMipCount = 1u, ETextureCreateFlags InFlag = ETextureCreateFlags::TextureCreate_None);
 
-	WTextureSRVRHIRef CreateTextureSRV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, class RHITexture* InTexture);
-
-	WTextureSRVRHIRef CreateTextureUAV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, class RHITexture* InTexture);
-
-	WTextureSRVRHIRef CreateTextureRTV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, class RHITexture *InTexture);
+	WTextureViewRHIRef CreateTextureSRV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, class RHITexture* InTexture);
 
 	WRenderPassRHIRef CreateRenderPass(class RHIRenderPassDescriptor* descriptor);
 

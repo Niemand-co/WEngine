@@ -11,7 +11,7 @@ class PrePass : public ScriptableRenderPass
 {
 public:
 
-	PrePass(ScriptableRenderer* pRenderer);
+	PrePass();
 
 	virtual ~PrePass();
 

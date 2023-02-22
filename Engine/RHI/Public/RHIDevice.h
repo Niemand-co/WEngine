@@ -34,15 +34,9 @@ public:
 
 	virtual WTexture3DRHIRef CreateTexture3D(class RHITextureDescriptor* descriptor) = 0;
 
-	virtual WTextureSRVRHIRef CreateTextureSRV(class RHITextureViewDescriptor *descriptor, RHITexture* InTexture) = 0;
-
-	virtual WTextureUAVRHIRef CreateTextureUAV(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture) = 0;
-
-	virtual WTextureRTVRHIRef CreateTextureRTV(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture) = 0;
+	virtual WTextureViewRHIRef CreateTextureView(class RHITextureViewDescriptor *descriptor, RHITexture *InTexture) = 0;
 
 	virtual class RHISampler* CreateSampler(class RHISamplerDescriptor * descriptor) = 0;
-
-	virtual RHIRenderTarget* CreateRenderTarget(class RHIRenderTargetDescriptor *descriptor) = 0;
 
 	virtual WVertexBufferRHIRef CreateVertexBuffer(class RHIBufferDescriptor* descriptor) = 0;
 
@@ -70,7 +64,7 @@ public:
 
 	virtual void UpdateTextureResourceToGroup(class RHIUpdateResourceDescriptor *descriptor) = 0;
 
-	virtual WEngine::WArray<class RHISemaphore*> GetSemaphore(unsigned int count) = 0;
+	virtual class RHISemaphore* GetSemaphore() = 0;
 
 	virtual void WaitForFences(class RHIFence *pFences, unsigned int count, bool waitForAll = true) = 0;
 

@@ -15,10 +15,6 @@ public:
 
 	virtual ~MainLightShadowPass();
 
-	virtual void Setup() override;
-
-	virtual void Execute() override;
-
 private:
 
 	

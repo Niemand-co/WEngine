@@ -12,7 +12,6 @@ WShadowMap2D::~WShadowMap2D()
 
 void WShadowMap2D::InitRHIResource()
 {
-	Texture = GetRenderCommandList()->CreateTexture2D(Width, Height, format, IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT, IMAGE_ASPECT_DEPTH | IMAGE_ASPECT_STENCIL);
 }
 
 void WShadowMap2D::ReleaseRHIResource()

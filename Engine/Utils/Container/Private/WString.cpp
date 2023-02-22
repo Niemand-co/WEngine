@@ -19,20 +19,20 @@ namespace WEngine
 			return;
 		}
 		m_size = strlen(str);
-		m_pData = (char*)Allocator::Get()->Allocate(m_size + 1);
+		m_pData = (char*)NormalAllocator::Get()->Allocate(m_size + 1);
 		memcpy(m_pData, str, m_size + 1);
 	}
 
 	WString::WString(const WString& string)
 	{
 		m_size = string.m_size;
-		m_pData = (char*)Allocator::Get()->Allocate(m_size + 1);
+		m_pData = (char*)NormalAllocator::Get()->Allocate(m_size + 1);
 		memcpy(m_pData, string.m_pData, m_size + 1);
 	}
 
 	WString::~WString()
 	{
-		Allocator::Get()->Deallocate(m_pData);
+		NormalAllocator::Get()->Deallocate(m_pData);
 	}
 
 	int32 WString::find(const char& c) const
@@ -92,7 +92,7 @@ namespace WEngine
 		RE_ASSERT(length <= m_size, "Out of String Length.");
 		WString newstring;
 		newstring.m_size = length;
-		newstring.m_pData = (char*)Allocator::Get()->Allocate(length + 1);
+		newstring.m_pData = (char*)NormalAllocator::Get()->Allocate(length + 1);
 		memcpy(newstring.m_pData, m_pData, length);
 		*(newstring.m_pData + length) = '\0';
 		return newstring;
@@ -103,7 +103,7 @@ namespace WEngine
 		RE_ASSERT((start + length) <= m_size, "Out of String Length.");
 		WString newstring;
 		newstring.m_size = length;
-		newstring.m_pData = (char*)Allocator::Get()->Allocate(length + 1);
+		newstring.m_pData = (char*)NormalAllocator::Get()->Allocate(length + 1);
 		memcpy(newstring.m_pData, m_pData + start, length);
 		*(newstring.m_pData + length) = '\0';
 		return newstring;
@@ -112,7 +112,7 @@ namespace WEngine
 	WString operator+(const char* str, const WString& string)
 	{
 		size_t length = strlen(str);
-		char* newPtr = (char*)Allocator::Get()->Allocate(length + string.m_size + 1);
+		char* newPtr = (char*)NormalAllocator::Get()->Allocate(length + string.m_size + 1);
 		memcpy(newPtr, str, length);
 		memcpy(newPtr + length, string.m_pData, string.m_size + 1);
 		WString newString = WString();

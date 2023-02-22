@@ -23,7 +23,7 @@ void RHICommandDrawIndexedPrimitive::Execute(RHICommandListBase* CmdList)
 
 void RHICommandSetViewport::Execute(RHICommandListBase* CmdList)
 {
-	ENCODER_EXECUTE(SetViewport)({});
+	ENCODER_EXECUTE(SetViewport)(MinX, MinY, MaxX - MinX, MaxY - MaxY, MinZ, MaxZ);
 }
 
 void RHICommandSetScissor::Execute(RHICommandListBase* CmdList)

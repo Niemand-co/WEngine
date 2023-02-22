@@ -40,82 +40,82 @@ void WRDGBuilder::Compile()
 		bool bWithAsyncCompute = WEngine::EnumHasFlags(Pass->Flag, EPassFlag::AsyncCompute);
 
 		Pass->TextureStates.Enumerate([this, &Handle](WEngine::WPair<WRDGTexture*, WRDGPass::TextureState>& TexturePair)
-		{
-			WRDGTexture* Texture = TexturePair.First();
-			auto& PassNeedState = TexturePair.Second();
-			Texture->ReferenceCount+= PassNeedState.ReferenceCount;
-
-			WEngine::WArray<WRDGResourceState*>& TextureState = Texture->GetMergeState();
-
-			uint32 SubresourceCount = PassNeedState.States.Size();
-			PassNeedState.MergeStates.Resize(SubresourceCount);
-			if (TextureState.Size() != SubresourceCount)
 			{
-				InitResource(TextureState, SubresourceCount);
-			}
+				WRDGTexture* Texture = TexturePair.First();
+				auto& PassNeedState = TexturePair.Second();
+				Texture->ReferenceCount += PassNeedState.ReferenceCount;
 
-			for (uint32 Index = 0; Index < SubresourceCount; ++Index)
-			{
-				if (PassNeedState.States[Index].Access == EAccess::Unknown)
+				WEngine::WArray<WRDGResourceState*>& TextureState = Texture->GetMergeState();
+
+				uint32 SubresourceCount = PassNeedState.States.Size();
+				PassNeedState.MergeStates.Resize(SubresourceCount);
+				if (TextureState.Size() != SubresourceCount)
 				{
-					continue;
+					InitResource(TextureState, SubresourceCount);
 				}
 
-				if (!TextureState[Index] || !WRDGResourceState::IsMergeAllowed(*TextureState[Index], PassNeedState.States[Index]))
+				for (uint32 Index = 0; Index < SubresourceCount; ++Index)
 				{
-					if (TextureState[Index] && TextureState[Index]->Pipeline != PassNeedState.States[Index].Pipeline)
+					if (PassNeedState.States[Index].Access == EAccess::Unknown)
 					{
-						if (Passes[Handle]->Producers.Find(TextureState[Index]->LastPass) == Passes[Handle]->Producers.end())
-						{
-							Passes[Handle]->Producers.Push(TextureState[Index]->LastPass);
-						}
+						continue;
 					}
 
-					TextureState[Index] = (WRDGResourceState*)(WRDGAllocator::Get()->Allocate(sizeof(WRDGResourceState)));
-					memcpy(TextureState[Index], &PassNeedState.States[Index], sizeof(WRDGResourceState));
-					TextureState[Index]->FirstPass = TextureState[Index]->LastPass = Handle;
+					if (!TextureState[Index] || !WRDGResourceState::IsMergeAllowed(*TextureState[Index], PassNeedState.States[Index]))
+					{
+						if (TextureState[Index] && TextureState[Index]->Pipeline != PassNeedState.States[Index].Pipeline)
+						{
+							if (Passes[Handle]->Producers.Find(TextureState[Index]->LastPass) == Passes[Handle]->Producers.end())
+							{
+								Passes[Handle]->Producers.Push(TextureState[Index]->LastPass);
+							}
+						}
+
+						TextureState[Index] = (WRDGResourceState*)(WRDGAllocator::Get()->Allocate(sizeof(WRDGResourceState)));
+						memcpy(TextureState[Index], &PassNeedState.States[Index], sizeof(WRDGResourceState));
+						TextureState[Index]->FirstPass = TextureState[Index]->LastPass = Handle;
+					}
+					else
+					{
+						TextureState[Index]->Access |= PassNeedState.States[Index].Access;
+						TextureState[Index]->LastPass = Handle;
+					}
+					PassNeedState.MergeStates[Index] = TextureState[Index];
 				}
-				else
-				{
-					TextureState[Index]->Access |= PassNeedState.States[Index].Access;
-					TextureState[Index]->LastPass = Handle;
-				}
-				PassNeedState.MergeStates[Index] = TextureState[Index];
-			}
-		});
+			});
 
 		Pass->BufferStates.Enumerate([this, &Handle](WEngine::WPair<WRDGBuffer*, WRDGPass::BufferState>& BufferPair)
-		{
-			WRDGBuffer* Buffer = BufferPair.First();
-			auto& PassNeedState = BufferPair.Second();
-			Buffer->ReferenceCount += PassNeedState.ReferenceCount;
-
-			if (PassNeedState.State.Access == EAccess::Unknown)
 			{
-				return;
-			}
+				WRDGBuffer* Buffer = BufferPair.First();
+				auto& PassNeedState = BufferPair.Second();
+				Buffer->ReferenceCount += PassNeedState.ReferenceCount;
 
-			if (!Buffer->MergeState || !WRDGResourceState::IsMergeAllowed(*Buffer->MergeState, PassNeedState.State))
-			{
-				if (Buffer->MergeState && PassNeedState.State.Pipeline != Buffer->MergeState->Pipeline)
+				if (PassNeedState.State.Access == EAccess::Unknown)
 				{
-					if (Passes[Handle]->Producers.Find(Buffer->MergeState->LastPass) == Passes[Handle]->Producers.end())
+					return;
+				}
+
+				if (!Buffer->MergeState || !WRDGResourceState::IsMergeAllowed(*Buffer->MergeState, PassNeedState.State))
+				{
+					if (Buffer->MergeState && PassNeedState.State.Pipeline != Buffer->MergeState->Pipeline)
 					{
-						Passes[Handle]->Producers.Push(Buffer->MergeState->LastPass);
-					}
+						if (Passes[Handle]->Producers.Find(Buffer->MergeState->LastPass) == Passes[Handle]->Producers.end())
+						{
+							Passes[Handle]->Producers.Push(Buffer->MergeState->LastPass);
+						}
 
-					Buffer->MergeState = (WRDGResourceState*)(WRDGAllocator::Get()->Allocate(sizeof(WRDGResourceState)));
-					memcpy(Buffer->MergeState, &PassNeedState.State, sizeof(WRDGResourceState));
-					Buffer->MergeState->FirstPass = Buffer->MergeState->LastPass = Handle;
+						Buffer->MergeState = (WRDGResourceState*)(WRDGAllocator::Get()->Allocate(sizeof(WRDGResourceState)));
+						memcpy(Buffer->MergeState, &PassNeedState.State, sizeof(WRDGResourceState));
+						Buffer->MergeState->FirstPass = Buffer->MergeState->LastPass = Handle;
+					}
+					else
+					{
+						Buffer->MergeState->Access |= PassNeedState.State.Access;
+						Buffer->MergeState->LastPass = Handle;
+					}
+					PassNeedState.MergeState = Buffer->MergeState;
 				}
-				else
-				{
-					Buffer->MergeState->Access |= PassNeedState.State.Access;
-					Buffer->MergeState->LastPass = Handle;
-				}
-				PassNeedState.MergeState = Buffer->MergeState;
-			}
-		});
+			});
 	}
 
 	PassMerging();
@@ -127,33 +127,33 @@ void WRDGBuilder::Execute()
 
 	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
 	{
-		Passes[Handle]->Parameters.EnumerateTextures(Passes[Handle]->Flag, [&Handle](EUniformBaseType Type, auto Texture, EAccess Access)
-		{
-			BeginResourceRHI(Type, Handle, Texture);
-		});
+		Passes[Handle]->Parameters.EnumerateTextures(Passes[Handle]->Flag, [&Handle, this](EUniformBaseType Type, auto Texture, EAccess Access)
+			{
+				this->BeginResourceRHI(Type, Handle, Texture);
+			});
 
-		Passes[Handle]->Parameters.EnumerateTextures(Passes[Handle]->Flag, [&Handle](EUniformBaseType, auto Texture, EAccess Access)
-		{
-			EndResourceRHI(Type, Handle, Texture);
-		});
+		Passes[Handle]->Parameters.EnumerateTextures(Passes[Handle]->Flag, [&Handle, this](EUniformBaseType Type, auto Texture, EAccess Access)
+			{
+				this->EndResourceRHI(Type, Handle, Texture);
+			});
 	}
 
 	for (WRDGTextureHandle Handle = Textures.Begin(); Handle != Textures.End(); ++Handle)
 	{
 		WRDGTexture* Texture = Textures[Handle];
-		
+
 	}
 }
 
 WRDGTexture* WRDGBuilder::CreateTexture(const WRDGTextureDesc& inDesc, const char* inName)
 {
-	WRDGTexture *Texture = Textures.Allocate<WRDGTexture>(inDesc, inName);
+	WRDGTexture* Texture = Textures.Allocate<WRDGTexture>(inDesc, inName);
 	return Texture;
 }
 
 WRDGBuffer* WRDGBuilder::CreateBuffer(const WRDGBufferDesc& inDesc, const char* inName)
 {
-	WRDGBuffer *Buffer = Buffers.Allocate<WRDGBuffer>(inDesc, inName);
+	WRDGBuffer* Buffer = Buffers.Allocate<WRDGBuffer>(inDesc, inName);
 	return Buffer;
 }
 
@@ -166,17 +166,17 @@ void WRDGBuilder::PassCulling()
 
 	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
 	{
-		WRDGPass *Pass = Passes[Handle];
+		WRDGPass* Pass = Passes[Handle];
 		bool bUntrackedOutput = Pass->Parameters.HasExternalOutput();
 		Pass->TextureStates.Enumerate([&bUntrackedOutput](WEngine::WPair<WRDGTexture*, WRDGPass::TextureState>& TexturePair)
-		{
-			bUntrackedOutput |= TexturePair.First()->IsExternal();
-		});
+			{
+				bUntrackedOutput |= TexturePair.First()->IsExternal();
+			});
 
 		Pass->BufferStates.Enumerate([&bUntrackedOutput](WEngine::WPair<WRDGTexture*, WRDGPass::BufferState>& BufferPair)
-		{
-			bUntrackedOutput |= BufferPair.First()->IsExternal();
-		});
+			{
+				bUntrackedOutput |= BufferPair.First()->IsExternal();
+			});
 
 		PassesNeverCull[Handle] = Pass->IsNeverCulling();
 		PassesWithUntrackedOutput[Handle] = bUntrackedOutput;
@@ -184,9 +184,9 @@ void WRDGBuilder::PassCulling()
 
 	WEngine::WArray<WRDGPassHandle> PassesProcessing;
 
-	for (WRDGPassHandle Handle = Passes.Begin(); Handle < Passes.End(); Handle++)
+	for (WRDGPassHandle Handle = Passes.Begin(); Handle < Passes.End(); ++Handle)
 	{
-		if(PassesNeverCull[Handle] || PassesWithUntrackedOutput[Handle])
+		if (PassesNeverCull[Handle] || PassesWithUntrackedOutput[Handle])
 			PassesProcessing.Push(Handle);
 	}
 
@@ -224,7 +224,7 @@ void WRDGBuilder::PassMerging()
 
 		if (PassesToMerge.Size() == 1)
 		{
-			WRDGPass *Pass = Passes[PassesToMerge[0]];
+			WRDGPass* Pass = Passes[PassesToMerge[0]];
 			Pass->bSkipRenderPassBegin = false;
 			Pass->bSkipRenderPassEnd = false;
 			Pass->PrologueRenderPass = PassesToMerge[0];
@@ -235,7 +235,7 @@ void WRDGBuilder::PassMerging()
 		WRDGPassHandle LastPassHandle = PassesToMerge[PassesToMerge.Size() - 1];
 
 		{
-			WRDGPass *FirstPass = Passes[FirstPassHandle];
+			WRDGPass* FirstPass = Passes[FirstPassHandle];
 			FirstPass->bSkipRenderPassEnd = true;
 			FirstPass->bSkipRenderPassBegin = false;
 			FirstPass->PrologueRenderPass = FirstPassHandle;
@@ -244,7 +244,7 @@ void WRDGBuilder::PassMerging()
 
 		for (uint32 HandleIndex = 1; HandleIndex < PassesToMerge.Size() - 1; ++HandleIndex)
 		{
-			WRDGPass *Pass = Passes[PassesToMerge[HandleIndex]];
+			WRDGPass* Pass = Passes[PassesToMerge[HandleIndex]];
 			Pass->bSkipRenderPassBegin = true;
 			Pass->bSkipRenderPassEnd = true;
 			Pass->PrologueRenderPass = FirstPassHandle;
@@ -266,41 +266,41 @@ void WRDGBuilder::PassMerging()
 
 void WRDGBuilder::SetupPass(WRDGPass* Pass)
 {
-	const WRDGParameterStruct &Parameters = Pass->Parameters;
+	const WRDGParameterStruct& Parameters = Pass->Parameters;
 	const WRDGPassHandle& Handle = Pass->Handle;
 	EPipeline Pipeline = Pass->GetPipeline();
 
-	Parameters.EnumerateTextures(Pass->Flag, [&Pass, &Pipeline, &Handle](EUniformBaseType Type, auto Texture, EAccess Access)
-	{
-		auto& PassState = Pass->TextureStates[Texture];
-		PassState.ReferenceCount++;
-
-		PassState.States.Resize(Texture->Layout.MipCount * Texture->Layout.LayerCount * Texture->Layout.PlaneCount);
-
-		WRDGTextureSubresourceRange Range = Texture->GetSubresourceRange();
-		Texture->EnumerateSubresource(Range, [&PassState, &Pipeline, &Handle, &Access](uint32 Index)
+	Parameters.EnumerateTextures(Pass->Flag, [&Pass, &Pipeline, &Handle](EUniformBaseType Type, WRDGTexture* Texture, EAccess Access)
 		{
-			PassState.States[Index].Access = GetValidWriteAccess(PassState.States[Index].Access | Access);
-			PassState.States[Index].Pipeline = Pipeline;
-			PassState.States[Index].FirstPass = Handle;
-			PassState.States[Index].LastPass = Handle;
+			auto& PassState = Pass->TextureStates[Texture];
+			PassState.ReferenceCount++;
+
+			PassState.States.Resize(Texture->Layout.MipCount * Texture->Layout.LayerCount * Texture->Layout.PlaneCount);
+
+			WRDGTextureSubresourceRange Range = Texture->GetSubresourceRange();
+			Texture->EnumerateSubresource(Range, [&PassState, &Pipeline, &Handle, &Access](uint32 Index)
+				{
+					PassState.States[Index].Access = GetValidWriteAccess(PassState.States[Index].Access | Access);
+					PassState.States[Index].Pipeline = Pipeline;
+					PassState.States[Index].FirstPass = Handle;
+					PassState.States[Index].LastPass = Handle;
+				});
+
+			Pass->bHasUAVResource |= WEngine::EnumHasFlags(Access, EAccess::UAV);
 		});
 
-		Pass->bHasUAVResource |= WEngine::EnumHasFlags(Access, EAccess::UAV);
-	});
-
 	Parameters.EnumerateBuffers(Pass->Flag, [&Pass, &Pipeline, &Handle](EUniformBaseType Type, WRDGBuffer* Buffer, EAccess Access)
-	{
-		auto& BufferState = Pass->BufferStates[Buffer];
-		BufferState.ReferenceCount++;
+		{
+			auto& BufferState = Pass->BufferStates[Buffer];
+			BufferState.ReferenceCount++;
 
-		BufferState.State.Access = GetValidWriteAccess(BufferState.State.Access | Access);
-		BufferState.State.Pipeline = Pipeline;
-		BufferState.State.FirstPass = Handle;
-		BufferState.State.LastPass = Handle;
+			BufferState.State.Access = GetValidWriteAccess(BufferState.State.Access | Access);
+			BufferState.State.Pipeline = Pipeline;
+			BufferState.State.FirstPass = Handle;
+			BufferState.State.LastPass = Handle;
 
-		Pass->bHasUAVResource |= WEngine::EnumHasFlags(Access, EAccess::UAV);
-	});
+			Pass->bHasUAVResource |= WEngine::EnumHasFlags(Access, EAccess::UAV);
+		});
 }
 
 void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGTexture* Texture)
@@ -362,6 +362,10 @@ void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHan
 }
 
 void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGTextureUAV* UAV)
+{
+}
+
+void WRDGBuilder::EndResourceRHI(WRDGPassHandle PassHandle, WRDGTextureUAV* Texture)
 {
 }
 

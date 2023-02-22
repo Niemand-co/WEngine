@@ -22,9 +22,13 @@ void RHIRenderCommandList::DrawIndexedPrimitive(unsigned int indexCount, unsigne
 {
 }
 
+void RHIRenderCommandList::SetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth)
+{
+}
+
 uint32 RHIRenderCommandList::AcquireImageIndex()
 {
-    return RHIContext::GetContext()->AcquireImageIndex();
+    return RHIContext::GetContext()->AcquireImageIndex(nullptr);
 }
 
 WVertexBufferRHIRef RHIRenderCommandList::CreateVertexBuffer(size_t stride, size_t count)
@@ -77,19 +81,9 @@ WTexture3DRHIRef RHIRenderCommandList::CreateTexture3D(uint32 InWith, uint32 InH
     return RHIContext::GetContext()->CreateTexture3D(InWith, InHeight, InDepth, InFormat, InMipCount, InFlag);
 }
 
-WTextureSRVRHIRef RHIRenderCommandList::CreateTextureSRV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)
+WTextureViewRHIRef RHIRenderCommandList::CreateTextureSRV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)
 {
-    return RHIContext::GetContext()->CreateTextureSRV(InMipIndex, InMipCount, InLayerIndex, InLayerCount, InPlaneIndex, InPlaneCount, InDimension, InFormat, InTexture);
-}
-
-WTextureSRVRHIRef RHIRenderCommandList::CreateTextureUAV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)
-{
-    return WTextureSRVRHIRef();
-}
-
-WTextureSRVRHIRef RHIRenderCommandList::CreateTextureRTV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)
-{
-    return WTextureSRVRHIRef();
+    return RHIContext::GetContext()->CreateTextureView(InMipIndex, InMipCount, InLayerIndex, InLayerCount, InPlaneIndex, InPlaneCount, InDimension, InFormat, InTexture);
 }
 
 WRenderPassRHIRef RHIRenderCommandList::CreateRenderPass(RHIRenderPassDescriptor *descriptor)

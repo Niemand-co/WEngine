@@ -22,6 +22,6 @@ public:
 
 	uint32 layerCount = 1;
 
-	ETextureCreateFlags Flag = ETextureCreateFlags::None;
+	ETextureCreateFlags Flag = ETextureCreateFlags::TextureCreate_None;
 
 };

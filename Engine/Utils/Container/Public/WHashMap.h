@@ -10,23 +10,23 @@ namespace WEngine
 	template<typename k, typename v>
 	class WPair;
 
-	template<typename v>
+	template<typename k, typename v>
 	struct Entry
 	{
 		size_t id;
-		WPair<size_t, v> pair;
-		Entry<v> *next;
+		WPair<k, v> pair;
+		Entry<k, v> *next;
 
-		Entry(size_t key, const v& val) : id(key), pair(key, val), next(nullptr) {  }
+		Entry(k key, const v& val, size_t hashCode) : pair(key, val), id(hashCode), next(nullptr) {  }
 
 		void* operator new(size_t size)
 		{
-			return Allocator::Get()->Allocate(size);
+			return NormalAllocator::Get()->Allocate(size);
 		}
 
 		void operator delete(void* pData)
 		{
-			Allocator::Get()->Deallocate(pData);
+			NormalAllocator::Get()->Deallocate(pData);
 		}
 	};
 
@@ -54,7 +54,7 @@ namespace WEngine
 		template<typename LAMBDA>
 		void Enumerate(LAMBDA lambda)
 		{
-			for (Entry<v>* bucket : m_table)
+			for (Entry<k, v>* bucket : m_table)
 			{
 				while (bucket != nullptr)
 				{
@@ -68,7 +68,7 @@ namespace WEngine
 		{
 			size_t id = Hash(key);
 			size_t index = GetIndex(id);
-			Entry<v>* head = m_table[index];
+			Entry<k, v>* head = m_table[index];
 			while (head)
 			{
 				if (head->id == id)
@@ -88,13 +88,13 @@ namespace WEngine
 
 	private:
 
-		WArray<Entry<v>*> m_table;
+		WArray<Entry<k, v>*> m_table;
 
 	};
 
 	template<typename k, typename v, size_t(*Hash)(k key)>
 	inline WHashMap<k, v, Hash>::WHashMap()
-		: m_table(WArray<Entry<v>*>(64, nullptr))
+		: m_table(WArray<Entry<k, v>*>(64, nullptr))
 	{
 		
 	}
@@ -102,16 +102,16 @@ namespace WEngine
 	template<typename k, typename v, size_t(*Hash)(k key)>
 	inline bool WHashMap<k, v, Hash>::Insert(const k& key, const v& val)
 	{
-		Entry<v> *entry = new Entry(Hash(key), val);
+		Entry<k, v> *entry = new Entry(key, val, Hash(key));
 		size_t index = GetIndex(entry->id);
-		Entry<v> *head = m_table[index];
+		Entry<k, v> *head = m_table[index];
 		if (head == nullptr)
 		{
 			m_table[index] = entry;
 			return true;
 		}
 
-		Entry<v> *pre = head;
+		Entry<k, v> *pre = head;
 		while (head)
 		{
 			if (head->id == entry->id)
@@ -131,13 +131,13 @@ namespace WEngine
 	{
 		size_t id = Hash(key);
 		size_t index = GetIndex(id);
-		Entry<v>* head = m_table[index];
+		Entry<k, v>* head = m_table[index];
 		if (head == nullptr)
 		{
 			return false;
 		}
 
-		Entry<v>* pre = head;
+		Entry<k, v>* pre = head;
 		while (head)
 		{
 			if (head->id == id)
@@ -166,7 +166,7 @@ namespace WEngine
 	{
 		size_t id = Hash(key);
 		size_t index = GetIndex(id);
-		Entry<v>* head = m_table[index];
+		Entry<k, v>* head = m_table[index];
 		if (head == nullptr)
 		{
 			return false;

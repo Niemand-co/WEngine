@@ -1,5 +1,6 @@
 #pragma once
 #include "Render/Public/RenderDependencyGraphDefinitions.h"
+#include "Render/Public/RenderDependencyGraphResource.h"
 #include "Render/Descriptor/Public/RHIRenderPassDescriptor.h"
 
 inline EAccess GetPassAccess(EPassFlag Flag, EAccess& SRVAccess, EAccess& UAVAccess);
@@ -100,6 +101,7 @@ private:
 	WEngine::WArray<ResourceInfo> UniformBuffers;
 
 	friend struct WShaderParameterMetaData;
+	friend struct WRDGParameterStruct;
 };
 
 struct WShaderParameterMetaData
@@ -170,9 +172,9 @@ public:
 
 	bool HasExternalOutput() const;
 
-	const WRDGRenderTargetBinding& GetRenderTarget() const
+	const WRDGRenderTargetBindingSlots& GetRenderTarget() const
 	{
-		return *reinterpret_cast<const WRDGRenderTargetBinding*>(Contents + Layout->GetRenderTargetOffset());
+		return *reinterpret_cast<const WRDGRenderTargetBindingSlots*>(Contents + Layout->GetRenderTargetOffset());
 	}
 
 	const uint8* GetContents() const { return Contents; }
@@ -210,23 +212,23 @@ inline void WRDGParameterStruct::EnumerateTextures(EPassFlag PassFlag, LAMBDA la
 			lambda(Layout->GraphTextures[Index].Type, (WRDGTexture*)(Contents + Layout->GraphTextures[Index].Offset), SRVAccess);
 			break;
 		case EUniformBaseType::UB_RDG_TEXTURE_SRV:
-			lambda(Layout->GraphTextures[Index].Type, (WRDGTextureSRV*)(Contents + Layout->GraphTextures[Index].Offset), SRVAccess);
+			lambda(Layout->GraphTextures[Index].Type, ((WRDGTextureSRV*)(Contents + Layout->GraphTextures[Index].Offset))->Desc.Texture, SRVAccess);
 			break;
 		case EUniformBaseType::UB_RDG_BUFFER_UAV:
 		{
-			lambda(Layout->GraphTextures[Index].Type, (WRDGTextureUAV*)(Contents + Layout->GraphTextures[Index].Offset), UAVAccess);
+			lambda(Layout->GraphTextures[Index].Type, ((WRDGTextureUAV*)(Contents + Layout->GraphTextures[Index].Offset))->Desc.Texture, UAVAccess);
 			break;
 		}
 		case EUniformBaseType::UB_RTV:
 		{
-			WRDGRenderTargetBinding*  RenderTarget = (WRDGRenderTargetBinding*)(Contents + Layout->GraphTextures[Index].Offset);
+			WRDGRenderTargetBindingSlots*  RenderTarget = (WRDGRenderTargetBindingSlots*)(Contents + Layout->GraphTextures[Index].Offset);
 			for (uint32 ColorIndex = 0; ColorIndex < MaxSimultaneousRenderTargets; ++ColorIndex)
 			{
-				lambda(Layout->GraphTextures[Index].Type, RenderTarget->ColorTextures[ColorIndex], EAccess::RTV);
+				lambda(Layout->GraphTextures[Index].Type, RenderTarget->ColorTextures[ColorIndex].Texture, EAccess::RTV);
 			}
-			if (RenderTarget->DepthStencilTexture)
+			if (RenderTarget->DepthStencilTexture.Texture)
 			{
-				lambda(Layout->GraphTextures[Index].Type, RenderTarget->DepthStencilTexture, EAccess::RTV)
+				lambda(Layout->GraphTextures[Index].Type, RenderTarget->DepthStencilTexture.Texture, EAccess::RTV);
 			}
 			break;
 		}

@@ -68,8 +68,7 @@ namespace Vulkan
 		instanceCreateInfo.enabledLayerCount = 0;
 
 		m_pInstance = (VkInstance*)NormalAllocator::Get()->Allocate(sizeof(VkInstance));
-		Vulkan::VulkanAllocatorData userData = { NormalAllocator::Get()->Get() };
-		VkAllocationCallbacks* callbacks = static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(&userData);
+		VkAllocationCallbacks* callbacks = static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks();
 		RE_ASSERT(vkCreateInstance(&instanceCreateInfo, callbacks, m_pInstance) == VK_SUCCESS, "Failed to Create Vulkan Instance.");
 
 		if (enableDebugLayer)
@@ -83,8 +82,7 @@ namespace Vulkan
 	VulkanInstance::~VulkanInstance()
 	{
 		DestroyDebugUtilsMessengerEXT(*m_pInstance, m_debugUtilsMessenger, nullptr);
-		Vulkan::VulkanAllocatorData userData = { NormalAllocator::Get()->Get() };
-		VkAllocationCallbacks *callbacks = static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(&userData);
+		VkAllocationCallbacks *callbacks = static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks();
 		vkDestroyInstance(*m_pInstance, callbacks);
 	}
 

@@ -21,12 +21,10 @@ namespace WEngine
 
 	void GuiRenderPipeline::Setup()
 	{
-		m_pPass->Setup();
 	}
 
 	void GuiRenderPipeline::Execute()
 	{
-		m_pPass->Execute();
 	}
 
 }

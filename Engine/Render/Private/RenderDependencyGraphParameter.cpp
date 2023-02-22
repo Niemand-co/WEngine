@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Render/Public/RenderDependencyGraphParameter.h"
-#include "Render/Public/RenderDependencyGraphResource.h"
 
 inline EAccess GetPassAccess(EPassFlag Flag, EAccess& SRVAccess, EAccess& UAVAccess)
 {
@@ -60,19 +59,18 @@ void WShaderParameterMetaData::InitializeLayout()
 RHIRenderPassDescriptor WRDGParameterStruct::GetRenderPassInfo() const
 {
 	RHIRenderPassDescriptor descriptor = {};
-	const WRDGRenderTargetBinding& RenderTarget = GetRenderTarget();
+	const WRDGRenderTargetBindingSlots& RenderTarget = GetRenderTarget();
 	uint32 ColorAttachmentCount = 0;
 	for (uint32 ColorAttachmentIndex = 0; ColorAttachmentIndex < MaxSimultaneousRenderTargets; ++ColorAttachmentIndex)
 	{
-		if (RenderTarget.ColorTextures[ColorAttachmentIndex] != nullptr)
+		if (RenderTarget.ColorTextures[ColorAttachmentIndex].Texture != nullptr)
 		{
-			WRDGTexture *Texture = RenderTarget.ColorTextures[ColorAttachmentIndex];
+			WRDGTexture *Texture = RenderTarget.ColorTextures[ColorAttachmentIndex].Texture;
 			ColorAttachmentCount++;
 			descriptor.AttachmentDescriptors[ColorAttachmentCount].attachmentFormat = Texture->Desc.format;
 			descriptor.AttachmentDescriptors[ColorAttachmentCount].sampleCount = Texture->Desc.sampleCount;
 		}
 	}
 	descriptor.AttachmentCount = ColorAttachmentCount;
-	descriptor.
-	return ();
+	return descriptor;
 }

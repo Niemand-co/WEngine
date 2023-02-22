@@ -8,7 +8,7 @@
 #include "HAL/Public/TaskGraph.h"
 #include "Render/Public/Scene.h"
 #include "Framework/Public/LayerStack.h"
-#include "Framework/Public/GuiLayer.h"
+#include "Framework/Public/SlateLayer.h"
 #include "Event/Public/TimeStep.h"
 #include "Scene/Public/World.h"
 #include "Render/Public/Shader.h"
