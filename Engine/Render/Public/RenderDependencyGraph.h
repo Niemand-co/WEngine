@@ -242,6 +242,14 @@ private:
 
 	void SetupPass(WRDGPass *Pass);
 
+	void BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGTexture* Texture);
+
+	void BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGBuffer* Buffer);
+
+	void BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, class WRDGTextureSRV* SRV);
+
+	void BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, class WRDGTextureUAV* UAV);
+
 private:
 
 	WRDGPassRegistry Passes;

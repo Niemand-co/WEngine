@@ -13,6 +13,14 @@ public:
 
 	uint32 GetMipCount() const { return MipCount; }
 
+	virtual uint32 GetWidth() const = 0;
+
+	virtual uint32 GetHeight() const = 0;
+
+	virtual uint32 GetDepth() const = 0;
+
+	virtual uint32 GetLayerCount() const = 0;
+
 protected:
 
 	RHITexture(uint32 inMipCount)
@@ -32,9 +40,13 @@ public:
 
 	virtual ~RHITexture2D() = default;
 
-	uint32 GetWidth() const { return Width; }
+	virtual uint32 GetWidth() const override { return Width; }
 
-	uint32 GetHeight() const { return Height; }
+	virtual uint32 GetHeight() const override { return Height; }
+
+	virtual uint32 GetDepth() const override { return 0; }
+
+	virtual uint32 GetLayerCount() const override { return 1; }
 
 protected:
 
@@ -57,7 +69,7 @@ public:
 
 	virtual ~RHITexture2DArray() = default;
 
-	uint32 GetLayerCount() const { return LayerCount; }
+	virtual uint32 GetLayerCount() const override { return LayerCount; }
 
 protected:
 
@@ -77,6 +89,14 @@ class RHITexture3D : public RHITexture
 public:
 
 	virtual ~RHITexture3D() = default;
+
+	virtual uint32 GetWidth() const override { return Width; }
+
+	virtual uint32 GetHeight() const override { return Height; }
+
+	virtual uint32 GetDepth() const override { return Depth; }
+
+	virtual uint32 GetLayerCount() const override { return 1; }
 
 protected:
 

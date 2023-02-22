@@ -123,6 +123,26 @@ namespace WEngine
 			++(*m_counter);
 		}
 
+		bool operator==(const WSharedPtr<T>& other)
+		{
+			return m_ptr == other.m_ptr;
+		}
+
+		bool operator==(T* ptr)
+		{
+			return m_ptr == ptr;
+		}
+
+		bool operator!=(const WSharedPtr<T>& other)
+		{
+			return !(m_ptr == other.m_ptr);
+		}
+
+		bool operator!=(T* ptr)
+		{
+			return !(m_ptr == ptr);
+		}
+
 		~WSharedPtr();
 
 		void* operator new(size_t size)

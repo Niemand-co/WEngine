@@ -359,6 +359,30 @@ WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 InWidth, uint32 InHeight, ui
 	return g_pDevice->CreateTexture3D(&descriptor);
 }
 
+WTextureSRVRHIRef RHIContext::CreateTextureSRV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)
+{
+	RHITextureViewDescriptor descriptor = {};
+	{
+		descriptor.format = InFormat;
+		descriptor.baseMipLevel = InMipIndex;
+		descriptor.mipCount = InMipCount;
+		descriptor.baseArrayLayer = InLayerIndex;
+		descriptor.arrayLayerCount = InLayerCount;
+		descriptor.dimension = InDimension;
+	}
+	return g_pDevice->CreateTextureSRV(&descriptor, InTexture);
+}
+
+WTextureUAVRHIRef RHIContext::CreateTextureUAV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 LayerCount, uint32 PlaneIndex, uint32 PlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)
+{
+	return WTextureUAVRHIRef();
+}
+
+WTextureRTVRHIRef RHIContext::CreateTextureRTV(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 LayerCount, uint32 PlaneIndex, uint32 PlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)
+{
+	return WTextureRTVRHIRef();
+}
+
 WRenderPassRHIRef RHIContext::CreateRenderPass(RHIRenderPassDescriptor* descriptor)
 {
 	return g_pDevice->CreateRenderPass(descriptor);

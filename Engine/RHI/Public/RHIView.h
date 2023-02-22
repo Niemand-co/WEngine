@@ -29,6 +29,30 @@ protected:
 
 };
 
+class RHITextureSRV : public RHITextureView
+{
+public:
+
+	virtual ~RHITextureSRV() = default;
+
+};
+
+class RHITextureUAV : public RHITextureView
+{
+public:
+
+	virtual ~RHITextureUAV() = default;
+
+};
+
+class RHITextureRTV : public RHITextureView
+{
+public:
+
+	virtual ~RHITextureRTV() = default;
+
+};
+
 class RHIBufferView : public RHIView
 {
 

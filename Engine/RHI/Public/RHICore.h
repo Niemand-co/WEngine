@@ -441,9 +441,9 @@ struct WResolveRect
 
 enum class ETextureCreateFlags : uint32
 {
-	None                                  = 0,
-	TextureCreate_RenderTarget            = 1 << 0,
-	TextureCreate_Present                 = 1 << 1,
+	TextureCreate_None                    = 0,
+	TextureCreate_Presenttable            = 1 << 0,
+	TextureCreate_RenderTarget            = 1 << 1,
 	TextureCreate_DepthStencil            = 1 << 2,
 	TextureCreate_SRV                     = 1 << 3,
 	TextureCreate_UAV                     = 1 << 4,
@@ -470,6 +470,10 @@ typedef WEngine::WSharedPtr<class RHIComputeShader> WComputeShaderRHIRef;
 typedef WEngine::WSharedPtr<class RHITexture2D> WTexture2DRHIRef;
 typedef WEngine::WSharedPtr<class RHITexture2DArray> WTexture2DArrayRHIRef;
 typedef WEngine::WSharedPtr<class RHITexture3D> WTexture3DRHIRef;
+
+typedef WEngine::WSharedPtr<class RHITextureSRV> WTextureSRVRHIRef;
+typedef WEngine::WSharedPtr<class RHITextureUAV> WTextureUAVRHIRef;
+typedef WEngine::WSharedPtr<class RHITextureRTV> WTextureRTVRHIRef;
 
 typedef WEngine::WSharedPtr<class RHIViewport> WViewportRHIRef;
 

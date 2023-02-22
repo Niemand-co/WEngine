@@ -457,6 +457,46 @@ namespace Vulkan
 		return new VulkanTexture3D(this, &imageCreateInfo);
 	}
 
+	WTextureSRVRHIRef VulkanDevice::CreateTextureSRV(RHITextureViewDescriptor* descriptor, RHITexture* InTexture)
+	{
+		VkImageViewCreateInfo ImageViewCreateInfo = {};
+		{
+			ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+
+			if(descriptor->dimension == Dimension::Texture2D)
+				ImageViewCreateInfo.image = static_cast<VulkanTexture2D*>(InTexture)->GetHandle();
+			else if(descriptor->dimension == Dimension::Texture2DARRAY)
+				ImageViewCreateInfo.image = static_cast<VulkanTexture2DArray*>(InTexture)->GetHandle();
+			else if(descriptor->dimension == Dimension::Texture3D)
+				ImageViewCreateInfo.image = static_cast<VulkanTexture3D*>(InTexture)->GetHandle();
+
+			ImageViewCreateInfo.format = WEngine::ToVulkan(descriptor->format);
+			ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
+			ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;
+			ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_B;
+			ImageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_A;
+			ImageViewCreateInfo.subresourceRange.baseMipLevel = descriptor->baseMipLevel;
+			ImageViewCreateInfo.subresourceRange.levelCount = descriptor->mipCount;
+			ImageViewCreateInfo.subresourceRange.baseArrayLayer = descriptor->baseArrayLayer;
+			ImageViewCreateInfo.subresourceRange.layerCount = descriptor->arrayLayerCount;
+			for (uint32 PlaneIndex = 0; PlaneIndex < descriptor->planeCount; ++PlaneIndex)
+			{
+				ImageViewCreateInfo.subresourceRange.aspectMask |= (VkImageAspectFlags)(1 << (PlaneIndex + descriptor->planeIndex));
+			}
+		}
+		return WTextureSRVRHIRef();
+	}
+
+	WTextureUAVRHIRef VulkanDevice::CreateTextureUAV(RHITextureViewDescriptor* descriptor, RHITexture* InTexture)
+	{
+		return WTextureUAVRHIRef();
+	}
+
+	WTextureRTVRHIRef VulkanDevice::CreateTextureRTV(RHITextureViewDescriptor* descriptor, RHITexture* InTexture)
+	{
+		return WTextureRTVRHIRef();
+	}
+
 	RHISampler* VulkanDevice::CreateSampler(RHISamplerDescriptor* descriptor)
 	{
 		VkSamplerCreateInfo samplerCreateInfo = {};
@@ -771,7 +811,7 @@ namespace Vulkan
 			pWriteDescriptorSets[i].dstBinding = descriptor->pBindingResources[i].bindingSlot;
 			pWriteDescriptorSets[i].pImageInfo = pDescriptorImageInfos[i];
 		}
-		vkUpdateDescriptorSets(*m_pDevice, descriptor->bindingCount, pWriteDescriptorSets, 0, nullptr);
+		vkUpdateDescriptorSets(pDevice, descriptor->bindingCount, pWriteDescriptorSets, 0, nullptr);
 
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
@@ -797,7 +837,7 @@ namespace Vulkan
 		semaphoreCreateInfo.flags = VK_PIPELINE_STAGE_HOST_BIT;
 		for (int i = 0; i < count; ++i)
 		{
-			RE_ASSERT(vkCreateSemaphore(*m_pDevice, &semaphoreCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pSemaphore + i) == VK_SUCCESS, "Failed to Create Semaphore.");
+			RE_ASSERT(vkCreateSemaphore(pDevice, &semaphoreCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pSemaphore + i) == VK_SUCCESS, "Failed to Create Semaphore.");
 			::new (semaphore + i) VulkanSemaphore(pSemaphore + i);
 			semaphores[i] = semaphore + i;
 		}
@@ -811,10 +851,10 @@ namespace Vulkan
 		fences.Reserve(count);
 		for (unsigned int i = 0; i < count; ++i)
 		{
-			fences.Push(*static_cast<VulkanFence*>(pFences + i)->GetHandle());
+			fences.Push(static_cast<VulkanFence*>(pFences + i)->GetHandle());
 		}
 
-		vkWaitForFences(*m_pDevice, count, fences.GetData(), waitForAll, (std::numeric_limits<uint64_t>::max)());
+		vkWaitForFences(pDevice, count, fences.GetData(), waitForAll, (std::numeric_limits<uint64_t>::max)());
 	}
 
 	void VulkanDevice::ResetFences(RHIFence* pFences, unsigned int count)
@@ -823,19 +863,19 @@ namespace Vulkan
 		fences.Reserve(count);
 		for (unsigned int i = 0; i < count; ++i)
 		{
-			fences.Push(*static_cast<VulkanFence*>(pFences + i)->GetHandle());
+			fences.Push(static_cast<VulkanFence*>(pFences + i)->GetHandle());
 		}
 
-		RE_ASSERT(vkResetFences(*m_pDevice, count, fences.GetData()) == VK_SUCCESS, "Failed to Reset Fences.");
+		RE_ASSERT(vkResetFences(pDevice, count, fences.GetData()) == VK_SUCCESS, "Failed to Reset Fences.");
 	}
 
 	int VulkanDevice::GetNextImage(RHISwapchain *swapchain, RHISemaphore *semaphore)
 	{
 		unsigned int index;
-		VkResult result = vkAcquireNextImageKHR(*m_pDevice, *static_cast<VulkanSwapchain*>(swapchain)->GetHandle(), (std::numeric_limits<uint64_t>::max)(), *static_cast<VulkanSemaphore*>(semaphore)->GetHandle(), VK_NULL_HANDLE, &index);
+		VkResult result = vkAcquireNextImageKHR(pDevice, static_cast<VulkanSwapchain*>(swapchain)->GetHandle(), (std::numeric_limits<uint64_t>::max)(), *static_cast<VulkanSemaphore*>(semaphore)->GetHandle(), VK_NULL_HANDLE, &index);
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || Window::cur_window->IsSizeChanged())
 		{
-			vkDeviceWaitIdle(*m_pDevice);
+			vkDeviceWaitIdle(pDevice);
 			return -1;
 		}
 		return index;
@@ -843,7 +883,7 @@ namespace Vulkan
 
 	void VulkanDevice::Wait()
 	{
-		vkDeviceWaitIdle(*m_pDevice);
+		vkDeviceWaitIdle(pDevice);
 	}
 
 	VkImageUsageFlags VulkanDevice::GetImageUsage(ETextureCreateFlags Flag)
@@ -874,6 +914,11 @@ namespace Vulkan
 			{
 				Usage |= (VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
 			}
+		}
+
+		if ((Flag & ETextureCreateFlags::TextureCreate_UAV) != ETextureCreateFlags::None)
+		{
+			Usage |= VK_IMAGE_USAGE_STORAGE_BIT;
 		}
 
 		return Usage;

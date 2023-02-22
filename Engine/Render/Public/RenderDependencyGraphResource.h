@@ -20,10 +20,6 @@ public:
 
 	bool IsExternal() const { return bExternal; }
 
-	virtual void BeginResource() = 0;
-
-	virtual void EndResource() = 0;
-
 	void* operator new(size_t size)
 	{
 		return WRDGAllocator::Get()->Allocate(size);
@@ -40,7 +36,9 @@ protected:
 
 	uint16 ReferenceCount = 0;
 
-	WRDGPassHandle LastProducer;
+	WRDGPassHandle FirstPass;
+
+	WRDGPassHandle LastPass;
 
 	friend class WRDGBuilder;
 
@@ -102,11 +100,11 @@ struct WRDGTextureSubresourceRange
 
 	WRDGTextureSubresourceRange(const WRDGTerxtureSubresourceLayout& Layout)
 		: MipIndex(0),
-		MipCount(Layout.MipCount),
-		LayerIndex(0),
-		LayerCount(Layout.LayerCount),
-		PlaneIndex(0),
-		PlaneCount(Layout.PlaneCount)
+		  MipCount(Layout.MipCount),
+		  LayerIndex(0),
+		  LayerCount(Layout.LayerCount),
+		  PlaneIndex(0),
+		  PlaneCount(Layout.PlaneCount)
 	{
 	}
 
@@ -128,16 +126,6 @@ class WRDGTexture : public WRDGResource
 public:
 
 	virtual ~WRDGTexture() = default;
-
-	virtual void BeginResource() override
-	{
-		RHI = GetRenderCommandList()->CreateTexture2D(Desc.extent.width, Desc.extent.height, Desc.format, Desc.mipCount);
-	}
-
-	virtual void EndResource() override
-	{
-
-	}
 
 	WEngine::WArray<WRDGResourceState*>& GetMergeState() { return MergeState; }
 
@@ -204,10 +192,6 @@ class WRDGBuffer : public WRDGResource
 public:
 
 	virtual ~WRDGBuffer() = default;
-
-	virtual void BeginResource() override;
-
-	virtual void EndResource() override;
 
 private:
 
@@ -282,10 +266,6 @@ public:
 	WRDGTextureUAVDesc() = default;
 
 	virtual ~WRDGTextureUAVDesc() = default;
-
-public:
-
-	WRDGTexture *Texture;
 
 };
 

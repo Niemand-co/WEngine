@@ -7,15 +7,42 @@
 namespace Vulkan
 {
 
-	VulkanTextureView::VulkanTextureView(VulkanDevice* pInDevice, VkImageViewCreateInfo* pInfo)
+	VulkanTextureViewBase::VulkanTextureViewBase(VulkanDevice* pInDevice, VkImageViewCreateInfo* pInfo)
 		: pDevice(pInDevice)
 	{
 		vkCreateImageView(pInDevice->GetHandle(), pInfo, ((VulkanAllocator*)NormalAllocator::Get())->GetCallbacks(), &ImageView);
 	}
 
-	VulkanTextureView::~VulkanTextureView()
+	VulkanTextureViewBase::~VulkanTextureViewBase()
 	{
 		vkDestroyImageView(pDevice->GetHandle(), ImageView, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+	}
+
+	VulkanTextureSRV::VulkanTextureSRV(VulkanDevice* pInDevice, VkImageViewCreateInfo* pInfo)
+		: VulkanTextureViewBase(pInDevice, pInfo)
+	{
+	}
+
+	VulkanTextureSRV::~VulkanTextureSRV()
+	{
+	}
+
+	VulkanTextureUAV::VulkanTextureUAV(VulkanDevice* pInDevice, VkImageViewCreateInfo* pInfo)
+		: VulkanTextureViewBase(pInDevice, pInfo)
+	{
+	}
+
+	VulkanTextureUAV::~VulkanTextureUAV()
+	{
+	}
+
+	VulkanTextureRTV::VulkanTextureRTV(VulkanDevice* pInDevice, VkImageViewCreateInfo* pInfo)
+		: VulkanTextureViewBase(pInDevice, pInfo)
+	{
+	}
+
+	VulkanTextureRTV::~VulkanTextureRTV()
+	{
 	}
 
 }

@@ -127,9 +127,14 @@ void WRDGBuilder::Execute()
 
 	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
 	{
-		Passes[Handle]->Parameters.EnumerateTextures(Passes[Handle]->Flag, [](EUniformBaseType Type, auto Texture, EAccess Access)
+		Passes[Handle]->Parameters.EnumerateTextures(Passes[Handle]->Flag, [&Handle](EUniformBaseType Type, auto Texture, EAccess Access)
 		{
-			Texture->BeginResource();
+			BeginResourceRHI(Type, Handle, Texture);
+		});
+
+		Passes[Handle]->Parameters.EnumerateTextures(Passes[Handle]->Flag, [&Handle](EUniformBaseType, auto Texture, EAccess Access)
+		{
+			EndResourceRHI(Type, Handle, Texture);
 		});
 	}
 
@@ -296,6 +301,68 @@ void WRDGBuilder::SetupPass(WRDGPass* Pass)
 
 		Pass->bHasUAVResource |= WEngine::EnumHasFlags(Access, EAccess::UAV);
 	});
+}
+
+void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGTexture* Texture)
+{
+	if (Texture->RHI != nullptr)
+	{
+		return;
+	}
+
+	ETextureCreateFlags Flag = ETextureCreateFlags::TextureCreate_None;
+	if (Type == EUniformBaseType::UB_RDG_TEXTURE)
+	{
+		Flag |= ETextureCreateFlags::TextureCreate_InputAttachmentReadable;
+	}
+	else if (Type == EUniformBaseType::UB_RDG_TEXTURE_SRV)
+	{
+		Flag |= ETextureCreateFlags::TextureCreate_SRV;
+	}
+	else if (Type == EUniformBaseType::UB_RDG_TEXTURE_UAV)
+	{
+		Flag |= ETextureCreateFlags::TextureCreate_UAV;
+	}
+
+	if (Texture->Desc.IsDepthFormat())
+	{
+		Flag |= ETextureCreateFlags::TextureCreate_DepthStencil;
+	}
+	else
+	{
+		Flag |= ETextureCreateFlags::TextureCreate_RenderTarget;
+	}
+
+	if (IsTexture2D(Texture->Desc))
+	{
+		if (IsTextureArray(Texture->Desc))
+		{
+			Texture->RHI = GetRenderCommandList()->CreateTexture2DArray(Texture->Desc.extent.width, Texture->Desc.extent.height, Texture->Desc.format, Texture->Desc.mipCount, Texture->Desc.layerCount, Flag);
+		}
+		else
+		{
+			Texture->RHI = GetRenderCommandList()->CreateTexture2D(Texture->Desc.extent.width, Texture->Desc.extent.height, Texture->Desc.format, Texture->Desc.mipCount, Flag);
+		}
+	}
+	else
+	{
+		Texture->RHI = GetRenderCommandList()->CreateTexture3D(Texture->Desc.extent.width, Texture->Desc.extent.height, Texture->Desc.extent.depth, Texture->Desc.format, Texture->Desc.mipCount, Flag);
+	}
+
+	Texture->FirstPass = PassHandle;
+}
+
+void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGBuffer* Buffer)
+{
+}
+
+void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGTextureSRV* SRV)
+{
+	GetRenderCommandList()->CreateTextureSRV(SRV->Desc.baseMipLevel, SRV->Desc.mipCount, SRV->Desc.baseArrayLayer, SRV->Desc.arrayLayerCount, SRV->Desc.planeIndex, SRV->Desc.planeCount, SRV->Desc.dimension, SRV->Desc.format, SRV->Desc.Texture->RHI.Get());
+}
+
+void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGTextureUAV* UAV)
+{
 }
 
 void WRDGBarrierBatch::Submit(RHIRenderCommandList& CmdList)

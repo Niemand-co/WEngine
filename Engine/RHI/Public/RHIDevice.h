@@ -34,6 +34,12 @@ public:
 
 	virtual WTexture3DRHIRef CreateTexture3D(class RHITextureDescriptor* descriptor) = 0;
 
+	virtual WTextureSRVRHIRef CreateTextureSRV(class RHITextureViewDescriptor *descriptor, RHITexture* InTexture) = 0;
+
+	virtual WTextureUAVRHIRef CreateTextureUAV(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture) = 0;
+
+	virtual WTextureRTVRHIRef CreateTextureRTV(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture) = 0;
+
 	virtual class RHISampler* CreateSampler(class RHISamplerDescriptor * descriptor) = 0;
 
 	virtual RHIRenderTarget* CreateRenderTarget(class RHIRenderTargetDescriptor *descriptor) = 0;

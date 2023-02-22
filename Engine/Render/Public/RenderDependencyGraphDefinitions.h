@@ -141,32 +141,32 @@ struct WRDGTextureDesc
 		TextureCubeArray
 	};
 
-	WRDGTextureDesc(Format inFormat, Extent inExtent, EDimension inDimension, WEngine::ClearValue inClearValue, uint8 inMipCount, uint8 inSampleCount, uint32 inLayerCount)
+	WRDGTextureDesc(Format inFormat, Extent inExtent, EDimension inDimension, ClearValue inClearValue, uint8 inMipCount, uint8 inSampleCount, uint32 inLayerCount)
 		: format(inFormat), extent(inExtent), dimension(inDimension), clearValue(inClearValue), mipCount(inMipCount), sampleCount(inSampleCount), layerCount(inLayerCount)
 	{
 	}
 
-	static WRDGTextureDesc GetTexture2DDesc(Format inFormat, Extent inExtent, WEngine::ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1)
+	static WRDGTextureDesc GetTexture2DDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1)
 	{
 		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture2D, inClearValue, inMipCount, inSampleCount, 1);
 	}
 
-	static WRDGTextureDesc GetTexture2DArrayDesc(Format inFormat, Extent inExtent, WEngine::ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, uint32 inLayerCount = 1)
+	static WRDGTextureDesc GetTexture2DArrayDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, uint32 inLayerCount = 1)
 	{
 		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture2DArray, inClearValue, inMipCount, inSampleCount, inLayerCount);
 	}
 
-	static WRDGTextureDesc GetTexture3DDesc(Format inFormat, Extent inExtent, WEngine::ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1)
+	static WRDGTextureDesc GetTexture3DDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1)
 	{
 		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture3D, inClearValue, inMipCount, inSampleCount, 1);
 	}
 
-	static WRDGTextureDesc GetTextureCubeDesc(Format inFormat, Extent inExtent, WEngine::ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1)
+	static WRDGTextureDesc GetTextureCubeDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1)
 	{
 		return WRDGTextureDesc(inFormat, inExtent, EDimension::TextureCube, inClearValue, inMipCount, inSampleCount, 1);
 	}
 
-	static WRDGTextureDesc GetTextureCubeArrayDesc(Format inFormat, Extent inExtent, WEngine::ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, uint32 inLayerCount = 1)
+	static WRDGTextureDesc GetTextureCubeArrayDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, uint32 inLayerCount = 1)
 	{
 		return WRDGTextureDesc(inFormat, inExtent, EDimension::TextureCubeArray, inClearValue, inMipCount, inSampleCount, inLayerCount);
 	}
@@ -186,6 +186,15 @@ struct WRDGTextureDesc
 		return format == Format::D16_UNORM_S8_UINT || format == Format::D24_UNORM_S8_UINT || format == Format::D32_SFLOAT_S8_UINT;
 	}
 
+	bool IsDepthFormat() const
+	{
+		return format == Format::D16_Unorm ||
+			   format == Format::D16_UNORM_S8_UINT ||
+			   format == Format::D24_UNORM_S8_UINT ||
+			   format == Format::D32_SFloat ||
+			   format == Format::D32_SFLOAT_S8_UINT;
+	}
+
 	WRDGTerxtureSubresourceLayout GetSubresourceLayout() const
 	{
 		return WRDGTerxtureSubresourceLayout(mipCount, layerCount * (IsTextureCube() ? 6 : 1), IsStencilFormat() ? 2 : 1);
@@ -194,11 +203,21 @@ struct WRDGTextureDesc
 	Format format;
 	Extent extent;
 	EDimension dimension;
-	WEngine::ClearValue clearValue;
+	ClearValue clearValue;
 	uint8 mipCount;
 	uint8 sampleCount;
 	uint32 layerCount;
 };
+
+bool IsTexture2D(const WRDGTextureDesc& Desc)
+{
+	return Desc.dimension == WRDGTextureDesc::EDimension::Texture2D || Desc.dimension == WRDGTextureDesc::EDimension::Texture2DArray;
+}
+
+bool IsTextureArray(const WRDGTextureDesc& Desc)
+{
+	return Desc.dimension == WRDGTextureDesc::EDimension::Texture2DArray || Desc.dimension == WRDGTextureDesc::EDimension::TextureCubeArray;
+}
 
 struct WRDGBufferDesc
 {

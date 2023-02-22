@@ -6,11 +6,24 @@ inline EAccess GetPassAccess(EPassFlag Flag, EAccess& SRVAccess, EAccess& UAVAcc
 
 struct WRDGRenderTargetBinding
 {
-	WRDGTexture* ColorTextures[MaxSimultaneousRenderTargets];
-	WRDGTexture* DepthStencilTexture;
-	WEngine::WResolveRect ResolveRect;
+	WRDGTexture* Texture = nullptr;
+	AttachmentLoadOP LoadOP = AttachmentLoadOP::DontCare;
+	uint8 MipIndex = 0;
+	uint8 ArrayIndex = -1;
 
 	bool operator==(const WRDGRenderTargetBinding& other) const
+	{
+		return Texture == other.Texture && LoadOP == other.LoadOP && MipIndex == other.MipIndex && ArrayIndex == other.ArrayIndex;
+	}
+};
+
+struct WRDGRenderTargetBindingSlots
+{
+	WRDGRenderTargetBinding ColorTextures[MaxSimultaneousRenderTargets];
+	WRDGRenderTargetBinding DepthStencilTexture;
+	WResolveRect ResolveRect;
+
+	bool operator==(const WRDGRenderTargetBindingSlots& other) const
 	{
 		for (uint32 ColorIndex = 0; ColorIndex < MaxSimultaneousRenderTargets; ++ColorIndex)
 		{
@@ -125,12 +138,12 @@ public:
 	WRDGParameterStruct(const uint8* inContents, const ShaderParametersLayout* inLayout)
 		: Contents(inContents), Layout(inLayout)
 	{
-		const WRDGRenderTargetBinding& RenderTarget = *reinterpret_cast<const WRDGRenderTargetBinding*>(Contents + Layout->GetRenderTargetOffset());
+		const WRDGRenderTargetBindingSlots& RenderTarget = *reinterpret_cast<const WRDGRenderTargetBindingSlots*>(Contents + Layout->GetRenderTargetOffset());
 		for (uint32 ColorAttachmentIndex = 0; ColorAttachmentIndex < MaxSimultaneousRenderTargets; ++ColorAttachmentIndex)
 		{
-			if (RenderTarget.ColorTextures[ColorAttachmentIndex] != nullptr)
+			if (RenderTarget.ColorTextures[ColorAttachmentIndex].Texture != nullptr)
 			{
-				WRDGTexture* Texture = RenderTarget.ColorTextures[ColorAttachmentIndex];
+				WRDGTexture* Texture = RenderTarget.ColorTextures[ColorAttachmentIndex].Texture;
 				if (Texture->IsExternal())
 				{
 					bHasExternalOutput = true;
@@ -138,7 +151,7 @@ public:
 				}
 			}
 		}
-		if(RenderTarget.DepthStencilTexture->IsExternal())
+		if(RenderTarget.DepthStencilTexture.Texture->IsExternal())
 			bHasExternalOutput = true;
 		bHasExternalOutput = false;
 	}

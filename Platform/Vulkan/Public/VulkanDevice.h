@@ -44,6 +44,12 @@ namespace Vulkan
 
 		virtual WTexture3DRHIRef CreateTexture3D(RHITextureDescriptor* descriptor) override;
 
+		virtual WTextureSRVRHIRef CreateTextureSRV(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture);
+
+		virtual WTextureUAVRHIRef CreateTextureUAV(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture);
+
+		virtual WTextureRTVRHIRef CreateTextureRTV(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture);
+
 		virtual RHISampler* CreateSampler(RHISamplerDescriptor * descriptor) override;
 
 		virtual RHIRenderTarget* CreateRenderTarget(RHIRenderTargetDescriptor *descriptor) override;
