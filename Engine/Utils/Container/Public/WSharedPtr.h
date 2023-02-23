@@ -70,29 +70,16 @@ namespace WEngine
 
 		T* Get() const { return m_ptr; }
 
+		RefCounterBase* GetCounter() const { return m_counter; }
+
 		T* operator->() { return m_ptr; }
 
 		T& operator*() { return *m_ptr; }
 
 		void operator=(const WSharedPtr<T>& other)
 		{
-			if (m_ptr != nullptr)
-			{
-				--(*m_counter);
-				if (m_counter->GetCount() == 0)
-				{
-					delete m_ptr;
-					delete m_counter;
-				}
-			}
-			m_ptr = other.m_ptr;
-			m_counter = other.m_counter;
-			++(*m_counter);
-		}
-
-		template<typename T2>
-		void operator=(const WSharedPtr<T2>& other)
-		{
+			if(m_ptr == other.m_ptr)
+				return;
 			if (m_ptr != nullptr)
 			{
 				--(*m_counter);
@@ -109,6 +96,8 @@ namespace WEngine
 
 		void operator=(T* ptr)
 		{
+			if(m_ptr == ptr)
+				return;
 			if (m_ptr != nullptr)
 			{
 				--(*m_counter);

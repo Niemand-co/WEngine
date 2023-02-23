@@ -91,7 +91,7 @@ public:
 
 	void Insert(ObjectType* Object)
 	{
-		Object->Handle = Array.Size();
+		Object->Handle = HandleType((uint16)Array.Size());
 		Array.Push(Object);
 	}
 
@@ -290,6 +290,11 @@ struct WRDGTextureDesc
 		return dimension == EDimension::Texture2DArray || dimension == EDimension::TextureCubeArray;
 	}
 
+	bool IsTexture2D() const
+	{
+		return dimension == WRDGTextureDesc::EDimension::Texture2D || dimension == WRDGTextureDesc::EDimension::Texture2DArray;
+	}
+
 	bool IsStencilFormat() const
 	{
 		return format == Format::D16_UNORM_S8_UINT || format == Format::D24_UNORM_S8_UINT || format == Format::D32_SFLOAT_S8_UINT;
@@ -318,15 +323,7 @@ struct WRDGTextureDesc
 	uint32 layerCount;
 };
 
-bool IsTexture2D(const WRDGTextureDesc& Desc)
-{
-	return Desc.dimension == WRDGTextureDesc::EDimension::Texture2D || Desc.dimension == WRDGTextureDesc::EDimension::Texture2DArray;
-}
 
-bool IsTextureArray(const WRDGTextureDesc& Desc)
-{
-	return Desc.dimension == WRDGTextureDesc::EDimension::Texture2DArray || Desc.dimension == WRDGTextureDesc::EDimension::TextureCubeArray;
-}
 
 struct WRDGBufferDesc
 {

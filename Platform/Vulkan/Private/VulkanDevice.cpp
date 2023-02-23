@@ -42,7 +42,6 @@ namespace Vulkan
 	{
 		VkSwapchainCreateInfoKHR swapchainCreateInfo = {};
 		swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-		swapchainCreateInfo.surface = *static_cast<VulkanInstance*>(descriptor->instance)->GetSurface();
 		swapchainCreateInfo.imageFormat = WEngine::ToVulkan(descriptor->format);
 		swapchainCreateInfo.imageColorSpace = WEngine::ToVulkan(descriptor->colorSpace);
 		swapchainCreateInfo.presentMode = WEngine::ToVulkan(descriptor->presenMode);

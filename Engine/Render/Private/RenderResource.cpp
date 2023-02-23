@@ -21,15 +21,15 @@ void BeginReleaseResource(RenderResource* resource)
 
 void EnqueInitResource(RenderResource* resource)
 {
-	ResourcesWitingToInit.Push(resource);
+	//ResourcesWitingToInit.Push(resource);
 }
 
 void EnqueReleasResource(RenderResource* resource)
 {
-	ResourcesWaitingToRelease.Push(resource);
+	//ResourcesWaitingToRelease.Push(resource);
 }
 
 void EnqueUpdateResource(RenderResource* resource)
 {
-	ResourcesWaitingToUpdate.Push(resource);
+	//ResourcesWaitingToUpdate.Push(resource);
 }

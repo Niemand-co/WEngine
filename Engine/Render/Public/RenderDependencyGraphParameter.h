@@ -3,7 +3,7 @@
 #include "Render/Public/RenderDependencyGraphResource.h"
 #include "Render/Descriptor/Public/RHIRenderPassDescriptor.h"
 
-inline EAccess GetPassAccess(EPassFlag Flag, EAccess& SRVAccess, EAccess& UAVAccess);
+void GetPassAccess(EPassFlag Flag, EAccess& SRVAccess, EAccess& UAVAccess);
 
 struct WRDGRenderTargetBinding
 {
@@ -78,7 +78,7 @@ public:
 		EUniformBaseType Type;
 	};
 
-	ShaderParametersLayout();
+	ShaderParametersLayout() = default;
 
 	uint16 GetRenderTargetOffset() const { return RenderTargetOffset; }
 
@@ -170,7 +170,7 @@ public:
 
 	bool HasRenderTargets() const { Layout->HasRenderTarget(); }
 
-	bool HasExternalOutput() const;
+	bool HasExternalOutput() const { return false; }
 
 	const WRDGRenderTargetBindingSlots& GetRenderTarget() const
 	{

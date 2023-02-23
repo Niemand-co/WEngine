@@ -17,17 +17,11 @@ namespace Vulkan
 
 		virtual void InitializeGPU() override;
 
-		virtual void UpdateSurface() override;
-
-		VkInstance* GetHandle();
-
-		VkSurfaceKHR* GetSurface() const { return m_pSurface; }
+		VkInstance GetHandle() const { return Instance; }
 
 	private:
 
 		void SetupDebugCallback();
-
-		void CreateWin32Surface();
 
 	private:
 
@@ -43,9 +37,7 @@ namespace Vulkan
 
 	private:
 
-		VkInstance *m_pInstance;
-
-		VkSurfaceKHR *m_pSurface;
+		VkInstance Instance;
 
 		VkDebugUtilsMessengerEXT m_debugUtilsMessenger;
 	};

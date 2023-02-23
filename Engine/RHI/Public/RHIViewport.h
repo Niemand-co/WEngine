@@ -4,7 +4,7 @@ class RHIViewport : public RHIResource
 {
 public:
 
-	virtual ~RHIViewport();
+	virtual ~RHIViewport() = default;
 
 	virtual void Tick() = 0;
 

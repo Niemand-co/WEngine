@@ -69,6 +69,8 @@ void GameScene::Tick(WEngine::TimeStep timeStep)
 		Scene->StartRendering(Viewport.Get());
 	}
 	), WEngine::EThreadProperty::RenderThread);
+
+	RE_LOG("END");
 	
 }
 

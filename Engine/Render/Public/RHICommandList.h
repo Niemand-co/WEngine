@@ -41,6 +41,10 @@ public:
 
 	RHIGraphicsEncoder* GetEncoder() const { return m_pEncoder; }
 
+	void BeginDrawingViewport();
+
+	void EndDrawingViewport();
+
 	void BeginRenderPass(class RHIRenderPassBeginDescriptor *descriptor);
 
 	void EndRenderPass();

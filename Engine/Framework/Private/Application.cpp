@@ -34,7 +34,7 @@ namespace WEngine
 		WinProc proc = { "WEngine", 1920u, 1080u };
 		m_window = Window::Get(&proc);
 
-		//m_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+		m_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
 		//RHIContext::Init();
 
@@ -62,46 +62,15 @@ namespace WEngine
 	{
 		while (!IsQuit())
 		{
+			m_window->Poll();
 			TimeStep timeStep = TimeStep::GetTimeStep();
 			REngine::Get()->Tick(timeStep);
-			GEngine::Get()->Tick(timeStep);
 		}
 		Finalize();
 	}
 
 	void Application::OnEvent(Event* pEvent)
 	{
-		EventDispatcher dispatcher(pEvent);
-		dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent* e)->bool
-		{
-			if (e->GetKeycode() == GLFW_KEY_ESCAPE)
-			{
-				this->m_isQuit = true;
-				RHIContext::Wait();
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		});
-
-		dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent *e) -> bool
-		{
-			this->m_isQuit = true;
-
-			return true;
-		});
-
-		dispatcher.Dispatch<WindowResizeEvent>([this](WindowResizeEvent *e) -> bool
-		{
-			m_window->SetWidth(e->GetWidth());
-			m_window->SetHeight(e->GetHeight());
-			RHIContext::GetContext()->RecreateSwapchain();
-			return false;
-		});
-
-		m_pLayerStack->OnEvent(pEvent);
 	}
 
 	bool Application::IsQuit()

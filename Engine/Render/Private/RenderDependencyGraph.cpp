@@ -2,6 +2,7 @@
 #include "Render/Public/RenderDependencyGraph.h"
 #include "Render/Public/RenderDependencyGraphResource.h"
 #include "Render/Public/RenderDependencyGraphParameter.h"
+#include "RHI/Public/RHITexture.h"
 
 WEngine::Allocator<6>* WEngine::Allocator<6>::g_pInstance = new WRDGAllocator();
 
@@ -132,9 +133,9 @@ void WRDGBuilder::Execute()
 				this->BeginResourceRHI(Type, Handle, Texture);
 			});
 
-		Passes[Handle]->Parameters.EnumerateTextures(Passes[Handle]->Flag, [&Handle, this](EUniformBaseType Type, auto Texture, EAccess Access)
+		Passes[Handle]->Parameters.EnumerateBuffers(Passes[Handle]->Flag, [&Handle, this](EUniformBaseType Type, auto Buffer, EAccess Access)
 			{
-				this->EndResourceRHI(Type, Handle, Texture);
+				this->EndResourceRHI(Handle, Buffer);
 			});
 	}
 
@@ -173,7 +174,7 @@ void WRDGBuilder::PassCulling()
 				bUntrackedOutput |= TexturePair.First()->IsExternal();
 			});
 
-		Pass->BufferStates.Enumerate([&bUntrackedOutput](WEngine::WPair<WRDGTexture*, WRDGPass::BufferState>& BufferPair)
+		Pass->BufferStates.Enumerate([&bUntrackedOutput](WEngine::WPair<WRDGBuffer*, WRDGPass::BufferState>& BufferPair)
 			{
 				bUntrackedOutput |= BufferPair.First()->IsExternal();
 			});
@@ -333,9 +334,9 @@ void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHan
 		Flag |= ETextureCreateFlags::TextureCreate_RenderTarget;
 	}
 
-	if (IsTexture2D(Texture->Desc))
+	if (Texture->Desc.IsTexture2D())
 	{
-		if (IsTextureArray(Texture->Desc))
+		if (Texture->Desc.IsTextureArray())
 		{
 			Texture->RHI = GetRenderCommandList()->CreateTexture2DArray(Texture->Desc.extent.width, Texture->Desc.extent.height, Texture->Desc.format, Texture->Desc.mipCount, Texture->Desc.layerCount, Flag);
 		}
@@ -358,14 +359,26 @@ void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHan
 
 void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGTextureSRV* SRV)
 {
-	GetRenderCommandList()->CreateTextureSRV(SRV->Desc.baseMipLevel, SRV->Desc.mipCount, SRV->Desc.baseArrayLayer, SRV->Desc.arrayLayerCount, SRV->Desc.planeIndex, SRV->Desc.planeCount, SRV->Desc.dimension, SRV->Desc.format, SRV->Desc.Texture->RHI.Get());
+	GetRenderCommandList()->CreateTextureSRV(SRV->Desc.baseMipLevel, SRV->Desc.mipCount, SRV->Desc.baseArrayLayer, SRV->Desc.arrayLayerCount, SRV->Desc.planeIndex, SRV->Desc.planeCount, SRV->Desc.dimension, SRV->Desc.format, SRV->Desc.Texture->RHI);
 }
 
 void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGTextureUAV* UAV)
 {
 }
 
+void WRDGBuilder::EndResourceRHI(WRDGPassHandle PassHandle, WRDGTexture* Texture)
+{
+}
+
+void WRDGBuilder::EndResourceRHI(WRDGPassHandle PassHandle, WRDGTextureSRV* Texture)
+{
+}
+
 void WRDGBuilder::EndResourceRHI(WRDGPassHandle PassHandle, WRDGTextureUAV* Texture)
+{
+}
+
+void WRDGBuilder::EndResourceRHI(WRDGPassHandle PassHandle, WRDGBuffer* Texture)
 {
 }
 

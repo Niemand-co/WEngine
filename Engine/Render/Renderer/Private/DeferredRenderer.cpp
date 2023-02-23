@@ -12,11 +12,9 @@
 #include "Render/Public/RenderDependencyGraphParameter.h"
 
 DeferredRenderer::DeferredRenderer(CameraComponent* pCamera)
-	: SceneRenderer(pCamera), GBuffer(pCamera->GetResolution().x, pCamera->GetResolution().y)
+	: SceneRenderer(pCamera)
 {
-	BasePass = new DeferredBasePass();
 	GraphBuilder = new WRDGBuilder();
-	BeginInitResource(BasePass);
 }
 
 DeferredRenderer::~DeferredRenderer()

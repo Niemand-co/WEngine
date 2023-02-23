@@ -18,9 +18,11 @@ namespace Vulkan
 		surfaceCreateInfo.hinstance = GetModuleHandle(0);
 		surfaceCreateInfo.hwnd = glfwGetWin32Window((GLFWwindow*)Window::Get()->GetHandle());
 
-		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(*pInstance->GetHandle(), "vkCreateWin32SurfaceKHR");
+		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(pInstance->GetHandle(), "vkCreateWin32SurfaceKHR");
 
-		RE_ASSERT(CreateWin32SurfaceKHR(*pInstance->GetHandle(), &surfaceCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Surface) == VK_SUCCESS, "Failed to Create Win32 Surface.");
+		RE_ASSERT(CreateWin32SurfaceKHR(pInstance->GetHandle(), &surfaceCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Surface) == VK_SUCCESS, "Failed to Create Win32 Surface.");
+
+		pInfo->surface = Surface;
 
 		VulkanGPU *gpu = pDevice->GetGPU();
 
@@ -29,7 +31,7 @@ namespace Vulkan
 			uint32 FormatCount;
 			vkGetPhysicalDeviceSurfaceFormatsKHR(*gpu->GetHandle(), Surface, &FormatCount, nullptr);
 			RE_ASSERT(FormatCount > 0, "No Format Support On This Device.");
-			WEngine::WArray<VkSurfaceFormatKHR> Formats;
+			WEngine::WArray<VkSurfaceFormatKHR> Formats(FormatCount);
 			vkGetPhysicalDeviceSurfaceFormatsKHR(*gpu->GetHandle(), Surface, &FormatCount, Formats.GetData());
 
 			bool bFound = false;
@@ -66,7 +68,7 @@ namespace Vulkan
 			uint32 PresentModeCount;
 			vkGetPhysicalDeviceSurfacePresentModesKHR(*gpu->GetHandle(), Surface, &PresentModeCount, nullptr);
 			RE_ASSERT(PresentModeCount > 0, "This device doesn't supporting presenting.");
-			WEngine::WArray<VkPresentModeKHR> PresentModes;
+			WEngine::WArray<VkPresentModeKHR> PresentModes(PresentModeCount);
 			vkGetPhysicalDeviceSurfacePresentModesKHR(*gpu->GetHandle(), Surface, &PresentModeCount, PresentModes.GetData());
 			bool bSupportMailbox = false;
 			bool bSupportImmediate = false;
@@ -113,8 +115,8 @@ namespace Vulkan
 		ImageAcquireFence.Reserve(pInfo->minImageCount);
 		for (uint32 ImageIndex = 0; ImageIndex < pInfo->minImageCount; ++ImageIndex)
 		{
-			ImageAcquireSemaphore[ImageIndex] = new VulkanSemaphore(pDevice);
-			ImageAcquireFence[ImageIndex] = new VulkanFence(pDevice);
+			ImageAcquireSemaphore.Push(new VulkanSemaphore(pDevice));
+			ImageAcquireFence.Push(new VulkanFence(pDevice));
 		}
 		
 		PresentID = 0;
@@ -124,7 +126,7 @@ namespace Vulkan
 	VulkanSwapchain::~VulkanSwapchain()
 	{
 		vkDestroySwapchainKHR(pDevice->GetHandle(), Swapchain, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
-		vkDestroySurfaceKHR(*pInstance->GetHandle(), Surface, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkDestroySurfaceKHR(pInstance->GetHandle(), Surface, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
 	int32 VulkanSwapchain::AcquireImageIndex(RHISemaphore** OutSemaphore)

@@ -29,7 +29,7 @@ namespace WEngine
 			guiConfigure.pGPU = RHIContext::GetGPU();
 			guiConfigure.pDevice = RHIContext::GetDevice();
 			guiConfigure.pQueue = RHIContext::GetQueue();
-			guiConfigure.imageCount = RHIContext::g_maxFrames;
+			guiConfigure.imageCount = 3;
 		}
 
 		Gui* pGui = Gui::CreateGui(WEngine::Backend::Vulkan);
@@ -37,7 +37,7 @@ namespace WEngine
 
 		Viewport = new WEditorViewport(1920, 1080, Format::A16R16G16B16_SFloat);
 
-		m_imageID.Resize(RHIContext::g_maxFrames);
+		m_imageID.Resize(3);
 		//for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
 			//m_imageID[i] = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(i).pColorTexture, m_pSampler);
 	}
@@ -99,7 +99,7 @@ namespace WEngine
 				Screen::SetHeight(m_displayArea.Second().y - m_displayArea.First().y);
 				if (Screen::SizeChanged())
 				{
-					for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)
+					for (unsigned int i = 0; i < 3; ++i)
 					{
 						//Gui::g_pGui->RemoveTexture(m_imageID[i]);
 						//m_imageID[i] = Gui::g_pGui->LoadTexture(Editor::g_pEditorCamera->GetRenderTarget(i).pColorTexture, m_pSampler);
@@ -175,7 +175,7 @@ namespace WEngine
 						Screen::SetHeight(m_displayArea.Second().y - m_displayArea.Second().y);
 
 						//ImGui::ImageButton(m_imageID[0], ImVec2(25, 25));
-						ImGui::Image(m_imageID[RHIContext::g_currentFrame], { (float)Screen::GetWidth(), (float)Screen::GetHeight() });
+						ImGui::Image(m_imageID[0], { (float)Screen::GetWidth(), (float)Screen::GetHeight() });
 					}
 					ImGui::End();
 

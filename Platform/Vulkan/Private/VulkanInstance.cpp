@@ -67,31 +67,28 @@ namespace Vulkan
 		instanceCreateInfo.enabledExtensionCount = extensions.Size();
 		instanceCreateInfo.enabledLayerCount = 0;
 
-		m_pInstance = (VkInstance*)NormalAllocator::Get()->Allocate(sizeof(VkInstance));
 		VkAllocationCallbacks* callbacks = static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks();
-		RE_ASSERT(vkCreateInstance(&instanceCreateInfo, callbacks, m_pInstance) == VK_SUCCESS, "Failed to Create Vulkan Instance.");
+		RE_ASSERT(vkCreateInstance(&instanceCreateInfo, callbacks, &Instance) == VK_SUCCESS, "Failed to Create Vulkan Instance.");
 
 		if (enableDebugLayer)
 		{
 			SetupDebugCallback();
 		}
-
-		CreateWin32Surface();
 	}
 
 	VulkanInstance::~VulkanInstance()
 	{
-		DestroyDebugUtilsMessengerEXT(*m_pInstance, m_debugUtilsMessenger, nullptr);
+		DestroyDebugUtilsMessengerEXT(Instance, m_debugUtilsMessenger, nullptr);
 		VkAllocationCallbacks *callbacks = static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks();
-		vkDestroyInstance(*m_pInstance, callbacks);
+		vkDestroyInstance(Instance, callbacks);
 	}
 
 	void VulkanInstance::InitializeGPU()
 	{
 		unsigned int physicalDeviceCount = 0;
-		vkEnumeratePhysicalDevices(*m_pInstance, &physicalDeviceCount, nullptr);
+		vkEnumeratePhysicalDevices(Instance, &physicalDeviceCount, nullptr);
 		VkPhysicalDevice *pPhysicalDevices = (VkPhysicalDevice*)NormalAllocator::Get()->Allocate(physicalDeviceCount * sizeof(VkPhysicalDevice));
-		vkEnumeratePhysicalDevices(*m_pInstance, &physicalDeviceCount, pPhysicalDevices);
+		vkEnumeratePhysicalDevices(Instance, &physicalDeviceCount, pPhysicalDevices);
 
 		m_gpus.Resize(physicalDeviceCount);
 
@@ -99,25 +96,6 @@ namespace Vulkan
 		{
 			m_gpus[i] = new VulkanGPU(pPhysicalDevices + i);
 		}
-	}
-
-	void VulkanInstance::UpdateSurface()
-	{
-		vkDestroySurfaceKHR(*m_pInstance, *m_pSurface, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
-
-		VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
-		surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-		surfaceCreateInfo.hinstance = GetModuleHandle(0);
-		surfaceCreateInfo.hwnd = glfwGetWin32Window((GLFWwindow*)Window::Get()->GetHandle());
-
-		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(*m_pInstance, "vkCreateWin32SurfaceKHR");
-
-		RE_ASSERT(CreateWin32SurfaceKHR(*m_pInstance, &surfaceCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), m_pSurface) == VK_SUCCESS, "Failed to Recreate Win32 Surface.");
-	}
-
-	VkInstance* VulkanInstance::GetHandle()
-	{
-		return m_pInstance;
 	}
 
 	void VulkanInstance::SetupDebugCallback()
@@ -133,12 +111,7 @@ namespace Vulkan
 		debugMessageInfo.pfnUserCallback = debugCallback;
 		debugMessageInfo.pUserData = nullptr;
 
-		RE_ASSERT(CreateDebugUtilsMessengerEXT(*m_pInstance, &debugMessageInfo, nullptr, &m_debugUtilsMessenger) == VK_SUCCESS, "Failed to Create Debug Utils Messenger!")
-	}
-
-	void VulkanInstance::CreateWin32Surface()
-	{
-		
+		RE_ASSERT(CreateDebugUtilsMessengerEXT(Instance, &debugMessageInfo, nullptr, &m_debugUtilsMessenger) == VK_SUCCESS, "Failed to Create Debug Utils Messenger!")
 	}
 
 	bool VulkanInstance::CheckLayerAvailability(const WEngine::WArray<const char*>& layers)
@@ -167,7 +140,7 @@ namespace Vulkan
 
 	VkResult VulkanInstance::CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* createInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* callback)
 	{
-		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*m_pInstance, "vkCreateDebugUtilsMessengerEXT");
+		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(Instance, "vkCreateDebugUtilsMessengerEXT");
 		if (func != nullptr)
 		{
 			return func(instance, createInfo, pAllocator, callback);
@@ -177,7 +150,7 @@ namespace Vulkan
 
 	void VulkanInstance::DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback, const VkAllocationCallbacks* pAllocator)
 	{
-		auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*m_pInstance, "vkDestroyDebugUtilsMessengerEXT");
+		auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(Instance, "vkDestroyDebugUtilsMessengerEXT");
 		if (func != nullptr)
 		{
 			func(instance, callback, pAllocator);

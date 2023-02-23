@@ -2,22 +2,6 @@
 #include "Render/Renderer/Public/ScriptableRenderer.h"
 #include "Render/Public/CascadedShadowMap.h"
 
-struct GBufferPack
-{
-	SRVTexture GBuffer0;
-	SRVTexture GBuffer1;
-	SRVTexture GBuffer2;
-	SRVTexture GBuffer3;
-
-	GBufferPack(unsigned int width, unsigned int height, Format format = Format::A32R32G32B32_SFloat)
-		: GBuffer0(width, height, format),
-		  GBuffer1(width, height, format),
-		  GBuffer2(width, height, format),
-		  GBuffer3(width, height, format)
-	{
-	}
-};
-
 class DeferredRenderer : public SceneRenderer
 {
 public:
@@ -52,8 +36,6 @@ private:
 
 	CSMShadowMapPack CSMMaps;
 
-	GBufferPack GBuffer;
-
 	uint8 bRenderPrePass : 1;
 
 	uint8 bUseSphereTest : 1;
@@ -63,7 +45,5 @@ private:
 	float MaxDrawDistance;
 
 	class WRDGBuilder* GraphBuilder;
-
-	class DeferredBasePass *BasePass;
 
 };

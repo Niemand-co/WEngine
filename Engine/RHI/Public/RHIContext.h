@@ -51,23 +51,13 @@ public:
 
 	virtual RHITextureView* GetDepthView(unsigned int index);
 
-	virtual RHICommandBuffer* GetCommandBuffer();
-
 	virtual int GetNextImage(RHISemaphore* pSignalSemaphore);
-
-	virtual void ExecuteCommandBuffer(RHICommandBuffer *cmd);
 
 	virtual void Submit(RHISubmitDescriptor* descriptor);
 
 	virtual int32 AcquireImageIndex(RHISemaphore** OutSemaphore);
 
 	virtual void Present(unsigned int imageIndex);
-
-	virtual RHISemaphore* GetImageVailableSemaphore() { return g_pImageAvailibleSemaphores[g_currentFrame]; }
-
-	virtual RHISemaphore* GetPresentVailableSemaphore() { return g_pPresentAVailibleSemaphores[g_currentFrame]; }
-
-	virtual RHIFence* GetFence() { return g_pFences[g_currentFrame]; }
 
 	virtual bool IsDisplayChanged();
 
@@ -119,6 +109,10 @@ public:
 
 	virtual RHIPipelineStateObject* CreatePSO(RHIPipelineStateObjectDescriptor *descriptor);
 
+	virtual void RHIBeginDrawingViewport(class RHIViewport* Viewport) = 0;
+
+	virtual void RHIEndDrawingViewport(class RHIViewport* Viewport) = 0;
+
 public:
 
 	static inline RHIContext* GetContext() { return g_pContext; }
@@ -136,14 +130,6 @@ public:
 	template<typename T>
 	static T* CreateRenderPipeline();
 
-public:
-
-	static unsigned int g_maxFrames;
-
-	static unsigned int g_currentFrame;
-
-	static int g_currentImage;
-
 private:
 
 	static RHIInstance* g_pInstance;
@@ -155,26 +141,6 @@ private:
 	static RHIContext* g_pContext;
 
 	static RHIQueue *g_pQueue;
-
-	static RHISurface *g_pSurface;
-
-	static RHICommandPool *g_pPool;
-
-	static WEngine::WArray<RHISemaphore*> g_pImageAvailibleSemaphores;
-
-	static WEngine::WArray<RHISemaphore*> g_pPresentAVailibleSemaphores;
-
-	static WEngine::WArray<RHIFence*> g_pFences;
-
-	static WEngine::WArray<RHITextureView*> g_pTextureViews;
-
-	static WEngine::WArray<RHITexture*> g_pDepthTextures;
-
-	static WEngine::WArray<RHITextureView*> g_pDepthTextureViews;
-
-	static WEngine::WArray<RHICommandBuffer*> g_pCommandBuffers;
-
-	static WEngine::WArray<RHICommandBuffer*> g_pPrimaryCommandBuffers;
 
 	static bool m_isDisplayChagned;
 

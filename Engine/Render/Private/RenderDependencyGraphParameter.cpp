@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Render/Public/RenderDependencyGraphParameter.h"
 
-inline EAccess GetPassAccess(EPassFlag Flag, EAccess& SRVAccess, EAccess& UAVAccess)
+void GetPassAccess(EPassFlag Flag, EAccess& SRVAccess, EAccess& UAVAccess)
 {
 	if (WEngine::EnumHasFlags(Flag, EPassFlag::Raster))
 	{

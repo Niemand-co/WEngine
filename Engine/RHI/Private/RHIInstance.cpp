@@ -15,8 +15,7 @@ RHIInstance* RHIInstance::CreateInstance(RHIInstanceDescriptor *descriptor)
 	{
 		case RHIBackend::Vulkan:
 		{
-			g_instance = (RHIInstance*)NormalAllocator::Get()->Allocate(sizeof(Vulkan::VulkanInstance));
-			::new (g_instance) Vulkan::VulkanInstance(descriptor->enableDebugLayer, descriptor->enableGPUValidator);
+			g_instance = new Vulkan::VulkanInstance(descriptor->enableDebugLayer, descriptor->enableGPUValidator);
 			g_instance->InitializeGPU();
 			return g_instance;
 		}
@@ -28,9 +27,4 @@ RHIInstance* RHIInstance::CreateInstance(RHIInstanceDescriptor *descriptor)
 RHIGPU* RHIInstance::GetGPU(unsigned int gpuID)
 {
 	return m_gpus[gpuID];
-}
-
-RHISurface* RHIInstance::GetSurface()
-{
-	return m_surface;
 }

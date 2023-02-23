@@ -71,7 +71,7 @@ namespace WEngine
 		{
 			return nullptr;
 		}
-		else if (size > GetBlockSize(NumBlock))
+		else if (size > GetBlockSize(NumBlock - 1))
 		{
 			BYTE* block = (BYTE*)malloc(size + sizeof(BYTE));
 			::new (block) BYTE(0);
@@ -133,4 +133,15 @@ namespace WEngine
 
 
 }
-typedef WEngine::Allocator<8> NormalAllocator;
+
+class NormalAllocator : public WEngine::Allocator<8>
+{
+public:
+
+	static NormalAllocator* Get() { if(!g_pInstance) g_pInstance = new NormalAllocator();return g_pInstance;  }
+
+private:
+
+	static NormalAllocator *g_pInstance;	
+
+};

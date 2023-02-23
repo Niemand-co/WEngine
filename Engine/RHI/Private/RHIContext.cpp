@@ -49,10 +49,6 @@ void RHIContext::Init()
 
 	g_pQueue = g_pDevice->GetQueue(RHIQueueType::Graphics, 1);
 
-	g_pPool = g_pQueue->GetCommandPool();
-
-	g_pSurface = g_pInstance->GetSurface();
-
 	RHISwapchainDescriptor swapchainDescriptor = {};
 	{
 		swapchainDescriptor.count = 3;
@@ -70,42 +66,7 @@ void RHIContext::Init()
 
 void RHIContext::RecreateSwapchain()
 {
-	g_pSwapchain->~RHISwapchain();
-	NormalAllocator::Get()->Deallocate(g_pSwapchain);
 
-	g_pInstance->UpdateSurface();
-
-	RHISwapchainDescriptor swapchainDescriptor = {};
-	{
-		swapchainDescriptor.count = 3;
-		swapchainDescriptor.format = Format::B8G8R8A8_UNorm;
-		swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
-		swapchainDescriptor.presenMode = PresentMode::Immediate;
-		swapchainDescriptor.instance = g_pInstance;
-		swapchainDescriptor.presentFamilyIndex = 0;
-		swapchainDescriptor.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
-	}
-	g_pSwapchain = g_pDevice->CreateSwapchain(&swapchainDescriptor);
-
-	RHITextureViewDescriptor textureViewDescriptor = {};
-	{
-		textureViewDescriptor.format = Format::B8G8R8A8_UNorm;
-		textureViewDescriptor.mipCount = 1;
-		textureViewDescriptor.baseMipLevel = 0;
-		textureViewDescriptor.arrayLayerCount = 1;
-		textureViewDescriptor.baseArrayLayer = 0;
-		textureViewDescriptor.dimension = Dimension::Texture2D;
-		textureViewDescriptor.planeIndex = 0;
-		textureViewDescriptor.planeCount = 1;
-	}
-	for (int i = 0; i < 3; ++i)
-	{
-		g_pTextureViews[i]->~RHITextureView();
-		NormalAllocator::Get()->Deallocate(g_pTextureViews[i]);
-		//g_pTextureViews[i] = g_pSwapchain->GetTexture(i)->CreateTextureView(&textureViewDescriptor);
-	}
-
-	m_isDisplayChagned = true;
 }
 
 RHITexture* RHIContext::GetTexture(unsigned int index)
@@ -115,27 +76,17 @@ RHITexture* RHIContext::GetTexture(unsigned int index)
 
 RHITextureView* RHIContext::GetTextureView(unsigned int index)
 {
-	return g_pTextureViews[index];
+	return nullptr;
 }
 
 RHITextureView* RHIContext::GetDepthView(unsigned int index)
 {
-	return g_pDepthTextureViews[index];
-}
-
-RHICommandBuffer* RHIContext::GetCommandBuffer()
-{
-	return g_pPool->GetCommandBuffer();
+	return nullptr;
 }
 
 int RHIContext::GetNextImage(RHISemaphore *pSignalSemaphore)
 {
 	return g_pDevice->GetNextImage(g_pSwapchain, pSignalSemaphore);
-}
-
-void RHIContext::ExecuteCommandBuffer(RHICommandBuffer* cmd)
-{
-	g_pCommandBuffers.Push(cmd);
 }
 
 void RHIContext::Submit(RHISubmitDescriptor* descriptor)

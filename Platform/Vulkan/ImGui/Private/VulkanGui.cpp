@@ -55,7 +55,7 @@ namespace Vulkan
 		vkCreateDescriptorPool(static_cast<VulkanDevice*>(pConfigure->pDevice)->GetHandle(), &pool_info, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pool);
 
 		{
-			m_vulkanInitInfo.Instance = *static_cast<VulkanInstance*>(pConfigure->pInstance)->GetHandle();
+			m_vulkanInitInfo.Instance = static_cast<VulkanInstance*>(pConfigure->pInstance)->GetHandle();
 			m_vulkanInitInfo.PhysicalDevice = *static_cast<VulkanGPU*>(pConfigure->pGPU)->GetHandle();
 			m_vulkanInitInfo.Device = static_cast<VulkanDevice*>(pConfigure->pDevice)->GetHandle();
 			m_vulkanInitInfo.Queue = static_cast<VulkanQueue*>(pConfigure->pQueue)->GetHandle();

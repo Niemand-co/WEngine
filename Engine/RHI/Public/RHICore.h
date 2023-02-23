@@ -455,24 +455,24 @@ enum class ETextureCreateFlags : uint32
 };
 ENUM_CLASS_FLAGS(ETextureCreateFlags)
 
-typedef WEngine::WSharedPtr<class RHIVertexBuffer> WVertexBufferRHIRef;
-typedef WEngine::WSharedPtr<class RHIDynamicVertexBuffer> WDynamicVertexBufferRHIRef;
-typedef WEngine::WSharedPtr<class RHIIndexBuffer> WIndexBufferRHIRef;
-typedef WEngine::WSharedPtr<class RHIUniformBuffer> WUniformBufferRHIRef;
-typedef WEngine::WSharedPtr<class RHIDynamicUniformBuffer> WDynamicUniformBufferRHIRef;
-typedef WEngine::WSharedPtr<class RHITextureBuffer> WTextureBufferRHIRef;
+typedef class RHIVertexBuffer* WVertexBufferRHIRef;
+typedef class RHIDynamicVertexBuffer* WDynamicVertexBufferRHIRef;
+typedef class RHIIndexBuffer* WIndexBufferRHIRef;
+typedef class RHIUniformBuffer* WUniformBufferRHIRef;
+typedef class RHIDynamicUniformBuffer* WDynamicUniformBufferRHIRef;
+typedef class RHITextureBuffer* WTextureBufferRHIRef;
 
-typedef WEngine::WSharedPtr<class RHIVertexShader> WVertexShaderRHIRef;
-typedef WEngine::WSharedPtr<class RHIPixelShader> WPixelShaderRHIRef;
-typedef WEngine::WSharedPtr<class RHIGeometryShader> WGeometryShaderRHIRef;
-typedef WEngine::WSharedPtr<class RHIComputeShader> WComputeShaderRHIRef;
+typedef class RHIVertexShader* WVertexShaderRHIRef;
+typedef class RHIPixelShader* WPixelShaderRHIRef;
+typedef class RHIGeometryShader* WGeometryShaderRHIRef;
+typedef class RHIComputeShader* WComputeShaderRHIRef;
 
-typedef WEngine::WSharedPtr<class RHITexture2D> WTexture2DRHIRef;
-typedef WEngine::WSharedPtr<class RHITexture2DArray> WTexture2DArrayRHIRef;
-typedef WEngine::WSharedPtr<class RHITexture3D> WTexture3DRHIRef;
+typedef class RHITexture2D* WTexture2DRHIRef;
+typedef class RHITexture2DArray* WTexture2DArrayRHIRef;
+typedef class RHITexture3D* WTexture3DRHIRef;
 
-typedef WEngine::WSharedPtr<class RHITextureView> WTextureViewRHIRef;
+typedef class RHITextureView* WTextureViewRHIRef;
 
-typedef WEngine::WSharedPtr<class RHIViewport> WViewportRHIRef;
+typedef class RHIViewport* WViewportRHIRef;
 
-typedef WEngine::WSharedPtr<class RHIRenderPass> WRenderPassRHIRef;
+typedef class RHIRenderPass* WRenderPassRHIRef;

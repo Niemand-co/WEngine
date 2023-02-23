@@ -37,11 +37,6 @@ namespace Vulkan
 		if(features.tessellationShader)
 			m_feature.SHDAER_SUPPORT |= FEATURE_TESSELATION_SHADER;
 
-		unsigned int queueFamilyPropertyCount = 0;
-		vkGetPhysicalDeviceQueueFamilyProperties(*m_pPhysicalDevice, &queueFamilyPropertyCount, nullptr);
-		WEngine::WArray<VkQueueFamilyProperties> queueFamilyProperties(queueFamilyPropertyCount);
-		vkGetPhysicalDeviceQueueFamilyProperties(*m_pPhysicalDevice, &queueFamilyPropertyCount, queueFamilyProperties.GetData());
-
 		VkPhysicalDeviceMemoryProperties memoryProperties;
 		vkGetPhysicalDeviceMemoryProperties(*m_pPhysicalDevice, &memoryProperties);
 		m_feature.memorySupports.Resize(memoryProperties.memoryHeapCount);
@@ -81,17 +76,23 @@ namespace Vulkan
 		WEngine::WArray<QueueStack> queueStack;
 		queueStack.Reserve(descriptor->queueInfoCount);
 		unsigned int size = 0;
+
+		unsigned int queueFamilyPropertyCount = 0;
+		vkGetPhysicalDeviceQueueFamilyProperties(*m_pPhysicalDevice, &queueFamilyPropertyCount, nullptr);
+		WEngine::WArray<VkQueueFamilyProperties> queueFamilyProperties(queueFamilyPropertyCount);
+		vkGetPhysicalDeviceQueueFamilyProperties(*m_pPhysicalDevice, &queueFamilyPropertyCount, queueFamilyProperties.GetData());
+
 		for (unsigned int i = 0; i < descriptor->queueInfoCount; ++i)
 		{
 			RHIQueueDescriptor queueDescriptor = descriptor->queueInfos[i];
 			unsigned int QueueFamilyIndex = 0;
-			for (; QueueFamilyIndex < m_feature.queueProperties.Size(); ++QueueFamilyIndex)
+			for (; QueueFamilyIndex < queueFamilyProperties.Size(); ++QueueFamilyIndex)
 			{
-				QueueProperty *queueProperty = m_feature.queueProperties[QueueFamilyIndex];
-				if ((queueProperty->QUEUE_SUPPORT & (uint8)queueDescriptor.type) > 0 && queueDescriptor.count <= queueProperty->count)
+				VkQueueFamilyProperties queueProperty = queueFamilyProperties[QueueFamilyIndex];
+				if ((queueProperty.queueFlags & (uint8)queueDescriptor.type) > 0 && queueDescriptor.count <= queueProperty.queueCount)
 					break;
 			}
-			if(QueueFamilyIndex >= m_feature.queueProperties.Size())
+			if(QueueFamilyIndex >= queueFamilyProperties.Size())
 				RE_ASSERT(false, "GPU does not support queue specified.")
 			else
 			{

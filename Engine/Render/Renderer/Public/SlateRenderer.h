@@ -11,4 +11,10 @@ public:
 
 	virtual void Render() override;
 
+private:
+
+	glm::mat4 ViewMatrix;
+
+	WEngine::WSharedPtr<class RScene> ActiveScene;
+
 };

@@ -149,7 +149,7 @@ private:
 
 	const WRDGTextureDesc Desc;
 
-	WEngine::WSharedPtr<class RHITexture> RHI;
+	class RHITexture* RHI;
 
 	const WRDGTerxtureSubresourceLayout Layout;
 

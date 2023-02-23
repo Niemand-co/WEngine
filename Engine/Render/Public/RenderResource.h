@@ -35,10 +35,6 @@ protected:
 
 };
 
-WEngine::WQueue<RenderResource*> ResourcesWitingToInit;
-WEngine::WQueue<RenderResource*> ResourcesWaitingToRelease;
-WEngine::WQueue<RenderResource*> ResourcesWaitingToUpdate;
-
 /**
  * Start initializing resource.
  * 

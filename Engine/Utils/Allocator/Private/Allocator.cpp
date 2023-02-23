@@ -4,8 +4,6 @@
 
 namespace WEngine
 {
-	template<>
-	Allocator<8> *Allocator<8>::g_pInstance = new Vulkan::VulkanAllocator();
 
 	BYTE GetIndex(size_t blockSize)
 	{
@@ -57,3 +55,5 @@ namespace WEngine
 
 
 }
+
+NormalAllocator* NormalAllocator::g_pInstance = new Vulkan::VulkanAllocator();

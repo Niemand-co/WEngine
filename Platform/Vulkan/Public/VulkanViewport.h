@@ -20,7 +20,25 @@ namespace Vulkan
 
 	private:
 
+		void CreateSwapchain(class RHISwapchainDescriptor *descriptor);
+
+		void DestroySwapchain();
+
+		void RecreateSwapchain(class RHISwapchainDescriptor* descriptor);
+
+	private:
+
 		VulkanDevice *pDevice;
+
+		class VulkanSwapchain *pSwapchain;
+
+		class VulkanSemaphore* pAcquireImageSemaphore;
+
+		WEngine::WArray<VkImage> BackBufferImages;
+
+		WEngine::WArray<VulkanSemaphore*> RenderingDoneSemaphores;
+
+		WEngine::WArray<class VulkanTextureView> TextureViews;
 
 	};
 

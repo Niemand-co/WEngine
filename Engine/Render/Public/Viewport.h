@@ -2,12 +2,14 @@
 #include "Render/Public/RenderResource.h"
 #include "Render/Public/RenderTarget.h"
 
-class WViewport : public WRenderTarget
+class WViewport : public RenderResource
 {
 public:
 
-	WViewport(uint32 width, uint32 height, Format format)
-		: WRenderTarget(width, height, format)
+	WViewport(uint32 InWidth, uint32 InHeight, Format InFormat)
+		: Width(InWidth),
+		  Height(InHeight),
+		  PixelFormat(InFormat)
 	{
 	}
 
@@ -17,15 +19,25 @@ public:
 
 	virtual void ProcessInput() = 0;
 
+	virtual void InitRHIResource() override;
+
+	virtual void ReleaseRHIResource() override;
+
+	virtual void UpdateRHIResource() override;
+
 protected:
 
-	glm::vec2 MinPos = glm::vec2(0, 0);
+	uint32 Width;
 
-	glm::vec2 MaxPos = glm::vec2(0, 0);
+	uint32 Height;
+
+	Format PixelFormat;
 
 	uint32 AcquiredImageIndex = 0;
 
-	
+	WViewportRHIRef ViewportRHI;
+
+	WTexture2DRHIRef DepthStencil;
 
 };
 

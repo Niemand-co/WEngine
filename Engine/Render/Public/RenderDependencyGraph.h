@@ -149,7 +149,13 @@ private:
 
 	void BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, class WRDGTextureUAV* UAV);
 
+	void EndResourceRHI(WRDGPassHandle PassHandle, class WRDGTexture* Texture);
+
+	void EndResourceRHI(WRDGPassHandle PassHandle, class WRDGTextureSRV* Texture);
+
 	void EndResourceRHI(WRDGPassHandle PassHandle, class WRDGTextureUAV* Texture);
+
+	void EndResourceRHI(WRDGPassHandle PassHandle, class WRDGBuffer* Texture);
 
 private:
 
