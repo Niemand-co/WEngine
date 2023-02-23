@@ -10,7 +10,7 @@
 namespace Vulkan
 {
 
-	VulkanSwapchain::VulkanSwapchain(VulkanDevice* pInDevice, VulkanInstance* pInInstance, VkSwapchainCreateInfoKHR *pInfo)
+	VulkanSwapchain::VulkanSwapchain(VulkanDevice* pInDevice, VulkanInstance* pInInstance, VkSwapchainCreateInfoKHR *pInfo, WEngine::WArray<VkImage>& OutImages)
 		: pDevice(pInDevice), pInstance(pInInstance)
 	{
 		VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
@@ -129,7 +129,7 @@ namespace Vulkan
 		vkDestroySurfaceKHR(pInstance->GetHandle(), Surface, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
-	int32 VulkanSwapchain::AcquireImageIndex(RHISemaphore** OutSemaphore)
+	int32 VulkanSwapchain::AcquireImageIndex(VulkanSemaphore** OutSemaphore)
 	{
 		uint32 ImageIndex = 0;
 		const uint32 PreSemaphoreID = SemaphoreID;

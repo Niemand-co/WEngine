@@ -54,6 +54,11 @@ namespace Vulkan
 			Info.pSignalSemaphores = SignalSemaphores.GetData();
 		}
 		vkQueueSubmit(Queue, 1, &Info, VK_NULL_HANDLE);
+
+		CmdBuffer->State = VulkanCommandBuffer::ECmdState::Submitted;
+		CmdBuffer->WaitingStageMasks.Clear();
+		CmdBuffer->SubmittedWaitingSemaphores = CmdBuffer->WaitingSemaphores;
+		CmdBuffer->WaitingSemaphores.Clear();
 	}
 
 }

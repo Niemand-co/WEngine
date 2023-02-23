@@ -20,7 +20,7 @@ namespace Vulkan
 
 		virtual RHIQueue* GetQueue(RHIQueueType type, unsigned int count) override;
 
-		virtual RHISwapchain* CreateSwapchain(RHISwapchainDescriptor* descriptor) override;
+		RHISwapchain* CreateSwapchain(RHISwapchainDescriptor* descriptor, WEngine::WArray<VkImage>& OutImages);
 
 		virtual WEngine::WArray<RHIFence*> CreateFence(unsigned int count) override;
 
@@ -44,7 +44,9 @@ namespace Vulkan
 
 		virtual WTexture3DRHIRef CreateTexture3D(RHITextureDescriptor* descriptor) override;
 
-		virtual WTextureViewRHIRef CreateTextureView(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture);
+		virtual WTextureViewRHIRef CreateTextureView(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture) override;
+
+		WTextureViewRHIRef CreateTextureView(class RHITextureViewDescriptor* descriptor, VkImage InImage);
 
 		virtual RHISampler* CreateSampler(RHISamplerDescriptor * descriptor) override;
 

@@ -10,8 +10,6 @@ public:
 
 	virtual class RHIQueue* GetQueue(RHIQueueType, unsigned int index) = 0;
 
-	virtual class RHISwapchain* CreateSwapchain(class RHISwapchainDescriptor *descriptor) = 0;
-
 	virtual WEngine::WArray<class RHIFence*> CreateFence(unsigned int count) = 0;
 
 	virtual class RHIEvent* GetEvent() = 0;
@@ -34,7 +32,7 @@ public:
 
 	virtual WTexture3DRHIRef CreateTexture3D(class RHITextureDescriptor* descriptor) = 0;
 
-	virtual WTextureViewRHIRef CreateTextureView(class RHITextureViewDescriptor *descriptor, RHITexture *InTexture) = 0;
+	virtual WTextureViewRHIRef CreateTextureView(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture) = 0;;
 
 	virtual class RHISampler* CreateSampler(class RHISamplerDescriptor * descriptor) = 0;
 

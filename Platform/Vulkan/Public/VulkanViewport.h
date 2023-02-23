@@ -38,7 +38,11 @@ namespace Vulkan
 
 		WEngine::WArray<VulkanSemaphore*> RenderingDoneSemaphores;
 
-		WEngine::WArray<class VulkanTextureView> TextureViews;
+		WEngine::WArray<class VulkanTextureView*> TextureViews;
+
+		Format PixelFormat;
+
+		int32 AcquiredImageIndex;
 
 	};
 

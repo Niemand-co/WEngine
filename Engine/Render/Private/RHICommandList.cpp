@@ -10,6 +10,15 @@ RHIRenderCommandList::RHIRenderCommandList()
 {
 }
 
+void RHIRenderCommandList::BeginDrawingViewport(RHIViewport* Viewport)
+{
+    RHIContext::GetContext()->RHIBeginDrawingViewport(Viewport);
+}
+
+void RHIRenderCommandList::EndDrawingViewport(RHIViewport* Viewport, bool bPresent)
+{
+}
+
 void RHIRenderCommandList::BeginRenderPass(RHIRenderPassBeginDescriptor* descriptor)
 {
 }

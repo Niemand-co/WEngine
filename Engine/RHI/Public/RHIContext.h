@@ -1,5 +1,5 @@
 #pragma once
-#include "Render/Public/RenderContext.h"
+#include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 #include "RHI/Public/RHIInstance.h"
 #include "RHI/Public/RHIDevice.h"
 
@@ -33,7 +33,7 @@ class RHIPipelineStateObjectDescriptor;
 class RHISubmitDescriptor;
 class RHIBarrierDescriptor;
 
-class RHIContext : public RenderContext
+class RHIContext
 {
 public:
 
@@ -41,27 +41,7 @@ public:
 
 	virtual ~RHIContext() = default;
 
-	static void Init();
-
-	virtual void RecreateSwapchain();
-
-	virtual RHITexture* GetTexture(unsigned int index);
-
-	virtual RHITextureView* GetTextureView(unsigned int index);
-
-	virtual RHITextureView* GetDepthView(unsigned int index);
-
-	virtual int GetNextImage(RHISemaphore* pSignalSemaphore);
-
-	virtual void Submit(RHISubmitDescriptor* descriptor);
-
-	virtual int32 AcquireImageIndex(RHISemaphore** OutSemaphore);
-
-	virtual void Present(unsigned int imageIndex);
-
-	virtual bool IsDisplayChanged();
-
-	virtual void ResetDisplayState();
+	static void Init(RHIBackend backend);
 
 	WVertexBufferRHIRef CreateVertexBuffer(size_t stride, size_t count);
 
@@ -111,38 +91,40 @@ public:
 
 	virtual void RHIBeginDrawingViewport(class RHIViewport* Viewport) = 0;
 
-	virtual void RHIEndDrawingViewport(class RHIViewport* Viewport) = 0;
+	virtual void RHIEndDrawingViewport(class RHIViewport* Viewport, bool bPresent) = 0;
 
 public:
 
 	static inline RHIContext* GetContext() { return g_pContext; }
 
-	static inline RHIInstance* GetInstance() { return g_pInstance; }
+protected:
 
-	static inline RHIGPU* GetGPU() { return g_pInstance->GetGPU(0); }
+	inline RHIInstance* GetInstance() { return pInstance; }
 
-	static inline RHIDevice* GetDevice() { return g_pDevice; }
+	inline RHIGPU* GetGPU() { return pInstance->GetGPU(0); }
 
-	static inline RHIQueue* GetQueue() { return g_pQueue; }
+	inline RHIDevice* GetDevice() { return pDevice; }
 
-	static inline void Wait() { g_pDevice->Wait(); }
+	inline RHIQueue* GetQueue() { return pQueue; }
 
 	template<typename T>
 	static T* CreateRenderPipeline();
 
+protected:
+
+	RHIInstance* pInstance;
+
+	RHIDevice* pDevice;
+
+	RHIQueue *pQueue;
+
+	static bool m_isDisplayChagned;
+
 private:
-
-	static RHIInstance* g_pInstance;
-
-	static RHIDevice* g_pDevice;
-
-	static RHISwapchain* g_pSwapchain;
 
 	static RHIContext* g_pContext;
 
-	static RHIQueue *g_pQueue;
-
-	static bool m_isDisplayChagned;
+	
 
 };
 

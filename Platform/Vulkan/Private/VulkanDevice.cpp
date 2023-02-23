@@ -38,7 +38,7 @@ namespace Vulkan
 		return new VulkanQueue(this, queueFamilyID);
 	}
 
-	RHISwapchain* VulkanDevice::CreateSwapchain(RHISwapchainDescriptor* descriptor)
+	RHISwapchain* VulkanDevice::CreateSwapchain(RHISwapchainDescriptor* descriptor, WEngine::WArray<VkImage>& OutImages)
 	{
 		VkSwapchainCreateInfoKHR swapchainCreateInfo = {};
 		swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -58,7 +58,7 @@ namespace Vulkan
 		swapchainCreateInfo.clipped = VK_TRUE;
 		swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-		return new VulkanSwapchain(this, static_cast<VulkanInstance*>(RHIContext::GetInstance()), &swapchainCreateInfo);
+		return new VulkanSwapchain(this, static_cast<VulkanInstance*>(RHIContext::GetInstance()), &swapchainCreateInfo, OutImages);
 	}
 
 	WEngine::WArray<RHIFence*> VulkanDevice::CreateFence(unsigned int count)
@@ -469,6 +469,29 @@ namespace Vulkan
 			else if(descriptor->dimension == Dimension::Texture3D)
 				ImageViewCreateInfo.image = static_cast<VulkanTexture3D*>(InTexture)->GetHandle();
 
+			ImageViewCreateInfo.format = WEngine::ToVulkan(descriptor->format);
+			ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
+			ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;
+			ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_B;
+			ImageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_A;
+			ImageViewCreateInfo.subresourceRange.baseMipLevel = descriptor->baseMipLevel;
+			ImageViewCreateInfo.subresourceRange.levelCount = descriptor->mipCount;
+			ImageViewCreateInfo.subresourceRange.baseArrayLayer = descriptor->baseArrayLayer;
+			ImageViewCreateInfo.subresourceRange.layerCount = descriptor->arrayLayerCount;
+			for (uint32 PlaneIndex = 0; PlaneIndex < descriptor->planeCount; ++PlaneIndex)
+			{
+				ImageViewCreateInfo.subresourceRange.aspectMask |= (VkImageAspectFlags)(1 << (PlaneIndex + descriptor->planeIndex));
+			}
+		}
+		return new VulkanTextureView(this, &ImageViewCreateInfo);
+	}
+
+	WTextureViewRHIRef VulkanDevice::CreateTextureView(RHITextureViewDescriptor* descriptor, VkImage InImage)
+	{
+		VkImageViewCreateInfo ImageViewCreateInfo = {};
+		{
+			ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+			ImageViewCreateInfo.image = InImage;
 			ImageViewCreateInfo.format = WEngine::ToVulkan(descriptor->format);
 			ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
 			ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;

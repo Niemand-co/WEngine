@@ -14,11 +14,17 @@ namespace Vulkan
 
 		virtual RHICommandBuffer* GetCommandBuffer() override;
 
+		class VulkanCommandBuffer* AllocateCmdBuffer();
+
 	private:
 
 		VkCommandPool CommandPool;
 
 		VulkanDevice *pDevice;
+
+		WEngine::WArray<VulkanCommandBuffer*> CmdBuffers;
+
+		friend class VulkanCommandBufferManager;
 
 	};
 

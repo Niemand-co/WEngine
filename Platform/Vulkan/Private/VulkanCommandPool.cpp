@@ -28,4 +28,20 @@ namespace Vulkan
 		return new VulkanCommandBuffer(pDevice, this, &CommandBufferAllocateInfo);
 	}
 
+	VulkanCommandBuffer* VulkanCommandPool::AllocateCmdBuffer()
+	{
+		VkCommandBufferAllocateInfo CommandBufferAllocateInfo = {};
+		CommandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		CommandBufferAllocateInfo.commandPool = CommandPool;
+		CommandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		CommandBufferAllocateInfo.commandBufferCount = 1;
+
+		VulkanCommandBuffer *CmdBuffer = new VulkanCommandBuffer(pDevice, this, &CommandBufferAllocateInfo);
+		CmdBuffer->State = VulkanCommandBuffer::ECmdState::ReadyForBegin;
+
+		CmdBuffers.Push(CmdBuffer);
+
+		return CmdBuffer;
+	}
+
 }

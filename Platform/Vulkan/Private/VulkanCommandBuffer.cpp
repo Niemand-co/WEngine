@@ -1,12 +1,7 @@
 #include "pch.h"
-#include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
-#include "Platform/Vulkan/Public/VulkanDevice.h"
-#include "Platform/Vulkan/Public/VulkanQueue.h"
-#include "Platform/Vulkan/Public/VulkanCommandPool.h"
-#include "Platform/Vulkan/Public/VulkanSemaphore.h"
-#include "Platform/Vulkan/Public/VulkanFence.h"
-#include "Platform/Vulkan/Encoder/Public/VulkanGraphicsEncoder.h"
-#include "Platform/Vulkan/Encoder/Public/VulkanComputeEncoder.h"
+#include "Platform/Vulkan/Public/VulkanHeads.h"
+#include "RHI/Public/RHIHeads.h"
+#include "Render/Descriptor/Public/RHIDescriptorHeads.h"
 
 namespace Vulkan
 {
@@ -31,11 +26,14 @@ namespace Vulkan
 		VkCommandBufferInheritanceInfo inheritanceInfo = {};
 
 		RE_ASSERT(vkBeginCommandBuffer(CommandBuffer, &CommandbufferBeginInfo) == VK_SUCCESS, "Failed to Begin Command Buffer.");
+
+		State = ECmdState::IsInsideBegin;
 	}
 
 	void VulkanCommandBuffer::EndScopePass()
 	{
 		vkEndCommandBuffer(CommandBuffer);
+		State = ECmdState::HasEnded;
 	}
 
 	void VulkanCommandBuffer::ExecuteCommandBuffer(RHICommandBuffer* pCommandBuffer)
@@ -50,19 +48,152 @@ namespace Vulkan
 		WaitingSemaphores.Push(pSemaphore->GetHandle());
 	}
 
-	RHIGraphicsEncoder* VulkanCommandBuffer::GetGraphicsEncoder()
+	void VulkanCommandBuffer::BeginPass(RHIRenderPassBeginDescriptor* descriptor)
 	{
-		return new VulkanGraphicsEncoder(&CommandBuffer);
+		VkRenderPassBeginInfo renderPassBeginInfo = {};
+		renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassBeginInfo.framebuffer = *static_cast<VulkanRenderTarget*>(descriptor->renderTarget)->GetHandle();
+		renderPassBeginInfo.renderPass = *static_cast<VulkanRenderPass*>(descriptor->renderPass)->GetHandle();
+		renderPassBeginInfo.renderArea.offset = { 0, 0 };
+		renderPassBeginInfo.renderArea.extent = { descriptor->renderTarget->GetWidth(), descriptor->renderTarget->GetHeight() };
+		renderPassBeginInfo.clearValueCount = descriptor->clearCount;
+
+		WEngine::WArray<VkClearValue> values(descriptor->clearCount);
+		for (unsigned int i = 0; i < descriptor->clearCount; ++i)
+		{
+			values[i] = { descriptor->pClearValues[i].Color[0], descriptor->pClearValues[i].Color[1], descriptor->pClearValues[i].Color[2], descriptor->pClearValues[i].Color[3] };
+		}
+		renderPassBeginInfo.pClearValues = values.GetData();
+
+		vkCmdBeginRenderPass(CommandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		State = ECmdState::IsInsideRenderPass;
 	}
 
-	RHIComputeEncoder* VulkanCommandBuffer::GetComputeEncoder()
+	void VulkanCommandBuffer::SetPipeline(RHIPipelineStateObject* pso)
 	{
-		return nullptr;
+		vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *static_cast<VulkanPipelineStateObject*>(pso)->GetHandle());
+	}
+
+	void VulkanCommandBuffer::SetViewport(const Viewport& pViewport)
+	{
+		vkCmdSetViewport(CommandBuffer, 0, 1, {});
+	}
+
+	void VulkanCommandBuffer::SetScissor(const Scissor& scissor)
+	{
+		vkCmdSetScissor(CommandBuffer, 0, 1, {});
+	}
+
+	void VulkanCommandBuffer::SetLineWidth(float width)
+	{
+		vkCmdSetLineWidth(CommandBuffer, width);
+	}
+
+	void VulkanCommandBuffer::SetDepthTestEnable(bool enable)
+	{
+		vkCmdSetDepthTestEnable(CommandBuffer, enable);
+	}
+
+	void VulkanCommandBuffer::SetPolygonTopology(PrimitiveTopology primitive)
+	{
+		vkCmdSetPrimitiveTopology(CommandBuffer, WEngine::ToVulkan(primitive));
+	}
+
+	void VulkanCommandBuffer::ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth, unsigned int clearStencil)
+	{
+
+	}
+
+	void VulkanCommandBuffer::BindVertexBuffer(RHIBuffer* pBuffer)
+	{
+		VkDeviceSize offets[] = { 0 };
+		VkBuffer Buffer = static_cast<VulkanVertexBuffer*>(pBuffer)->GetHandle();
+		vkCmdBindVertexBuffers(CommandBuffer, 0, 1, &Buffer, offets);
+	}
+
+	void VulkanCommandBuffer::BindIndexBuffer(RHIBuffer* pBuffer)
+	{
+		vkCmdBindIndexBuffer(CommandBuffer, static_cast<VulkanIndexBuffer*>(pBuffer)->GetHandle(), 0, VK_INDEX_TYPE_UINT32);
+	}
+
+	void VulkanCommandBuffer::BindGroups(unsigned int groupCount, RHIGroup* pGroup, RHIPipelineResourceLayout* pPipelineResourceLayout, unsigned int offsetCount, unsigned int* offsets)
+	{
+		vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *static_cast<VulkanPipelineResourceLayout*>(pPipelineResourceLayout)->GetHandle(), 0, groupCount, static_cast<VulkanGroup*>(pGroup)->GetHandle(), offsetCount, offsets);
+	}
+
+	void VulkanCommandBuffer::DrawVertexArray()
+	{
+		vkCmdDraw(CommandBuffer, 3, 1, 0, 0);
+	}
+
+	void VulkanCommandBuffer::DrawIndexed(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount, unsigned int firstInstance)
+	{
+		vkCmdDrawIndexed(CommandBuffer, indexCount, instanceCount, firstIndex, 0, firstInstance);
+	}
+
+	void VulkanCommandBuffer::ResourceBarrier(unsigned int srcStage, unsigned int dstStage)
+	{
+		vkCmdPipelineBarrier(CommandBuffer, srcStage, dstStage, VkDependencyFlagBits(), 0, nullptr, 0, nullptr, 0, nullptr);
+	}
+
+	void VulkanCommandBuffer::ResourceBarrier(RHIBarrierDescriptor* pDescriptor)
+	{
+
+	}
+
+	void VulkanCommandBuffer::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height)
+	{
+		VkBufferImageCopy bufferImageCopy = {};
+		{
+			bufferImageCopy.bufferOffset = 0;
+			bufferImageCopy.bufferImageHeight = 0;
+			bufferImageCopy.bufferRowLength = 0;
+
+			bufferImageCopy.imageExtent = { width, height, 1 };
+			bufferImageCopy.imageOffset = { 0, 0, 0 };
+
+			bufferImageCopy.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			bufferImageCopy.imageSubresource.baseArrayLayer = 0;
+			bufferImageCopy.imageSubresource.mipLevel = 0;
+			bufferImageCopy.imageSubresource.layerCount = 1;
+		}
+		vkCmdCopyBufferToImage(CommandBuffer, static_cast<VulkanTextureBuffer*>(pBuffer)->GetHandle(), static_cast<VulkanTexture2D*>(pTexture)->GetHandle(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
+	}
+
+	void VulkanCommandBuffer::SetEvent(RHIEvent* pEvent)
+	{
+		vkCmdSetEvent(CommandBuffer, *static_cast<VulkanEvent*>(pEvent)->GetHandle(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
+	}
+
+	void VulkanCommandBuffer::NextSubpass()
+	{
+		vkCmdNextSubpass(CommandBuffer, VK_SUBPASS_CONTENTS_INLINE);
+	}
+
+	void VulkanCommandBuffer::EndPass()
+	{
+		vkCmdEndRenderPass(CommandBuffer);
+		State = ECmdState::IsInsideBegin;
 	}
 
 	void VulkanCommandBuffer::Clear()
 	{
 		vkResetCommandBuffer(CommandBuffer, 0);
+	}
+
+	void VulkanCommandBuffer::RefreshFenceState()
+	{
+		if (State == ECmdState::Submitted)
+		{
+			for (VkSemaphore Semaphore : SubmittedWaitingSemaphores)
+			{
+				vkDestroySemaphore(pDevice->GetHandle(), Semaphore, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+			}
+			SubmittedWaitingSemaphores.Clear();
+
+			State = ECmdState::NeedRest;
+		}
 	}
 
 	VulkanCommandBufferManager::VulkanCommandBufferManager(VulkanDevice* pInDevice)
@@ -82,44 +213,89 @@ namespace Vulkan
 
 	VulkanCommandBuffer* VulkanCommandBufferManager::GetActiveCommandBuffer()
 	{
-		if (!ActiveCmdBuffer)
+		if (ImmediateCmdBuffer)
 		{
-			//ActiveCmdBuffer
+			SubmitImmediateCommandBuffer();
 		}
-		return nullptr;
+		return ActiveCmdBuffer;
 	}
 
 	VulkanCommandBuffer* VulkanCommandBufferManager::GetImmediateCommandBuffer()
 	{
-		return nullptr;
+		if (!ImmediateCmdBuffer)
+		{
+			pImmediateSemaphore = new VulkanSemaphore(pDevice);
+
+			for (uint32 BufferIndex = 0; BufferIndex < pCommandPool->CmdBuffers.Size(); ++BufferIndex)
+			{
+				pCommandPool->CmdBuffers[BufferIndex]->RefreshFenceState();
+
+				if (pCommandPool->CmdBuffers[BufferIndex]->State == VulkanCommandBuffer::ECmdState::ReadyForBegin || pCommandPool->CmdBuffers[BufferIndex]->State == VulkanCommandBuffer::ECmdState::NeedRest)
+				{
+					ImmediateCmdBuffer = pCommandPool->CmdBuffers[BufferIndex];
+					ImmediateCmdBuffer->BeginScopePass("None");
+					return ImmediateCmdBuffer;
+				}
+			}
+
+			ImmediateCmdBuffer = pCommandPool->AllocateCmdBuffer();
+			ImmediateCmdBuffer->BeginScopePass("None");
+		}
+
+		return ImmediateCmdBuffer;
 	}
 
-	void VulkanCommandBufferManager::SubmitActiveCommandBuffer(WEngine::WArray<VulkanSemaphore*>& SignalSemaphores)
+	void VulkanCommandBufferManager::SubmitActiveCommandBuffer(uint32 NumSignalSemaphore, VulkanSemaphore* pSemaphores)
 	{
-		for (VulkanSemaphore* IMSemaphore : ImmediateDoneSemaphores)
+		if(!ActiveCmdBuffer->IsSubmitted() && ActiveCmdBuffer->HasBegun())
 		{
-			ActiveCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, IMSemaphore);
-		}
-		ImmediateDoneSemaphores.Clear();
+			if (!ActiveCmdBuffer->IsOutsideRenderPass())
+			{
+				ActiveCmdBuffer->EndPass();
+			}
 
-		WEngine::WArray<VkSemaphore> Semaphores(SignalSemaphores.Size());
-		for (VulkanSemaphore* pSemaphore : SignalSemaphores)
-		{
-			Semaphores.Push(pSemaphore->GetHandle());
-		}
-		Semaphores.Push(pActiveSemaphore->GetHandle());
+			ActiveCmdBuffer->EndScopePass();
 
-		pQueue->Submit(ActiveCmdBuffer, Semaphores);
+			for (VulkanSemaphore* IMSemaphore : ImmediateDoneSemaphores)
+			{
+				ActiveCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, IMSemaphore);
+			}
+			ImmediateDoneSemaphores.Clear();
+
+			WEngine::WArray<VkSemaphore> Semaphores(NumSignalSemaphore);
+			for (uint32 SemaphoreIndex = 0; SemaphoreIndex < NumSignalSemaphore; ++SemaphoreIndex)
+			{
+				Semaphores.Push(pSemaphores[SemaphoreIndex].GetHandle());
+			}
+			Semaphores.Push(pActiveSemaphore->GetHandle());
+
+			pQueue->Submit(ActiveCmdBuffer, Semaphores);
+		}
 	}
 
-	void VulkanCommandBufferManager::SubmitImmediateCommandBuffer(WEngine::WArray<VulkanSemaphore*>& SignalSemaphores)
+	void VulkanCommandBufferManager::SubmitImmediateCommandBuffer(uint32 NumSignalSemaphore, VulkanSemaphore *pSemaphores)
 	{
-		WEngine::WArray<VkSemaphore> Semaphores(SignalSemaphores.Size());
-		for (VulkanSemaphore* pSemaphore : SignalSemaphores)
+		if (!ImmediateCmdBuffer->IsSubmitted() && ImmediateCmdBuffer->HasBegun())
 		{
-			Semaphores.Push(pSemaphore->GetHandle());
+			ImmediateCmdBuffer->EndScopePass();
+
+			for (VulkanSemaphore* pSemaphore : RenderingDoneSemaphores)
+			{
+				ImmediateCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, pSemaphore);
+			}
+
+			WEngine::WArray<VkSemaphore> Semaphores(NumSignalSemaphore);
+			for (uint32 SemaphoreIndex = 0; SemaphoreIndex < NumSignalSemaphore; ++SemaphoreIndex)
+			{
+				Semaphores.Push(pSemaphores[SemaphoreIndex].GetHandle());
+			}
+			Semaphores.Push(pImmediateSemaphore->GetHandle());
+			if(NumSignalSemaphore == 0)
+				pImmediateSemaphore = nullptr;
+			pQueue->Submit(ImmediateCmdBuffer, Semaphores);
 		}
-		pQueue->Submit(ImmediateCmdBuffer, Semaphores);
+
+		ImmediateCmdBuffer = nullptr;
 	}
 
 	void VulkanCommandBufferManager::WaitForCommandBuffer(VulkanCommandBuffer* CmdBuffer, double Time)

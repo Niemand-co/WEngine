@@ -1,3 +1,4 @@
+#include "Render/Descriptor/Public/RHIInstanceDescriptor.h"
 #include "Render/Descriptor/Public/RHIBlendDescriptor.h"
 #include "Render/Descriptor/Public/RHIBufferDescriptor.h"
 #include "Render/Descriptor/Public/RHICommandPoolDescriptor.h"

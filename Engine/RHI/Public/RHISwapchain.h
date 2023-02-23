@@ -10,10 +10,6 @@ public:
 
 	virtual ~RHISwapchain() = default;
 
-	virtual int32 AcquireImageIndex(RHISemaphore** outSemaphore) = 0;
-
-	virtual int32 Present(class RHIQueue *queue, RHISemaphore *renderingDoneSemaphore) = 0;
-
 protected:
 
 	WEngine::WArray<class WRenderTarget*> RenderTargets;

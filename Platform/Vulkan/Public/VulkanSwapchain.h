@@ -10,13 +10,13 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanSwapchain(class VulkanDevice *pInDevice, class VulkanInstance *pInInstance, VkSwapchainCreateInfoKHR* pInfo);
+		VulkanSwapchain(class VulkanDevice *pInDevice, class VulkanInstance *pInInstance, VkSwapchainCreateInfoKHR* pInfo, WEngine::WArray<VkImage>& OutImages);
 
 		virtual ~VulkanSwapchain();
 
-		virtual int32 AcquireImageIndex(RHISemaphore** OutSemaphore) override;
+		int32 AcquireImageIndex(VulkanSemaphore** OutSemaphore);
 
-		virtual int32 Present(RHIQueue *Queue, RHISemaphore *RenderingDoneSemaphore) override;
+		int32 Present(RHIQueue* Queue, RHISemaphore* RenderingDoneSemaphore);
 
 		VkSwapchainKHR GetHandle() const { return Swapchain; }
 

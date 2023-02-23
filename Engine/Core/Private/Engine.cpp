@@ -69,8 +69,6 @@ namespace WEngine
 
 	void REngine::Tick(const TimeStep& timeStep)
 	{
-		
-
 		GEngine::Get()->Tick(timeStep);
 
 		const WArray<Layer*>& layers = LayerStack::Get()->GetLayers();
