@@ -16,7 +16,7 @@ namespace Vulkan
 
 		virtual class RHICommandPool* GetCommandPool() override;
 
-		void Submit(class VulkanCommandBuffer* CmdBuffer, WEngine::WArray<VkSemaphore>& SignalSemaphores);
+		void Submit(class VulkanCommandBuffer* CmdBuffer, uint32 NumSignalSemaphore = 0u, VkSemaphore* pSignalSemaphores = nullptr);
 
 		VkQueue GetHandle() const { return Queue; }
 

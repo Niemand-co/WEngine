@@ -55,7 +55,7 @@ void RHIContext::Init(RHIBackend backend)
 	case RHIBackend::None:
 		RE_ASSERT(false, "No RHI Support.");
 	case RHIBackend::Vulkan:
-		g_pContext = new VulkanContext();
+		g_pContext = new Vulkan::VulkanContext();
 	default:
 		break;
 	}

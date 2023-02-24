@@ -1,6 +1,7 @@
 #include "Platform/Vulkan/Public/VulkanBuffer.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 #include "Platform/Vulkan/Public/VulkanCommandPool.h"
+#include "Platform/Vulkan/Public/VulkanContext.h"
 #include "Platform/Vulkan/Public/VulkanGroupPool.h"
 #include "Platform/Vulkan/Public/VulkanGroup.h"
 #include "Platform/Vulkan/Public/VulkanGroupLayout.h"

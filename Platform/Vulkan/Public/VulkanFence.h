@@ -14,11 +14,21 @@ namespace Vulkan
 
 		virtual void Reset() override;
 
-		virtual int32 Wait(double Time = UINT64_MAX) override;
+		virtual bool Wait(double Time = UINT64_MAX) override;
+
+		bool IsFenceSignaled() const { return State == EFenceState::Signaled; }
 
 		VkFence GetHandle() const { return Fence; }
 
 	private:
+
+		enum EFenceState : uint8
+		{
+			NotReady,
+			Signaled,
+		};
+
+		EFenceState State;
 
 		VkFence Fence;
 

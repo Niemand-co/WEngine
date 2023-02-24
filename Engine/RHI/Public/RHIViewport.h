@@ -1,5 +1,8 @@
 #pragma once
 
+class RHICommandBuffer;
+class RHIQueue;
+
 class RHIViewport : public RHIResource
 {
 public:
@@ -8,8 +11,8 @@ public:
 
 	virtual void Tick() = 0;
 
-	virtual uint32 AcquireImageIndex() = 0;
+	virtual bool AcquireImageIndex() = 0;
 
-	virtual void Present() = 0;
+	virtual int32 Present(RHICommandBuffer *CmdBuffer, RHIQueue* Queue) = 0;
 
 };

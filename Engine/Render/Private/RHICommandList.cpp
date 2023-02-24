@@ -17,6 +17,7 @@ void RHIRenderCommandList::BeginDrawingViewport(RHIViewport* Viewport)
 
 void RHIRenderCommandList::EndDrawingViewport(RHIViewport* Viewport, bool bPresent)
 {
+    RHIContext::GetContext()->RHIEndDrawingViewport(Viewport, bPresent);
 }
 
 void RHIRenderCommandList::BeginRenderPass(RHIRenderPassBeginDescriptor* descriptor)
@@ -33,11 +34,6 @@ void RHIRenderCommandList::DrawIndexedPrimitive(unsigned int indexCount, unsigne
 
 void RHIRenderCommandList::SetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth)
 {
-}
-
-uint32 RHIRenderCommandList::AcquireImageIndex()
-{
-    return RHIContext::GetContext()->AcquireImageIndex(nullptr);
 }
 
 WVertexBufferRHIRef RHIRenderCommandList::CreateVertexBuffer(size_t stride, size_t count)

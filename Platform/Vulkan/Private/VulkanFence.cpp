@@ -6,7 +6,8 @@ namespace Vulkan
 {
 
 	VulkanFence::VulkanFence(VulkanDevice *pInDevice)
-		: pDevice(pInDevice)
+		: pDevice(pInDevice),
+		  State(EFenceState::Signaled)
 	{
 		VkFenceCreateInfo info = {};
 		{
@@ -23,12 +24,24 @@ namespace Vulkan
 
 	void VulkanFence::Reset()
 	{
-		vkResetFences(pDevice->GetHandle(), 1, &Fence);
+		if (State != EFenceState::NotReady)
+		{
+			vkResetFences(pDevice->GetHandle(), 1, &Fence);
+			State = EFenceState::NotReady;
+		}
 	}
 
-	int32 VulkanFence::Wait(double Time)
+	bool VulkanFence::Wait(double Time)
 	{
-		return vkWaitForFences(pDevice->GetHandle(), 1, &Fence, VK_TRUE, Time) == VK_SUCCESS;
+		if (vkWaitForFences(pDevice->GetHandle(), 1, &Fence, VK_TRUE, Time) == VK_SUCCESS)
+		{
+			State = EFenceState::Signaled;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 }

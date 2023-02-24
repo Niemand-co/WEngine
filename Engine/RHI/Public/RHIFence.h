@@ -8,7 +8,7 @@ public:
 
 	virtual void Reset() = 0;
 
-	virtual int32 Wait(double Time = UINT64_MAX) = 0;
+	virtual bool Wait(double Time = UINT64_MAX) = 0;
 
 };
 

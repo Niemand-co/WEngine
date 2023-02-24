@@ -142,7 +142,7 @@ namespace Vulkan
 		VkFence Fence = VK_NULL_HANDLE;
 #endif
 
-		VkResult Result = vkAcquireNextImageKHR(pDevice->GetHandle(), Swapchain, VK_TIMEOUT, static_cast<VulkanSemaphore*>(ImageAcquireSemaphore[SemaphoreID].Get())->GetHandle(), Fence, &ImageIndex);
+		VkResult Result = vkAcquireNextImageKHR(pDevice->GetHandle(), Swapchain, VK_TIMEOUT, static_cast<VulkanSemaphore*>(ImageAcquireSemaphore[SemaphoreID])->GetHandle(), Fence, &ImageIndex);
 
 		if (Result = VK_ERROR_OUT_OF_DATE_KHR)
 		{
@@ -156,7 +156,7 @@ namespace Vulkan
 			return (int32)EState::SurfaceLost;
 		}
 
-		*OutSemaphore = ImageAcquireSemaphore[SemaphoreID].Get();
+		*OutSemaphore = static_cast<VulkanSemaphore*>(ImageAcquireSemaphore[SemaphoreID]);
 
 #if VULKAN_USE_FENCE_ACQUIRE_IMAGE
 		ImageAcquireFence[SemaphoreID]->Wait();
@@ -197,6 +197,26 @@ namespace Vulkan
 		}
 
 		return (int32)EState::Healthy;
+	}
+
+	void VulkanSwapchain::Recreate()
+	{
+		vkDestroySwapchainKHR(pDevice->GetHandle(), Swapchain, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkDestroySurfaceKHR(pInstance->GetHandle(), Surface, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+
+		VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
+		surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+		surfaceCreateInfo.hinstance = GetModuleHandle(0);
+		surfaceCreateInfo.hwnd = glfwGetWin32Window((GLFWwindow*)Window::Get()->GetHandle());
+
+		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(pInstance->GetHandle(), "vkCreateWin32SurfaceKHR");
+
+		RE_ASSERT(CreateWin32SurfaceKHR(pInstance->GetHandle(), &surfaceCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Surface) == VK_SUCCESS, "Failed to Create Win32 Surface.");
+
+		RecreateInfo.imageExtent.width = Window::cur_window->GetWidth();
+		RecreateInfo.imageExtent.height = Window::cur_window->GetHeight();
+
+		RE_ASSERT(vkCreateSwapchainKHR(pDevice->GetHandle(), &RecreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Swapchain) == VK_SUCCESS, "Failed to recreate swapchain.");
 	}
 
 }

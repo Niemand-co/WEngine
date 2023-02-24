@@ -28,7 +28,8 @@ namespace Vulkan
 	{
 		if (bPresent)
 		{
-			Viewport->Present();
+			VulkanCommandBuffer *ActiveCmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
+			bool bSuccefullyPresent = Viewport->Present(ActiveCmdBuffer, pQueue);
 		}
 	}
 

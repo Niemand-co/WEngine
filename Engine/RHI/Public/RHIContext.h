@@ -97,7 +97,7 @@ public:
 
 	static inline RHIContext* GetContext() { return g_pContext; }
 
-protected:
+public:
 
 	inline RHIInstance* GetInstance() { return pInstance; }
 

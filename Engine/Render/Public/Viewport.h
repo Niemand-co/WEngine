@@ -25,6 +25,8 @@ public:
 
 	virtual void UpdateRHIResource() override;
 
+	WViewportRHIRef GetRHI() const { ViewportRHI; }
+
 protected:
 
 	uint32 Width;

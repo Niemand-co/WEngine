@@ -53,8 +53,6 @@ public:
 
 	void SetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth);
 
-	uint32 AcquireImageIndex();
-
 	WVertexBufferRHIRef CreateVertexBuffer(size_t stride, size_t count);
 
 	WIndexBufferRHIRef CreateIndexBuffer(size_t count);

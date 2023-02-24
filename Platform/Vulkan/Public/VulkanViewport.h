@@ -1,5 +1,8 @@
 #pragma once
 #include "RHI/Public/RHIViewport.h"
+#include "HAL/Public/WScopeLock.h"
+
+class RHISwapchainDescriptor;
 
 namespace Vulkan
 {
@@ -14,17 +17,17 @@ namespace Vulkan
 
 		virtual void Tick() override;
 
-		virtual uint32 AcquireImageIndex() override;
+		virtual bool AcquireImageIndex() override;
 
-		virtual void Present() override;
+		virtual int32 Present(RHICommandBuffer *CmdBuffer, RHIQueue *Queue) override;
 
 	private:
 
-		void CreateSwapchain(class RHISwapchainDescriptor *descriptor);
+		void CreateSwapchain(RHISwapchainDescriptor *descriptor);
 
 		void DestroySwapchain();
 
-		void RecreateSwapchain(class RHISwapchainDescriptor* descriptor);
+		void RecreateSwapchain();
 
 	private:
 
@@ -43,6 +46,8 @@ namespace Vulkan
 		Format PixelFormat;
 
 		int32 AcquiredImageIndex;
+
+		WCriticalSection SwapchainRecreationSection;
 
 	};
 

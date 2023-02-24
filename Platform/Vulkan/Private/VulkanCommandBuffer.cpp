@@ -186,13 +186,18 @@ namespace Vulkan
 	{
 		if (State == ECmdState::Submitted)
 		{
-			for (VkSemaphore Semaphore : SubmittedWaitingSemaphores)
+			if (pFence->IsFenceSignaled())
 			{
-				vkDestroySemaphore(pDevice->GetHandle(), Semaphore, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
-			}
-			SubmittedWaitingSemaphores.Clear();
+				for (VkSemaphore Semaphore : SubmittedWaitingSemaphores)
+				{
+					vkDestroySemaphore(pDevice->GetHandle(), Semaphore, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+				}
+				SubmittedWaitingSemaphores.Clear();
 
-			State = ECmdState::NeedRest;
+				pFence->Reset();
+
+				State = ECmdState::NeedRest;
+			}
 		}
 	}
 
@@ -245,6 +250,25 @@ namespace Vulkan
 		return ImmediateCmdBuffer;
 	}
 
+	void VulkanCommandBufferManager::PrepareForNewActiveCmdBuffer()
+	{
+		for (uint32 BufferIndex = 0; BufferIndex < pCommandPool->CmdBuffers.Size(); ++BufferIndex)
+		{
+			VulkanCommandBuffer *CmdBuffer = pCommandPool->CmdBuffers[BufferIndex];
+			CmdBuffer->RefreshFenceState();
+
+			if (CmdBuffer->State == VulkanCommandBuffer::ECmdState::ReadyForBegin || CmdBuffer->State == VulkanCommandBuffer::ECmdState::NeedRest)
+			{
+				ActiveCmdBuffer = CmdBuffer;
+				ActiveCmdBuffer->BeginScopePass("None");
+				return;
+			}
+		}
+
+		ActiveCmdBuffer = pCommandPool->AllocateCmdBuffer();
+		ActiveCmdBuffer->BeginScopePass("None");
+	}
+
 	void VulkanCommandBufferManager::SubmitActiveCommandBuffer(uint32 NumSignalSemaphore, VulkanSemaphore* pSemaphores)
 	{
 		if(!ActiveCmdBuffer->IsSubmitted() && ActiveCmdBuffer->HasBegun())
@@ -262,15 +286,18 @@ namespace Vulkan
 			}
 			ImmediateDoneSemaphores.Clear();
 
-			WEngine::WArray<VkSemaphore> Semaphores(NumSignalSemaphore);
+			WEngine::WArray<VkSemaphore> Semaphores(NumSignalSemaphore + 1);
 			for (uint32 SemaphoreIndex = 0; SemaphoreIndex < NumSignalSemaphore; ++SemaphoreIndex)
 			{
 				Semaphores.Push(pSemaphores[SemaphoreIndex].GetHandle());
 			}
 			Semaphores.Push(pActiveSemaphore->GetHandle());
+			pActiveSemaphore = nullptr;
 
-			pQueue->Submit(ActiveCmdBuffer, Semaphores);
+			pQueue->Submit(ActiveCmdBuffer, Semaphores.Size(), Semaphores.GetData());
 		}
+
+		ActiveCmdBuffer = nullptr;
 	}
 
 	void VulkanCommandBufferManager::SubmitImmediateCommandBuffer(uint32 NumSignalSemaphore, VulkanSemaphore *pSemaphores)
@@ -290,17 +317,37 @@ namespace Vulkan
 				Semaphores.Push(pSemaphores[SemaphoreIndex].GetHandle());
 			}
 			Semaphores.Push(pImmediateSemaphore->GetHandle());
-			if(NumSignalSemaphore == 0)
+			if (NumSignalSemaphore == 0)
+			{
+				ImmediateDoneSemaphores.Push(pImmediateSemaphore);
 				pImmediateSemaphore = nullptr;
-			pQueue->Submit(ImmediateCmdBuffer, Semaphores);
+			}
+			pQueue->Submit(ImmediateCmdBuffer, Semaphores.Size(), Semaphores.GetData());
 		}
 
 		ImmediateCmdBuffer = nullptr;
 	}
 
+	void VulkanCommandBufferManager::SubmitActiveCommandBufferFromPresent(VulkanSemaphore* SignalSemaphore)
+	{
+		if (SignalSemaphore)
+		{
+			VkSemaphore Semaphores[2] = { pActiveSemaphore->GetHandle(), SignalSemaphore->GetHandle() };
+			pQueue->Submit(ActiveCmdBuffer, 2, Semaphores);
+		}
+		else
+		{
+			VkSemaphore Semaphore = pActiveSemaphore->GetHandle();
+			pQueue->Submit(ActiveCmdBuffer, 1, &Semaphore);
+		}
+		RenderingDoneSemaphores.Push(pActiveSemaphore);
+		pActiveSemaphore = nullptr;
+	}
+
 	void VulkanCommandBufferManager::WaitForCommandBuffer(VulkanCommandBuffer* CmdBuffer, double Time)
 	{
-		//CmdBuffer->GetFence()->Wait(Time);
+		CmdBuffer->GetFence()->Wait(Time);
+		CmdBuffer->RefreshFenceState();
 	}
 
 }

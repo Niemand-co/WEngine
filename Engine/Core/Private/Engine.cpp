@@ -81,7 +81,7 @@ namespace WEngine
 
 	void REngine::InitRHIDevice()
 	{
-		RHIContext::Init();
+		RHIContext::Init(RHIBackend::Vulkan);
 	}
 
 	void REngine::ResourceLoading()

@@ -187,7 +187,6 @@ void RScene::UpdateCameraInfoForScene()
 
 void RScene::StartFrame(WViewport* viewport)
 {
-	viewport->AcquireImageIndex(GetRenderCommandList()->AcquireImageIndex());
 }
 
 void RScene::StartRendering(WViewport* viewport)

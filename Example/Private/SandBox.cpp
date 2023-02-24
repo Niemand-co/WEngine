@@ -70,7 +70,11 @@ void GameScene::Tick(WEngine::TimeStep timeStep)
 	}
 	), WEngine::EThreadProperty::RenderThread);
 
-	RE_LOG("END");
+	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [this]()
+	{
+		GetRenderCommandList()->BeginDrawingViewport(Viewport->GetRHI());
+		GetRenderCommandList()->EndDrawingViewport(Viewport->GetRHI(), true);
+	}), WEngine::EThreadProperty::RenderThread);
 	
 }
 

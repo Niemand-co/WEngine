@@ -38,7 +38,7 @@ namespace Vulkan
 		return new VulkanCommandPool(pDevice, &CommandPoolCreateInfo);
 	}
 
-	void VulkanQueue::Submit(VulkanCommandBuffer *CmdBuffer, WEngine::WArray<VkSemaphore>& SignalSemaphores)
+	void VulkanQueue::Submit(VulkanCommandBuffer *CmdBuffer, uint32 NumSignalSemaphore, VkSemaphore *pSignalSemaphores)
 	{
 		VkCommandBuffer CommandBuffer = CmdBuffer->GetHandle();
 
@@ -50,8 +50,8 @@ namespace Vulkan
 			Info.waitSemaphoreCount = CmdBuffer->GetWaitingSemaphores().Size();
 			Info.pWaitSemaphores = CmdBuffer->GetWaitingSemaphores().GetData();
 			Info.pWaitDstStageMask = CmdBuffer->GetWaitingStageMasks().GetData();
-			Info.signalSemaphoreCount = SignalSemaphores.Size();
-			Info.pSignalSemaphores = SignalSemaphores.GetData();
+			Info.signalSemaphoreCount = NumSignalSemaphore;
+			Info.pSignalSemaphores = pSignalSemaphores;
 		}
 		vkQueueSubmit(Queue, 1, &Info, VK_NULL_HANDLE);
 

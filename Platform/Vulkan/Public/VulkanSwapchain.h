@@ -18,6 +18,8 @@ namespace Vulkan
 
 		int32 Present(RHIQueue* Queue, RHISemaphore* RenderingDoneSemaphore);
 
+		void Recreate();
+
 		VkSwapchainKHR GetHandle() const { return Swapchain; }
 
 	private:

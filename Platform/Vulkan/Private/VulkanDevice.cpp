@@ -58,7 +58,7 @@ namespace Vulkan
 		swapchainCreateInfo.clipped = VK_TRUE;
 		swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-		return new VulkanSwapchain(this, static_cast<VulkanInstance*>(RHIContext::GetInstance()), &swapchainCreateInfo, OutImages);
+		return new VulkanSwapchain(this, static_cast<VulkanInstance*>(RHIContext::GetContext()->GetInstance()), &swapchainCreateInfo, OutImages);
 	}
 
 	WEngine::WArray<RHIFence*> VulkanDevice::CreateFence(unsigned int count)
@@ -841,16 +841,18 @@ namespace Vulkan
 		RE_ASSERT(vkResetFences(pDevice, count, fences.GetData()) == VK_SUCCESS, "Failed to Reset Fences.");
 	}
 
-	int VulkanDevice::GetNextImage(RHISwapchain *swapchain, RHISemaphore *semaphore)
+	void VulkanDevice::SubmitCommandsAndFlushGPU()
 	{
-		unsigned int index;
-		VkResult result = vkAcquireNextImageKHR(pDevice, static_cast<VulkanSwapchain*>(swapchain)->GetHandle(), (std::numeric_limits<uint64_t>::max)(), static_cast<VulkanSemaphore*>(semaphore)->GetHandle(), VK_NULL_HANDLE, &index);
-		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || Window::cur_window->IsSizeChanged())
+		VulkanCommandBufferManager *CmdBufferMgr = static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager();
+		if (CmdBufferMgr->HasPendingActiveCmdBuffer())
 		{
-			vkDeviceWaitIdle(pDevice);
-			return -1;
+			CmdBufferMgr->SubmitActiveCommandBuffer();
 		}
-		return index;
+		if (CmdBufferMgr->HasPendingImmediateCmdBuffer())
+		{
+			CmdBufferMgr->SubmitImmediateCommandBuffer();
+		}
+		CmdBufferMgr->PrepareForNewActiveCmdBuffer();
 	}
 
 	void VulkanDevice::Wait()

@@ -24,7 +24,7 @@ namespace Vulkan
 
 		const WEngine::WArray<uint32> GetWaitingStageMasks() { return WaitingStageMasks; }
 
-		const class VulkanFence* GetFence() { return pFence; }
+		class VulkanFence* GetFence() const { return pFence; }
 
 		virtual void BeginPass(RHIRenderPassBeginDescriptor* descriptor) override;
 
@@ -126,11 +126,19 @@ namespace Vulkan
 
 		VulkanCommandBuffer* GetImmediateCommandBuffer();
 
+		void PrepareForNewActiveCmdBuffer();
+
 		void SubmitActiveCommandBuffer(uint32 NumSignalSemaphore = 0u, VulkanSemaphore* pSemaphores = nullptr);
 
 		void SubmitImmediateCommandBuffer(uint32 NumSignalSemaphore = 0u, VulkanSemaphore* pSemaphores = nullptr);
 
+		void SubmitActiveCommandBufferFromPresent(VulkanSemaphore *SignaleSemaphore);
+
 		void WaitForCommandBuffer(VulkanCommandBuffer *CmdBuffer, double Time);
+
+		bool HasPendingActiveCmdBuffer() const { return ActiveCmdBuffer != nullptr; }
+
+		bool HasPendingImmediateCmdBuffer() const { return ImmediateCmdBuffer != nullptr; }
 
 	private:
 

@@ -7,4 +7,4 @@ public:
 	virtual ~RHISemaphore() = default;
 };
 
-typedef WEngine::WSharedPtr<RHISemaphore> WSemaphoreRHIRef;
+typedef RHISemaphore* WSemaphoreRHIRef;

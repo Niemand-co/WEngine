@@ -3,6 +3,8 @@
 
 class RHIQueue;
 class VulkanTextureBase;
+class RHISwapchain;
+class RHISwapchainDescriptor;
 struct QueueStack;
 
 namespace Vulkan
@@ -82,7 +84,7 @@ namespace Vulkan
 
 		virtual void ResetFences(RHIFence* pFences, unsigned int count) override;
 
-		virtual int GetNextImage(RHISwapchain *swapchain, RHISemaphore *semaphore) override;
+		virtual void SubmitCommandsAndFlushGPU() override;
 
 		virtual void Wait() override;
 

@@ -68,7 +68,7 @@ public:
 
 	virtual void ResetFences(class RHIFence *pFences, unsigned int count) = 0;
 
-	virtual int GetNextImage(class RHISwapchain *swapchain, RHISemaphore *semaphore) = 0;
+	virtual void SubmitCommandsAndFlushGPU() = 0;
 
 	virtual void Wait() = 0;
 
