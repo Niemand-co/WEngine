@@ -1,11 +1,13 @@
 #pragma once
 
+class RHICommandBuffer;
+
 class RHICommandPool : public RHIResource
 {
 public:
 
 	virtual ~RHICommandPool() = default;
 
-	virtual class RHICommandBuffer* GetCommandBuffer() = 0;
+	virtual RHICommandBuffer* GetCommandBuffer() = 0;
 
 };

@@ -28,14 +28,14 @@ namespace Vulkan
 		return QueueFamilyIndex;
 	}
 
-	RHICommandPool* VulkanQueue::GetCommandPool()
+	RHICommandPool* VulkanQueue::GetCommandPool(VulkanCommandBufferManager *pInManager)
 	{
 		VkCommandPoolCreateInfo CommandPoolCreateInfo = {};
 		CommandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		CommandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 		CommandPoolCreateInfo.queueFamilyIndex = QueueFamilyIndex;
 
-		return new VulkanCommandPool(pDevice, &CommandPoolCreateInfo);
+		return new VulkanCommandPool(pDevice, &CommandPoolCreateInfo, pInManager);
 	}
 
 	void VulkanQueue::Submit(VulkanCommandBuffer *CmdBuffer, uint32 NumSignalSemaphore, VkSemaphore *pSignalSemaphores)
@@ -53,7 +53,8 @@ namespace Vulkan
 			Info.signalSemaphoreCount = NumSignalSemaphore;
 			Info.pSignalSemaphores = pSignalSemaphores;
 		}
-		vkQueueSubmit(Queue, 1, &Info, VK_NULL_HANDLE);
+		vkQueueSubmit(Queue, 1, &Info, CmdBuffer->GetFence()->GetHandle());
+		LastSubmittedCmdBuffer = CmdBuffer;
 
 		CmdBuffer->State = VulkanCommandBuffer::ECmdState::Submitted;
 		CmdBuffer->WaitingStageMasks.Clear();

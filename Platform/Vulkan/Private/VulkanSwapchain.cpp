@@ -109,6 +109,11 @@ namespace Vulkan
 
 		vkCreateSwapchainKHR(pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Swapchain);
 
+		uint32 NumSwapchainImageCount = 0;
+		vkGetSwapchainImagesKHR(pDevice->GetHandle(), Swapchain, &NumSwapchainImageCount, nullptr);
+		OutImages.Resize(NumSwapchainImageCount);
+		vkGetSwapchainImagesKHR(pDevice->GetHandle(), Swapchain, &NumSwapchainImageCount, OutImages.GetData());
+
 		RecreateInfo = *pInfo;
 
 		ImageAcquireSemaphore.Reserve(pInfo->minImageCount);
@@ -144,13 +149,13 @@ namespace Vulkan
 
 		VkResult Result = vkAcquireNextImageKHR(pDevice->GetHandle(), Swapchain, VK_TIMEOUT, static_cast<VulkanSemaphore*>(ImageAcquireSemaphore[SemaphoreID])->GetHandle(), Fence, &ImageIndex);
 
-		if (Result = VK_ERROR_OUT_OF_DATE_KHR)
+		if (Result == VK_ERROR_OUT_OF_DATE_KHR)
 		{
 			SemaphoreID = PreSemaphoreID;
 			return (int32)EState::OutofData;
 		}
 
-		if (Result = VK_ERROR_SURFACE_LOST_KHR)
+		if (Result == VK_ERROR_SURFACE_LOST_KHR)
 		{
 			SemaphoreID = PreSemaphoreID;
 			return (int32)EState::SurfaceLost;
@@ -168,19 +173,23 @@ namespace Vulkan
 
 	int32 VulkanSwapchain::Present(RHIQueue* Queue, RHISemaphore* RenderingDoneSemaphore)
 	{
-		VkSemaphore Semaphore;
-		if(RenderingDoneSemaphore)
-			Semaphore = static_cast<VulkanSemaphore*>(RenderingDoneSemaphore)->GetHandle();
-		else
-			Semaphore = VK_NULL_HANDLE;
 
 		VkPresentInfoKHR Info = {};
 		{
 			Info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 			Info.swapchainCount = 1;
 			Info.pSwapchains = &Swapchain;
-			Info.waitSemaphoreCount = 1;
-			Info.pWaitSemaphores = &Semaphore;
+			if (RenderingDoneSemaphore)
+			{
+				VkSemaphore Semaphore = static_cast<VulkanSemaphore*>(RenderingDoneSemaphore)->GetHandle();
+				Info.waitSemaphoreCount = 1;
+				Info.pWaitSemaphores = &Semaphore;
+			}
+			else
+			{
+				Info.waitSemaphoreCount = 0;
+				Info.pWaitSemaphores = VK_NULL_HANDLE;
+			}
 			Info.pImageIndices = (const uint32*)(&CurrentImageIndex);
 		}
 
@@ -215,6 +224,7 @@ namespace Vulkan
 
 		RecreateInfo.imageExtent.width = Window::cur_window->GetWidth();
 		RecreateInfo.imageExtent.height = Window::cur_window->GetHeight();
+		RecreateInfo.surface = Surface;
 
 		RE_ASSERT(vkCreateSwapchainKHR(pDevice->GetHandle(), &RecreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Swapchain) == VK_SUCCESS, "Failed to recreate swapchain.");
 	}

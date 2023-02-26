@@ -126,35 +126,34 @@ void WRDGBuilder::Execute()
 {
 	Compile();
 
-	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
-	{
-		Passes[Handle]->Parameters.EnumerateTextures(Passes[Handle]->Flag, [&Handle, this](EUniformBaseType Type, auto Texture, EAccess Access)
-			{
-				this->BeginResourceRHI(Type, Handle, Texture);
-			});
+	//for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
+	//{
+	//	if(PassesToCull[Handle])
+	//		continue;
 
-		Passes[Handle]->Parameters.EnumerateBuffers(Passes[Handle]->Flag, [&Handle, this](EUniformBaseType Type, auto Buffer, EAccess Access)
-			{
-				this->EndResourceRHI(Handle, Buffer);
-			});
-	}
+	//	CollectResource(Handle);
+	//}
 
-	for (WRDGTextureHandle Handle = Textures.Begin(); Handle != Textures.End(); ++Handle)
-	{
-		WRDGTexture* Texture = Textures[Handle];
+	//for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
+	//{
+	//	if (PassesToCull[Handle])
+	//		continue;
 
-	}
+	//	CollectTrasition(Handle);
+	//}
 }
 
 WRDGTexture* WRDGBuilder::CreateTexture(const WRDGTextureDesc& inDesc, const char* inName)
 {
 	WRDGTexture* Texture = Textures.Allocate<WRDGTexture>(inDesc, inName);
+	Texture->bExternal = false;
 	return Texture;
 }
 
 WRDGBuffer* WRDGBuilder::CreateBuffer(const WRDGBufferDesc& inDesc, const char* inName)
 {
 	WRDGBuffer* Buffer = Buffers.Allocate<WRDGBuffer>(inDesc, inName);
+	Buffer->bExternal = false;
 	return Buffer;
 }
 
@@ -304,6 +303,39 @@ void WRDGBuilder::SetupPass(WRDGPass* Pass)
 		});
 }
 
+void WRDGBuilder::CollectResource(WRDGPassHandle PassHandle)
+{
+	Passes[PassHandle]->Parameters.EnumerateTextures(Passes[PassHandle]->Flag, [&PassHandle, this](EUniformBaseType Type, auto Texture, EAccess Access)
+		{
+			this->BeginResourceRHI(Type, PassHandle, Texture);
+		});
+
+	Passes[PassHandle]->Parameters.EnumerateBuffers(Passes[PassHandle]->Flag, [&PassHandle, this](EUniformBaseType Type, auto Buffer, EAccess Access)
+		{
+			this->BeginResourceRHI(Type, PassHandle, Buffer);
+		});
+
+	Passes[PassHandle]->Parameters.EnumerateTextures(Passes[PassHandle]->Flag, [&PassHandle, this](EUniformBaseType Type, auto Texture, EAccess Access)
+		{
+			this->EndResourceRHI(PassHandle, Texture);
+		});
+
+	Passes[PassHandle]->Parameters.EnumerateBuffers(Passes[PassHandle]->Flag, [&PassHandle, this](EUniformBaseType Type, auto Buffer, EAccess Access)
+		{
+			this->EndResourceRHI(PassHandle, Buffer);
+		});
+}
+
+void WRDGBuilder::CollectTrasition(WRDGPassHandle PassHandle)
+{
+	WRDGPass *Pass = Passes[PassHandle];
+
+	Pass->TextureStates.Enumerate([](WEngine::WPair<WRDGTexture*, WRDGPass::TextureState>& TexturePair)
+	{
+		
+	});
+}
+
 void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGTexture* Texture)
 {
 	if (Texture->RHI != nullptr)
@@ -359,15 +391,42 @@ void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHan
 
 void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGTextureSRV* SRV)
 {
-	GetRenderCommandList()->CreateTextureSRV(SRV->Desc.baseMipLevel, SRV->Desc.mipCount, SRV->Desc.baseArrayLayer, SRV->Desc.arrayLayerCount, SRV->Desc.planeIndex, SRV->Desc.planeCount, SRV->Desc.dimension, SRV->Desc.format, SRV->Desc.Texture->RHI);
+	if (SRV->RHI != nullptr)
+	{
+		return;
+	}
+
+	BeginResourceRHI(Type, PassHandle, SRV->Desc.Texture);
+
+	SRV->RHI = GetRenderCommandList()->CreateTextureView(SRV->Desc.baseMipLevel, SRV->Desc.mipCount, SRV->Desc.baseArrayLayer, SRV->Desc.arrayLayerCount, SRV->Desc.planeIndex, SRV->Desc.planeCount, SRV->Desc.dimension, SRV->Desc.format, SRV->Desc.Texture->RHI);
+
+	SRV->FirstPass = PassHandle;
 }
 
 void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGTextureUAV* UAV)
 {
+	if (UAV->RHI != nullptr)
+	{
+		return;
+	}
+
+	BeginResourceRHI(Type, PassHandle, UAV->Desc.Texture);
+
+	UAV->RHI = GetRenderCommandList()->CreateTextureView(UAV->Desc.baseMipLevel, UAV->Desc.mipCount, UAV->Desc.baseArrayLayer, UAV->Desc.arrayLayerCount, UAV->Desc.planeIndex, UAV->Desc.planeCount, UAV->Desc.dimension, UAV->Desc.format, UAV->Desc.Texture->RHI);
+
+	UAV->FirstPass = PassHandle;
 }
 
 void WRDGBuilder::EndResourceRHI(WRDGPassHandle PassHandle, WRDGTexture* Texture)
 {
+	RE_ASSERT(Texture->ReferenceCount > 0, "This resource should have been ended already.");
+
+	Texture->ReferenceCount -= Passes[PassHandle]->TextureStates[Texture].ReferenceCount;
+
+	if (Texture->ReferenceCount == 0)
+	{
+		Texture->LastPass = PassHandle;
+	}
 }
 
 void WRDGBuilder::EndResourceRHI(WRDGPassHandle PassHandle, WRDGTextureSRV* Texture)

@@ -8,7 +8,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanCommandPool(class VulkanDevice* pInDevice, VkCommandPoolCreateInfo* pInfo);
+		VulkanCommandPool(class VulkanDevice* pInDevice, VkCommandPoolCreateInfo* pInfo, class VulkanCommandBufferManager* pInManager);
 
 		virtual ~VulkanCommandPool();
 
@@ -16,9 +16,15 @@ namespace Vulkan
 
 		class VulkanCommandBuffer* AllocateCmdBuffer();
 
+		VulkanCommandBufferManager* GetManager() const { return pManager; }
+
+		VkCommandPool GetHandle() const { return CommandPool; }
+
 	private:
 
 		VkCommandPool CommandPool;
+
+		VulkanCommandBufferManager *pManager;
 
 		VulkanDevice *pDevice;
 

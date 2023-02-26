@@ -3,6 +3,7 @@
 #include "HAL/Public/WScopeLock.h"
 
 class RHISwapchainDescriptor;
+class RHIViewportDescriptor;
 
 namespace Vulkan
 {
@@ -11,7 +12,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanViewport(class VulkanDevice* pInDevice);
+		VulkanViewport(class VulkanDevice* pInDevice, RHIViewportDescriptor *descriptor);
 
 		virtual ~VulkanViewport();
 
@@ -21,9 +22,11 @@ namespace Vulkan
 
 		virtual int32 Present(RHICommandBuffer *CmdBuffer, RHIQueue *Queue) override;
 
+		void WaitForFrameEvenCompletion();
+
 	private:
 
-		void CreateSwapchain(RHISwapchainDescriptor *descriptor);
+		void CreateSwapchain();
 
 		void DestroySwapchain();
 
@@ -43,11 +46,17 @@ namespace Vulkan
 
 		WEngine::WArray<class VulkanTextureView*> TextureViews;
 
+		uint32 Width;
+
+		uint32 Height;
+
 		Format PixelFormat;
 
 		int32 AcquiredImageIndex;
 
 		WCriticalSection SwapchainRecreationSection;
+
+		class VulkanCommandBuffer *LastFrameCmdBuffer = nullptr;
 
 	};
 

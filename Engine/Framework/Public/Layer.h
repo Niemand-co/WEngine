@@ -2,6 +2,7 @@
 
 class WViewport;
 class RScene;
+class CameraComponent;
 
 namespace WEngine
 {
@@ -41,6 +42,8 @@ namespace WEngine
 
 		virtual ~Layer() = default;
 
+		void StartRendering();
+
 	protected:
 
 		WString DebugName;
@@ -48,6 +51,8 @@ namespace WEngine
 		WEngine::WSharedPtr<WViewport> Viewport;
 
 		WEngine::WSharedPtr<RScene> Scene;
+
+		WEngine::WSharedPtr<CameraComponent> Camera;
 
 	};
 

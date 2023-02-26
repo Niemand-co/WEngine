@@ -6,24 +6,20 @@ class RHISwapchainDescriptor
 {
 public:
 	
-	RHISwapchainDescriptor();
+	RHISwapchainDescriptor() = default;
 
 	~RHISwapchainDescriptor() = default;
 
 public:
 
-	unsigned int count;
+	unsigned int count = 1;
 
-	Format format;
+	Format format = Format::A16R16G16B16_SFloat;
 
-	ColorSpace colorSpace;
+	ColorSpace colorSpace = ColorSpace::SRGB_Linear;
 
-	Extent extent;
+	Extent extent = Extent();
 
-	PresentMode presenMode;
-
-	RHIInstance *instance;
-
-	int presentFamilyIndex;
+	RHIInstance *instance = nullptr;
 
 };

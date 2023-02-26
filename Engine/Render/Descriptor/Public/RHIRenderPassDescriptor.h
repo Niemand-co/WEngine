@@ -13,7 +13,7 @@ class RHIRenderPassDescriptor
 {
 public:
 
-	RHIRenderPassDescriptor();
+	RHIRenderPassDescriptor() = default;
 
 	~RHIRenderPassDescriptor() = default;
 
@@ -24,15 +24,15 @@ public:
 
 public:
 
-	unsigned int AttachmentCount;
+	unsigned int AttachmentCount = 0;
 
 	RHIAttachmentDescriptor AttachmentDescriptors[MaxSimultaneousRenderTargets + 3];
 
-	unsigned int SubpassCount;
+	unsigned int SubpassCount = 0;
 
 	RHISubPassDescriptor SubPassDescriptors[MaxSubPasses];
 
-	unsigned int DependencyCount;
+	unsigned int DependencyCount = 0;
 
 	RHISubPassDependencyDescriptor DependencyDescriptors[MaxSubPasses + 1];
 

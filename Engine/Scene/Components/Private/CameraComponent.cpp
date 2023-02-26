@@ -9,8 +9,6 @@ CameraComponent::CameraComponent(GameObject* pGameObject, const float& fov, cons
 	phi = 0.0f;
 	theta = 0.0f;
 	m_forward = glm::vec3(0.0f, 0.0f, -1.0f);
-
-	RScene::GetActiveScene()->AddCamera(this);
 }
 
 void CameraComponent::ShowInInspector()

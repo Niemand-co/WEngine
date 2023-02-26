@@ -93,7 +93,7 @@ namespace WEngine
 			return true;
 		}
 
-		WString&& operator+(const WString& string)
+		WString operator+(const WString& string) const
 		{
 			char* newPtr = (char*)NormalAllocator::Get()->Allocate(string.m_size + m_size + 1);
 			memcpy(newPtr, m_pData, m_size);
@@ -101,10 +101,10 @@ namespace WEngine
 			WString newString = WString();
 			newString.m_pData = newPtr;
 			newString.m_size = m_size + string.m_size;
-			return (WString&&)newString;
+			return newString;
 		}
 
-		WString&& operator+(const char *str)
+		WString operator+(const char *str) const
 		{
 			if (str == nullptr)
 			{
@@ -117,7 +117,7 @@ namespace WEngine
 			WString newString = WString();
 			newString.m_pData = newPtr;
 			newString.m_size = m_size + length;
-			return (WString&&)newString;
+			return newString;
 		}
 
 		void operator+=(const WString& string)

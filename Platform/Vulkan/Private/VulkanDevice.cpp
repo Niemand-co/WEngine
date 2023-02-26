@@ -9,8 +9,8 @@
 namespace Vulkan
 {
 
-	VulkanDevice::VulkanDevice(VulkanGPU *pInGPU, VkDeviceCreateInfo* pInfo)
-		: pGPU(pInGPU)
+	VulkanDevice::VulkanDevice(VulkanGPU *pInGPU, VkDeviceCreateInfo* pInfo, WEngine::WArray<QueueStack>& InQueueStack)
+		: pGPU(pInGPU), m_queues(InQueueStack)
 	{
 		RE_ASSERT(vkCreateDevice(*pInGPU->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &pDevice) == VK_SUCCESS, "Failed to Create Device.");
 	}
@@ -44,7 +44,6 @@ namespace Vulkan
 		swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 		swapchainCreateInfo.imageFormat = WEngine::ToVulkan(descriptor->format);
 		swapchainCreateInfo.imageColorSpace = WEngine::ToVulkan(descriptor->colorSpace);
-		swapchainCreateInfo.presentMode = WEngine::ToVulkan(descriptor->presenMode);
 		swapchainCreateInfo.imageExtent = { descriptor->extent.width, descriptor->extent.height };
 		swapchainCreateInfo.minImageCount = descriptor->count;
 		swapchainCreateInfo.imageArrayLayers = 1;
@@ -719,20 +718,9 @@ namespace Vulkan
 		return scissor;
 	}
 
-	RHIViewport* VulkanDevice::CreateViewport(RHIViewportDescriptor* descriptor)
+	WViewportRHIRef VulkanDevice::CreateViewport(RHIViewportDescriptor* descriptor)
 	{
-		VkViewport *pViewport = (VkViewport*)NormalAllocator::Get()->Allocate(sizeof(VkViewport));
-		pViewport->x = descriptor->x;
-		pViewport->y = descriptor->y;
-		pViewport->width = descriptor->width;
-		pViewport->height = descriptor->height;
-		pViewport->minDepth = descriptor->minDepth;
-		pViewport->maxDepth = descriptor->maxDepth;
-
-		VulkanViewport *viewport = (VulkanViewport*)NormalAllocator::Get()->Allocate(sizeof(VulkanViewport));
-		::new (viewport) VulkanViewport(this);
-
-		return viewport;
+		return new VulkanViewport(this, descriptor);
 	}
 
 	void VulkanDevice::UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor* descriptor)

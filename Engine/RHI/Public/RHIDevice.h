@@ -56,7 +56,7 @@ public:
 
 	virtual class RHIScissor* CreateScissor(class RHIScissorDescriptor *descriptor) = 0;
 
-	virtual class RHIViewport* CreateViewport(class RHIViewportDescriptor *descriptor) = 0;
+	virtual WViewportRHIRef CreateViewport(class RHIViewportDescriptor* descriptor) = 0;
 
 	virtual void UpdateUniformResourceToGroup(class RHIUpdateResourceDescriptor *descriptor) = 0;
 

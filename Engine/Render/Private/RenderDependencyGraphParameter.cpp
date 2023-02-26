@@ -33,7 +33,7 @@ void WShaderParameterMetaData::InitializeLayout()
 	auto IsRDGBufferResource = [](EUniformBaseType Type)->bool { return Type == EUniformBaseType::UB_RDG_BUFFER_SRV  ||
 																		 Type == EUniformBaseType::UB_RDG_BUFFER_SRV ;};
 
-	for (uint32 Index = Members.Size() - 1; Index >= 0; --Index)
+	for (int32 Index = Members.Size() - 1; Index >= 0; --Index)
 	{
 		WParameterMember& Member = Members[Index];
 		if (IsRDGTextureResource(Member.BaseType))

@@ -7,7 +7,8 @@ namespace Vulkan
 {
 
 	VulkanCommandBuffer::VulkanCommandBuffer(VulkanDevice* pInDevice, VulkanCommandPool *pInCommandPool, VkCommandBufferAllocateInfo* pInfo)
-		: pDevice(pInDevice)
+		: pDevice(pInDevice),
+		  pCommandPool(pInCommandPool)
 	{
 		vkAllocateCommandBuffers(pDevice->GetHandle(), pInfo, &CommandBuffer);
 		pFence = new VulkanFence(pDevice);
@@ -15,7 +16,7 @@ namespace Vulkan
 
 	VulkanCommandBuffer::~VulkanCommandBuffer()
 	{
-		vkFreeCommandBuffers(pDevice->GetHandle(), *pCommandPool, 1, &CommandBuffer);
+		vkFreeCommandBuffers(pDevice->GetHandle(), pCommandPool->GetHandle(), 1, &CommandBuffer);
 	}
 
 	void VulkanCommandBuffer::BeginScopePass(const WEngine::WString& passName)
@@ -201,13 +202,15 @@ namespace Vulkan
 		}
 	}
 
-	VulkanCommandBufferManager::VulkanCommandBufferManager(VulkanDevice* pInDevice)
-		: pDevice(pInDevice)
+	VulkanCommandBufferManager::VulkanCommandBufferManager(VulkanDevice* pInDevice, VulkanQueue *pInQueue)
+		: pDevice(pInDevice),
+		  pQueue(pInQueue)
 	{
-		pQueue = (VulkanQueue*)pInDevice->GetQueue(RHIQueueType((uint8)RHIQueueType::Graphics | (uint8)RHIQueueType::Present), 1);
-		pCommandPool = (VulkanCommandPool*)pQueue->GetCommandPool();
+		pCommandPool = (VulkanCommandPool*)pQueue->GetCommandPool(this);
 		ActiveCmdBuffer = (VulkanCommandBuffer*)pCommandPool->GetCommandBuffer();
 		ImmediateCmdBuffer = (VulkanCommandBuffer*)pCommandPool->GetCommandBuffer();
+		PrepareForNewActiveCmdBuffer();
+		pActiveSemaphore = new VulkanSemaphore(pInDevice);
 	}
 
 	VulkanCommandBufferManager::~VulkanCommandBufferManager()
@@ -252,6 +255,8 @@ namespace Vulkan
 
 	void VulkanCommandBufferManager::PrepareForNewActiveCmdBuffer()
 	{
+		pActiveSemaphore = new VulkanSemaphore(pDevice);
+
 		for (uint32 BufferIndex = 0; BufferIndex < pCommandPool->CmdBuffers.Size(); ++BufferIndex)
 		{
 			VulkanCommandBuffer *CmdBuffer = pCommandPool->CmdBuffers[BufferIndex];
@@ -267,6 +272,7 @@ namespace Vulkan
 
 		ActiveCmdBuffer = pCommandPool->AllocateCmdBuffer();
 		ActiveCmdBuffer->BeginScopePass("None");
+		
 	}
 
 	void VulkanCommandBufferManager::SubmitActiveCommandBuffer(uint32 NumSignalSemaphore, VulkanSemaphore* pSemaphores)

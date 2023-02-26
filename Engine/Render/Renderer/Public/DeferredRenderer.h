@@ -32,6 +32,8 @@ private:
 
 	void ComputeVisibility();
 
+	void SetupBasePass();
+
 private:
 
 	CSMShadowMapPack CSMMaps;

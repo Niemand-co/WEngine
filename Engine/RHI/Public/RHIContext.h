@@ -73,8 +73,6 @@ public:
 
 	virtual RHIScissor* CreateScissor(RHIScissorDescriptor *descriptor);
 
-	virtual RHIViewport* CreateViewport(RHIViewportDescriptor *descriptor);
-
 	virtual void CopyBufferToImage(RHITexture *pTexture, RHIBuffer *pBuffer, unsigned int width, unsigned int height);
 
 	virtual RHIGroupLayout* CreateGroupLayout(RHIGroupLayoutDescriptor *descriptor);
@@ -88,6 +86,8 @@ public:
 	virtual RHIPipelineResourceLayout* CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor *descriptor);
 
 	virtual RHIPipelineStateObject* CreatePSO(RHIPipelineStateObjectDescriptor *descriptor);
+
+	virtual WViewportRHIRef CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, Format InFormat);
 
 	virtual void RHIBeginDrawingViewport(class RHIViewport* Viewport) = 0;
 
@@ -117,8 +117,6 @@ protected:
 	RHIDevice* pDevice;
 
 	RHIQueue *pQueue;
-
-	static bool m_isDisplayChagned;
 
 private:
 

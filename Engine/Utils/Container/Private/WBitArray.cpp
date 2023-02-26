@@ -54,6 +54,7 @@ namespace WEngine
 			Array.Clear();
 			Array.Append(WArray(Count, 0x00000000u));
 		}
+		NumBits = Count;
 	}
 
 	void WBitArray::Push(const bool NewValue)

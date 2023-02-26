@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanContext.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
+#include "Platform/Vulkan/Public/VulkanQueue.h"
 #include "Platform/Vulkan/Public/VulkanViewport.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 #include "Platform/Vulkan/Encoder/Public/VulkanGraphicsEncoder.h"
@@ -11,7 +12,7 @@ namespace Vulkan
 
 	VulkanContext::VulkanContext()
 	{
-		pCommandBufferManager = new VulkanCommandBufferManager(static_cast<VulkanDevice*>(pDevice));
+		pCommandBufferManager = new VulkanCommandBufferManager(static_cast<VulkanDevice*>(pDevice), static_cast<VulkanQueue*>(pQueue));
 	}
 
 	VulkanContext::~VulkanContext()

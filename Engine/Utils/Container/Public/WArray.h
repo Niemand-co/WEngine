@@ -366,6 +366,8 @@ namespace WEngine
 	template<typename T>
 	inline T* WArray<T>::GetData() const
 	{
+		if(m_size == 0)
+			return nullptr;
 		return m_pData;
 	}
 

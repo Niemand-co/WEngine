@@ -40,7 +40,7 @@ public:
 	glm::vec3 GetForward() const { return m_forward; }
 
 	template<typename T>
-	void SetRenderer();
+	void SetRenderer(RScene* Scene);
 
 	inline CameraRenderTarget& GetRenderTarget(unsigned int index) { return m_rendertargets[index]; }
 
@@ -153,13 +153,12 @@ struct CameraInfo
 };
 
 template<typename T>
-void CameraComponent::SetRenderer()
+void CameraComponent::SetRenderer(RScene* Scene)
 {
 	m_renderer = new T(this);
 	SceneRenderer* renderer = dynamic_cast<SceneRenderer*>(m_renderer);
 	if (renderer != nullptr)
-		renderer->SetScene(RScene::GetActiveScene());
-	m_pInfo->MarkDirty();
+		renderer->SetScene(Scene);
 }
 
 //namespace WEngine

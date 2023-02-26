@@ -6,8 +6,9 @@
 namespace Vulkan
 {
 
-	VulkanCommandPool::VulkanCommandPool(VulkanDevice *pInDevice, VkCommandPoolCreateInfo *pInfo)
-		: pDevice(pInDevice)
+	VulkanCommandPool::VulkanCommandPool(VulkanDevice *pInDevice, VkCommandPoolCreateInfo *pInfo, VulkanCommandBufferManager *pInManager)
+		: pDevice(pInDevice),
+		  pManager(pInManager)
 	{
 		RE_ASSERT(vkCreateCommandPool(pDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &CommandPool) == VK_SUCCESS, "Failed to Get Command Pool.");
 	}

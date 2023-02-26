@@ -3,6 +3,7 @@
 class RHITexture;
 class RHISemaphore;
 class RHIFence;
+class RHIQueue;
 
 class RHISwapchain
 {

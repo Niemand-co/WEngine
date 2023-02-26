@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanViewport.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
+#include "Platform/Vulkan/Public/VulkanCommandPool.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 #include "Platform/Vulkan/Public/VulkanSwapchain.h"
 #include "Platform/Vulkan/Public/VulkanQueue.h"
@@ -13,15 +14,24 @@
 namespace Vulkan
 {
 
-	VulkanViewport::VulkanViewport(VulkanDevice *pInDevice)
-		: pDevice(pInDevice)
+	VulkanViewport::VulkanViewport(VulkanDevice *pInDevice, RHIViewportDescriptor* descriptor)
+		: pDevice(pInDevice),
+		  PixelFormat(descriptor->format),
+		  Width(descriptor->Width),
+		  Height(descriptor->Height)
 	{
-		
+		CreateSwapchain();
+		for (uint32 index = 0; index < RenderingDoneSemaphores.Size(); ++index)
+		{
+			RenderingDoneSemaphores[index] = new VulkanSemaphore(pInDevice);
+		}
 	}
 
 	VulkanViewport::~VulkanViewport()
 	{
-		
+		if(!pAcquireImageSemaphore)
+			delete pAcquireImageSemaphore;
+		delete pSwapchain;
 	}
 
 	void VulkanViewport::Tick()
@@ -58,8 +68,8 @@ namespace Vulkan
 		VulkanCommandBufferManager *ImmediateCmdBufferMgr = static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager();
 		if (!bFailedToAcquireImage)
 		{
-			TrueCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, pAcquireImageSemaphore);
-			ImmediateCmdBufferMgr->SubmitActiveCommandBufferFromPresent(RenderingDoneSemaphores[AcquiredImageIndex]);
+			//TrueCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, pAcquireImageSemaphore);
+			//ImmediateCmdBufferMgr->SubmitActiveCommandBufferFromPresent(RenderingDoneSemaphores[AcquiredImageIndex]);
 		}
 		else
 		{
@@ -75,7 +85,7 @@ namespace Vulkan
 		if(AcquiredImageIndex == -1)
 			return (int32)EState::Healthy;
 
-		EState PresentState = (EState)pSwapchain->Present(Queue, RenderingDoneSemaphores[AcquiredImageIndex]);
+		EState PresentState = (EState)pSwapchain->Present(Queue, pAcquireImageSemaphore);
 		int32 AttemptsPending = 4;
 		while ((int32)PresentState < 0 && AttemptsPending > 0)
 		{
@@ -102,6 +112,8 @@ namespace Vulkan
 			RE_LOG("Failed to present image.");
 		}
 
+		WaitForFrameEvenCompletion();
+
 		AcquiredImageIndex = -1;
 
 		if (ImmediateCmdBufferMgr->GetActiveCommandBuffer() && !ImmediateCmdBufferMgr->GetActiveCommandBuffer()->HasBegun())
@@ -112,9 +124,33 @@ namespace Vulkan
 		return bResult;
 	}
 
-	void VulkanViewport::CreateSwapchain(RHISwapchainDescriptor* descriptor)
+	void VulkanViewport::WaitForFrameEvenCompletion()
 	{
-		pSwapchain = static_cast<VulkanSwapchain*>(pDevice->CreateSwapchain(descriptor, BackBufferImages));
+		static WCriticalSection section;
+		WEngine::WScopeLock Lock(&section);
+
+		if (LastFrameCmdBuffer && LastFrameCmdBuffer->IsSubmitted())
+		{
+			if (!LastFrameCmdBuffer->GetFence()->IsFenceSignaled())
+			{
+				LastFrameCmdBuffer->GetOwner()->GetManager()->WaitForCommandBuffer(LastFrameCmdBuffer);
+			}
+		}
+
+		LastFrameCmdBuffer = static_cast<VulkanQueue*>(RHIContext::GetContext()->GetQueue())->GetLastSubmittedCmdBuffer();
+	}
+
+	void VulkanViewport::CreateSwapchain()
+	{
+		RHISwapchainDescriptor SwapchainDescriptor = {};
+		{
+			SwapchainDescriptor.instance = RHIContext::GetContext()->GetInstance();
+			SwapchainDescriptor.count = 3;
+			SwapchainDescriptor.extent = Extent(Width, Height);
+			SwapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
+			SwapchainDescriptor.format = PixelFormat;
+		}
+		pSwapchain = static_cast<VulkanSwapchain*>(pDevice->CreateSwapchain(&SwapchainDescriptor, BackBufferImages));
 
 		RenderingDoneSemaphores.Resize(BackBufferImages.Size());
 		TextureViews.Resize(BackBufferImages.Size());

@@ -187,8 +187,10 @@ void RScene::UpdateCameraInfoForScene()
 
 void RScene::StartFrame(WViewport* viewport)
 {
+	GetRenderCommandList()->BeginDrawingViewport(viewport->GetRHI());
 }
 
-void RScene::StartRendering(WViewport* viewport)
+void RScene::EndFrame(WViewport* viewport)
 {
+	GetRenderCommandList()->EndDrawingViewport(viewport->GetRHI(), true);
 }

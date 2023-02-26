@@ -5,6 +5,7 @@ GameScene::GameScene(const WEngine::WString& name)
 	: Layer(name)
 {
 	Viewport = new WSceneViewport(1920, 1080, Format::A16R16G16B16_SFloat);
+	Camera->SetRenderer<DeferredRenderer>(Scene.Get());
 }
 
 GameScene::~GameScene()
@@ -66,14 +67,14 @@ void GameScene::Tick(WEngine::TimeStep timeStep)
 
 	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [this]()
 	{
-		Scene->StartRendering(Viewport.Get());
+		this->StartRendering();
 	}
 	), WEngine::EThreadProperty::RenderThread);
 
 	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [this]()
 	{
-		GetRenderCommandList()->BeginDrawingViewport(Viewport->GetRHI());
-		GetRenderCommandList()->EndDrawingViewport(Viewport->GetRHI(), true);
+		Scene->EndFrame(Viewport.Get());
+		
 	}), WEngine::EThreadProperty::RenderThread);
 	
 }
@@ -94,11 +95,6 @@ SandBox::SandBox()
 	//plane->GetComponent<TransformComponent>()->SetScale(glm::vec3(50.0f, 50.0f, 50.0f));
 
 	WEngine::LayerStack::Get()->PushLayer(new GameScene("Game Scene"));
-	RScene::SetActiveScene(new RScene);
-
-	GameObject *go = GWorld::GetWorld()->CreateGameObject("Camera");
-	CameraComponent *camera = go->AddComponent<CameraComponent>();
-	camera->SetRenderer<DeferredRenderer>();
 }
 
 SandBox::~SandBox()

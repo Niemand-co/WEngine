@@ -272,6 +272,10 @@ private:
 	{
 	}
 
+private:
+
+	WTextureViewRHIRef RHI;
+
 	friend class WRDGBuilder;
 	friend WRDGViewRegistry;
 
@@ -289,6 +293,10 @@ private:
 		: Desc(inDesc)
 	{
 	}
+
+private:
+
+	WTextureViewRHIRef RHI;
 
 	friend class WRDGBuilder;
 	friend WRDGViewRegistry;

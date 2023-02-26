@@ -14,7 +14,7 @@ namespace Vulkan
 	{
 	public:
 	
-		VulkanDevice(class VulkanGPU* pInGPU, VkDeviceCreateInfo *pInfo);
+		VulkanDevice(class VulkanGPU* pInGPU, VkDeviceCreateInfo *pInfo, WEngine::WArray<QueueStack>& InQueueStack);
 
 		virtual ~VulkanDevice();
 
@@ -72,7 +72,7 @@ namespace Vulkan
 
 		virtual RHIScissor* CreateScissor(RHIScissorDescriptor *descriptor) override;
 
-		virtual RHIViewport* CreateViewport(RHIViewportDescriptor *descriptor) override;
+		virtual WViewportRHIRef CreateViewport(RHIViewportDescriptor *descriptor) override;
 
 		virtual void UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor *descriptor) override;
 

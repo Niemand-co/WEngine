@@ -33,19 +33,6 @@ RHIContext::RHIContext()
 	pDevice = pInstance->GetGPU(0)->CreateDevice(&deviceDescriptor);
 
 	pQueue = pDevice->GetQueue(RHIQueueType::Graphics, 1);
-
-	RHISwapchainDescriptor swapchainDescriptor = {};
-	{
-		swapchainDescriptor.count = 3;
-		swapchainDescriptor.format = Format::B8G8R8A8_UNorm;
-		swapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
-		swapchainDescriptor.presenMode = PresentMode::Immediate;
-		swapchainDescriptor.instance = pInstance;
-		swapchainDescriptor.presentFamilyIndex = pQueue->GetIndex();
-		swapchainDescriptor.extent = { Window::cur_window->GetWidth(), Window::cur_window->GetHeight() };
-	}
-
-	m_isDisplayChagned = false;
 }
 
 void RHIContext::Init(RHIBackend backend)
@@ -59,8 +46,6 @@ void RHIContext::Init(RHIBackend backend)
 	default:
 		break;
 	}
-
-
 }
 
 WVertexBufferRHIRef RHIContext::CreateVertexBuffer(size_t stride, size_t count)
@@ -216,11 +201,6 @@ RHIScissor* RHIContext::CreateScissor(RHIScissorDescriptor* descriptor)
 	return pDevice->CreateScissor(descriptor);
 }
 
-RHIViewport* RHIContext::CreateViewport(RHIViewportDescriptor* descriptor)
-{
-	return pDevice->CreateViewport(descriptor);
-}
-
 void RHIContext::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height)
 {
 
@@ -263,4 +243,15 @@ RHIPipelineResourceLayout* RHIContext::CreatePipelineResourceLayout(RHIPipelineR
 RHIPipelineStateObject* RHIContext::CreatePSO(RHIPipelineStateObjectDescriptor* descriptor)
 {
 	return pDevice->CreatePipelineStateObject(descriptor);
+}
+
+WViewportRHIRef RHIContext::CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, Format InFormat)
+{
+	RHIViewportDescriptor descriptor = {};
+	{
+		descriptor.format = InFormat;
+		descriptor.Width = InWidth;
+		descriptor.Height = InHeight;
+	}
+	return pDevice->CreateViewport(&descriptor);
 }

@@ -24,6 +24,16 @@ struct WRDGRenderTargetBindingSlots
 	WRDGRenderTargetBinding DepthStencilTexture;
 	WResolveRect ResolveRect;
 
+	WRDGRenderTargetBindingSlots()
+	{
+		for(uint32 ColorIndex = 0; ColorIndex < MaxSimultaneousRenderTargets; ++ColorIndex)
+			ColorTextures[ColorIndex] = WRDGRenderTargetBinding();
+
+		DepthStencilTexture = WRDGRenderTargetBinding();
+
+		ResolveRect = { 0, 0, 0, 0 };
+	}
+
 	bool operator==(const WRDGRenderTargetBindingSlots& other) const
 	{
 		for (uint32 ColorIndex = 0; ColorIndex < MaxSimultaneousRenderTargets; ++ColorIndex)
@@ -200,7 +210,7 @@ private:
 template<typename LAMBDA>
 inline void WRDGParameterStruct::EnumerateTextures(EPassFlag PassFlag, LAMBDA lambda) const
 {
-	for (uint32 Index; Index < Layout->GraphTextures.Size(); ++Index)
+	for (uint32 Index = 0; Index < Layout->GraphTextures.Size(); ++Index)
 	{
 		EAccess SRVAccess = EAccess::Unknown;
 		EAccess UAVAccess = EAccess::Unknown;
@@ -241,7 +251,7 @@ inline void WRDGParameterStruct::EnumerateTextures(EPassFlag PassFlag, LAMBDA la
 template<typename LAMBDA>
 inline void WRDGParameterStruct::EnumerateBuffers(EPassFlag PassFlag, LAMBDA lambda) const
 {
-	for (uint32 Index; Index < Layout->GraphBuffers.Size(); ++Index)
+	for (uint32 Index = 0; Index < Layout->GraphBuffers.Size(); ++Index)
 	{
 		EAccess SRVAccess = EAccess::Unknown;
 		EAccess UAVAccess = EAccess::Unknown;
@@ -487,7 +497,7 @@ private:\
 	};
 
 #define RENDER_TARGET_SLOTS()\
-	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RTV, WRDGRenderTargetBinding*, RenderTarget, = nullptr)
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RTV, WRDGRenderTargetBindingSlots, RenderTarget, )
 
 #define SHADER_PARAMETER(PARAMETER_TYPE, PARAMETER_NAME)\
 	SHADER_PARAMETER_INTERNAL(WParameterTypeInfo<PARAMETER_TYPE>::BaseType, PARAMETER_TYPE, PARAMETER_NAME, )
@@ -508,9 +518,5 @@ private:\
 	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RDG_TEXTURE, PARAMETER_TYPE, PARAMETER_NAME, = nullptr)
 
 BEGIN_SHADER_PARAMETERS_STRUCT(DeferredBasePassParameters)
-	SHADER_PARAMETER_RDG_TEXTURE(WRDGTexture*, GBuffer0)
-	SHADER_PARAMETER_RDG_TEXTURE(WRDGTexture*, GBuffer1)
-	SHADER_PARAMETER_RDG_TEXTURE(WRDGTexture*, GBuffer2)
-	SHADER_PARAMETER_RDG_TEXTURE(WRDGTexture*, GBuffer3)
 	RENDER_TARGET_SLOTS()
 END_SHADER_PARAMETERS_STRUCT

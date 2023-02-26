@@ -8,6 +8,4 @@ public:
 
 	virtual int GetIndex() = 0;
 
-	virtual class RHICommandPool* GetCommandPool() = 0;
-
 };

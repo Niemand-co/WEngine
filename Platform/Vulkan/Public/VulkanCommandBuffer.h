@@ -66,7 +66,7 @@ namespace Vulkan
 
 		virtual void Clear() override;
 
-		VkCommandPool* GetOwner() const { return pCommandPool; }
+		VulkanCommandPool* GetOwner() const { return pCommandPool; }
 
 		VkCommandBuffer GetHandle() const { return CommandBuffer; }
 
@@ -92,7 +92,7 @@ namespace Vulkan
 
 		VkCommandBuffer CommandBuffer;
 
-		VkCommandPool *pCommandPool;
+		VulkanCommandPool *pCommandPool;
 
 		VulkanDevice *pDevice;
 
@@ -118,7 +118,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanCommandBufferManager(class VulkanDevice *pInDevice);
+		VulkanCommandBufferManager(class VulkanDevice *pInDevice, class VulkanQueue *pInQueue);
 
 		~VulkanCommandBufferManager();
 
@@ -134,7 +134,7 @@ namespace Vulkan
 
 		void SubmitActiveCommandBufferFromPresent(VulkanSemaphore *SignaleSemaphore);
 
-		void WaitForCommandBuffer(VulkanCommandBuffer *CmdBuffer, double Time);
+		void WaitForCommandBuffer(VulkanCommandBuffer *CmdBuffer, double Time = 10.0);
 
 		bool HasPendingActiveCmdBuffer() const { return ActiveCmdBuffer != nullptr; }
 

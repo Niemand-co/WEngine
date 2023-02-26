@@ -129,7 +129,7 @@ namespace Vulkan
 			DeviceCreateInfo.enabledLayerCount = 0u;
 		}
 
-		return new VulkanDevice(this, &DeviceCreateInfo);
+		return new VulkanDevice(this, &DeviceCreateInfo, queueStack);
 	}
 
 }

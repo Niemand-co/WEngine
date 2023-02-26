@@ -22,7 +22,7 @@ class WRDGPass
 {
 public:
 
-	WRDGPass(WEngine::WString&& inName,  WRDGParameterStruct inParameters)
+	WRDGPass(WEngine::WString& inName,  WRDGParameterStruct inParameters)
 		: Name(inName),
 		  Parameters(inParameters)
 	{
@@ -30,7 +30,7 @@ public:
 
 	virtual ~WRDGPass() = default;
 
-	virtual void Execute() = 0;
+	virtual void Execute(RHIRenderCommandList& CmdList) = 0;
 
 	void SetNeverCulling(bool bInCulling) { Flag = (EPassFlag)((uint16)Flag | (uint16)EPassFlag::NeverCull); }
 
@@ -95,15 +95,18 @@ class WRDGLambdaPass : public WRDGPass
 {
 public:
 
-	WRDGLambdaPass(WEngine::WString&& inName, const ParameterStructType* inParameters, LAMBDA inLambda)
+	WRDGLambdaPass(WEngine::WString& inName, const ParameterStructType* inParameters, LAMBDA inLambda)
 		: WRDGPass(inName, WRDGParameterStruct(inParameters)),
 		  Lambda(inLambda)
 	{
 	}
 
-	virtual ~WRDGLambdaPass();
+	virtual ~WRDGLambdaPass() = default;
 
-	virtual void Execute() override;
+	virtual void Execute(RHIRenderCommandList& CmdList) override
+	{
+		Lambda(CmdList);
+	}
 
 private:
 
@@ -141,6 +144,10 @@ private:
 
 	void SetupPass(WRDGPass *Pass);
 
+	void CollectResource(WRDGPassHandle PassHandle);
+
+	void CollectTrasition(WRDGPassHandle PassHandle);
+
 	void BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGTexture* Texture);
 
 	void BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGBuffer* Buffer);
@@ -174,7 +181,9 @@ private:
 template<typename ParameterStructType>
 inline ParameterStructType* WRDGBuilder::AllocateParameterStruct()
 {
-	return (ParameterStructType*)WRDGAllocator::Allocate(sizeof(ParameterStructType));
+	ParameterStructType* Parameter = (ParameterStructType*)WRDGAllocator::Get()->Allocate(sizeof(ParameterStructType));
+	::new (Parameter) ParameterStructType();
+	return Parameter;
 }
 
 template<typename ParameterStructType, typename LAMBDA>
