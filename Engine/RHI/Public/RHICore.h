@@ -442,7 +442,7 @@ struct WResolveRect
 enum class ETextureCreateFlags : uint32
 {
 	TextureCreate_None                    = 0,
-	TextureCreate_Presentable            = 1 << 0,
+	TextureCreate_Presentable             = 1 << 0,
 	TextureCreate_RenderTarget            = 1 << 1,
 	TextureCreate_DepthStencil            = 1 << 2,
 	TextureCreate_SRV                     = 1 << 3,
@@ -452,6 +452,7 @@ enum class ETextureCreateFlags : uint32
 	TextureCreate_CPUReadable             = 1 << 7,
 	TextureCreate_Transient               = 1 << 8,
 	TextureCreate_InputAttachmentReadable = 1 << 9,
+	TextureCreate_Memoryless              = 1 << 10,
 };
 ENUM_CLASS_FLAGS(ETextureCreateFlags)
 

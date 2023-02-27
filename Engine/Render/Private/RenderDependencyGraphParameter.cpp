@@ -59,18 +59,42 @@ void WShaderParameterMetaData::InitializeLayout()
 RHIRenderPassDescriptor WRDGParameterStruct::GetRenderPassInfo() const
 {
 	RHIRenderPassDescriptor descriptor = {};
-	const WRDGRenderTargetBindingSlots& RenderTarget = GetRenderTarget();
-	uint32 ColorAttachmentCount = 0;
-	for (uint32 ColorAttachmentIndex = 0; ColorAttachmentIndex < MaxSimultaneousRenderTargets; ++ColorAttachmentIndex)
+	const WRDGRenderTargetBindingSlots& RenderTargets = GetRenderTarget();
+	
+	uint32 ColorAttachmentIndex = 0;
+	RenderTargets.Enumerate([&descriptor, &ColorAttachmentIndex](WRDGRenderTargetBinding& RenderTarget)
 	{
-		if (RenderTarget.ColorTextures[ColorAttachmentIndex].Texture != nullptr)
+		WRDGTexture *Texture = RenderTarget.Texture;
+		AttachmentStoreOP StoreOp = WEngine::EnumHasFlags(Texture->Desc.Flags, ETextureCreateFlags::TextureCreate_CPUReadable) ? AttachmentStoreOP::DontCare : AttachmentStoreOP::Store;
+		AttachmentLoadOP LoadOp = RenderTarget.LoadOP;
+
 		{
-			WRDGTexture *Texture = RenderTarget.ColorTextures[ColorAttachmentIndex].Texture;
-			ColorAttachmentCount++;
-			descriptor.AttachmentDescriptors[ColorAttachmentCount].attachmentFormat = Texture->Desc.format;
-			descriptor.AttachmentDescriptors[ColorAttachmentCount].sampleCount = Texture->Desc.sampleCount;
+			descriptor.ColorAttachmentDescriptors[ColorAttachmentIndex].attachmentFormat = Texture->Desc.format;
+			descriptor.ColorAttachmentDescriptors[ColorAttachmentIndex].attachmentLoadOP = LoadOp;
+			descriptor.ColorAttachmentDescriptors[ColorAttachmentIndex].attachmentStoreOP = StoreOp;
+			descriptor.ColorAttachmentDescriptors[ColorAttachmentIndex].sampleCount = Texture->Desc.sampleCount;
 		}
+
+		++ColorAttachmentIndex;
+	});
+	descriptor.ColorAttachmentCount = ColorAttachmentIndex;
+
+	const WRDGDepthStencilBinding& DepthStencil = RenderTargets.DepthStencilTexture;
+	if (!DepthStencil.Texture)
+	{
+		WRDGTexture *Texture = DepthStencil.Texture;
+		AttachmentStoreOP DepthStoreOp = Texture->Desc.IsDepthFormat() ? AttachmentStoreOP::DontCare : AttachmentStoreOP::Store;
+		AttachmentStoreOP StencilStoreOp = Texture->Desc.IsStencilFormat() ? AttachmentStoreOP::DontCare : AttachmentStoreOP::Store;
+		AttachmentLoadOP DepthLoadOp = DepthStencil.DepthLoadOP;
+		AttachmentLoadOP StencilLoadOp = DepthStencil.StencilLoadOP;
+
+		descriptor.DepthStencilAttachmentDescriptor.attachmentFormat = Texture->Desc.format;
+		descriptor.DepthStencilAttachmentDescriptor.attachmentLoadOP = DepthLoadOp;
+		descriptor.DepthStencilAttachmentDescriptor.attachmentStoreOP = DepthStoreOp;
+		descriptor.DepthStencilAttachmentDescriptor.stencilLoadOP = StencilLoadOp;
+		descriptor.DepthStencilAttachmentDescriptor.stencilStoreOP = StencilStoreOp;
+		descriptor.DepthStencilAttachmentDescriptor.sampleCount = Texture->Desc.sampleCount;
 	}
-	descriptor.AttachmentCount = ColorAttachmentCount;
+
 	return descriptor;
 }

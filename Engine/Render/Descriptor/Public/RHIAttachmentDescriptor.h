@@ -20,6 +20,4 @@ public:
 
 	AttachmentStoreOP stencilStoreOP;
 
-	AttachmentLayout initialLayout;
-
 };

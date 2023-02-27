@@ -144,9 +144,15 @@ private:
 
 	void SetupPass(WRDGPass *Pass);
 
+	void ExecutePass(WRDGPass *Pass);
+
 	void CollectResource(WRDGPassHandle PassHandle);
 
 	void CollectTrasition(WRDGPassHandle PassHandle);
+
+	void AddTransition(WRDGPassHandle PassHandle, WRDGTexture* Texture, const WEngine::WArray<WRDGResourceState*>& StateAfter);
+
+	void AddTransition(WRDGPassHandle PassHandle, WRDGBuffer *Buffer, WRDGResourceState* StateAfter);
 
 	void BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGTexture* Texture);
 

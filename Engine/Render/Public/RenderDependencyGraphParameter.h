@@ -18,10 +18,22 @@ struct WRDGRenderTargetBinding
 	}
 };
 
+struct WRDGDepthStencilBinding
+{
+	WRDGTexture *Texture = nullptr;
+	AttachmentLoadOP DepthLoadOP = AttachmentLoadOP::DontCare;
+	AttachmentLoadOP StencilLoadOP = AttachmentLoadOP::DontCare;
+
+	bool operator==(const WRDGDepthStencilBinding& other) const
+	{
+		return Texture == other.Texture && DepthLoadOP == other.DepthLoadOP && StencilLoadOP == other.StencilLoadOP;
+	}
+};
+
 struct WRDGRenderTargetBindingSlots
 {
 	WRDGRenderTargetBinding ColorTextures[MaxSimultaneousRenderTargets];
-	WRDGRenderTargetBinding DepthStencilTexture;
+	WRDGDepthStencilBinding DepthStencilTexture;
 	WResolveRect ResolveRect;
 
 	WRDGRenderTargetBindingSlots()
@@ -29,9 +41,21 @@ struct WRDGRenderTargetBindingSlots
 		for(uint32 ColorIndex = 0; ColorIndex < MaxSimultaneousRenderTargets; ++ColorIndex)
 			ColorTextures[ColorIndex] = WRDGRenderTargetBinding();
 
-		DepthStencilTexture = WRDGRenderTargetBinding();
+		DepthStencilTexture = WRDGDepthStencilBinding();
 
 		ResolveRect = { 0, 0, 0, 0 };
+	}
+
+	template<typename LAMBDA>
+	void Enumerate(LAMBDA lambda) const
+	{
+		for (uint32 ColorIndex = 0; ColorIndex < MaxSimultaneousRenderTargets; ++ColorIndex)
+		{
+			if (!ColorTextures[ColorIndex].Texture)
+			{
+				lambda(ColorTextures[ColorIndex]);
+			}
+		}
 	}
 
 	bool operator==(const WRDGRenderTargetBindingSlots& other) const
@@ -49,7 +73,7 @@ struct WRDGRenderTargetBindingSlots
 			return false;
 		}
 
-		if (ResolveRect == other.ResolveRect)
+		if (ResolveRect != other.ResolveRect)
 		{
 			return false;
 		}

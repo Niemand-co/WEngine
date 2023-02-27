@@ -250,34 +250,34 @@ struct WRDGTextureDesc
 		TextureCubeArray
 	};
 
-	WRDGTextureDesc(Format inFormat, Extent inExtent, EDimension inDimension, ClearValue inClearValue, uint8 inMipCount, uint8 inSampleCount, uint32 inLayerCount)
-		: format(inFormat), extent(inExtent), dimension(inDimension), clearValue(inClearValue), mipCount(inMipCount), sampleCount(inSampleCount), layerCount(inLayerCount)
+	WRDGTextureDesc(Format inFormat, Extent inExtent, EDimension inDimension, ClearValue inClearValue, uint8 inMipCount, uint8 inSampleCount, uint32 inLayerCount, ETextureCreateFlags InFlags)
+		: format(inFormat), extent(inExtent), dimension(inDimension), clearValue(inClearValue), mipCount(inMipCount), sampleCount(inSampleCount), layerCount(inLayerCount), Flags(InFlags)
 	{
 	}
 
-	static WRDGTextureDesc GetTexture2DDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1)
+	static WRDGTextureDesc GetTexture2DDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
 	{
-		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture2D, inClearValue, inMipCount, inSampleCount, 1);
+		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture2D, inClearValue, inMipCount, inSampleCount, 1, InFlags);
 	}
 
-	static WRDGTextureDesc GetTexture2DArrayDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, uint32 inLayerCount = 1)
+	static WRDGTextureDesc GetTexture2DArrayDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, uint32 inLayerCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
 	{
-		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture2DArray, inClearValue, inMipCount, inSampleCount, inLayerCount);
+		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture2DArray, inClearValue, inMipCount, inSampleCount, inLayerCount, InFlags);
 	}
 
-	static WRDGTextureDesc GetTexture3DDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1)
+	static WRDGTextureDesc GetTexture3DDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
 	{
-		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture3D, inClearValue, inMipCount, inSampleCount, 1);
+		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture3D, inClearValue, inMipCount, inSampleCount, 1, InFlags);
 	}
 
-	static WRDGTextureDesc GetTextureCubeDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1)
+	static WRDGTextureDesc GetTextureCubeDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
 	{
-		return WRDGTextureDesc(inFormat, inExtent, EDimension::TextureCube, inClearValue, inMipCount, inSampleCount, 1);
+		return WRDGTextureDesc(inFormat, inExtent, EDimension::TextureCube, inClearValue, inMipCount, inSampleCount, 1, InFlags);
 	}
 
-	static WRDGTextureDesc GetTextureCubeArrayDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, uint32 inLayerCount = 1)
+	static WRDGTextureDesc GetTextureCubeArrayDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, uint32 inLayerCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
 	{
-		return WRDGTextureDesc(inFormat, inExtent, EDimension::TextureCubeArray, inClearValue, inMipCount, inSampleCount, inLayerCount);
+		return WRDGTextureDesc(inFormat, inExtent, EDimension::TextureCubeArray, inClearValue, inMipCount, inSampleCount, inLayerCount, InFlags);
 	}
 
 	bool IsTextureCube() const
@@ -321,6 +321,7 @@ struct WRDGTextureDesc
 	uint8 mipCount;
 	uint8 sampleCount;
 	uint32 layerCount;
+	ETextureCreateFlags Flags;
 };
 
 
@@ -376,4 +377,9 @@ struct WRDGResourceState
 	WRDGPassHandle FirstPass;
 
 	WRDGPassHandle LastPass;
+
+	bool operator==(const WRDGResourceState& other) const
+	{
+		return Access == other.Access && Pipeline == other.Pipeline;
+	}
 };

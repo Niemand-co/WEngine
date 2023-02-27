@@ -303,6 +303,11 @@ void WRDGBuilder::SetupPass(WRDGPass* Pass)
 		});
 }
 
+void WRDGBuilder::ExecutePass(WRDGPass* Pass)
+{
+	
+}
+
 void WRDGBuilder::CollectResource(WRDGPassHandle PassHandle)
 {
 	Passes[PassHandle]->Parameters.EnumerateTextures(Passes[PassHandle]->Flag, [&PassHandle, this](EUniformBaseType Type, auto Texture, EAccess Access)
@@ -330,10 +335,32 @@ void WRDGBuilder::CollectTrasition(WRDGPassHandle PassHandle)
 {
 	WRDGPass *Pass = Passes[PassHandle];
 
-	Pass->TextureStates.Enumerate([](WEngine::WPair<WRDGTexture*, WRDGPass::TextureState>& TexturePair)
+	Pass->TextureStates.Enumerate([&PassHandle](WEngine::WPair<WRDGTexture*, WRDGPass::TextureState>& TexturePair)
 	{
-		
+		WEngine::WArray<WRDGResourceState*>& States = TexturePair.Second().MergeStates;
+		uint32 SubresourceCount = States.Size();
+		for (uint32 SubresourceIndex = 0; SubresourceIndex < SubresourceCount; ++SubresourceIndex)
+		{
+			if(States[SubresourceIndex]->FirstPass != PassHandle)
+				continue;
+
+			uint32 StartSubresourceIndex = SubresourceIndex;
+			while (SubresourceIndex < SubresourceCount && States[SubresourceIndex + 1]->FirstPass != PassHandle && *States[SubresourceIndex] == *States[SubresourceIndex + 1])
+			{
+				++SubresourceCount;
+			}
+
+			VkImageSubresourceRange
+		}
 	});
+}
+
+void WRDGBuilder::AddTransition(WRDGPassHandle PassHandle, WRDGTexture* Texture, const WEngine::WArray<WRDGResourceState*>& StateAfter)
+{
+}
+
+void WRDGBuilder::AddTransition(WRDGPassHandle PassHandle, WRDGBuffer* Buffer, WRDGResourceState* StateAfter)
+{
 }
 
 void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHandle, WRDGTexture* Texture)

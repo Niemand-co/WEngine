@@ -24,9 +24,11 @@ public:
 
 public:
 
-	unsigned int AttachmentCount = 0;
+	unsigned int ColorAttachmentCount = 0;
 
-	RHIAttachmentDescriptor AttachmentDescriptors[MaxSimultaneousRenderTargets + 3];
+	RHIAttachmentDescriptor ColorAttachmentDescriptors[MaxSimultaneousRenderTargets];
+
+	RHIAttachmentDescriptor DepthStencilAttachmentDescriptor;
 
 	unsigned int SubpassCount = 0;
 
