@@ -4,8 +4,10 @@
 #include "Platform/Vulkan/Public/VulkanQueue.h"
 #include "Platform/Vulkan/Public/VulkanViewport.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
+#include "Platform/Vulkan/Public/VulkanPipelineBarrier.h"
 #include "Platform/Vulkan/Encoder/Public/VulkanGraphicsEncoder.h"
 #include "Platform/Vulkan/Encoder/Public/VulkanComputeEncoder.h"
+#include "Render/Descriptor/Public/RHIBarrierDescriptor.h"
 
 namespace Vulkan
 {
@@ -31,6 +33,21 @@ namespace Vulkan
 		{
 			VulkanCommandBuffer *ActiveCmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
 			bool bSuccefullyPresent = Viewport->Present(ActiveCmdBuffer, pQueue);
+		}
+	}
+
+	void VulkanContext::RHIBeginTransition(RHIBarrierBatch* Barrier)
+	{
+		VulkanPipelineBarrier PipelineBarrier;
+		for (auto& BarrierPair : Barrier->GetBarrierBatches())
+		{
+			RHIResource *resource = BarrierPair.First();
+			RHIBarrierDescriptor& descriptor = BarrierPair.Second();
+			
+			if (descriptor.Type == RHIBarrierDescriptor::EType::Texture)
+			{
+				PipelineBarrier.AddTransition(descriptor.Texture, )
+			}
 		}
 	}
 

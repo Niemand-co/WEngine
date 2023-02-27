@@ -18,6 +18,8 @@ namespace Vulkan
 
 		virtual void RHIEndDrawingViewport(class RHIViewport* Viewport, bool bPresent) override;
 
+		virtual void RHIBeginTransition(class RHIBarrierBatch* Barrier) override;
+
 	private:
 
 		VulkanCommandBufferManager *pCommandBufferManager;

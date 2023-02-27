@@ -153,6 +153,8 @@ private:
 
 	const WRDGTerxtureSubresourceLayout Layout;
 
+	WEngine::WArray<WRDGResourceState> States;
+
 	WEngine::WArray<WRDGResourceState*> MergeState;
 
 	friend class WRDGBuilder;

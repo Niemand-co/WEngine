@@ -93,6 +93,8 @@ public:
 
 	virtual void RHIEndDrawingViewport(class RHIViewport* Viewport, bool bPresent) = 0;
 
+	virtual void RHIBeginTransition(class RHIBarrierBatch *Barrier) = 0;
+
 public:
 
 	static inline RHIContext* GetContext() { return g_pContext; }

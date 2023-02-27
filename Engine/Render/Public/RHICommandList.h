@@ -49,6 +49,8 @@ public:
 
 	void EndRenderPass();
 
+	void BeginTransition(class RHIBarrierBatch *batch);
+
 	void DrawIndexedPrimitive(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount);
 
 	void SetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth);

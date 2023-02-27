@@ -28,6 +28,11 @@ void RHIRenderCommandList::EndRenderPass()
 {
 }
 
+void RHIRenderCommandList::BeginTransition(RHIBarrierBatch* batch)
+{
+    RHIContext::GetContext()->BeginTransition(batch);
+}
+
 void RHIRenderCommandList::DrawIndexedPrimitive(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount)
 {
 }
