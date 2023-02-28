@@ -204,11 +204,12 @@ namespace Vulkan
 
 	VulkanCommandBufferManager::VulkanCommandBufferManager(VulkanDevice* pInDevice, VulkanQueue *pInQueue)
 		: pDevice(pInDevice),
-		  pQueue(pInQueue)
+		  pQueue(pInQueue),
+		  ImmediateCmdBuffer(nullptr),
+		  pImmediateSemaphore(nullptr)
 	{
 		pCommandPool = (VulkanCommandPool*)pQueue->GetCommandPool(this);
 		ActiveCmdBuffer = (VulkanCommandBuffer*)pCommandPool->GetCommandBuffer();
-		ImmediateCmdBuffer = (VulkanCommandBuffer*)pCommandPool->GetCommandBuffer();
 		PrepareForNewActiveCmdBuffer();
 		pActiveSemaphore = new VulkanSemaphore(pInDevice);
 	}
@@ -229,7 +230,8 @@ namespace Vulkan
 	}
 
 	VulkanCommandBuffer* VulkanCommandBufferManager::GetImmediateCommandBuffer()
-	{
+	{	
+		WEngine::WScopeLock(&pCommandPool->CS);
 		if (!ImmediateCmdBuffer)
 		{
 			pImmediateSemaphore = new VulkanSemaphore(pDevice);
@@ -255,6 +257,7 @@ namespace Vulkan
 
 	void VulkanCommandBufferManager::PrepareForNewActiveCmdBuffer()
 	{
+		WEngine::WScopeLock(&pCommandPool->CS);
 		pActiveSemaphore = new VulkanSemaphore(pDevice);
 
 		for (uint32 BufferIndex = 0; BufferIndex < pCommandPool->CmdBuffers.Size(); ++BufferIndex)
@@ -277,6 +280,7 @@ namespace Vulkan
 
 	void VulkanCommandBufferManager::SubmitActiveCommandBuffer(uint32 NumSignalSemaphore, VulkanSemaphore* pSemaphores)
 	{
+		WEngine::WScopeLock(&pCommandPool->CS);
 		if(!ActiveCmdBuffer->IsSubmitted() && ActiveCmdBuffer->HasBegun())
 		{
 			if (!ActiveCmdBuffer->IsOutsideRenderPass())
@@ -308,6 +312,7 @@ namespace Vulkan
 
 	void VulkanCommandBufferManager::SubmitImmediateCommandBuffer(uint32 NumSignalSemaphore, VulkanSemaphore *pSemaphores)
 	{
+		WEngine::WScopeLock(&pCommandPool->CS);
 		if (!ImmediateCmdBuffer->IsSubmitted() && ImmediateCmdBuffer->HasBegun())
 		{
 			ImmediateCmdBuffer->EndScopePass();
@@ -323,11 +328,9 @@ namespace Vulkan
 				Semaphores.Push(pSemaphores[SemaphoreIndex].GetHandle());
 			}
 			Semaphores.Push(pImmediateSemaphore->GetHandle());
-			if (NumSignalSemaphore == 0)
-			{
-				ImmediateDoneSemaphores.Push(pImmediateSemaphore);
-				pImmediateSemaphore = nullptr;
-			}
+			ImmediateDoneSemaphores.Push(pImmediateSemaphore);
+			pImmediateSemaphore = nullptr;
+
 			pQueue->Submit(ImmediateCmdBuffer, Semaphores.Size(), Semaphores.GetData());
 		}
 

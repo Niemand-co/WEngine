@@ -137,7 +137,8 @@ private:
 	WRDGTexture(const WRDGTextureDesc& inDesc, const char* inName)
 		: Desc(inDesc),
 		  Name(inName),
-		  Layout(inDesc.GetSubresourceLayout())
+		  Layout(inDesc.GetSubresourceLayout()),
+		  RHI(nullptr)
 	{
 	}
 
@@ -184,7 +185,9 @@ public:
 private:
 
 	WRDGBuffer(const WRDGBufferDesc& inDesc, const char* inName)
-		: Desc(inDesc), Name(inName)
+		: Desc(inDesc),
+		  Name(inName),
+		  RHI(nullptr)
 	{
 	}
 
@@ -194,7 +197,11 @@ private:
 
 	const WEngine::WString Name;
 
+	class RHIBuffer *RHI;
+
 	const WRDGBufferDesc Desc;
+
+	WRDGResourceState State;
 
 	WRDGResourceState *MergeState = nullptr;
 

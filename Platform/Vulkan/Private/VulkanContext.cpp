@@ -3,6 +3,9 @@
 #include "Platform/Vulkan/Public/VulkanDevice.h"
 #include "Platform/Vulkan/Public/VulkanQueue.h"
 #include "Platform/Vulkan/Public/VulkanViewport.h"
+#include "Platform/Vulkan/Public/VulkanTexture.h"
+#include "Platform/Vulkan/Public/VulkanBuffer.h"
+#include "Platform/Vulkan/Public/VulkanPipelineBarrier.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 #include "Platform/Vulkan/Public/VulkanPipelineBarrier.h"
 #include "Platform/Vulkan/Encoder/Public/VulkanGraphicsEncoder.h"
@@ -36,19 +39,42 @@ namespace Vulkan
 		}
 	}
 
-	void VulkanContext::RHIBeginTransition(RHIBarrierBatch* Barrier)
+	void VulkanContext::RHIBeginTransition(WEngine::WArray<RHIBarrierDescriptor>& Transitions)
 	{
 		VulkanPipelineBarrier PipelineBarrier;
-		for (auto& BarrierPair : Barrier->GetBarrierBatches())
+		for (RHIBarrierDescriptor& Transition : Transitions)
 		{
-			RHIResource *resource = BarrierPair.First();
-			RHIBarrierDescriptor& descriptor = BarrierPair.Second();
-			
-			if (descriptor.Type == RHIBarrierDescriptor::EType::Texture)
+
+			VkPipelineStageFlags SrcPipelineStage, DstPipelineStage;
+			VkAccessFlags SrcAccess, DstAccess;
+			VkImageLayout SrcLayout, DstLayout;
+			GetVkStageAndAccessFlags(Transition.AccessBefore, false, SrcPipelineStage, SrcAccess, SrcLayout);
+			GetVkStageAndAccessFlags(Transition.AccessAfter, false, DstPipelineStage, DstAccess, DstLayout);
+
+			if (Transition.Type == RHIBarrierDescriptor::EType::Texture)
 			{
-				PipelineBarrier.AddTransition(descriptor.Texture, )
+				VulkanTextureBase *TextureBase = VulkanTextureBase::Cast(Transition.Texture);
+				VkImageSubresourceRange Range = {};
+				{
+					Range.aspectMask = TextureBase->GetSurface().GetImageAspect();
+					Range.baseArrayLayer = Transition.ArrayLayer;
+					Range.layerCount = 1;
+					Range.baseMipLevel = Transition.MipLevel;
+					Range.levelCount = 1;
+				}
+
+				if(SrcLayout == DstLayout)
+					PipelineBarrier.AddTransition(TextureBase->GetHandle(), Range, SrcAccess, DstAccess, SrcLayout);
+				else
+					PipelineBarrier.AddTransition(TextureBase->GetHandle(), Range, SrcAccess, DstAccess, SrcLayout, DstLayout);
+			}
+			else if (Transition.Type == RHIBarrierDescriptor::EType::Buffer)
+			{
+				VulkanBufferBase *BufferBase = VulkanBufferBase::Cast(Transition.Buffer);
+				PipelineBarrier.AddTransition(BufferBase->GetHandle(), Transition.Range, Transition.Offset, SrcAccess, DstAccess);
 			}
 		}
+		PipelineBarrier.Execute(static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager()->GetImmediateCommandBuffer());
 	}
 
 }

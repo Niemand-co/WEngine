@@ -28,9 +28,9 @@ void RHIRenderCommandList::EndRenderPass()
 {
 }
 
-void RHIRenderCommandList::BeginTransition(RHIBarrierBatch* batch)
+void RHIRenderCommandList::BeginTransition(WEngine::WArray<RHIBarrierDescriptor>& Transitions)
 {
-    RHIContext::GetContext()->BeginTransition(batch);
+    RHIContext::GetContext()->RHIBeginTransition(Transitions);
 }
 
 void RHIRenderCommandList::DrawIndexedPrimitive(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount)

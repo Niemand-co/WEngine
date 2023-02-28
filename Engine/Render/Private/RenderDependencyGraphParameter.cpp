@@ -45,6 +45,8 @@ void WShaderParameterMetaData::InitializeLayout()
 		else if (Member.BaseType == EUniformBaseType::UB_RTV)
 		{
 			Layout.RenderTargetOffset = Member.Offset;
+			Layout.GraphResources.Push(ShaderParametersLayout::ResourceInfo(Member.Offset, Member.BaseType));
+			Layout.GraphTextures.Push(ShaderParametersLayout::ResourceInfo(Member.Offset, Member.BaseType));
 		}
 		else if (IsRDGBufferResource(Member.BaseType))
 		{
@@ -62,7 +64,7 @@ RHIRenderPassDescriptor WRDGParameterStruct::GetRenderPassInfo() const
 	const WRDGRenderTargetBindingSlots& RenderTargets = GetRenderTarget();
 	
 	uint32 ColorAttachmentIndex = 0;
-	RenderTargets.Enumerate([&descriptor, &ColorAttachmentIndex](WRDGRenderTargetBinding& RenderTarget)
+	RenderTargets.Enumerate([&descriptor, &ColorAttachmentIndex](const WRDGRenderTargetBinding& RenderTarget)
 	{
 		WRDGTexture *Texture = RenderTarget.Texture;
 		AttachmentStoreOP StoreOp = WEngine::EnumHasFlags(Texture->Desc.Flags, ETextureCreateFlags::TextureCreate_CPUReadable) ? AttachmentStoreOP::DontCare : AttachmentStoreOP::Store;

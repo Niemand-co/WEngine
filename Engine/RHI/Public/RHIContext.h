@@ -93,7 +93,7 @@ public:
 
 	virtual void RHIEndDrawingViewport(class RHIViewport* Viewport, bool bPresent) = 0;
 
-	virtual void RHIBeginTransition(class RHIBarrierBatch *Barrier) = 0;
+	virtual void RHIBeginTransition(WEngine::WArray<class RHIBarrierDescriptor>& Transitions) = 0;
 
 public:
 

@@ -1,7 +1,9 @@
 #pragma once
+#include "Render/Public/RenderDependencyGraphDefinitions.h"
 
 namespace Vulkan
 {
+	void GetVkStageAndAccessFlags(EAccess RHIAccess, bool IsDepthStencil, VkPipelineStageFlags& StageFlags, VkAccessFlags& AccessFlags, VkImageLayout& Layout);
 
 	class VulkanPipelineBarrier
 	{

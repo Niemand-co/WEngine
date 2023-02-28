@@ -16,6 +16,11 @@ namespace Vulkan
 
 		VkBuffer GetHandle() const { return Buffer; }
 
+		static VulkanBufferBase* Cast(RHIBuffer* Buffer)
+		{
+			return static_cast<VulkanBufferBase*>(Buffer->GetBufferRHIBase());
+		}
+
 	protected:
 
 		VkBuffer Buffer;
@@ -44,6 +49,12 @@ namespace Vulkan
 
 		virtual void Resize(size_t count) override {}
 
+		virtual void* GetBufferRHIBase() override
+		{ 
+			VulkanBufferBase *Base = static_cast<VulkanBufferBase*>(this);
+			return  Base;
+		}
+
 	};
 
 	class VulkanDynamicVertexBuffer : public RHIDynamicVertexBuffer, public VulkanBufferBase
@@ -59,6 +70,13 @@ namespace Vulkan
 		virtual void Flush(size_t range) override {}
 
 		virtual void Resize(size_t count) override {}
+
+		virtual void* GetBufferRHIBase() override
+		{
+			VulkanBufferBase* Base = static_cast<VulkanBufferBase*>(this);
+			return  Base;
+		}
+
 	};
 
 	class VulkanIndexBuffer : public RHIIndexBuffer, public VulkanBufferBase
@@ -74,6 +92,12 @@ namespace Vulkan
 		virtual void Flush(size_t range) override {}
 
 		virtual void Resize(size_t count) override {}
+
+		virtual void* GetBufferRHIBase() override
+		{
+			VulkanBufferBase* Base = static_cast<VulkanBufferBase*>(this);
+			return  Base;
+		}
 
 	};
 
@@ -91,6 +115,12 @@ namespace Vulkan
 
 		virtual void Resize(size_t count) override {}
 
+		virtual void* GetBufferRHIBase() override
+		{
+			VulkanBufferBase* Base = static_cast<VulkanBufferBase*>(this);
+			return  Base;
+		}
+
 	};
 
 	class VulkanDynamicUniformBuffer : public RHIDynamicUniformBuffer, public VulkanBufferBase
@@ -106,6 +136,13 @@ namespace Vulkan
 		virtual void Flush(size_t range) override {}
 
 		virtual void Resize(size_t count) override {}
+
+		virtual void* GetBufferRHIBase() override
+		{
+			VulkanBufferBase* Base = static_cast<VulkanBufferBase*>(this);
+			return  Base;
+		}
+
 	};
 
 	class VulkanTextureBuffer : public RHITextureBuffer, public VulkanBufferBase
@@ -117,6 +154,12 @@ namespace Vulkan
 		virtual void Flush(size_t range) override {}
 
 		virtual void Resize(size_t count) override {}
+
+		virtual void* GetBufferRHIBase() override
+		{
+			VulkanBufferBase* Base = static_cast<VulkanBufferBase*>(this);
+			return  Base;
+		}
 
 	};
 

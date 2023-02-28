@@ -49,7 +49,7 @@ public:
 
 	void EndRenderPass();
 
-	void BeginTransition(class RHIBarrierBatch *batch);
+	void BeginTransition(WEngine::WArray<class RHIBarrierDescriptor>& Transitions);
 
 	void DrawIndexedPrimitive(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount);
 

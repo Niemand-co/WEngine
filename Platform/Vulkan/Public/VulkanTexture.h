@@ -1,5 +1,6 @@
 #pragma once
 #include "RHI/Public/RHITexture.h"
+#include "Platform/Vulkan/Public/VulkanSurface.h"
 
 namespace Vulkan
 {
@@ -12,7 +13,14 @@ namespace Vulkan
 
 		virtual ~VulkanTextureBase();
 
-		VkImage GetHandle() const { return Image; }
+		const VulkanSurface& GetSurface() const { return Surface; }
+
+		VkImage GetHandle() const { return Surface.GetImage(); }
+
+		static VulkanTextureBase* Cast(RHITexture* Texture)
+		{
+			return (VulkanTextureBase*)(Texture->GetTextureRHIBase());
+		}
 
 	protected:
 
@@ -20,9 +28,9 @@ namespace Vulkan
 
 		VkDeviceMemory DeviceMemory;
 
-		VkImage Image;
-
 		VulkanDevice *pDevice;
+
+		VulkanSurface Surface;
 
 	};
 
@@ -34,6 +42,12 @@ namespace Vulkan
 
 		virtual ~VulkanTexture2D();
 
+		virtual void* GetTextureRHIBase() override
+		{
+			VulkanTextureBase *Base = static_cast<VulkanTextureBase*>(this);
+			return Base;
+		}
+
 	};
 
 	class VulkanTexture2DArray : public RHITexture2DArray, public VulkanTextureBase
@@ -44,6 +58,12 @@ namespace Vulkan
 
 		virtual ~VulkanTexture2DArray();
 
+		virtual void* GetTextureRHIBase() override
+		{
+			VulkanTextureBase* Base = static_cast<VulkanTextureBase*>(this);
+			return Base;
+		}
+
 	};
 
 	class VulkanTexture3D : public RHITexture3D, public VulkanTextureBase
@@ -53,6 +73,12 @@ namespace Vulkan
 		VulkanTexture3D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo);
 
 		virtual ~VulkanTexture3D();
+
+		virtual void* GetTextureRHIBase() override
+		{
+			VulkanTextureBase* Base = static_cast<VulkanTextureBase*>(this);
+			return Base;
+		}
 
 	};
 

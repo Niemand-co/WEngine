@@ -12,11 +12,12 @@ namespace Vulkan
 {
 
 	VulkanTextureBase::VulkanTextureBase(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo)
-		: pDevice(pInDevice)
+		: pDevice(pInDevice),
+		  Surface(pInDevice, this, pInfo->extent.width, pInfo->extent.height, pInfo->extent.depth, pInfo->arrayLayers, pInfo->samples, pInfo->mipLevels, pInfo->format)
 	{
-		vkCreateImage(pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Image);
+		vkCreateImage(pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Surface.Image);
 
-		vkGetImageMemoryRequirements(pInDevice->GetHandle(), Image, &MemoryRequirements);
+		vkGetImageMemoryRequirements(pInDevice->GetHandle(), Surface.Image, &MemoryRequirements);
 
 		unsigned int index = 0;
 		GPUFeature feature = pInDevice->GetGPU()->GetFeature();
@@ -35,12 +36,12 @@ namespace Vulkan
 		}
 		vkAllocateMemory(pInDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DeviceMemory);
 
-		vkBindImageMemory(pInDevice->GetHandle(), Image, DeviceMemory, 0);
+		vkBindImageMemory(pInDevice->GetHandle(), Surface.Image, DeviceMemory, 0);
 	}
 
 	VulkanTextureBase::~VulkanTextureBase()
 	{
-		vkDestroyImage(pDevice->GetHandle(), Image, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+
 		vkFreeMemory(pDevice->GetHandle(), DeviceMemory, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 

@@ -94,6 +94,58 @@ namespace Vulkan
 			return VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
 		}
 	}
+
+	void GetVkStageAndAccessFlags(EAccess RHIAccess, bool IsDepthStencil, VkPipelineStageFlags& StageFlags, VkAccessFlags& AccessFlags, VkImageLayout& Layout)
+	{
+		switch (RHIAccess)
+		{
+		case EAccess::Unknown:
+			StageFlags = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
+			AccessFlags = VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
+			Layout = VK_IMAGE_LAYOUT_UNDEFINED;
+			return;
+		case EAccess::CopySrc:
+			StageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
+			AccessFlags = VK_ACCESS_TRANSFER_READ_BIT;
+			Layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+			return;
+		case EAccess::CopyDst:
+			StageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
+			AccessFlags = VK_ACCESS_TRANSFER_WRITE_BIT;
+			Layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			return;
+		case EAccess::SRVGraphics:
+			StageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+			AccessFlags = VK_ACCESS_SHADER_READ_BIT;
+			Layout = IsDepthStencil ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			return;
+		case EAccess::RTV:
+			StageFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			AccessFlags = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			Layout = IsDepthStencil ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			return;
+		case EAccess::HostReading:
+			StageFlags = VK_PIPELINE_STAGE_HOST_BIT;
+			AccessFlags = VK_ACCESS_HOST_READ_BIT;
+			Layout = VK_IMAGE_LAYOUT_GENERAL;
+			return;
+		case EAccess::Present:
+			StageFlags = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+			AccessFlags = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
+			Layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+			return;
+		case EAccess::Readable:
+			StageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+			AccessFlags = VK_ACCESS_MEMORY_READ_BIT;
+			Layout = IsDepthStencil ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			return;
+		case EAccess::Writable:
+			StageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			AccessFlags = VK_ACCESS_MEMORY_WRITE_BIT;
+			Layout = VK_IMAGE_LAYOUT_GENERAL;
+			return;
+		}
+	}
 	
 	void VulkanPipelineBarrier::AddTransition(VkImage Image, VkImageSubresourceRange Range, VkAccessFlags AccessBefore, VkAccessFlags AccessAfter, VkImageLayout LayoutBefore, VkImageLayout LayoutAfter)
 	{

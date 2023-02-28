@@ -2,7 +2,6 @@
 #include "RHI/Public/RHIDevice.h"
 
 class RHIQueue;
-class VulkanTextureBase;
 class RHISwapchain;
 class RHISwapchainDescriptor;
 struct QueueStack;

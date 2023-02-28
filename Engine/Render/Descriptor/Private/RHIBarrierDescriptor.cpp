@@ -4,5 +4,5 @@
 
 void RHIBarrierBatch::AddBarrier(const RHIBarrierDescriptor& Barrier)
 {
-	Batches.Push(WEngine::WPair(Barrier.Resource, Barrier));
+	Batches.Push(Barrier);
 }

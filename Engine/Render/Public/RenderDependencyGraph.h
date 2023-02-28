@@ -14,7 +14,7 @@ public:
 
 private:
 
-	WEngine::WArray<class RHIBarrierDescriptor> BarrierDesc;
+	WEngine::WArray<class RHIBarrierDescriptor> Transitions;
 
 };
 
@@ -69,6 +69,10 @@ private:
 	WEngine::WArray<class RHITexture*> TexturesToAcquire;
 
 	WEngine::WArray<class RHITexture*> TexturesToDiscard;
+
+	WRDGBarrierBatch PrologueTransitions;
+
+	WRDGBarrierBatch EpilogueTransitions;
 
 	EPassFlag Flag;
 

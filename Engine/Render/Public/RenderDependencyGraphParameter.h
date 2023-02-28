@@ -258,6 +258,8 @@ inline void WRDGParameterStruct::EnumerateTextures(EPassFlag PassFlag, LAMBDA la
 			WRDGRenderTargetBindingSlots*  RenderTarget = (WRDGRenderTargetBindingSlots*)(Contents + Layout->GraphTextures[Index].Offset);
 			for (uint32 ColorIndex = 0; ColorIndex < MaxSimultaneousRenderTargets; ++ColorIndex)
 			{
+				if(!RenderTarget->ColorTextures[ColorIndex].Texture)
+					break;
 				lambda(Layout->GraphTextures[Index].Type, RenderTarget->ColorTextures[ColorIndex].Texture, EAccess::RTV);
 			}
 			if (RenderTarget->DepthStencilTexture.Texture)

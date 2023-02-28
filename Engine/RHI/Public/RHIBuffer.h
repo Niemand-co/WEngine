@@ -27,6 +27,8 @@ public:
 
 	BufferResourceInfo* GetBufferInfo();
 
+	virtual void* GetBufferRHIBase() { return nullptr; }
+
 protected:
 
 	size_t m_size;

@@ -112,18 +112,18 @@ class RHIBarrierBatch : public RHIResource
 {
 public:
 
-	RHIBarrierBatch();
+	RHIBarrierBatch() = default;
 
-	virtual ~RHIBarrierBatch();
+	virtual ~RHIBarrierBatch() = default;
 
 	void AddBarrier(const RHIBarrierDescriptor& Barrier);
 
-	WEngine::WArray<WEngine::WPair<class RHIResource*, RHIBarrierDescriptor>>& GetBarrierBatches() { return Batches; }
+	WEngine::WArray<RHIBarrierDescriptor>& GetBarrierBatches() { return Batches; }
 
-	const WEngine::WArray<WEngine::WPair<class RHIResource*, RHIBarrierDescriptor>>& GetBarrierBatches() const { return Batches; }
+	const WEngine::WArray<RHIBarrierDescriptor>& GetBarrierBatches() const { return Batches; }
 
 private:
 
-	WEngine::WArray<WEngine::WPair<class RHIResource*, RHIBarrierDescriptor>> Batches;
+	WEngine::WArray<RHIBarrierDescriptor> Batches;
 
 };

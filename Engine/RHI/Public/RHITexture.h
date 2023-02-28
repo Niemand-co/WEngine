@@ -21,6 +21,8 @@ public:
 
 	virtual uint32 GetLayerCount() const = 0;
 
+	virtual void* GetTextureRHIBase() { return nullptr; }
+
 protected:
 
 	RHITexture(uint32 inMipCount)

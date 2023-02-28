@@ -26,6 +26,8 @@ namespace Vulkan
 
 		VulkanCommandBufferManager *pManager;
 
+		WCriticalSection CS;
+
 		VulkanDevice *pDevice;
 
 		WEngine::WArray<VulkanCommandBuffer*> CmdBuffers;
