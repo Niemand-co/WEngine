@@ -9,6 +9,8 @@ CameraComponent::CameraComponent(GameObject* pGameObject, const float& fov, cons
 	phi = 0.0f;
 	theta = 0.0f;
 	m_forward = glm::vec3(0.0f, 0.0f, -1.0f);
+
+	m_resolution = glm::vec2(1920.0f, 1080.0f);
 }
 
 void CameraComponent::ShowInInspector()

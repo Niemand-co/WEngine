@@ -128,8 +128,8 @@ void WRDGBuilder::Execute()
 
 	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
 	{
-		//if(PassesToCull[Handle])
-		//	continue;
+		if(PassesToCull[Handle])
+			continue;
 
 		CollectResource(Handle);
 	}

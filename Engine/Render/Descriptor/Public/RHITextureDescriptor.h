@@ -24,4 +24,6 @@ public:
 
 	ETextureCreateFlags Flag = ETextureCreateFlags::TextureCreate_None;
 
+	EAccess initialState;
+
 };

@@ -1,4 +1,6 @@
 #pragma once
+#include "Utils/Container/Public/WBitArray.h"
+#include "Utils/Allocator/Public/Allocator.h"
 
 class WRDGAllocator : public WEngine::Allocator<6>
 {

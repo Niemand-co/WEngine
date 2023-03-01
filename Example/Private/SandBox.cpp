@@ -54,8 +54,6 @@ void GameScene::Tick(WEngine::TimeStep timeStep)
 		Scene->UpdateLightInfosForScene();
 
 		Scene->UpdatePrimitiveInfosForScene();
-
-		Scene->UpdateCameraInfoForScene();
 	}
 	), WEngine::EThreadProperty::RenderThread);
 

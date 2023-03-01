@@ -8,11 +8,77 @@
 #include "Platform/Vulkan/Public/VulkanTexture.h"
 #include "Platform/Vulkan/Public/VulkanView.h"
 #include "Platform/Vulkan/Public/VulkanContext.h"
+#include "Platform/Vulkan/Public/VulkanPipelineBarrier.h"
 #include "Render/Descriptor/Public/RHISwapchainDescriptor.h"
 #include "Render/Descriptor/Public/RHITextureViewDescriptor.h"
 
 namespace Vulkan
 {
+
+	static void CopyImageToBackBuffer(VulkanCommandBuffer *CmdBuffer, VkImage SrcImage, VkImage DstImage, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY)
+	{
+		VkImageLayout SrcLayout = VulkanTextureLayoutManager::FindLayout(SrcImage);
+		VkImageLayout DstLayout = VulkanTextureLayoutManager::FindLayout(DstImage);
+
+		{
+			VulkanPipelineBarrier Barrier;
+			VkImageSubresourceRange Range = VulkanPipelineBarrier::GetTextureSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1);
+			if (SrcLayout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+				Barrier.AddTransition(SrcImage, Range, SrcLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+			if (DstLayout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+				Barrier.AddTransition(DstImage, Range, DstLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+			Barrier.Execute(CmdBuffer);
+		}
+
+		if (SrcSizeX != DstSizeX || SrcSizeY != DstSizeY)
+		{
+			VkImageBlit Region = {};
+			{
+				Region.srcOffsets[0].x = 0;
+				Region.srcOffsets[0].y = 0;
+				Region.srcOffsets[0].z = 0;
+				Region.srcOffsets[1].x = SrcSizeX;
+				Region.srcOffsets[1].y = SrcSizeY;
+				Region.srcOffsets[1].z = 1;
+				Region.dstOffsets[0].x = 0;
+				Region.dstOffsets[0].y = 0;
+				Region.dstOffsets[0].z = 0;
+				Region.dstOffsets[1].x = DstSizeX;
+				Region.dstOffsets[1].y = DstSizeY;
+				Region.dstOffsets[1].z = 1;
+				Region.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				Region.srcSubresource.layerCount = 1;
+				Region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				Region.dstSubresource.layerCount = 1;
+			}
+
+			vkCmdBlitImage(CmdBuffer->GetHandle(), SrcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, DstImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region, VK_FILTER_LINEAR);
+		}
+		else
+		{
+			VkImageCopy Region = {};
+			{
+				Region.extent.width = SrcSizeX;
+				Region.extent.height = SrcSizeY;
+				Region.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				Region.srcSubresource.layerCount = 1;
+				Region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				Region.dstSubresource.layerCount = 1;
+			}
+
+			vkCmdCopyImage(CmdBuffer->GetHandle(), SrcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, DstImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region);
+		}
+
+		{
+			VulkanPipelineBarrier Barrier;
+			VkImageSubresourceRange Range = VulkanPipelineBarrier::GetTextureSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1);
+			if (SrcLayout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+				Barrier.AddTransition(SrcImage, Range, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, SrcLayout);
+			if (DstLayout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+				Barrier.AddTransition(DstImage, Range, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, DstLayout);
+			Barrier.Execute(CmdBuffer);
+		}
+	}
 
 	VulkanViewport::VulkanViewport(VulkanDevice *pInDevice, RHIViewportDescriptor* descriptor)
 		: pDevice(pInDevice),
@@ -61,6 +127,7 @@ namespace Vulkan
 		bool bFailedToAcquireImage = true;
 		if (AcquireImageIndex())
 		{
+			CopyImageToBackBuffer(TrueCmdBuffer, RenderingBackBuffer->GetHandle(), BackBufferImages[AcquiredImageIndex], Width, Height, pSwapchain->Width, pSwapchain->Height);
 			bFailedToAcquireImage = false;
 		}
 
@@ -68,8 +135,8 @@ namespace Vulkan
 		VulkanCommandBufferManager *ImmediateCmdBufferMgr = static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager();
 		if (!bFailedToAcquireImage)
 		{
-			//TrueCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, pAcquireImageSemaphore);
-			//ImmediateCmdBufferMgr->SubmitActiveCommandBufferFromPresent(RenderingDoneSemaphores[AcquiredImageIndex]);
+			TrueCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, pAcquireImageSemaphore);
+			ImmediateCmdBufferMgr->SubmitActiveCommandBufferFromPresent(RenderingDoneSemaphores[AcquiredImageIndex]);
 		}
 		else
 		{
@@ -85,7 +152,7 @@ namespace Vulkan
 		if(AcquiredImageIndex == -1)
 			return (int32)EState::Healthy;
 
-		EState PresentState = (EState)pSwapchain->Present(Queue, pAcquireImageSemaphore);
+		EState PresentState = (EState)pSwapchain->Present(Queue, RenderingDoneSemaphores[AcquiredImageIndex]);
 		int32 AttemptsPending = 4;
 		while ((int32)PresentState < 0 && AttemptsPending > 0)
 		{
@@ -152,6 +219,11 @@ namespace Vulkan
 		}
 		pSwapchain = static_cast<VulkanSwapchain*>(pDevice->CreateSwapchain(&SwapchainDescriptor, BackBufferImages));
 
+		for (VkImage Image : BackBufferImages)
+		{
+			VulkanTextureLayoutManager::AddLayout(Image, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+		}
+
 		RenderingDoneSemaphores.Resize(BackBufferImages.Size());
 		TextureViews.Resize(BackBufferImages.Size());
 
@@ -171,6 +243,8 @@ namespace Vulkan
 		{
 			TextureViews[ImageIndex] = static_cast<VulkanTextureView*>(pDevice->CreateTextureView(&TextureViewDescriptor, BackBufferImages[ImageIndex]));
 		}
+
+		RenderingBackBuffer = static_cast<VulkanTexture2D*>(GetRenderCommandList()->CreateTexture2D(Width, Height, PixelFormat, 1, ETextureCreateFlags::TextureCreate_RenderTarget | ETextureCreateFlags::TextureCreate_SRV, EAccess::RTV));
 	}
 
 	void VulkanViewport::DestroySwapchain()

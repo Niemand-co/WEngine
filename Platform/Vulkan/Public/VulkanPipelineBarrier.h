@@ -28,7 +28,7 @@ namespace Vulkan
 
 		void Execute(class VulkanCommandBuffer *CmdBuffer);
 
-		static VkImageSubresourceRange GetTextureSubresourceRange(VkImageAspectFlags AspectMask, uint32 BaseMipLevel, uint32 MipLevelCount, uint32 BaseArrayLayer, uint32 ArrayLayerCount)
+		static VkImageSubresourceRange GetTextureSubresourceRange(VkImageAspectFlags AspectMask, uint32 BaseMipLevel = 0u, uint32 MipLevelCount = ~0u, uint32 BaseArrayLayer = 0u, uint32 ArrayLayerCount = ~0u)
 		{
 			return VkImageSubresourceRange(AspectMask, BaseMipLevel, MipLevelCount, BaseArrayLayer, ArrayLayerCount);
 		}

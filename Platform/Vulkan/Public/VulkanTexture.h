@@ -5,11 +5,32 @@
 namespace Vulkan
 {
 
+	class VulkanTextureLayoutManager
+	{
+	public:
+
+		static VkImageLayout FindLayout(VkImage Image)
+		{
+			RE_ASSERT(Layouts.Find(Image), "No Such Image Recorded.");
+			return Layouts[Image];
+		}
+
+		static void AddLayout(VkImage Image, VkImageLayout Layout)
+		{
+			Layouts.Insert(Image, Layout);
+		}
+
+	private:
+
+		static WEngine::WHashMap<VkImage, VkImageLayout> Layouts;
+
+	};
+
 	class VulkanTextureBase
 	{
 	public:
 
-		VulkanTextureBase(class VulkanDevice* pInDevice, VkImageCreateInfo* pInfo);
+		VulkanTextureBase(class VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, ETextureCreateFlags Flags, EAccess InitState);
 
 		virtual ~VulkanTextureBase();
 
@@ -24,10 +45,6 @@ namespace Vulkan
 
 	protected:
 
-		VkMemoryRequirements MemoryRequirements;
-
-		VkDeviceMemory DeviceMemory;
-
 		VulkanDevice *pDevice;
 
 		VulkanSurface Surface;
@@ -38,7 +55,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTexture2D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo);
+		VulkanTexture2D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, ETextureCreateFlags Flags, EAccess InitState);
 
 		virtual ~VulkanTexture2D();
 
@@ -54,7 +71,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTexture2DArray(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo);
+		VulkanTexture2DArray(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, ETextureCreateFlags Flags, EAccess InitState);
 
 		virtual ~VulkanTexture2DArray();
 
@@ -70,7 +87,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTexture3D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo);
+		VulkanTexture3D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, ETextureCreateFlags Flags, EAccess InitState);
 
 		virtual ~VulkanTexture3D();
 

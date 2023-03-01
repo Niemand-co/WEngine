@@ -46,6 +46,12 @@ namespace Vulkan
 
 		int32 CurrentImageIndex;
 
+		uint32 Width;
+
+		uint32 Height;
+
+		friend class VulkanViewport;
+
 	};
 
 }

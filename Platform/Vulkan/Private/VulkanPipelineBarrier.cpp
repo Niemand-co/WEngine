@@ -272,6 +272,8 @@ namespace Vulkan
 	void VulkanPipelineBarrier::Execute(VulkanCommandBuffer* CmdBuffer)
 	{
 		int32 NumMemoryCount = (MemBarrier.srcAccessMask != 0 || MemBarrier.dstAccessMask != 0) ? 1 : 0;
+		if(NumMemoryCount == 0 && BufferBarriers.Size() == 0 && ImageBarriers.Size() == 0)
+			return;
 		vkCmdPipelineBarrier(CmdBuffer->GetHandle(), SrcStage, DstStage, 0, NumMemoryCount, &MemBarrier, BufferBarriers.Size(), BufferBarriers.GetData(), ImageBarriers.Size(), ImageBarriers.GetData());
 	}
 

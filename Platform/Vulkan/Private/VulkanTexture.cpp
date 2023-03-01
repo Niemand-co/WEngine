@@ -11,42 +11,22 @@
 namespace Vulkan
 {
 
-	VulkanTextureBase::VulkanTextureBase(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo)
+	WEngine::WHashMap<VkImage, VkImageLayout> VulkanTextureLayoutManager::Layouts = WEngine::WHashMap<VkImage, VkImageLayout>();
+
+	VulkanTextureBase::VulkanTextureBase(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, ETextureCreateFlags Flags, EAccess InitState)
 		: pDevice(pInDevice),
-		  Surface(pInDevice, this, pInfo->extent.width, pInfo->extent.height, pInfo->extent.depth, pInfo->arrayLayers, pInfo->samples, pInfo->mipLevels, pInfo->format)
+		  Surface(pInDevice, this, pInfo, Flags, InitState)
 	{
-		vkCreateImage(pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Surface.Image);
 
-		vkGetImageMemoryRequirements(pInDevice->GetHandle(), Surface.Image, &MemoryRequirements);
-
-		unsigned int index = 0;
-		GPUFeature feature = pInDevice->GetGPU()->GetFeature();
-		for (; index < feature.memorySupports.Size(); ++index)
-		{
-			if ((MemoryRequirements.memoryTypeBits & 1) && (feature.memorySupports[index]->properties & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) == VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)
-				break;
-			MemoryRequirements.memoryTypeBits >>= 1;
-		}
-
-		VkMemoryAllocateInfo MemoryAllocateInfo = {};
-		{
-			MemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-			MemoryAllocateInfo.allocationSize = MemoryRequirements.size;
-			MemoryAllocateInfo.memoryTypeIndex = index;
-		}
-		vkAllocateMemory(pInDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DeviceMemory);
-
-		vkBindImageMemory(pInDevice->GetHandle(), Surface.Image, DeviceMemory, 0);
 	}
 
 	VulkanTextureBase::~VulkanTextureBase()
 	{
 
-		vkFreeMemory(pDevice->GetHandle(), DeviceMemory, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
-	VulkanTexture2D::VulkanTexture2D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo)
-		: VulkanTextureBase(pInDevice, pInfo), RHITexture2D(pInfo->extent.width, pInfo->extent.height, pInfo->mipLevels)
+	VulkanTexture2D::VulkanTexture2D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, ETextureCreateFlags Flags, EAccess InitState)
+		: VulkanTextureBase(pInDevice, pInfo, Flags, InitState), RHITexture2D(pInfo->extent.width, pInfo->extent.height, pInfo->mipLevels)
 	{
 	}
 
@@ -54,8 +34,8 @@ namespace Vulkan
 	{
 	}
 
-	VulkanTexture2DArray::VulkanTexture2DArray(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo)
-		: VulkanTextureBase(pInDevice, pInfo), RHITexture2DArray(pInfo->extent.width, pInfo->extent.height, pInfo->mipLevels, pInfo->arrayLayers)
+	VulkanTexture2DArray::VulkanTexture2DArray(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, ETextureCreateFlags Flags, EAccess InitState)
+		: VulkanTextureBase(pInDevice, pInfo, Flags, InitState), RHITexture2DArray(pInfo->extent.width, pInfo->extent.height, pInfo->mipLevels, pInfo->arrayLayers)
 	{
 	}
 
@@ -63,8 +43,8 @@ namespace Vulkan
 	{
 	}
 
-	VulkanTexture3D::VulkanTexture3D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo)
-		: VulkanTextureBase(pInDevice, pInfo), RHITexture3D(pInfo->extent.width, pInfo->extent.height, pInfo->extent.depth, pInfo->mipLevels)
+	VulkanTexture3D::VulkanTexture3D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, ETextureCreateFlags Flags, EAccess InitState)
+		: VulkanTextureBase(pInDevice, pInfo, Flags, InitState), RHITexture3D(pInfo->extent.width, pInfo->extent.height, pInfo->extent.depth, pInfo->mipLevels)
 	{
 	}
 

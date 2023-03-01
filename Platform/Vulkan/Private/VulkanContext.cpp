@@ -77,4 +77,73 @@ namespace Vulkan
 		PipelineBarrier.Execute(static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager()->GetImmediateCommandBuffer());
 	}
 
+	void VulkanContext::CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY)
+	{
+		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetImmediateCommandBuffer();
+
+		VkImage SrcImage = VulkanTextureBase::Cast(SrcTexture)->GetHandle();
+		VkImage DstImage = VulkanTextureBase::Cast(DstTexture)->GetHandle();
+		VkImageLayout SrcLayout = VulkanTextureLayoutManager::FindLayout(SrcImage);
+		VkImageLayout DstLayout = VulkanTextureLayoutManager::FindLayout(DstImage);
+
+		{
+			VulkanPipelineBarrier Barrier;
+			VkImageSubresourceRange Range = VulkanPipelineBarrier::GetTextureSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1);
+			if(SrcLayout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+				Barrier.AddTransition(SrcImage, Range, SrcLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+			if(DstLayout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+				Barrier.AddTransition(DstImage, Range, DstLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+			Barrier.Execute(CmdBuffer);
+		}
+
+		if (SrcSizeX != DstSizeX || SrcSizeY != DstSizeY)
+		{
+			VkImageBlit Region = {};
+			{
+				Region.srcOffsets[0].x = 0;
+				Region.srcOffsets[0].y = 0;
+				Region.srcOffsets[0].z = 0;
+				Region.srcOffsets[1].x = SrcSizeX;
+				Region.srcOffsets[1].y = SrcSizeY;
+				Region.srcOffsets[1].z = 1;
+				Region.dstOffsets[0].x = 0;
+				Region.dstOffsets[0].y = 0;
+				Region.dstOffsets[0].z = 0;
+				Region.dstOffsets[1].x = DstSizeX;
+				Region.dstOffsets[1].y = DstSizeY;
+				Region.dstOffsets[1].z = 1;
+				Region.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				Region.srcSubresource.layerCount = 1;
+				Region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				Region.dstSubresource.layerCount = 1;
+			}
+
+			vkCmdBlitImage(CmdBuffer->GetHandle(), SrcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, DstImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region, VK_FILTER_LINEAR);
+		}
+		else
+		{
+			VkImageCopy Region = {};
+			{
+				Region.extent.width = SrcSizeX;
+				Region.extent.height = SrcSizeY;
+				Region.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				Region.srcSubresource.layerCount = 1;
+				Region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				Region.dstSubresource.layerCount = 1;
+			}
+
+			vkCmdCopyImage(CmdBuffer->GetHandle(), SrcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, DstImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region);
+		}
+
+		{
+			VulkanPipelineBarrier Barrier;
+			VkImageSubresourceRange Range = VulkanPipelineBarrier::GetTextureSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1);
+			if (SrcLayout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+				Barrier.AddTransition(SrcImage, Range, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, SrcLayout);
+			if (DstLayout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+				Barrier.AddTransition(DstImage, Range, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, DstLayout);
+			Barrier.Execute(CmdBuffer);
+		}
+	}
+
 }

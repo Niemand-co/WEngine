@@ -134,7 +134,7 @@ WComputeShaderRHIRef RHIContext::CreateComputeShader(ShaderCodeBlob& blob)
 	return pDevice->CreateComputeShader(&descriptor);
 }
 
-WTexture2DRHIRef RHIContext::CreateTexture2D(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, ETextureCreateFlags InFlag)
+WTexture2DRHIRef RHIContext::CreateTexture2D(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, ETextureCreateFlags InFlag, EAccess InitState)
 {
 	RHITextureDescriptor descriptor = {};
 	{
@@ -144,11 +144,12 @@ WTexture2DRHIRef RHIContext::CreateTexture2D(uint32 InWidth, uint32 InHeight, Fo
 		descriptor.layerCount = 1;
 		descriptor.mipCount = InMipCount;
 		descriptor.Flag = InFlag;
+		descriptor.initialState = InitState;
 	}
 	return pDevice->CreateTexture2D(&descriptor);
 }
 
-WTexture2DArrayRHIRef RHIContext::CreateTexture2DArray(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, uint32 InLayerCount, ETextureCreateFlags InFlag)
+WTexture2DArrayRHIRef RHIContext::CreateTexture2DArray(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, uint32 InLayerCount, ETextureCreateFlags InFlag, EAccess InitState)
 {
 	RHITextureDescriptor descriptor = {};
 	{
@@ -158,11 +159,12 @@ WTexture2DArrayRHIRef RHIContext::CreateTexture2DArray(uint32 InWidth, uint32 In
 		descriptor.layerCount = InLayerCount;
 		descriptor.mipCount = InMipCount;
 		descriptor.Flag = InFlag;
+		descriptor.initialState = InitState;
 	}
 	return pDevice->CreateTexture2DArray(&descriptor);
 }
 
-WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 InWidth, uint32 InHeight, uint32 InDepth, Format InFormat, uint32 InMipCount, ETextureCreateFlags InFlag)
+WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 InWidth, uint32 InHeight, uint32 InDepth, Format InFormat, uint32 InMipCount, ETextureCreateFlags InFlag, EAccess InitState)
 {
 	RHITextureDescriptor descriptor = {};
 	{
@@ -173,6 +175,7 @@ WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 InWidth, uint32 InHeight, ui
 		descriptor.layerCount = 1;
 		descriptor.mipCount = InMipCount;
 		descriptor.Flag = InFlag;
+		descriptor.initialState = InitState;
 	}
 	return pDevice->CreateTexture3D(&descriptor);
 }

@@ -126,6 +126,9 @@ namespace Vulkan
 		
 		PresentID = 0;
 		SemaphoreID = 0;
+
+		Width = pInfo->imageExtent.width;
+		Height = pInfo->imageExtent.height;
 	}
 
 	VulkanSwapchain::~VulkanSwapchain()

@@ -1,5 +1,6 @@
 #pragma once
 #include "RHI/Public/RHICore.h"
+#include "Render/Public/RenderDependencyGraphDefinitions.h"
 #include "Utils/Public/ShaderCodeBlob.h"
 
 class RenderTarget;
@@ -55,6 +56,8 @@ public:
 
 	void SetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth);
 
+	void CopyImageToBackBuffer(class RHITexture *SrcTexture, class RHITexture *DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY);
+
 	WVertexBufferRHIRef CreateVertexBuffer(size_t stride, size_t count);
 
 	WIndexBufferRHIRef CreateIndexBuffer(size_t count);
@@ -69,11 +72,11 @@ public:
 
 	WComputeShaderRHIRef CreateComputeShader(ShaderCodeBlob& blob);
 
-	WTexture2DRHIRef CreateTexture2D(uint32 InWith, uint32 InHeight, Format InFormat, uint32 InMipCount = 1u, ETextureCreateFlags InFlag = ETextureCreateFlags::TextureCreate_None);
+	WTexture2DRHIRef CreateTexture2D(uint32 InWith, uint32 InHeight, Format InFormat, uint32 InMipCount = 1u, ETextureCreateFlags InFlag = ETextureCreateFlags::TextureCreate_None, EAccess InitState = EAccess::Unknown);
 
-	WTexture2DArrayRHIRef CreateTexture2DArray(uint32 InWith, uint32 InHeight, Format InFormat, uint32 InMipCount = 1u, uint32 InLayerCount = 1u, ETextureCreateFlags InFlag = ETextureCreateFlags::TextureCreate_None);
+	WTexture2DArrayRHIRef CreateTexture2DArray(uint32 InWith, uint32 InHeight, Format InFormat, uint32 InMipCount = 1u, uint32 InLayerCount = 1u, ETextureCreateFlags InFlag = ETextureCreateFlags::TextureCreate_None, EAccess InitState = EAccess::Unknown);
 
-	WTexture3DRHIRef CreateTexture3D(uint32 InWith, uint32 InHeight, uint32 InDepth, Format format, uint32 InMipCount = 1u, ETextureCreateFlags InFlag = ETextureCreateFlags::TextureCreate_None);
+	WTexture3DRHIRef CreateTexture3D(uint32 InWith, uint32 InHeight, uint32 InDepth, Format format, uint32 InMipCount = 1u, ETextureCreateFlags InFlag = ETextureCreateFlags::TextureCreate_None, EAccess InitState = EAccess::Unknown);
 
 	WTextureViewRHIRef CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, class RHITexture* InTexture);
 

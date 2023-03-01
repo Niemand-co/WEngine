@@ -41,6 +41,11 @@ void RHIRenderCommandList::SetViewport(float X, float Y, float Width, float Heig
 {
 }
 
+void RHIRenderCommandList::CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY)
+{
+    RHIContext::GetContext()->CopyImageToBackBuffer(SrcTexture, DstTexture, SrcSizeX, SrcSizeY, DstSizeX, DstSizeY);
+}
+
 WVertexBufferRHIRef RHIRenderCommandList::CreateVertexBuffer(size_t stride, size_t count)
 {
     return RHIContext::GetContext()->CreateVertexBuffer(stride, count);
@@ -76,19 +81,19 @@ WComputeShaderRHIRef RHIRenderCommandList::CreateComputeShader(ShaderCodeBlob& b
     return RHIContext::GetContext()->CreateComputeShader(blob);
 }
 
-WTexture2DRHIRef RHIRenderCommandList::CreateTexture2D(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, ETextureCreateFlags InFlag)
+WTexture2DRHIRef RHIRenderCommandList::CreateTexture2D(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, ETextureCreateFlags InFlag, EAccess InitState)
 {
-    return RHIContext::GetContext()->CreateTexture2D(InWidth, InHeight, InFormat, InMipCount, InFlag);
+    return RHIContext::GetContext()->CreateTexture2D(InWidth, InHeight, InFormat, InMipCount, InFlag, InitState);
 }
 
-WTexture2DArrayRHIRef RHIRenderCommandList::CreateTexture2DArray(uint32 InWith, uint32 InHeight, Format InFormat, uint32 InMipCount, uint32 InLayerCount, ETextureCreateFlags InFlag)
+WTexture2DArrayRHIRef RHIRenderCommandList::CreateTexture2DArray(uint32 InWith, uint32 InHeight, Format InFormat, uint32 InMipCount, uint32 InLayerCount, ETextureCreateFlags InFlag, EAccess InitState)
 {
-    return RHIContext::GetContext()->CreateTexture2DArray(InWith, InHeight, InFormat, InMipCount, InLayerCount, InFlag);
+    return RHIContext::GetContext()->CreateTexture2DArray(InWith, InHeight, InFormat, InMipCount, InLayerCount, InFlag, InitState);
 }
 
-WTexture3DRHIRef RHIRenderCommandList::CreateTexture3D(uint32 InWith, uint32 InHeight, uint32 InDepth, Format InFormat, uint32 InMipCount, ETextureCreateFlags InFlag)
+WTexture3DRHIRef RHIRenderCommandList::CreateTexture3D(uint32 InWith, uint32 InHeight, uint32 InDepth, Format InFormat, uint32 InMipCount, ETextureCreateFlags InFlag, EAccess InitState)
 {
-    return RHIContext::GetContext()->CreateTexture3D(InWith, InHeight, InDepth, InFormat, InMipCount, InFlag);
+    return RHIContext::GetContext()->CreateTexture3D(InWith, InHeight, InDepth, InFormat, InMipCount, InFlag, InitState);
 }
 
 WTextureViewRHIRef RHIRenderCommandList::CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)

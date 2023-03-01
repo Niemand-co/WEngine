@@ -339,6 +339,7 @@ namespace Vulkan
 
 	void VulkanCommandBufferManager::SubmitActiveCommandBufferFromPresent(VulkanSemaphore* SignalSemaphore)
 	{
+		WEngine::WScopeLock(&pCommandPool->CS);
 		if (SignalSemaphore)
 		{
 			VkSemaphore Semaphores[2] = { pActiveSemaphore->GetHandle(), SignalSemaphore->GetHandle() };

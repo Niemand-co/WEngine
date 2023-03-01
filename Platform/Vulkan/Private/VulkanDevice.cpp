@@ -327,7 +327,7 @@ namespace Vulkan
 		ImageCreateInfo.usage = GetImageUsage(descriptor->Flag);
 
 		ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		return new VulkanTexture2D(this, &ImageCreateInfo);
+		return new VulkanTexture2D(this, &ImageCreateInfo, descriptor->Flag, descriptor->initialState);
 	}
 
 	WTexture2DArrayRHIRef VulkanDevice::CreateTexture2DArray(RHITextureDescriptor* descriptor)
@@ -346,7 +346,7 @@ namespace Vulkan
 		imageCreateInfo.usage = GetImageUsage(descriptor->Flag);
 
 		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		return new VulkanTexture2DArray(this, &imageCreateInfo);
+		return new VulkanTexture2DArray(this, &imageCreateInfo, descriptor->Flag, descriptor->initialState);
 	}
 
 	WTexture3DRHIRef VulkanDevice::CreateTexture3D(RHITextureDescriptor* descriptor)
@@ -365,7 +365,7 @@ namespace Vulkan
 		imageCreateInfo.usage = GetImageUsage(descriptor->Flag);
 
 		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		return new VulkanTexture3D(this, &imageCreateInfo);
+		return new VulkanTexture3D(this, &imageCreateInfo, descriptor->Flag, descriptor->initialState);
 	}
 
 	WTextureViewRHIRef VulkanDevice::CreateTextureView(RHITextureViewDescriptor* descriptor, RHITexture* InTexture)

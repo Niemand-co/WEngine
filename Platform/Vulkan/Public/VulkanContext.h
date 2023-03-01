@@ -20,6 +20,8 @@ namespace Vulkan
 
 		virtual void RHIBeginTransition(WEngine::WArray<RHIBarrierDescriptor>& Transitions) override;
 
+		virtual void CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY) override;
+
 	private:
 
 		VulkanCommandBufferManager *pCommandBufferManager;

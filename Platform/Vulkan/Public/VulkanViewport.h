@@ -46,6 +46,8 @@ namespace Vulkan
 
 		WEngine::WArray<class VulkanTextureView*> TextureViews;
 
+		WEngine::WSharedPtr<class VulkanTexture2D> RenderingBackBuffer;
+
 		uint32 Width;
 
 		uint32 Height;

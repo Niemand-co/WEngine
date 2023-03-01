@@ -1,5 +1,4 @@
 #pragma once
-#include "Render/Public/RenderDependencyGraphDefinitions.h"
 #include "Render/Descriptor/Public/RHITextureViewDescriptor.h"
 
 template<typename ElementType>
