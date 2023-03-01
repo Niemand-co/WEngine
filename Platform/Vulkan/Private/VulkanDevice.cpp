@@ -315,7 +315,7 @@ namespace Vulkan
 	{
 		VkImageCreateInfo ImageCreateInfo = {};
 		ImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		ImageCreateInfo.extent = { descriptor->width, descriptor->height, 1 };
+		ImageCreateInfo.extent = { descriptor->width, descriptor->height, 0 };
 		ImageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
 		ImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
 		ImageCreateInfo.arrayLayers = 1;
@@ -334,7 +334,7 @@ namespace Vulkan
 	{
 		VkImageCreateInfo imageCreateInfo = {};
 		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		imageCreateInfo.extent = { descriptor->width, descriptor->height, 1 };
+		imageCreateInfo.extent = { descriptor->width, descriptor->height, 0 };
 		imageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
 		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
 		imageCreateInfo.arrayLayers = descriptor->layerCount;

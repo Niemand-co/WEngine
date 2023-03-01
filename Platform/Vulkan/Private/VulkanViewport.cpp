@@ -95,8 +95,7 @@ namespace Vulkan
 
 	VulkanViewport::~VulkanViewport()
 	{
-		if(!pAcquireImageSemaphore)
-			delete pAcquireImageSemaphore;
+		pAcquireImageSemaphore = nullptr;
 		delete pSwapchain;
 	}
 
@@ -106,7 +105,7 @@ namespace Vulkan
 
 	bool VulkanViewport::AcquireImageIndex()
 	{
-		int32 NewImageIndex = pSwapchain->AcquireImageIndex(&pAcquireImageSemaphore);
+		int32 NewImageIndex = pSwapchain->AcquireImageIndex(pAcquireImageSemaphore);
 		if (NewImageIndex != -1)
 		{
 			AcquiredImageIndex = NewImageIndex;

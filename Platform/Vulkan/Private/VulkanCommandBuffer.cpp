@@ -43,10 +43,10 @@ namespace Vulkan
 		vkCmdExecuteCommands(CommandBuffer, 1, &CmdBuffer);
 	}
 
-	void VulkanCommandBuffer::AddWaitingSemaphore(uint32 WaitingStageMask, VulkanSemaphore* pSemaphore)
+	void VulkanCommandBuffer::AddWaitingSemaphore(uint32 WaitingStageMask, WEngine::WSharedPtr<VulkanSemaphore>& pSemaphore)
 	{
 		WaitingStageMasks.Push(WaitingStageMask);
-		WaitingSemaphores.Push(pSemaphore->GetHandle());
+		WaitingSemaphores.Push(pSemaphore);
 	}
 
 	void VulkanCommandBuffer::BeginPass(RHIRenderPassBeginDescriptor* descriptor)
@@ -189,9 +189,9 @@ namespace Vulkan
 		{
 			if (pFence->IsFenceSignaled())
 			{
-				for (VkSemaphore Semaphore : SubmittedWaitingSemaphores)
+				for (WEngine::WSharedPtr<VulkanSemaphore>& Semaphore : SubmittedWaitingSemaphores)
 				{
-					vkDestroySemaphore(pDevice->GetHandle(), Semaphore, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+					Semaphore = nullptr;
 				}
 				SubmittedWaitingSemaphores.Clear();
 
@@ -290,7 +290,7 @@ namespace Vulkan
 
 			ActiveCmdBuffer->EndScopePass();
 
-			for (VulkanSemaphore* IMSemaphore : ImmediateDoneSemaphores)
+			for (WEngine::WSharedPtr<VulkanSemaphore>& IMSemaphore : ImmediateDoneSemaphores)
 			{
 				ActiveCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, IMSemaphore);
 			}
@@ -299,7 +299,7 @@ namespace Vulkan
 			WEngine::WArray<VkSemaphore> Semaphores(NumSignalSemaphore + 1);
 			for (uint32 SemaphoreIndex = 0; SemaphoreIndex < NumSignalSemaphore; ++SemaphoreIndex)
 			{
-				Semaphores.Push(pSemaphores[SemaphoreIndex].GetHandle());
+				Semaphores[SemaphoreIndex] = pSemaphores[SemaphoreIndex].GetHandle();
 			}
 			Semaphores.Push(pActiveSemaphore->GetHandle());
 			pActiveSemaphore = nullptr;
@@ -317,7 +317,7 @@ namespace Vulkan
 		{
 			ImmediateCmdBuffer->EndScopePass();
 
-			for (VulkanSemaphore* pSemaphore : RenderingDoneSemaphores)
+			for (WEngine::WSharedPtr<VulkanSemaphore>& pSemaphore : RenderingDoneSemaphores)
 			{
 				ImmediateCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, pSemaphore);
 			}
@@ -325,7 +325,7 @@ namespace Vulkan
 			WEngine::WArray<VkSemaphore> Semaphores(NumSignalSemaphore);
 			for (uint32 SemaphoreIndex = 0; SemaphoreIndex < NumSignalSemaphore; ++SemaphoreIndex)
 			{
-				Semaphores.Push(pSemaphores[SemaphoreIndex].GetHandle());
+				Semaphores[SemaphoreIndex] = pSemaphores[SemaphoreIndex].GetHandle();
 			}
 			Semaphores.Push(pImmediateSemaphore->GetHandle());
 			ImmediateDoneSemaphores.Push(pImmediateSemaphore);
@@ -337,10 +337,10 @@ namespace Vulkan
 		ImmediateCmdBuffer = nullptr;
 	}
 
-	void VulkanCommandBufferManager::SubmitActiveCommandBufferFromPresent(VulkanSemaphore* SignalSemaphore)
+	void VulkanCommandBufferManager::SubmitActiveCommandBufferFromPresent(WEngine::WSharedPtr<VulkanSemaphore>& SignalSemaphore)
 	{
 		WEngine::WScopeLock(&pCommandPool->CS);
-		if (SignalSemaphore)
+		if (SignalSemaphore.Get())
 		{
 			VkSemaphore Semaphores[2] = { pActiveSemaphore->GetHandle(), SignalSemaphore->GetHandle() };
 			pQueue->Submit(ActiveCmdBuffer, 2, Semaphores);

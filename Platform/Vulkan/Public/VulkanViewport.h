@@ -38,11 +38,11 @@ namespace Vulkan
 
 		class VulkanSwapchain *pSwapchain;
 
-		class VulkanSemaphore* pAcquireImageSemaphore;
+		WEngine::WSharedPtr<class VulkanSemaphore> pAcquireImageSemaphore;
 
 		WEngine::WArray<VkImage> BackBufferImages;
 
-		WEngine::WArray<VulkanSemaphore*> RenderingDoneSemaphores;
+		WEngine::WArray<WEngine::WSharedPtr<VulkanSemaphore>> RenderingDoneSemaphores;
 
 		WEngine::WArray<class VulkanTextureView*> TextureViews;
 

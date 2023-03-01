@@ -137,7 +137,7 @@ namespace Vulkan
 		vkDestroySurfaceKHR(pInstance->GetHandle(), Surface, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
-	int32 VulkanSwapchain::AcquireImageIndex(VulkanSemaphore** OutSemaphore)
+	int32 VulkanSwapchain::AcquireImageIndex(WEngine::WSharedPtr<VulkanSemaphore>& OutSemaphore)
 	{
 		uint32 ImageIndex = 0;
 		const uint32 PreSemaphoreID = SemaphoreID;
@@ -150,7 +150,7 @@ namespace Vulkan
 		VkFence Fence = VK_NULL_HANDLE;
 #endif
 
-		VkResult Result = vkAcquireNextImageKHR(pDevice->GetHandle(), Swapchain, VK_TIMEOUT, static_cast<VulkanSemaphore*>(ImageAcquireSemaphore[SemaphoreID])->GetHandle(), Fence, &ImageIndex);
+		VkResult Result = vkAcquireNextImageKHR(pDevice->GetHandle(), Swapchain, VK_TIMEOUT, ImageAcquireSemaphore[SemaphoreID]->GetHandle(), Fence, &ImageIndex);
 
 		if (Result == VK_ERROR_OUT_OF_DATE_KHR)
 		{
@@ -164,7 +164,7 @@ namespace Vulkan
 			return (int32)EState::SurfaceLost;
 		}
 
-		*OutSemaphore = static_cast<VulkanSemaphore*>(ImageAcquireSemaphore[SemaphoreID]);
+		OutSemaphore = ImageAcquireSemaphore[SemaphoreID];
 
 #if VULKAN_USE_FENCE_ACQUIRE_IMAGE
 		ImageAcquireFence[SemaphoreID]->Wait();
@@ -174,7 +174,7 @@ namespace Vulkan
 		return CurrentImageIndex;
 	}
 
-	int32 VulkanSwapchain::Present(RHIQueue* Queue, RHISemaphore* RenderingDoneSemaphore)
+	int32 VulkanSwapchain::Present(RHIQueue* Queue, WEngine::WSharedPtr<VulkanSemaphore>& RenderingDoneSemaphore)
 	{
 
 		VkPresentInfoKHR Info = {};
@@ -182,9 +182,9 @@ namespace Vulkan
 			Info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 			Info.swapchainCount = 1;
 			Info.pSwapchains = &Swapchain;
-			if (RenderingDoneSemaphore)
+			if (RenderingDoneSemaphore.Get())
 			{
-				VkSemaphore Semaphore = static_cast<VulkanSemaphore*>(RenderingDoneSemaphore)->GetHandle();
+				VkSemaphore Semaphore = RenderingDoneSemaphore->GetHandle();
 				Info.waitSemaphoreCount = 1;
 				Info.pWaitSemaphores = &Semaphore;
 			}

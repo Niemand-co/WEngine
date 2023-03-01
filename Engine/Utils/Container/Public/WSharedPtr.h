@@ -64,7 +64,9 @@ namespace WEngine
 	{
 	public:
 
-		WSharedPtr(const WSharedPtr& ptr = nullptr);
+		WSharedPtr() = default;
+
+		WSharedPtr(const WSharedPtr& ptr);
 
 		WSharedPtr(T *ptr);
 
@@ -73,6 +75,8 @@ namespace WEngine
 		RefCounterBase* GetCounter() const { return m_counter; }
 
 		T* operator->() { return m_ptr; }
+
+		const T* operator->() const { return m_ptr; }
 
 		T& operator*() { return *m_ptr; }
 
@@ -149,9 +153,9 @@ namespace WEngine
 
 	private:
 
-		T *m_ptr;
+		T *m_ptr = nullptr;
 
-		RefCounterBase *m_counter;
+		RefCounterBase *m_counter = nullptr;
 
 	};
 
@@ -173,6 +177,8 @@ namespace WEngine
 	template<typename T>
 	inline WSharedPtr<T>::~WSharedPtr()
 	{
+		if(m_ptr == nullptr)
+			return;
 		--(*m_counter);
 		if (m_counter->GetCount() == 0)
 		{

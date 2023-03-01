@@ -18,9 +18,9 @@ namespace Vulkan
 
 		virtual void ExecuteCommandBuffer(RHICommandBuffer* pCommandBuffer) override;
 
-		void AddWaitingSemaphore(uint32 WaitingStageMask, class VulkanSemaphore *pSemaphore);
+		void AddWaitingSemaphore(uint32 WaitingStageMask, WEngine::WSharedPtr<class VulkanSemaphore>& pSemaphore);
 
-		const WEngine::WArray<VkSemaphore>& GetWaitingSemaphores() { return WaitingSemaphores; }
+		const WEngine::WArray<WEngine::WSharedPtr<VulkanSemaphore>>& GetWaitingSemaphores() { return WaitingSemaphores; }
 
 		const WEngine::WArray<uint32> GetWaitingStageMasks() { return WaitingStageMasks; }
 
@@ -98,11 +98,11 @@ namespace Vulkan
 
 		uint8 m_isSecondary : 1;
 
-		WEngine::WArray<VkSemaphore> WaitingSemaphores;
+		WEngine::WArray<WEngine::WSharedPtr<VulkanSemaphore>> WaitingSemaphores;
 
 		WEngine::WArray<uint32> WaitingStageMasks;
 
-		WEngine::WArray<VkSemaphore> SubmittedWaitingSemaphores;
+		WEngine::WArray<WEngine::WSharedPtr<VulkanSemaphore>> SubmittedWaitingSemaphores;
 
 		VulkanFence *pFence;
 
@@ -132,7 +132,7 @@ namespace Vulkan
 
 		void SubmitImmediateCommandBuffer(uint32 NumSignalSemaphore = 0u, VulkanSemaphore* pSemaphores = nullptr);
 
-		void SubmitActiveCommandBufferFromPresent(VulkanSemaphore *SignaleSemaphore);
+		void SubmitActiveCommandBufferFromPresent(WEngine::WSharedPtr<VulkanSemaphore>& SignaleSemaphore);
 
 		void WaitForCommandBuffer(VulkanCommandBuffer *CmdBuffer, double Time = 10.0);
 
@@ -152,13 +152,13 @@ namespace Vulkan
 
 		VulkanCommandBuffer *ImmediateCmdBuffer;
 
-		WEngine::WArray<class VulkanSemaphore*> RenderingDoneSemaphores;
+		WEngine::WArray<WEngine::WSharedPtr<class VulkanSemaphore>> RenderingDoneSemaphores;
 
-		VulkanSemaphore *pActiveSemaphore;
+		WEngine::WSharedPtr<class VulkanSemaphore> pActiveSemaphore;
 
-		WEngine::WArray<class VulkanSemaphore*> ImmediateDoneSemaphores;
+		WEngine::WArray<WEngine::WSharedPtr<class VulkanSemaphore>> ImmediateDoneSemaphores;
 
-		VulkanSemaphore *pImmediateSemaphore;
+		WEngine::WSharedPtr<class VulkanSemaphore> pImmediateSemaphore;
 
 	};
 
