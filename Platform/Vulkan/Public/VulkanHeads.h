@@ -25,3 +25,4 @@
 #include "Platform/Vulkan/Public/VulkanSampler.h"
 #include "Platform/Vulkan/Public/VulkanScissor.h"
 #include "Platform/Vulkan/Public/VulkanViewport.h"
+#include "Platform/Vulkan/Public/VulkanPipelineBarrier.h"

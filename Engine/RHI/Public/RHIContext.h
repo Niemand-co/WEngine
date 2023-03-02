@@ -69,8 +69,6 @@ public:
 
 	WTextureViewRHIRef CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture);
 
-	WRenderPassRHIRef CreateRenderPass(class RHIRenderPassDescriptor *descriptor);
-
 	virtual RHIScissor* CreateScissor(RHIScissorDescriptor *descriptor);
 
 	virtual void CopyBufferToImage(RHITexture *pTexture, RHIBuffer *pBuffer, unsigned int width, unsigned int height);
@@ -92,6 +90,10 @@ public:
 	virtual void RHIBeginDrawingViewport(class RHIViewport* Viewport) = 0;
 
 	virtual void RHIEndDrawingViewport(class RHIViewport* Viewport, bool bPresent) = 0;
+
+	virtual void RHIBeginRenderPass(class RHIRenderPassDescriptor* RenderPasDescriptor, class RHIFramebufferDescriptor* FramebufferDescriptor) = 0;
+
+	virtual void RHIEndRenderPass() = 0;
 
 	virtual void RHIBeginTransition(WEngine::WArray<class RHIBarrierDescriptor>& Transitions) = 0;
 

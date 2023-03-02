@@ -55,7 +55,7 @@ namespace Vulkan
 		return Format == VK_FORMAT_S8_UINT || Format == VK_FORMAT_D16_UNORM_S8_UINT || Format == VK_FORMAT_D24_UNORM_S8_UINT || Format == VK_FORMAT_D32_SFLOAT_S8_UINT;
 	}
 
-	VulkanSurface::VulkanSurface(VulkanDevice *pInDevice, VulkanTextureBase* InOwner, VkImageCreateInfo* pInfo, ETextureCreateFlags Flags, EAccess InitState)
+	VulkanSurface::VulkanSurface(VulkanDevice *pInDevice, VulkanTextureBase* InOwner, VkImageCreateInfo* pInfo, VkImageViewType ViewType, ETextureCreateFlags Flags, EAccess InitState)
 		: pDevice(pInDevice),
 		  Owner(InOwner),
 		  Width(pInfo->extent.width),
@@ -65,6 +65,7 @@ namespace Vulkan
 		  NumSample(pInfo->samples),
 		  NumMip(pInfo->mipLevels),
 		  format(pInfo->format),
+		  ViewType(ViewType),
 		  Aspect(0)
 	{
 		vkCreateImage(pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Image);

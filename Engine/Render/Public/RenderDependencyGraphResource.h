@@ -131,6 +131,8 @@ public:
 
 	WRDGTextureSubresourceRange GetSubresourceRange() { return WRDGTextureSubresourceRange(Layout); }
 
+	class RHITexture* GetRHI() const { return RHI; }
+
 private:
 
 	WRDGTexture(const WRDGTextureDesc& inDesc, const char* inName)
@@ -149,7 +151,7 @@ private:
 
 	const WRDGTextureDesc Desc;
 
-	class RHITexture* RHI;
+	RHITexture* RHI;
 
 	const WRDGTerxtureSubresourceLayout Layout;
 

@@ -141,6 +141,11 @@ void WRDGBuilder::Execute()
 
 		CollectTrasition(Handle);
 	}
+
+	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
+	{
+		ExecutePass(Passes[Handle]);
+	}
 }
 
 WRDGTexture* WRDGBuilder::CreateTexture(const WRDGTextureDesc& inDesc, const char* inName)
@@ -305,7 +310,10 @@ void WRDGBuilder::SetupPass(WRDGPass* Pass)
 
 void WRDGBuilder::ExecutePass(WRDGPass* Pass)
 {
-	
+	RHIRenderPassDescriptor RenderPassdescriptor = Pass->Parameters.GetRenderPassInfo();
+	RHIFramebufferDescriptor FramebufferDescriptor = Pass->Parameters.GetFramebufferInfo();
+	GetRenderCommandList()->BeginRenderPass(&RenderPassdescriptor, &FramebufferDescriptor);
+	GetRenderCommandList()->EndRenderPass();
 }
 
 void WRDGBuilder::CollectResource(WRDGPassHandle PassHandle)

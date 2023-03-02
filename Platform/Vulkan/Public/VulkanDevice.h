@@ -35,9 +35,11 @@ namespace Vulkan
 
 		virtual WComputeShaderRHIRef CreateComputeShader(RHIShaderDescriptor* descriptor) override;
 
-		virtual RHIRenderPass* CreateRenderPass(RHIRenderPassDescriptor *descriptor) override;
+		virtual WRenderPassRHIRef GetOrCreateRenderPass(RHIRenderPassDescriptor *descriptor) override;
 
-		virtual RHIPipelineStateObject* CreatePipelineStateObject(RHIPipelineStateObjectDescriptor *descriptor) override;
+		virtual WFramebufferRHIRef GetOrCreateFramebuffer(RHIFramebufferDescriptor *descriptor, RHIRenderPass* RenderPass) override;
+
+		virtual WPsoRHIRef CreatePipelineStateObject(RHIPipelineStateObjectDescriptor *descriptor) override;
 
 		virtual WTexture2DRHIRef CreateTexture2D(RHITextureDescriptor* descriptor) override;
 

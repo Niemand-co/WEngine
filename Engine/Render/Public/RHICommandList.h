@@ -46,7 +46,7 @@ public:
 
 	void EndDrawingViewport(RHIViewport *Viewport, bool bPresent);
 
-	void BeginRenderPass(class RHIRenderPassBeginDescriptor *descriptor);
+	void BeginRenderPass(class RHIRenderPassDescriptor *RenderPasDescriptor, class RHIFramebufferDescriptor *FramebufferDescriptor);
 
 	void EndRenderPass();
 

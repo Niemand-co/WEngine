@@ -13,9 +13,9 @@ namespace Vulkan
 
 	WEngine::WHashMap<VkImage, VkImageLayout> VulkanTextureLayoutManager::Layouts = WEngine::WHashMap<VkImage, VkImageLayout>();
 
-	VulkanTextureBase::VulkanTextureBase(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, ETextureCreateFlags Flags, EAccess InitState)
+	VulkanTextureBase::VulkanTextureBase(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, VkImageViewType ViewType, ETextureCreateFlags Flags, EAccess InitState)
 		: pDevice(pInDevice),
-		  Surface(pInDevice, this, pInfo, Flags, InitState)
+		  Surface(pInDevice, this, pInfo, ViewType, Flags, InitState)
 	{
 
 	}
@@ -26,7 +26,7 @@ namespace Vulkan
 	}
 
 	VulkanTexture2D::VulkanTexture2D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, ETextureCreateFlags Flags, EAccess InitState)
-		: VulkanTextureBase(pInDevice, pInfo, Flags, InitState), RHITexture2D(pInfo->extent.width, pInfo->extent.height, pInfo->mipLevels)
+		: VulkanTextureBase(pInDevice, pInfo, VK_IMAGE_VIEW_TYPE_2D, Flags, InitState), RHITexture2D(pInfo->extent.width, pInfo->extent.height, pInfo->mipLevels)
 	{
 	}
 
@@ -35,7 +35,7 @@ namespace Vulkan
 	}
 
 	VulkanTexture2DArray::VulkanTexture2DArray(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, ETextureCreateFlags Flags, EAccess InitState)
-		: VulkanTextureBase(pInDevice, pInfo, Flags, InitState), RHITexture2DArray(pInfo->extent.width, pInfo->extent.height, pInfo->mipLevels, pInfo->arrayLayers)
+		: VulkanTextureBase(pInDevice, pInfo, VK_IMAGE_VIEW_TYPE_2D_ARRAY, Flags, InitState), RHITexture2DArray(pInfo->extent.width, pInfo->extent.height, pInfo->mipLevels, pInfo->arrayLayers)
 	{
 	}
 
@@ -44,7 +44,7 @@ namespace Vulkan
 	}
 
 	VulkanTexture3D::VulkanTexture3D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, ETextureCreateFlags Flags, EAccess InitState)
-		: VulkanTextureBase(pInDevice, pInfo, Flags, InitState), RHITexture3D(pInfo->extent.width, pInfo->extent.height, pInfo->extent.depth, pInfo->mipLevels)
+		: VulkanTextureBase(pInDevice, pInfo, VK_IMAGE_VIEW_TYPE_3D, Flags, InitState), RHITexture3D(pInfo->extent.width, pInfo->extent.height, pInfo->extent.depth, pInfo->mipLevels)
 	{
 	}
 

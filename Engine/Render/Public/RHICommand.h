@@ -24,10 +24,12 @@ struct RHICommand : public RHICommandBase
 
 struct RHICommandBeginRenderPass final : public RHICommand<RHICommandBeginRenderPass>
 {
-	class RHIRenderPassBeginDescriptor* descriptor;
+	class RHIRenderPassDescriptor* RenderPassDescriptor;
+	class RHIFramebufferDescriptor* FramebufferDescriptor;
 
-	RHICommandBeginRenderPass(RHIRenderPassBeginDescriptor* inDescriptor)
-		: descriptor(inDescriptor)
+	RHICommandBeginRenderPass(RHIRenderPassDescriptor* inRenderPassDescriptor, RHIFramebufferDescriptor *inFramebufferDescriptor)
+		: RenderPassDescriptor(inRenderPassDescriptor),
+		  FramebufferDescriptor(inFramebufferDescriptor)
 	{
 
 	}

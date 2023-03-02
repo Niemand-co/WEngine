@@ -194,11 +194,6 @@ WTextureViewRHIRef RHIContext::CreateTextureView(uint32 InMipIndex, uint32 InMip
 	return pDevice->CreateTextureView(&descriptor, InTexture);
 }
 
-WRenderPassRHIRef RHIContext::CreateRenderPass(RHIRenderPassDescriptor* descriptor)
-{
-	return pDevice->CreateRenderPass(descriptor);
-}
-
 RHIScissor* RHIContext::CreateScissor(RHIScissorDescriptor* descriptor)
 {
 	return pDevice->CreateScissor(descriptor);

@@ -28,6 +28,8 @@ public:
 
 	RHIAttachmentDescriptor ColorAttachmentDescriptors[MaxSimultaneousRenderTargets];
 
+	uint8 bHasDepthStencilAttachment : 1 = false;
+
 	RHIAttachmentDescriptor DepthStencilAttachmentDescriptor;
 
 	unsigned int SubpassCount = 0;

@@ -22,9 +22,11 @@ public:
 
 	virtual WComputeShaderRHIRef CreateComputeShader(class RHIShaderDescriptor* descriptor) = 0;
 
-	virtual class RHIRenderPass* CreateRenderPass(class RHIRenderPassDescriptor *descriptor) = 0;
+	virtual WRenderPassRHIRef GetOrCreateRenderPass(class RHIRenderPassDescriptor *descriptor) = 0;
 
-	virtual class RHIPipelineStateObject* CreatePipelineStateObject(class RHIPipelineStateObjectDescriptor *descriptor) = 0;
+	virtual WFramebufferRHIRef GetOrCreateFramebuffer(class RHIFramebufferDescriptor* descriptor, class RHIRenderPass* RenderPass) = 0;
+
+	virtual WPsoRHIRef CreatePipelineStateObject(class RHIPipelineStateObjectDescriptor *descriptor) = 0;
 
 	virtual WTexture2DRHIRef CreateTexture2D(class RHITextureDescriptor* descriptor) = 0;
 

@@ -8,7 +8,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanSurface(class VulkanDevice *pInDevice, class VulkanTextureBase *InOwner, VkImageCreateInfo *pInfo, ETextureCreateFlags Flags, EAccess InitState);
+		VulkanSurface(class VulkanDevice *pInDevice, class VulkanTextureBase *InOwner, VkImageCreateInfo *pInfo, VkImageViewType ViewType, ETextureCreateFlags Flags, EAccess InitState);
 
 		virtual ~VulkanSurface();
 
@@ -40,6 +40,8 @@ namespace Vulkan
 
 		VkFormat format;
 
+		VkImageViewType ViewType;
+
 		VkImageAspectFlags Aspect;
 
 		VkMemoryRequirements MemoryRequirements;
@@ -47,6 +49,7 @@ namespace Vulkan
 		VkDeviceMemory DeviceMemory;
 
 		friend VulkanTextureBase;
+		friend VulkanDevice;
 
 	};
 

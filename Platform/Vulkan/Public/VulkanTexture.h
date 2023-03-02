@@ -30,7 +30,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTextureBase(class VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, ETextureCreateFlags Flags, EAccess InitState);
+		VulkanTextureBase(class VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, VkImageViewType ViewType, ETextureCreateFlags Flags, EAccess InitState);
 
 		virtual ~VulkanTextureBase();
 

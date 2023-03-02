@@ -100,3 +100,31 @@ RHIRenderPassDescriptor WRDGParameterStruct::GetRenderPassInfo() const
 
 	return descriptor;
 }
+
+RHIFramebufferDescriptor WRDGParameterStruct::GetFramebufferInfo() const
+{
+	RHIFramebufferDescriptor descriptor = {};
+	const WRDGRenderTargetBindingSlots& RenderTargets = GetRenderTarget();
+
+	uint32 NumColorAttachment = 0;
+	RenderTargets.Enumerate([&descriptor, &NumColorAttachment](const WRDGRenderTargetBinding& RenderTarget)
+	{
+		WRDGTexture *Texture = RenderTarget.Texture;
+		descriptor.Attachments[NumColorAttachment++] = Texture->GetRHI();
+		descriptor.extent.width = Texture->Desc.extent.width < descriptor.extent.width ? Texture->Desc.extent.width : descriptor.extent.width;
+		descriptor.extent.height = Texture->Desc.extent.height < descriptor.extent.height ? Texture->Desc.extent.height : descriptor.extent.height;
+		descriptor.extent.depth = Texture->Desc.extent.depth < descriptor.extent.depth ? Texture->Desc.extent.depth : descriptor.extent.depth;
+	});
+
+	WRDGTexture *DepthStencil = RenderTargets.DepthStencilTexture.Texture;
+	if (DepthStencil)
+	{
+		descriptor.Attachments[NumColorAttachment++] = DepthStencil->GetRHI();
+		descriptor.extent.width = DepthStencil->Desc.extent.width < descriptor.extent.width ? DepthStencil->Desc.extent.width : descriptor.extent.width;
+		descriptor.extent.height = DepthStencil->Desc.extent.height < descriptor.extent.height ? DepthStencil->Desc.extent.height : descriptor.extent.height;
+		descriptor.extent.depth = DepthStencil->Desc.extent.depth < descriptor.extent.depth ? DepthStencil->Desc.extent.depth : descriptor.extent.depth;
+	}
+	descriptor.AttachmentCount = NumColorAttachment;
+
+	return descriptor;
+}

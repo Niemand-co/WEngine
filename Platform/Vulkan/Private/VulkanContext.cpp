@@ -1,16 +1,9 @@
 #include "pch.h"
-#include "Platform/Vulkan/Public/VulkanContext.h"
-#include "Platform/Vulkan/Public/VulkanDevice.h"
-#include "Platform/Vulkan/Public/VulkanQueue.h"
-#include "Platform/Vulkan/Public/VulkanViewport.h"
-#include "Platform/Vulkan/Public/VulkanTexture.h"
-#include "Platform/Vulkan/Public/VulkanBuffer.h"
-#include "Platform/Vulkan/Public/VulkanPipelineBarrier.h"
-#include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
-#include "Platform/Vulkan/Public/VulkanPipelineBarrier.h"
+#include "Platform/Vulkan/Public/VulkanHeads.h"
 #include "Platform/Vulkan/Encoder/Public/VulkanGraphicsEncoder.h"
 #include "Platform/Vulkan/Encoder/Public/VulkanComputeEncoder.h"
 #include "Render/Descriptor/Public/RHIBarrierDescriptor.h"
+#include "Render/Descriptor/Public/RHIFramebufferDescriptor.h"
 
 namespace Vulkan
 {
@@ -37,6 +30,33 @@ namespace Vulkan
 			VulkanCommandBuffer *ActiveCmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
 			bool bSuccefullyPresent = Viewport->Present(ActiveCmdBuffer, pQueue);
 		}
+	}
+
+	void VulkanContext::RHIBeginRenderPass(RHIRenderPassDescriptor* RenderPasDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor)
+	{
+		VulkanRenderPass *Pass = static_cast<VulkanRenderPass*>(pDevice->GetOrCreateRenderPass(RenderPasDescriptor));
+		VulkanFramebuffer *Framebuffer = static_cast<VulkanFramebuffer*>(pDevice->GetOrCreateFramebuffer(FramebufferDescriptor, Pass));
+
+		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
+		WEngine::WArray<VkClearValue> ClearValues(FramebufferDescriptor->AttachmentCount);
+		VkRenderPassBeginInfo Info = {};
+		{
+			Info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			Info.renderPass = Pass->GetHandle();
+			Info.framebuffer = Framebuffer->GetHandle();
+			Info.clearValueCount = ClearValues.Size();
+			Info.pClearValues = ClearValues.GetData();
+			Info.renderArea = { (int)FramebufferDescriptor->extent.width, (int)FramebufferDescriptor->extent.height };
+		}
+		vkCmdBeginRenderPass(CmdBuffer->GetHandle(), &Info, VK_SUBPASS_CONTENTS_INLINE);
+		CmdBuffer->State = VulkanCommandBuffer::ECmdState::IsInsideRenderPass;
+	}
+
+	void VulkanContext::RHIEndRenderPass()
+	{
+		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
+		vkCmdEndRenderPass(CmdBuffer->GetHandle());
+		CmdBuffer->State = VulkanCommandBuffer::ECmdState::IsInsideBegin;
 	}
 
 	void VulkanContext::RHIBeginTransition(WEngine::WArray<RHIBarrierDescriptor>& Transitions)

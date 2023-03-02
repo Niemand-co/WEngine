@@ -1,6 +1,7 @@
 #pragma once
 #include "Render/Public/RenderDependencyGraphResource.h"
 #include "Render/Descriptor/Public/RHIRenderPassDescriptor.h"
+#include "Render/Descriptor/Public/RHIFramebufferDescriptor.h"
 
 void GetPassAccess(EPassFlag Flag, EAccess& SRVAccess, EAccess& UAVAccess);
 
@@ -200,6 +201,8 @@ public:
 	~WRDGParameterStruct() = default;
 
 	RHIRenderPassDescriptor GetRenderPassInfo() const;
+
+	RHIFramebufferDescriptor GetFramebufferInfo() const;
 
 	bool HasRenderTargets() const { Layout->HasRenderTarget(); }
 

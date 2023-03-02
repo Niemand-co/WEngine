@@ -8,17 +8,17 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanFramebuffer(VkFramebuffer *pFramebuffer, VkDevice *pDevice);
+		VulkanFramebuffer(class VulkanDevice *pInDevice, VkFramebufferCreateInfo *pInfo);
 
 		virtual ~VulkanFramebuffer();
 
-		VkFramebuffer* GetHandle();
+		VkFramebuffer GetHandle() const { return Framebuffer; }
 
 	private:
 
-		VkFramebuffer *m_pFramebuffer;
+		VulkanDevice *pDevice;
 
-		VkDevice *m_pDevice;
+		VkFramebuffer Framebuffer;
 
 	};
 

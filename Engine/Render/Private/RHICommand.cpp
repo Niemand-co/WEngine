@@ -8,7 +8,7 @@
 
 void RHICommandBeginRenderPass::Execute(RHICommandListBase* CmdList)
 {
-	ENCODER_EXECUTE(BeginRenderPass)(descriptor);
+	ENCODER_EXECUTE(BeginRenderPass)(RenderPassDescriptor, FramebufferDescriptor);
 }
 
 void RHICommandEndRenderPass::Execute(RHICommandListBase* CmdList)

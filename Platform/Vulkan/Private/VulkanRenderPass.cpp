@@ -1,21 +1,27 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanRenderPass.h"
+#include "Platform/Vulkan/Public/VulkanDevice.h"
 
 namespace Vulkan
 {
 
-	VulkanRenderPass::VulkanRenderPass(VkRenderPass* renderPass)
-		: m_renderPass(renderPass)
+	VulkanRenderPass::VulkanRenderPass(class VulkanDevice* pInDevice, VkRenderPassCreateInfo* pInfo)
+		: pDevice(pInDevice)
 	{
+		vkCreateRenderPass(pDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &RenderPass);
 	}
 
 	VulkanRenderPass::~VulkanRenderPass()
 	{
+		vkDestroyRenderPass(pDevice->GetHandle(), RenderPass, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
-	VkRenderPass* VulkanRenderPass::GetHandle()
+	void VulkanRenderPass::Begin(VulkanCommandBuffer* CmdBuffer)
 	{
-		return m_renderPass;
+	}
+
+	void VulkanRenderPass::End(VulkanCommandBuffer* CmdBuffer)
+	{
 	}
 
 }

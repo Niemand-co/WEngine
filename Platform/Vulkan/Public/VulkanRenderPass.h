@@ -8,15 +8,21 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanRenderPass(VkRenderPass *renderPass);
+		VulkanRenderPass(class VulkanDevice *pInDevice, VkRenderPassCreateInfo *pInfo);
 
 		virtual ~VulkanRenderPass();
 
-		VkRenderPass* GetHandle();
+		void Begin(class VulkanCommandBuffer* CmdBuffer);
+
+		void End(class VulkanCommandBuffer *CmdBuffer);
+
+		VkRenderPass GetHandle() const { return RenderPass; }
 
 	private:
+		
+		VulkanDevice *pDevice;
 
-		VkRenderPass *m_renderPass;
+		VkRenderPass RenderPass;
 
 	};
 

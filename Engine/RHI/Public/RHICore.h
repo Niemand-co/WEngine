@@ -477,3 +477,5 @@ typedef class RHITextureView* WTextureViewRHIRef;
 typedef class RHIViewport* WViewportRHIRef;
 
 typedef class RHIRenderPass* WRenderPassRHIRef;
+typedef class RHIFramebuffer* WFramebufferRHIRef;
+typedef class RHIPipelineStateObject* WPsoRHIRef;

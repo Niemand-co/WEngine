@@ -20,12 +20,14 @@ void RHIRenderCommandList::EndDrawingViewport(RHIViewport* Viewport, bool bPrese
     RHIContext::GetContext()->RHIEndDrawingViewport(Viewport, bPresent);
 }
 
-void RHIRenderCommandList::BeginRenderPass(RHIRenderPassBeginDescriptor* descriptor)
+void RHIRenderCommandList::BeginRenderPass(RHIRenderPassDescriptor* RenderPasDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor)
 {
+    RHIContext::GetContext()->RHIBeginRenderPass(RenderPasDescriptor, FramebufferDescriptor);
 }
 
 void RHIRenderCommandList::EndRenderPass()
 {
+    RHIContext::GetContext()->RHIEndRenderPass();
 }
 
 void RHIRenderCommandList::BeginTransition(WEngine::WArray<RHIBarrierDescriptor>& Transitions)
@@ -99,11 +101,6 @@ WTexture3DRHIRef RHIRenderCommandList::CreateTexture3D(uint32 InWith, uint32 InH
 WTextureViewRHIRef RHIRenderCommandList::CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)
 {
     return RHIContext::GetContext()->CreateTextureView(InMipIndex, InMipCount, InLayerIndex, InLayerCount, InPlaneIndex, InPlaneCount, InDimension, InFormat, InTexture);
-}
-
-WRenderPassRHIRef RHIRenderCommandList::CreateRenderPass(RHIRenderPassDescriptor *descriptor)
-{
-    return RHIContext::GetContext()->CreateRenderPass(descriptor);
 }
 
 WViewportRHIRef RHIRenderCommandList::CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, Format InFormat)
