@@ -39,6 +39,7 @@ namespace Vulkan
 
 		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
 		WEngine::WArray<VkClearValue> ClearValues(FramebufferDescriptor->AttachmentCount);
+		ClearValues[0].color = {1.0f, 0, 0, 0};
 		VkRenderPassBeginInfo Info = {};
 		{
 			Info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;

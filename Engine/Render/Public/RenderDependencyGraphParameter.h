@@ -51,7 +51,7 @@ struct WRDGRenderTargetBindingSlots
 	{
 		for (uint32 ColorIndex = 0; ColorIndex < MaxSimultaneousRenderTargets; ++ColorIndex)
 		{
-			if (!ColorTextures[ColorIndex].Texture)
+			if (ColorTextures[ColorIndex].Texture)
 			{
 				lambda(ColorTextures[ColorIndex]);
 			}

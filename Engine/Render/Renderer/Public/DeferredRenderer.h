@@ -10,7 +10,7 @@ public:
 
 	virtual ~DeferredRenderer();
 
-	virtual void Render() override;
+	virtual void Render(WViewport* Viewport) override;
 
 	void InitView();
 

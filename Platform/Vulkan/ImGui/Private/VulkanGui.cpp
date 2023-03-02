@@ -128,7 +128,7 @@ namespace Vulkan
 	void VulkanGui::BindRenderPass(RHIRenderPass* pRenderPass, unsigned int subpass)
 	{
 		m_vulkanInitInfo.Subpass = subpass;
-		ImGui_ImplVulkan_Init(&m_vulkanInitInfo, *static_cast<VulkanRenderPass*>(pRenderPass)->GetHandle());
+		ImGui_ImplVulkan_Init(&m_vulkanInitInfo, static_cast<VulkanRenderPass*>(pRenderPass)->GetHandle());
 	}
 
 	ImTextureID VulkanGui::LoadTexture(RHITextureView* pTextureView, RHISampler* pSampler)

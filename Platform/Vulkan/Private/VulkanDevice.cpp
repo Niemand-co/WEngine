@@ -144,13 +144,13 @@ namespace Vulkan
 		uint32 RenderPassID = WEngine::MemCrc32(descriptor, sizeof(RHIRenderPassDescriptor));
 
 		WRenderPassRHIRef RenderPass = RHIRenderPassManager::GetRenderPass(RenderPassID);
-		if (!RenderPass)
+		if (RenderPass)
 		{
 			return RenderPass;
 		}
 
 		WEngine::WArray<VkAttachmentDescription> Attachments(descriptor->ColorAttachmentCount + (descriptor->bHasDepthStencilAttachment ? 1 : 0));
-		WEngine::WArray<VkAttachmentReference> ColorReferences(Attachments.Size());
+		WEngine::WArray<VkAttachmentReference> ColorReferences(descriptor->ColorAttachmentCount);
 		for (uint32 ColorIndex = 0; ColorIndex < descriptor->ColorAttachmentCount; ++ColorIndex)
 		{
 			Attachments[ColorIndex].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;

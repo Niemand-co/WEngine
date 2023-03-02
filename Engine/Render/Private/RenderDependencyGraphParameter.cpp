@@ -82,11 +82,11 @@ RHIRenderPassDescriptor WRDGParameterStruct::GetRenderPassInfo() const
 	descriptor.ColorAttachmentCount = ColorAttachmentIndex;
 
 	const WRDGDepthStencilBinding& DepthStencil = RenderTargets.DepthStencilTexture;
-	if (!DepthStencil.Texture)
+	if (DepthStencil.Texture)
 	{
 		WRDGTexture *Texture = DepthStencil.Texture;
-		AttachmentStoreOP DepthStoreOp = Texture->Desc.IsDepthFormat() ? AttachmentStoreOP::DontCare : AttachmentStoreOP::Store;
-		AttachmentStoreOP StencilStoreOp = Texture->Desc.IsStencilFormat() ? AttachmentStoreOP::DontCare : AttachmentStoreOP::Store;
+		AttachmentStoreOP DepthStoreOp = Texture->Desc.IsDepthFormat() ? AttachmentStoreOP::Store : AttachmentStoreOP::DontCare;
+		AttachmentStoreOP StencilStoreOp = Texture->Desc.IsStencilFormat() ? AttachmentStoreOP::Store : AttachmentStoreOP::DontCare;
 		AttachmentLoadOP DepthLoadOp = DepthStencil.DepthLoadOP;
 		AttachmentLoadOP StencilLoadOp = DepthStencil.StencilLoadOP;
 
@@ -96,6 +96,8 @@ RHIRenderPassDescriptor WRDGParameterStruct::GetRenderPassInfo() const
 		descriptor.DepthStencilAttachmentDescriptor.stencilLoadOP = StencilLoadOp;
 		descriptor.DepthStencilAttachmentDescriptor.stencilStoreOP = StencilStoreOp;
 		descriptor.DepthStencilAttachmentDescriptor.sampleCount = Texture->Desc.sampleCount;
+
+		descriptor.bHasDepthStencilAttachment = true;
 	}
 
 	return descriptor;

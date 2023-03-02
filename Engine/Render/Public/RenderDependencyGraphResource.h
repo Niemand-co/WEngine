@@ -139,7 +139,8 @@ private:
 		: Desc(inDesc),
 		  Name(inName),
 		  Layout(inDesc.GetSubresourceLayout()),
-		  RHI(nullptr)
+		  RHI(nullptr),
+		  States(WEngine::WArray<WRDGResourceState>(Layout.MipCount* Layout.LayerCount* Layout.PlaneCount, WRDGResourceState()))
 	{
 	}
 

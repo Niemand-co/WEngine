@@ -9,12 +9,6 @@ class RHITextureView;
 class RHITexture;
 struct CameraInfo;
 
-struct CameraRenderTarget
-{
-	RHITextureView *pColorTexture;
-	RHITextureView *pDepthTexture;
-};
-
 class CameraComponent : public Component
 {
 	ENABLE_REFLECTION
@@ -41,8 +35,6 @@ public:
 
 	template<typename T>
 	void SetRenderer(RScene* Scene);
-
-	inline CameraRenderTarget& GetRenderTarget(unsigned int index) { return m_rendertargets[index]; }
 
 	ScriptableRenderer* GetRenderer();
 
@@ -79,8 +71,6 @@ private:
 	glm::mat4x4 m_projectionMatrix;
 
 	ScriptableRenderer *m_renderer;
-
-	WEngine::WArray<CameraRenderTarget> m_rendertargets;
 
 	WEngine::WArray<RHITexture*> m_textureResources;
 
@@ -134,8 +124,6 @@ struct CameraInfo
 	glm::mat4x4 MatrixP;
 	
 	glm::mat4x4 MatrixVP;
-	
-	CameraRenderTarget *pRenderTarget;
 	
 	float Fov;
 	

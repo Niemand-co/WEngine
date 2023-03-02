@@ -32,10 +32,10 @@ void WRDGBuilder::Compile()
 
 	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
 	{
-		if (PassesToCull[Handle])
-		{
-			continue;
-		}
+		//if (PassesToCull[Handle])
+		//{
+		//	continue;
+		//}
 
 		WRDGPass* Pass = Passes[Handle];
 		bool bWithAsyncCompute = WEngine::EnumHasFlags(Pass->Flag, EPassFlag::AsyncCompute);
@@ -128,16 +128,16 @@ void WRDGBuilder::Execute()
 
 	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
 	{
-		if(PassesToCull[Handle])
-			continue;
+		//if(PassesToCull[Handle])
+		//	continue;
 
 		CollectResource(Handle);
 	}
 
 	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
 	{
-		if (PassesToCull[Handle])
-			continue;
+		//if (PassesToCull[Handle])
+		//	continue;
 
 		CollectTrasition(Handle);
 	}
