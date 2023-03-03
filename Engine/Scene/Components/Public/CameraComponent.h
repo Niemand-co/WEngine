@@ -34,7 +34,7 @@ public:
 	glm::vec3 GetForward() const { return m_forward; }
 
 	template<typename T>
-	void SetRenderer(RScene* Scene);
+	void SetRenderer(RScene* Scene, class WViewport* Viewport);
 
 	ScriptableRenderer* GetRenderer();
 
@@ -141,9 +141,9 @@ struct CameraInfo
 };
 
 template<typename T>
-void CameraComponent::SetRenderer(RScene* Scene)
+void CameraComponent::SetRenderer(RScene* Scene, WViewport *Viewport)
 {
-	m_renderer = new T(this);
+	m_renderer = new T(this, Viewport);
 	SceneRenderer* renderer = dynamic_cast<SceneRenderer*>(m_renderer);
 	if (renderer != nullptr)
 		renderer->SetScene(Scene);

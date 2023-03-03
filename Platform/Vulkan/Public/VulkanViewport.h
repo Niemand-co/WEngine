@@ -24,6 +24,8 @@ namespace Vulkan
 
 		void WaitForFrameEvenCompletion();
 
+		virtual RHITexture* GetRenderTarget() const;
+
 	private:
 
 		void CreateSwapchain();

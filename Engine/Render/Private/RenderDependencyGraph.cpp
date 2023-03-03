@@ -16,8 +16,6 @@ inline EAccess GetValidReadAccess(const EAccess& Access)
 	return ((uint16)(Access & EAccess::Readable) != 0) ? (Access & ~EAccess::WriteOnly) : Access;
 }
 
-
-
 WRDGBuilder::WRDGBuilder()
 {
 }
@@ -32,10 +30,10 @@ void WRDGBuilder::Compile()
 
 	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
 	{
-		//if (PassesToCull[Handle])
-		//{
-		//	continue;
-		//}
+		if (PassesToCull[Handle])
+		{
+			continue;
+		}
 
 		WRDGPass* Pass = Passes[Handle];
 		bool bWithAsyncCompute = WEngine::EnumHasFlags(Pass->Flag, EPassFlag::AsyncCompute);
@@ -128,16 +126,16 @@ void WRDGBuilder::Execute()
 
 	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
 	{
-		//if(PassesToCull[Handle])
-		//	continue;
+		if(PassesToCull[Handle])
+			continue;
 
 		CollectResource(Handle);
 	}
 
 	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
 	{
-		//if (PassesToCull[Handle])
-		//	continue;
+		if (PassesToCull[Handle])
+			continue;
 
 		CollectTrasition(Handle);
 	}
@@ -160,6 +158,42 @@ WRDGBuffer* WRDGBuilder::CreateBuffer(const WRDGBufferDesc& inDesc, const char* 
 	WRDGBuffer* Buffer = Buffers.Allocate<WRDGBuffer>(inDesc, inName);
 	Buffer->bExternal = false;
 	return Buffer;
+}
+
+WRDGTexture* WRDGBuilder::RegisterExternalTexture(RHITexture* ExternalTexture)
+{
+	WRDGTextureDesc Desc;
+	uint32 MipCount = ExternalTexture->GetMipCount();
+	uint32 LayerCount = ExternalTexture->GetLayerCount();
+	uint32 SampleCount = ExternalTexture->GetSampleCount();
+	uint32 Width = ExternalTexture->GetWidth();
+	uint32 Height = ExternalTexture->GetHeight();
+	uint32 Depth = ExternalTexture->GetDepth();
+	switch (ExternalTexture->GetDimension())
+	{
+	case Dimension::Texture2D:
+		Desc = WRDGTextureDesc::GetTexture2DDesc(ExternalTexture->GetFormat(), { Width, Height, Depth }, ExternalTexture->GetClearValue(), MipCount, SampleCount, ExternalTexture->GetFlags());
+		break;
+	case Dimension::Texture2DARRAY:
+		Desc = WRDGTextureDesc::GetTexture2DArrayDesc(ExternalTexture->GetFormat(), {Width, Height, Depth}, ExternalTexture->GetClearValue(), MipCount, SampleCount, ExternalTexture->GetLayerCount(), ExternalTexture->GetFlags());
+		break;
+	case Dimension::Texture3D:
+		Desc = WRDGTextureDesc::GetTexture3DDesc(ExternalTexture->GetFormat(), { Width, Height, Depth }, ExternalTexture->GetClearValue(), MipCount, SampleCount, ExternalTexture->GetFlags());
+		break;
+	case Dimension::TextureCUBE:
+	case Dimension::TextureCUBEARRAY:
+		break;
+	}
+	WRDGTexture* Texture = Textures.Allocate<WRDGTexture>(Desc, "<External>");
+	Texture->bExternal = true;
+	Texture->RHI = ExternalTexture;
+
+	return Texture;
+}
+
+WRDGBuffer* WRDGBuilder::RegisterExternalBuffer(RHIBuffer* ExternalBuffer)
+{
+	return nullptr;
 }
 
 void WRDGBuilder::PassCulling()
@@ -272,7 +306,7 @@ void WRDGBuilder::PassMerging()
 void WRDGBuilder::SetupPass(WRDGPass* Pass)
 {
 	const WRDGParameterStruct& Parameters = Pass->Parameters;
-	const WRDGPassHandle& Handle = Pass->Handle;
+	const WRDGPassHandle Handle = Pass->Handle;
 	EPipeline Pipeline = Pass->GetPipeline();
 
 	Parameters.EnumerateTextures(Pass->Flag, [&Pass, &Pipeline, &Handle](EUniformBaseType Type, WRDGTexture* Texture, EAccess Access)
@@ -434,16 +468,16 @@ void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHan
 	{
 		if (Texture->Desc.IsTextureArray())
 		{
-			Texture->RHI = GetRenderCommandList()->CreateTexture2DArray(Texture->Desc.extent.width, Texture->Desc.extent.height, Texture->Desc.format, Texture->Desc.mipCount, Texture->Desc.layerCount, Flag);
+			Texture->RHI = GetRenderCommandList()->CreateTexture2DArray(Texture->Desc.extent.width, Texture->Desc.extent.height, Texture->Desc.format, Texture->Desc.mipCount, Texture->Desc.layerCount, Texture->Desc.clearValue, Flag);
 		}
 		else
 		{
-			Texture->RHI = GetRenderCommandList()->CreateTexture2D(Texture->Desc.extent.width, Texture->Desc.extent.height, Texture->Desc.format, Texture->Desc.mipCount, Flag);
+			Texture->RHI = GetRenderCommandList()->CreateTexture2D(Texture->Desc.extent.width, Texture->Desc.extent.height, Texture->Desc.format, Texture->Desc.mipCount, Texture->Desc.clearValue, Flag);
 		}
 	}
 	else
 	{
-		Texture->RHI = GetRenderCommandList()->CreateTexture3D(Texture->Desc.extent.width, Texture->Desc.extent.height, Texture->Desc.extent.depth, Texture->Desc.format, Texture->Desc.mipCount, Flag);
+		Texture->RHI = GetRenderCommandList()->CreateTexture3D(Texture->Desc.extent.width, Texture->Desc.extent.height, Texture->Desc.extent.depth, Texture->Desc.format, Texture->Desc.mipCount, Texture->Desc.clearValue, Flag);
 	}
 
 	Texture->FirstPass = PassHandle;

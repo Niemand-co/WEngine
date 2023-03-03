@@ -10,8 +10,9 @@
 #include "Scene/Components/Public/CameraComponent.h"
 #include "Utils/Public/Synchronizer.h"
 
-ScriptableRenderer::ScriptableRenderer(CameraComponent* pCamera)
-	: m_pCamera(pCamera)
+ScriptableRenderer::ScriptableRenderer(CameraComponent* pCamera, WViewport* Viewport)
+	: m_pCamera(pCamera),
+	  Viewport(Viewport)
 {
 }
 

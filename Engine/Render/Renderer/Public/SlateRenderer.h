@@ -5,7 +5,7 @@ class SlateRenderer : public ScriptableRenderer
 {
 public:
 
-	SlateRenderer(class CameraComponent *pInCamera);
+	SlateRenderer(class CameraComponent *pInCamera, class WViewport* Viewport);
 
 	virtual ~SlateRenderer();
 

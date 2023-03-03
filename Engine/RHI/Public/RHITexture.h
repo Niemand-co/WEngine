@@ -21,18 +21,40 @@ public:
 
 	virtual uint32 GetLayerCount() const = 0;
 
+	Format GetFormat() const { return PixelFormat; }
+
+	ClearValue GetClearValue() const { return clearValue; }
+
+	virtual Dimension GetDimension() const = 0;
+
+	uint32 GetSampleCount() const { return SampleCount; }
+
+	ETextureCreateFlags GetFlags() const { return Flags; }
+
 	virtual void* GetTextureRHIBase() { return nullptr; }
 
 protected:
 
-	RHITexture(uint32 inMipCount)
-		: MipCount(inMipCount)
+	RHITexture(Format InPixelFormat, uint32 inMipCount, ClearValue InClearValue, uint32 InSampleCount, ETextureCreateFlags InFlags)
+		: PixelFormat(InPixelFormat),
+		  MipCount(inMipCount),
+		  clearValue(InClearValue),
+		  SampleCount(InSampleCount),
+		  Flags(InFlags)
 	{
 	}
 
 protected:
 
 	uint32 MipCount;
+
+	ClearValue clearValue;
+
+	Format PixelFormat;
+
+	uint32 SampleCount;
+
+	ETextureCreateFlags Flags;
 
 };
 
@@ -50,10 +72,12 @@ public:
 
 	virtual uint32 GetLayerCount() const override { return 1; }
 
+	virtual Dimension GetDimension() const override { return Dimension::Texture2D; }
+
 protected:
 
-	RHITexture2D(uint32 inWidth, uint32 inHeight, uint32 inMipCount)
-		: Width(inWidth), Height(inHeight), RHITexture(inMipCount)
+	RHITexture2D(Format InPixelFormat, uint32 inWidth, uint32 inHeight, uint32 inMipCount, ClearValue InClearValue, uint32 SampleCount, ETextureCreateFlags Flags)
+		: Width(inWidth), Height(inHeight), RHITexture(InPixelFormat, inMipCount, InClearValue, SampleCount, Flags)
 	{
 	}
 
@@ -73,10 +97,12 @@ public:
 
 	virtual uint32 GetLayerCount() const override { return LayerCount; }
 
+	virtual Dimension GetDimension() const override { return Dimension::Texture2DARRAY; }
+
 protected:
 
-	RHITexture2DArray(uint32 inWidth, uint32 inHeight, uint32 inMipCount, uint32 inLayerCount)
-		: RHITexture2D(inWidth, inHeight, inMipCount), LayerCount(inLayerCount)
+	RHITexture2DArray(Format InPixelFormat, uint32 inWidth, uint32 inHeight, uint32 inMipCount, uint32 inLayerCount, ClearValue InClearValue, uint32 SampleCount, ETextureCreateFlags Flags)
+		: RHITexture2D(InPixelFormat, inWidth, inHeight, inMipCount, InClearValue, SampleCount, Flags), LayerCount(inLayerCount)
 	{
 	}
 
@@ -100,10 +126,12 @@ public:
 
 	virtual uint32 GetLayerCount() const override { return 1; }
 
+	virtual Dimension GetDimension() const override { return Dimension::Texture3D; }
+
 protected:
 
-	RHITexture3D(uint32 inWidth, uint32 inHeight, uint32 inDepth, uint32 inMipCount)
-		: Width(inWidth), Height(inHeight), Depth(inDepth), RHITexture(inMipCount)
+	RHITexture3D(Format InPixelFormat, uint32 inWidth, uint32 inHeight, uint32 inDepth, uint32 inMipCount, ClearValue InClearValue, uint32 SampleCount, ETextureCreateFlags Flags)
+		: Width(inWidth), Height(inHeight), Depth(inDepth), RHITexture(InPixelFormat, inMipCount, InClearValue, SampleCount, Flags)
 	{
 	}
 

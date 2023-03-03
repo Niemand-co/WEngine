@@ -6,11 +6,11 @@ class DeferredRenderer : public SceneRenderer
 {
 public:
 
-	DeferredRenderer(CameraComponent *pCamera);
+	DeferredRenderer(CameraComponent *pCamera, class WViewport* Viewport);
 
 	virtual ~DeferredRenderer();
 
-	virtual void Render(WViewport* Viewport) override;
+	virtual void Render() override;
 
 	void InitView();
 
@@ -32,7 +32,7 @@ private:
 
 	void ComputeVisibility();
 
-	void SetupBasePass();
+	void SetupBasePass(class WViewport *Viewport);
 
 private:
 

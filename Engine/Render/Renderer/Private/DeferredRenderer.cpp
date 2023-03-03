@@ -10,12 +10,14 @@
 #include "Render/Public/RenderDependencyGraph.h"
 #include "Render/Public/RenderDependencyGraphResource.h"
 #include "Render/Public/RenderDependencyGraphParameter.h"
+#include "Render/Public/Viewport.h"
+#include "RHI/Public/RHIViewport.h"
 
-DeferredRenderer::DeferredRenderer(CameraComponent* pCamera)
-	: SceneRenderer(pCamera)
+DeferredRenderer::DeferredRenderer(CameraComponent* pCamera, WViewport *Viewport)
+	: SceneRenderer(pCamera, Viewport)
 {
 	GraphBuilder = new WRDGBuilder();
-	SetupBasePass();
+	SetupBasePass(Viewport);
 }
 
 DeferredRenderer::~DeferredRenderer()
@@ -139,11 +141,10 @@ void DeferredRenderer::ComputeVisibility()
 
 }
 
-void DeferredRenderer::SetupBasePass()
+void DeferredRenderer::SetupBasePass(WViewport* Viewport)
 {
 	glm::vec2 Resolution = m_pCamera->GetResolution();
-	const WRDGTextureDesc GBufferDesc = WRDGTextureDesc::GetTexture2DDesc(Format::A16R16G16B16_SFloat, { (uint32)Resolution.x, (uint32)Resolution.y, 0u }, {0.0f, 0.0f, 0.0f, 0.0f});
-	WRDGTexture* GBuffer0 = GraphBuilder->CreateTexture(GBufferDesc, "GBuffer0");
+	WRDGTexture* GBuffer0 = GraphBuilder->RegisterExternalTexture(Viewport->GetRHI()->GetRenderTarget());
 
 	const WRDGTextureDesc DepthDesc = WRDGTextureDesc::GetTexture2DDesc(Format::D16_Unorm, { (uint32)Resolution.x, (uint32)Resolution.y, 0u }, { 0.0f, 0.0f, 0.0f, 0.0f });
 	WRDGTexture* DepthBuffer = GraphBuilder->CreateTexture(DepthDesc, "Depth");

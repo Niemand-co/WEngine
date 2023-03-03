@@ -25,8 +25,8 @@ namespace Vulkan
 
 	}
 
-	VulkanTexture2D::VulkanTexture2D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, ETextureCreateFlags Flags, EAccess InitState)
-		: VulkanTextureBase(pInDevice, pInfo, VK_IMAGE_VIEW_TYPE_2D, Flags, InitState), RHITexture2D(pInfo->extent.width, pInfo->extent.height, pInfo->mipLevels)
+	VulkanTexture2D::VulkanTexture2D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, Format InPixelFormat, ETextureCreateFlags Flags, EAccess InitState, ClearValue InClearValue, uint32 InSampleCount)
+		: VulkanTextureBase(pInDevice, pInfo, VK_IMAGE_VIEW_TYPE_2D, Flags, InitState), RHITexture2D(InPixelFormat, pInfo->extent.width, pInfo->extent.height, pInfo->mipLevels, InClearValue, InSampleCount, Flags)
 	{
 	}
 
@@ -34,8 +34,8 @@ namespace Vulkan
 	{
 	}
 
-	VulkanTexture2DArray::VulkanTexture2DArray(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, ETextureCreateFlags Flags, EAccess InitState)
-		: VulkanTextureBase(pInDevice, pInfo, VK_IMAGE_VIEW_TYPE_2D_ARRAY, Flags, InitState), RHITexture2DArray(pInfo->extent.width, pInfo->extent.height, pInfo->mipLevels, pInfo->arrayLayers)
+	VulkanTexture2DArray::VulkanTexture2DArray(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, Format InPixelFormat, ETextureCreateFlags Flags, EAccess InitState, ClearValue InClearValue, uint32 InSampleCount)
+		: VulkanTextureBase(pInDevice, pInfo, VK_IMAGE_VIEW_TYPE_2D_ARRAY, Flags, InitState), RHITexture2DArray(InPixelFormat, pInfo->extent.width, pInfo->extent.height, pInfo->mipLevels, pInfo->arrayLayers, InClearValue, InSampleCount, Flags)
 	{
 	}
 
@@ -43,8 +43,8 @@ namespace Vulkan
 	{
 	}
 
-	VulkanTexture3D::VulkanTexture3D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, ETextureCreateFlags Flags, EAccess InitState)
-		: VulkanTextureBase(pInDevice, pInfo, VK_IMAGE_VIEW_TYPE_3D, Flags, InitState), RHITexture3D(pInfo->extent.width, pInfo->extent.height, pInfo->extent.depth, pInfo->mipLevels)
+	VulkanTexture3D::VulkanTexture3D(VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, Format InPixelFormat, ETextureCreateFlags Flags, EAccess InitState, ClearValue InClearValue, uint32 InSampleCount)
+		: VulkanTextureBase(pInDevice, pInfo, VK_IMAGE_VIEW_TYPE_3D, Flags, InitState), RHITexture3D(InPixelFormat, pInfo->extent.width, pInfo->extent.height, pInfo->extent.depth, pInfo->mipLevels, InClearValue, InSampleCount, Flags)
 	{
 	}
 

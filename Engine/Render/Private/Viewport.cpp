@@ -4,7 +4,7 @@
 
 void WViewport::InitRHIResource()
 {
-	DepthStencil = GetRenderCommandList()->CreateTexture2D(Width, Height, Format::D32_SFLOAT_S8_UINT, 1, ETextureCreateFlags::TextureCreate_DepthStencil);
+	DepthStencil = GetRenderCommandList()->CreateTexture2D(Width, Height, Format::D32_SFLOAT_S8_UINT, 1, {}, ETextureCreateFlags::TextureCreate_DepthStencil);
 }
 
 void WViewport::ReleaseRHIResource()

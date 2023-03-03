@@ -447,13 +447,13 @@ namespace Vulkan
 		ImageCreateInfo.arrayLayers = 1;
 		ImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		ImageCreateInfo.mipLevels = descriptor->mipCount;
-		ImageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		ImageCreateInfo.samples = WEngine::ToVulkan(descriptor->sampleCount);
 		ImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 		ImageCreateInfo.usage = GetImageUsage(descriptor->Flag);
 
 		ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		return new VulkanTexture2D(this, &ImageCreateInfo, descriptor->Flag, descriptor->initialState);
+		return new VulkanTexture2D(this, &ImageCreateInfo, descriptor->format, descriptor->Flag, descriptor->initialState, descriptor->clearValue, descriptor->sampleCount);
 	}
 
 	WTexture2DArrayRHIRef VulkanDevice::CreateTexture2DArray(RHITextureDescriptor* descriptor)
@@ -466,13 +466,13 @@ namespace Vulkan
 		imageCreateInfo.arrayLayers = descriptor->layerCount;
 		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		imageCreateInfo.mipLevels = descriptor->mipCount;
-		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		imageCreateInfo.samples = WEngine::ToVulkan(descriptor->sampleCount);
 		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 		imageCreateInfo.usage = GetImageUsage(descriptor->Flag);
 
 		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		return new VulkanTexture2DArray(this, &imageCreateInfo, descriptor->Flag, descriptor->initialState);
+		return new VulkanTexture2DArray(this, &imageCreateInfo, descriptor->format, descriptor->Flag, descriptor->initialState, descriptor->clearValue, descriptor->sampleCount);
 	}
 
 	WTexture3DRHIRef VulkanDevice::CreateTexture3D(RHITextureDescriptor* descriptor)
@@ -485,13 +485,13 @@ namespace Vulkan
 		imageCreateInfo.arrayLayers = 1;
 		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		imageCreateInfo.mipLevels = descriptor->mipCount;
-		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		imageCreateInfo.samples = WEngine::ToVulkan(descriptor->sampleCount);
 		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 		imageCreateInfo.usage = GetImageUsage(descriptor->Flag);
 
 		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		return new VulkanTexture3D(this, &imageCreateInfo, descriptor->Flag, descriptor->initialState);
+		return new VulkanTexture3D(this, &imageCreateInfo, descriptor->format, descriptor->Flag, descriptor->initialState, descriptor->clearValue, descriptor->sampleCount);
 	}
 
 	WTextureViewRHIRef VulkanDevice::CreateTextureView(RHITextureViewDescriptor* descriptor, RHITexture* InTexture)

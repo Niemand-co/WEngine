@@ -16,7 +16,7 @@ class ScriptableRenderer
 {
 public:
 
-	ScriptableRenderer(class CameraComponent * pCamera);
+	ScriptableRenderer(class CameraComponent * pCamera, class WViewport* Viewport);
 
 	virtual ~ScriptableRenderer();
 
@@ -46,6 +46,8 @@ protected:
 
 	CameraComponent *m_pCamera;
 
+	WViewport *Viewport;
+
 };
 
 struct SceneViewInfo
@@ -57,8 +59,8 @@ class SceneRenderer : public ScriptableRenderer
 {
 public:
 
-	SceneRenderer(CameraComponent* pCamera)
-		: ScriptableRenderer(pCamera)
+	SceneRenderer(CameraComponent* pCamera, WViewport* Viewport)
+		: ScriptableRenderer(pCamera, Viewport)
 	{
 	}
 

@@ -134,7 +134,7 @@ WComputeShaderRHIRef RHIContext::CreateComputeShader(ShaderCodeBlob& blob)
 	return pDevice->CreateComputeShader(&descriptor);
 }
 
-WTexture2DRHIRef RHIContext::CreateTexture2D(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, ETextureCreateFlags InFlag, EAccess InitState)
+WTexture2DRHIRef RHIContext::CreateTexture2D(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, ClearValue InClearValue, ETextureCreateFlags InFlag, EAccess InitState)
 {
 	RHITextureDescriptor descriptor = {};
 	{
@@ -145,11 +145,12 @@ WTexture2DRHIRef RHIContext::CreateTexture2D(uint32 InWidth, uint32 InHeight, Fo
 		descriptor.mipCount = InMipCount;
 		descriptor.Flag = InFlag;
 		descriptor.initialState = InitState;
+		descriptor.clearValue = InClearValue;
 	}
 	return pDevice->CreateTexture2D(&descriptor);
 }
 
-WTexture2DArrayRHIRef RHIContext::CreateTexture2DArray(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, uint32 InLayerCount, ETextureCreateFlags InFlag, EAccess InitState)
+WTexture2DArrayRHIRef RHIContext::CreateTexture2DArray(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, uint32 InLayerCount, ClearValue InClearValue, ETextureCreateFlags InFlag, EAccess InitState)
 {
 	RHITextureDescriptor descriptor = {};
 	{
@@ -160,11 +161,12 @@ WTexture2DArrayRHIRef RHIContext::CreateTexture2DArray(uint32 InWidth, uint32 In
 		descriptor.mipCount = InMipCount;
 		descriptor.Flag = InFlag;
 		descriptor.initialState = InitState;
+		descriptor.clearValue = InClearValue;
 	}
 	return pDevice->CreateTexture2DArray(&descriptor);
 }
 
-WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 InWidth, uint32 InHeight, uint32 InDepth, Format InFormat, uint32 InMipCount, ETextureCreateFlags InFlag, EAccess InitState)
+WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 InWidth, uint32 InHeight, uint32 InDepth, Format InFormat, uint32 InMipCount, ClearValue InClearValue, ETextureCreateFlags InFlag, EAccess InitState)
 {
 	RHITextureDescriptor descriptor = {};
 	{
@@ -176,6 +178,7 @@ WTexture3DRHIRef RHIContext::CreateTexture3D(uint32 InWidth, uint32 InHeight, ui
 		descriptor.mipCount = InMipCount;
 		descriptor.Flag = InFlag;
 		descriptor.initialState = InitState;
+		descriptor.clearValue = InClearValue;
 	}
 	return pDevice->CreateTexture3D(&descriptor);
 }

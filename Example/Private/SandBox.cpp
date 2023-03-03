@@ -5,7 +5,7 @@ GameScene::GameScene(const WEngine::WString& name)
 	: Layer(name)
 {
 	Viewport = new WSceneViewport(1920, 1080, Format::A16R16G16B16_SFloat);
-	Camera->SetRenderer<DeferredRenderer>(Scene.Get());
+	Camera->SetRenderer<DeferredRenderer>(Scene.Get(), Viewport.Get());
 }
 
 GameScene::~GameScene()

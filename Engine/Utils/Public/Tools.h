@@ -116,15 +116,15 @@ namespace WEngine
 	template<>
 	struct NumericLimits<uint8>
 	{
-		static constexpr uint32 Min() { return 0x00; }
-		static constexpr uint32 Max() { return UINT8_MAX; }
+		static constexpr uint8 Min() { return 0x00; }
+		static constexpr uint8 Max() { return UINT8_MAX; }
 	};
 
 	template<>
 	struct NumericLimits<uint16>
 	{
-		static constexpr uint32 Min() { return 0x0000; }
-		static constexpr uint32 Max() { return UINT16_MAX; }
+		static constexpr uint16 Min() { return 0x0000; }
+		static constexpr uint16 Max() { return UINT16_MAX; }
 	};
 
 	template<>
@@ -137,36 +137,36 @@ namespace WEngine
 	template<>
 	struct NumericLimits<uint64>
 	{
-		static constexpr uint32 Min() { return 0x0000000000000000; }
-		static constexpr uint32 Max() { return UINT64_MAX; }
+		static constexpr uint64 Min() { return 0x0000000000000000; }
+		static constexpr uint64 Max() { return UINT64_MAX; }
 	};
 
 	template<>
 	struct NumericLimits<int8>
 	{
-		static constexpr uint32 Min() { return INT8_MIN; }
-		static constexpr uint32 Max() { return INT8_MAX; }
+		static constexpr int8 Min() { return INT8_MIN; }
+		static constexpr int8 Max() { return INT8_MAX; }
 	};
 
 	template<>
 	struct NumericLimits<int16>
 	{
-		static constexpr uint32 Min() { return INT16_MIN; }
-		static constexpr uint32 Max() { return INT16_MAX; }
+		static constexpr int16 Min() { return INT16_MIN; }
+		static constexpr int16 Max() { return INT16_MAX; }
 	};
 
 	template<>
 	struct NumericLimits<int32>
 	{
-		static constexpr uint32 Min() { return INT32_MIN; }
-		static constexpr uint32 Max() { return INT32_MAX; }
+		static constexpr int32 Min() { return INT32_MIN; }
+		static constexpr int32 Max() { return INT32_MAX; }
 	};
 
 	template<>
 	struct NumericLimits<int64>
 	{
-		static constexpr uint32 Min() { return INT64_MIN; }
-		static constexpr uint32 Max() { return INT64_MAX; }
+		static constexpr int64 Min() { return INT64_MIN; }
+		static constexpr int64 Max() { return INT64_MAX; }
 	};
 
 	template<typename Enum>

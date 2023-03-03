@@ -55,7 +55,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTexture2D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, ETextureCreateFlags Flags, EAccess InitState);
+		VulkanTexture2D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, Format InPixelFormat, ETextureCreateFlags Flags, EAccess InitState, ClearValue InClearValue, uint32 InSampleCount);
 
 		virtual ~VulkanTexture2D();
 
@@ -71,7 +71,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTexture2DArray(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, ETextureCreateFlags Flags, EAccess InitState);
+		VulkanTexture2DArray(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, Format InPixelFormat, ETextureCreateFlags Flags, EAccess InitState, ClearValue InClearValue, uint32 InSampleCount);
 
 		virtual ~VulkanTexture2DArray();
 
@@ -87,7 +87,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanTexture3D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, ETextureCreateFlags Flags, EAccess InitState);
+		VulkanTexture3D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, Format InPixelFormat, ETextureCreateFlags Flags, EAccess InitState, ClearValue InClearValue, uint32 InSampleCount);
 
 		virtual ~VulkanTexture3D();
 

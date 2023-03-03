@@ -22,8 +22,12 @@ public:
 
 	uint32 layerCount = 1;
 
+	uint32 sampleCount = 1;
+
 	ETextureCreateFlags Flag = ETextureCreateFlags::TextureCreate_None;
 
 	EAccess initialState;
+
+	ClearValue clearValue = { 0, 0, 0, 0 };
 
 };

@@ -206,6 +206,11 @@ namespace Vulkan
 		LastFrameCmdBuffer = static_cast<VulkanQueue*>(RHIContext::GetContext()->GetQueue())->GetLastSubmittedCmdBuffer();
 	}
 
+	RHITexture* VulkanViewport::GetRenderTarget() const
+	{
+		return RenderingBackBuffer.Get();
+	}
+
 	void VulkanViewport::CreateSwapchain()
 	{
 		RHISwapchainDescriptor SwapchainDescriptor = {};
@@ -243,7 +248,7 @@ namespace Vulkan
 			TextureViews[ImageIndex] = static_cast<VulkanTextureView*>(pDevice->CreateTextureView(&TextureViewDescriptor, BackBufferImages[ImageIndex]));
 		}
 
-		RenderingBackBuffer = static_cast<VulkanTexture2D*>(GetRenderCommandList()->CreateTexture2D(Width, Height, PixelFormat, 1, ETextureCreateFlags::TextureCreate_RenderTarget | ETextureCreateFlags::TextureCreate_SRV, EAccess::RTV));
+		RenderingBackBuffer = static_cast<VulkanTexture2D*>(GetRenderCommandList()->CreateTexture2D(Width, Height, PixelFormat, 1, { 1, 0, 0, 1 }, ETextureCreateFlags::TextureCreate_RenderTarget | ETextureCreateFlags::TextureCreate_SRV, EAccess::RTV));
 	}
 
 	void VulkanViewport::DestroySwapchain()

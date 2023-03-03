@@ -252,6 +252,8 @@ struct WRDGTextureDesc
 		TextureCubeArray
 	};
 
+	WRDGTextureDesc() = default;
+
 	WRDGTextureDesc(Format inFormat, Extent inExtent, EDimension inDimension, ClearValue inClearValue, uint8 inMipCount, uint8 inSampleCount, uint32 inLayerCount, ETextureCreateFlags InFlags)
 		: format(inFormat), extent(inExtent), dimension(inDimension), clearValue(inClearValue), mipCount(inMipCount), sampleCount(inSampleCount), layerCount(inLayerCount), Flags(InFlags)
 	{
@@ -316,14 +318,14 @@ struct WRDGTextureDesc
 		return WRDGTerxtureSubresourceLayout(mipCount, layerCount * (IsTextureCube() ? 6 : 1), IsStencilFormat() ? 2 : 1);
 	}
 
-	Format format;
+	Format format = Format::A16R16G16B16_SFloat;
 	Extent extent;
-	EDimension dimension;
+	EDimension dimension = EDimension::Texture2D;
 	ClearValue clearValue;
-	uint8 mipCount;
-	uint8 sampleCount;
-	uint32 layerCount;
-	ETextureCreateFlags Flags;
+	uint8 mipCount = 1;
+	uint8 sampleCount = 1;
+	uint32 layerCount = 1;
+	ETextureCreateFlags Flags = ETextureCreateFlags::TextureCreate_None;
 };
 
 

@@ -72,15 +72,13 @@ public:
 
 	WComputeShaderRHIRef CreateComputeShader(ShaderCodeBlob& blob);
 
-	WTexture2DRHIRef CreateTexture2D(uint32 InWith, uint32 InHeight, Format InFormat, uint32 InMipCount = 1u, ETextureCreateFlags InFlag = ETextureCreateFlags::TextureCreate_None, EAccess InitState = EAccess::Unknown);
+	WTexture2DRHIRef CreateTexture2D(uint32 InWith, uint32 InHeight, Format InFormat, uint32 InMipCount = 1u, ClearValue InClearValue = { 0, 0, 0, 0 }, ETextureCreateFlags InFlag = ETextureCreateFlags::TextureCreate_None, EAccess InitState = EAccess::Unknown);
 
-	WTexture2DArrayRHIRef CreateTexture2DArray(uint32 InWith, uint32 InHeight, Format InFormat, uint32 InMipCount = 1u, uint32 InLayerCount = 1u, ETextureCreateFlags InFlag = ETextureCreateFlags::TextureCreate_None, EAccess InitState = EAccess::Unknown);
+	WTexture2DArrayRHIRef CreateTexture2DArray(uint32 InWith, uint32 InHeight, Format InFormat, uint32 InMipCount = 1u, uint32 InLayerCount = 1u, ClearValue InClearValue = { 0, 0, 0, 0 }, ETextureCreateFlags InFlag = ETextureCreateFlags::TextureCreate_None, EAccess InitState = EAccess::Unknown);
 
-	WTexture3DRHIRef CreateTexture3D(uint32 InWith, uint32 InHeight, uint32 InDepth, Format format, uint32 InMipCount = 1u, ETextureCreateFlags InFlag = ETextureCreateFlags::TextureCreate_None, EAccess InitState = EAccess::Unknown);
+	WTexture3DRHIRef CreateTexture3D(uint32 InWith, uint32 InHeight, uint32 InDepth, Format format, uint32 InMipCount = 1u, ClearValue InClearValue = { 0, 0, 0, 0 }, ETextureCreateFlags InFlag = ETextureCreateFlags::TextureCreate_None, EAccess InitState = EAccess::Unknown);
 
 	WTextureViewRHIRef CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, class RHITexture* InTexture);
-
-	WRenderPassRHIRef CreateRenderPass(class RHIRenderPassDescriptor* descriptor);
 
 	WViewportRHIRef CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, Format InFormat);
 

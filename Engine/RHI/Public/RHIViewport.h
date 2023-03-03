@@ -15,4 +15,6 @@ public:
 
 	virtual int32 Present(RHICommandBuffer *CmdBuffer, RHIQueue* Queue) = 0;
 
+	virtual RHITexture* GetRenderTarget() const = 0;
+
 };

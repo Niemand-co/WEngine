@@ -137,6 +137,10 @@ public:
 
 	class WRDGBuffer* CreateBuffer(const WRDGBufferDesc& inDesc, const char* inName);
 
+	WRDGTexture* RegisterExternalTexture(RHITexture * ExternalTexture);
+
+	WRDGBuffer* RegisterExternalBuffer(RHIBuffer * ExternalBuffer);
+
 	template<typename ParameterStructType, typename LAMBDA>
 	WRDGPass* AddPass(WEngine::WString inName, const ParameterStructType* inParameters, LAMBDA inLambda);
 
