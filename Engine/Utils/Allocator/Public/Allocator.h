@@ -1,5 +1,6 @@
 #pragma once
 #include "Utils/Container/Public/WQueue.h"
+#include "HAL/Public/WScopeLock.h"
 
 #define MIN_BLOCK_SIZE
 
@@ -42,6 +43,8 @@ namespace WEngine
 
 		WQueue<void*> freeLists[NumBlock];
 
+		WCriticalSection Section;
+
 	};
 
 	template<uint32 NumBlock>
@@ -67,6 +70,7 @@ namespace WEngine
 	template<uint32 NumBlock>
 	void* Allocator<NumBlock>::Allocate(size_t size)
 	{
+		WScopeLock Lock(&Section);
 		if (size <= 0)
 		{
 			return nullptr;
@@ -100,6 +104,7 @@ namespace WEngine
 	template<uint32 NumBlock>
 	void Allocator<NumBlock>::Deallocate(void* pBlock)
 	{
+		WScopeLock Lock(&Section);
 		if (pBlock == nullptr)
 			return;
 		BYTE index = *((BYTE*)pBlock - 1);

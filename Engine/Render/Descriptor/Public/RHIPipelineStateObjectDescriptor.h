@@ -1,14 +1,9 @@
 #pragma once
-
-class RHIVertexInputDescriptor;
-class RHIBlendDescriptor;
-class RHIDepthStencilDescriptor;
-class RHIShader;
-class RHIRenderPass;
-class RHIPipelineResourceLayout;
-class RHIRasterizationStateDescriptor;
-class RHIScissor;
-class RHIViewport;
+#include "Render/Descriptor/Public/RHIVertexInputDescriptor.h"
+#include "Render/Descriptor/Public/RHIBlendDescriptor.h"
+#include "Render/Descriptor/Public/RHIDepthStencilDescriptor.h"
+#include "Render/Descriptor/Public/RHIPipelineResourceLayoutDescriptor.h"
+#include "Render/Descriptor/Public/RHIRasterizationStateDescriptor.h"
 
 class RHIPipelineStateObjectDescriptor
 {
@@ -20,30 +15,18 @@ public:
 
 public:
 
-	RHIVertexInputDescriptor *vertexDescriptor = nullptr;
+	RHIVertexInputDescriptor VertexInputAttrib;
 
-	RHIBlendDescriptor *blendDescriptor = nullptr;
+	RHIBlendDescriptor BlendState;
 
-	RHIDepthStencilDescriptor *depthStencilDescriptor = nullptr;
+	RHIDepthStencilDescriptor DepthStencilState;
 
-	RHIShader** pShader = nullptr;
+	class WShader* pShader = nullptr;
 
 	unsigned int shaderCount = 0;
 
-	RHIRenderPass *renderPass = nullptr;
+	RHIPipelineResourceLayoutDescriptor DescriptorSetLayout;
 
-	unsigned int subpass = 0;
-
-	RHIPipelineResourceLayout *pipelineResourceLayout = nullptr;
-
-	RHIRasterizationStateDescriptor *rasterizationStateDescriptor = nullptr;
-
-	unsigned int scissorCount = 0;
-
-	RHIScissor *pScissors = nullptr;
-
-	unsigned int viewportCount = 0;
-
-	RHIViewport *pViewports = nullptr;
+	RHIRasterizationStateDescriptor RasterizationState;
 
 };

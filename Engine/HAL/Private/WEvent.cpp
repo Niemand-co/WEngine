@@ -6,9 +6,4 @@
 namespace WEngine
 {
 
-	WEvent* WEvent::Create()
-	{
-		return PlatformProcess::CreateWEvent();
-	}
-
 }

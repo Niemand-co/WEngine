@@ -22,7 +22,7 @@ namespace WEngine
 
 	public:
 
-		class WEvent* pMainThreadSyncEvent;
+		WEvent* pMainThreadSyncEvent;
 
 	private:
 

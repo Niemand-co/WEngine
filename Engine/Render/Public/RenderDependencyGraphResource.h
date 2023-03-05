@@ -1,5 +1,7 @@
 #pragma once
 #include "Render/Descriptor/Public/RHITextureViewDescriptor.h"
+#include "RHI/Public/RHIBuffer.h"
+#include "RHI/Public/RHITexture.h"
 
 template<typename ElementType>
 inline void InitResource(WEngine::WArray<ElementType>& ResourceArray, uint32 Num, const ElementType& Element = {})
@@ -110,7 +112,11 @@ class WRDGTexture : public WRDGResource
 {
 public:
 
-	virtual ~WRDGTexture() = default;
+	virtual ~WRDGTexture()
+	{
+		if(!bExternal)
+			RHI->~RHITexture();
+	}
 
 	WEngine::WArray<WRDGResourceState*>& GetMergeState() { return MergeState; }
 
@@ -163,6 +169,7 @@ private:
 	friend class WRDGBuilder;
 	friend WRDGTextureRegistry;
 	friend class WRDGParameterStruct;
+	friend class WRDGAllocator;
 
 };
 
@@ -182,7 +189,11 @@ class WRDGBuffer : public WRDGResource
 {
 public:
 
-	virtual ~WRDGBuffer() = default;
+	virtual ~WRDGBuffer()
+	{
+		if(!bExternal)
+			RHI->~RHIBuffer();
+	}
 
 private:
 
@@ -209,6 +220,7 @@ private:
 
 	friend class WRDGBuilder;
 	friend WRDGBufferRegistry;
+	friend class WRDGAllocator;
 
 };
 

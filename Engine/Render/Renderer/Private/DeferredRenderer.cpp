@@ -26,8 +26,6 @@ DeferredRenderer::~DeferredRenderer()
 
 void DeferredRenderer::Render()
 {
-	Scene->UpdateLightInfosForScene();
-
 	InitView();
 
 	RenderPrePass();
@@ -61,7 +59,7 @@ void DeferredRenderer::InitView()
 
 void DeferredRenderer::RenderPrePass()
 {
-	
+
 }
 
 void DeferredRenderer::RenderBasePass()
@@ -146,7 +144,7 @@ void DeferredRenderer::SetupBasePass(WViewport* Viewport)
 	glm::vec2 Resolution = m_pCamera->GetResolution();
 	WRDGTexture* GBuffer0 = GraphBuilder->RegisterExternalTexture(Viewport->GetRHI()->GetRenderTarget());
 
-	const WRDGTextureDesc DepthDesc = WRDGTextureDesc::GetTexture2DDesc(Format::D16_Unorm, { (uint32)Resolution.x, (uint32)Resolution.y, 0u }, { 0.0f, 0.0f, 0.0f, 0.0f });
+	const WRDGTextureDesc DepthDesc = WRDGTextureDesc::GetTexture2DDesc(Format::D16_Unorm, { (uint32)Resolution.x, (uint32)Resolution.y, 1u }, { 0.0f, 0.0f, 0.0f, 0.0f });
 	WRDGTexture* DepthBuffer = GraphBuilder->CreateTexture(DepthDesc, "Depth");
 
 	DeferredBasePassParameters* Parameters = GraphBuilder->AllocateParameterStruct<DeferredBasePassParameters>();
@@ -154,7 +152,7 @@ void DeferredRenderer::SetupBasePass(WViewport* Viewport)
 	Parameters->RenderTarget.DepthStencilTexture.Texture = DepthBuffer;
 
 	GraphBuilder->AddPass("BasePass", Parameters, [](RHIRenderCommandList& CmdList)
-	{
-		CmdList.DrawIndexedPrimitive(3, 0, 1);
-	});
+		{
+			CmdList.DrawIndexedPrimitive(3, 0, 1);
+		});
 }

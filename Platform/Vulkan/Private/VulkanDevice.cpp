@@ -159,7 +159,7 @@ namespace Vulkan
 			Attachments[ColorIndex].stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
 
 			Attachments[ColorIndex].format = WEngine::ToVulkan(descriptor->ColorAttachmentDescriptors[ColorIndex].attachmentFormat);
-			Attachments[ColorIndex].loadOp = WEngine::ToVulkan(descriptor->ColorAttachmentDescriptors[ColorIndex].attachmentLoadOP);
+			Attachments[ColorIndex].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;//WEngine::ToVulkan(descriptor->ColorAttachmentDescriptors[ColorIndex].attachmentLoadOP);
 			Attachments[ColorIndex].storeOp = WEngine::ToVulkan(descriptor->ColorAttachmentDescriptors[ColorIndex].attachmentStoreOP);
 			Attachments[ColorIndex].samples = WEngine::ToVulkan(descriptor->ColorAttachmentDescriptors[ColorIndex].sampleCount);
 
@@ -441,7 +441,7 @@ namespace Vulkan
 	{
 		VkImageCreateInfo ImageCreateInfo = {};
 		ImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		ImageCreateInfo.extent = { descriptor->width, descriptor->height, 0 };
+		ImageCreateInfo.extent = { descriptor->width, descriptor->height, 1 };
 		ImageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
 		ImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
 		ImageCreateInfo.arrayLayers = 1;
@@ -460,7 +460,7 @@ namespace Vulkan
 	{
 		VkImageCreateInfo imageCreateInfo = {};
 		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		imageCreateInfo.extent = { descriptor->width, descriptor->height, 0 };
+		imageCreateInfo.extent = { descriptor->width, descriptor->height, 1 };
 		imageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
 		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
 		imageCreateInfo.arrayLayers = descriptor->layerCount;
@@ -531,6 +531,7 @@ namespace Vulkan
 			ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 			ImageViewCreateInfo.image = InImage;
 			ImageViewCreateInfo.format = WEngine::ToVulkan(descriptor->format);
+			ImageViewCreateInfo.viewType = WEngine::ToVulkan(descriptor->dimension);
 			ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
 			ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;
 			ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_B;

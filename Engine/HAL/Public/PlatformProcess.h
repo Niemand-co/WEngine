@@ -2,6 +2,13 @@
 
 namespace WEngine
 {
+	class WEventWin;
+}
+
+typedef WEngine::WEventWin WEvent;
+
+namespace WEngine
+{
 
 	class GenericPlatformProcess
 	{
@@ -9,7 +16,7 @@ namespace WEngine
 
 		static class WThread* CreateThread() {}
 
-		static class WEvent* CreateWEvent() {}
+		static WEvent* CreateWEvent() {}
 
 		template<typename T>
 		static bool CAS(volatile T* Destination, T NewValue, T CompareValue) {}

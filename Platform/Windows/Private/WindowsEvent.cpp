@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Platform/Windows/Public/WindowsEvent.h"
+#include "Utils/Allocator/Public/Allocator.h"
 
 namespace WEngine
 {
@@ -12,6 +13,7 @@ namespace WEngine
 
 	WEventWin::~WEventWin()
 	{
+		CloseHandle(m_event);
 	}
 
 	void WEventWin::Wait()
@@ -28,5 +30,15 @@ namespace WEngine
 	{
 		RE_ASSERT(SetEvent(m_event), "Failed to set event signaled.");
 	}
+
+	//void* WEventWin::operator new(size_t size)
+	//{
+	//	return NormalAllocator::Get()->Allocate(size);
+	//}
+
+	//void WEventWin::operator delete(void* pData)
+	//{
+	//	NormalAllocator::Get()->Deallocate(pData);
+	//}
 
 }

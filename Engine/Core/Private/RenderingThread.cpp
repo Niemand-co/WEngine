@@ -9,7 +9,7 @@ namespace WEngine
 {
 
 	WRenderingThread::WRenderingThread()
-		: pMainThreadSyncEvent(WEvent::Create())
+		: pMainThreadSyncEvent(PlatformProcess::CreateWEvent())
 	{
 	}
 

@@ -149,7 +149,7 @@ namespace Vulkan
 	
 	void VulkanPipelineBarrier::AddTransition(VkImage Image, VkImageSubresourceRange Range, VkAccessFlags AccessBefore, VkAccessFlags AccessAfter, VkImageLayout LayoutBefore, VkImageLayout LayoutAfter)
 	{
-		VkImageMemoryBarrier Barrier;
+		VkImageMemoryBarrier Barrier = {};
 		{
 			Barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 			Barrier.image = Image;

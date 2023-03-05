@@ -11,7 +11,7 @@ public:
 		  Height(InHeight),
 		  PixelFormat(InFormat)
 	{
-		ViewportRHI = GetRenderCommandList()->CreateViewport(Width, Height, false, Format::A8R8G8B8_UNorm);
+		ViewportRHI = GetRenderCommandList()->CreateViewport(Width, Height, false, InFormat);
 	}
 
 	void AcquireImageIndex(uint32 ImageIndex) { AcquiredImageIndex = ImageIndex; }

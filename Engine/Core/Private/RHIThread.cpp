@@ -7,7 +7,7 @@ namespace WEngine
 {
 
 	WRHIThread::WRHIThread()
-		: m_pRenderingThreadSyncEvent(WEvent::Create())
+		: m_pRenderingThreadSyncEvent(PlatformProcess::CreateWEvent())
 	{
 	}
 

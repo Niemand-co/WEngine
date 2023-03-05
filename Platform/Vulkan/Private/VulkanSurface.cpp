@@ -96,11 +96,11 @@ namespace Vulkan
 
 		VkImageLayout InitLayout = GetInitialLayoutForAccess(InitState, Flags);
 
-		VulkanPipelineBarrier Barrier;
-		VkImageSubresourceRange Range = VulkanPipelineBarrier::GetTextureSubresourceRange(Aspect);
-		Barrier.AddTransition(Image, Range, VK_IMAGE_LAYOUT_UNDEFINED, InitLayout);
-		VulkanCommandBuffer *CmdBuffer = static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager()->GetImmediateCommandBuffer();
-		Barrier.Execute(CmdBuffer);
+		//VulkanPipelineBarrier Barrier;
+		//VkImageSubresourceRange Range = VulkanPipelineBarrier::GetTextureSubresourceRange(Aspect);
+		//Barrier.AddTransition(Image, Range, VK_IMAGE_LAYOUT_UNDEFINED, InitLayout);
+		//VulkanCommandBuffer *CmdBuffer = static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager()->GetImmediateCommandBuffer();
+		//Barrier.Execute(CmdBuffer);
 
 		VulkanTextureLayoutManager::AddLayout(Image, InitLayout);
 	}

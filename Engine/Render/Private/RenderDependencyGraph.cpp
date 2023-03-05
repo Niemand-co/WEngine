@@ -70,7 +70,7 @@ void WRDGBuilder::Compile()
 							}
 						}
 
-						TextureState[Index] = (WRDGResourceState*)(WRDGAllocator::Get()->Allocate(sizeof(WRDGResourceState)));
+						TextureState[Index] = WRDGAllocator::GetAllocator()->AllocateObject<WRDGResourceState>();
 						memcpy(TextureState[Index], &PassNeedState.States[Index], sizeof(WRDGResourceState));
 						TextureState[Index]->FirstPass = TextureState[Index]->LastPass = Handle;
 					}
@@ -103,7 +103,7 @@ void WRDGBuilder::Compile()
 							Passes[Handle]->Producers.Push(Buffer->MergeState->LastPass);
 						}
 
-						Buffer->MergeState = (WRDGResourceState*)(WRDGAllocator::Get()->Allocate(sizeof(WRDGResourceState)));
+						Buffer->MergeState = WRDGAllocator::GetAllocator()->AllocateObject<WRDGResourceState>();
 						memcpy(Buffer->MergeState, &PassNeedState.State, sizeof(WRDGResourceState));
 						Buffer->MergeState->FirstPass = Buffer->MergeState->LastPass = Handle;
 					}
@@ -122,28 +122,22 @@ void WRDGBuilder::Compile()
 
 void WRDGBuilder::Execute()
 {
-	Compile();
 
-	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
-	{
-		if(PassesToCull[Handle])
-			continue;
-
-		CollectResource(Handle);
-	}
-
-	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
-	{
-		if (PassesToCull[Handle])
-			continue;
-
-		CollectTrasition(Handle);
-	}
 
 	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
 	{
 		ExecutePass(Passes[Handle]);
 	}
+
+	//Clear();
+}
+
+void WRDGBuilder::Clear()
+{
+	Passes.Clear();
+	Textures.Clear();
+	Buffers.Clear();
+	WRDGAllocator::GetAllocator()->Clear();
 }
 
 WRDGTexture* WRDGBuilder::CreateTexture(const WRDGTextureDesc& inDesc, const char* inName)
@@ -340,10 +334,31 @@ void WRDGBuilder::SetupPass(WRDGPass* Pass)
 
 			Pass->bHasUAVResource |= WEngine::EnumHasFlags(Access, EAccess::UAV);
 		});
+
+	Compile();
+
+	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
+	{
+		if (PassesToCull[Handle])
+			continue;
+
+		CollectResource(Handle);
+	}
+
+	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
+	{
+		if (PassesToCull[Handle])
+			continue;
+
+		CollectTrasition(Handle);
+	}
 }
 
 void WRDGBuilder::ExecutePass(WRDGPass* Pass)
 {
+	RHIRenderCommandList &CmdList = *GetRenderCommandList();
+	Pass->PrologueTransitions.Submit(CmdList);
+
 	RHIRenderPassDescriptor RenderPassdescriptor = Pass->Parameters.GetRenderPassInfo();
 	RHIFramebufferDescriptor FramebufferDescriptor = Pass->Parameters.GetFramebufferInfo();
 	GetRenderCommandList()->BeginRenderPass(&RenderPassdescriptor, &FramebufferDescriptor);
@@ -407,6 +422,7 @@ void WRDGBuilder::AddTransition(WRDGPassHandle PassHandle, WRDGTexture* Texture,
 
 		RHIBarrierDescriptor Barrier = {};
 		{
+			Barrier.Type = RHIBarrierDescriptor::EType::Texture;
 			Barrier.Texture = Texture->RHI;
 			Barrier.MipLevel = SubresourceIndex / MipMod;
 			Barrier.ArrayLayer = (SubresourceIndex % MipCount) / PlaneCount;
@@ -424,6 +440,7 @@ void WRDGBuilder::AddTransition(WRDGPassHandle PassHandle, WRDGBuffer* Buffer, W
 
 	RHIBarrierDescriptor Barrier = {};
 	{
+		Barrier.Type = RHIBarrierDescriptor::EType::Buffer;
 		Barrier.Buffer = Buffer->RHI;
 		Barrier.Range = Buffer->Desc.ByteStride * Buffer->Desc.ElementCount;
 		Barrier.Offset = 0;
@@ -541,6 +558,6 @@ void WRDGBuilder::EndResourceRHI(WRDGPassHandle PassHandle, WRDGBuffer* Texture)
 
 void WRDGBarrierBatch::Submit(RHIRenderCommandList& CmdList)
 {
-	GetRenderCommandList()->BeginTransition(Transitions);
-	Transitions.Clear();
+	GetRenderCommandList()->BeginTransition(Batches);
+	Batches.Clear();
 }

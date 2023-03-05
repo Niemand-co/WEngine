@@ -43,7 +43,7 @@ namespace Vulkan
 		vkCmdExecuteCommands(CommandBuffer, 1, &CmdBuffer);
 	}
 
-	void VulkanCommandBuffer::AddWaitingSemaphore(uint32 WaitingStageMask, WEngine::WSharedPtr<VulkanSemaphore>& pSemaphore)
+	void VulkanCommandBuffer::AddWaitingSemaphore(uint32 WaitingStageMask, VulkanSemaphore* pSemaphore)
 	{
 		WaitingStageMasks.Push(WaitingStageMask);
 		WaitingSemaphores.Push(pSemaphore);
@@ -189,10 +189,10 @@ namespace Vulkan
 		{
 			if (pFence->IsFenceSignaled())
 			{
-				for (WEngine::WSharedPtr<VulkanSemaphore>& Semaphore : SubmittedWaitingSemaphores)
-				{
-					Semaphore = nullptr;
-				}
+				//for (VulkanSemaphore* Semaphore : SubmittedWaitingSemaphores)
+				//{
+				//	delete Semaphore;
+				//}
 				SubmittedWaitingSemaphores.Clear();
 
 				pFence->Reset();
@@ -290,7 +290,7 @@ namespace Vulkan
 
 			ActiveCmdBuffer->EndScopePass();
 
-			for (WEngine::WSharedPtr<VulkanSemaphore>& IMSemaphore : ImmediateDoneSemaphores)
+			for (VulkanSemaphore* IMSemaphore : ImmediateDoneSemaphores)
 			{
 				ActiveCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, IMSemaphore);
 			}
@@ -317,10 +317,11 @@ namespace Vulkan
 		{
 			ImmediateCmdBuffer->EndScopePass();
 
-			for (WEngine::WSharedPtr<VulkanSemaphore>& pSemaphore : RenderingDoneSemaphores)
+			for (VulkanSemaphore* pSemaphore : RenderingDoneSemaphores)
 			{
 				ImmediateCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, pSemaphore);
 			}
+			RenderingDoneSemaphores.Clear();
 
 			WEngine::WArray<VkSemaphore> Semaphores(NumSignalSemaphore);
 			for (uint32 SemaphoreIndex = 0; SemaphoreIndex < NumSignalSemaphore; ++SemaphoreIndex)
@@ -337,10 +338,10 @@ namespace Vulkan
 		ImmediateCmdBuffer = nullptr;
 	}
 
-	void VulkanCommandBufferManager::SubmitActiveCommandBufferFromPresent(WEngine::WSharedPtr<VulkanSemaphore>& SignalSemaphore)
+	void VulkanCommandBufferManager::SubmitActiveCommandBufferFromPresent(VulkanSemaphore* SignalSemaphore)
 	{
 		WEngine::WScopeLock(&pCommandPool->CS);
-		if (SignalSemaphore.Get())
+		if (SignalSemaphore)
 		{
 			VkSemaphore Semaphores[2] = { pActiveSemaphore->GetHandle(), SignalSemaphore->GetHandle() };
 			pQueue->Submit(ActiveCmdBuffer, 2, Semaphores);

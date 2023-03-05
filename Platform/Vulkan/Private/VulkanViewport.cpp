@@ -25,8 +25,8 @@ namespace Vulkan
 			VkImageSubresourceRange Range = VulkanPipelineBarrier::GetTextureSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1);
 			if (SrcLayout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
 				Barrier.AddTransition(SrcImage, Range, SrcLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-			if (DstLayout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
-				Barrier.AddTransition(DstImage, Range, DstLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+			if (DstLayout != VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+				Barrier.AddTransition(DstImage, Range, DstLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 			Barrier.Execute(CmdBuffer);
 		}
 
@@ -60,6 +60,7 @@ namespace Vulkan
 			{
 				Region.extent.width = SrcSizeX;
 				Region.extent.height = SrcSizeY;
+				Region.extent.depth = 1;
 				Region.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 				Region.srcSubresource.layerCount = 1;
 				Region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -74,8 +75,8 @@ namespace Vulkan
 			VkImageSubresourceRange Range = VulkanPipelineBarrier::GetTextureSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1);
 			if (SrcLayout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
 				Barrier.AddTransition(SrcImage, Range, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, SrcLayout);
-			if (DstLayout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
-				Barrier.AddTransition(DstImage, Range, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, DstLayout);
+			if (DstLayout != VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+				Barrier.AddTransition(DstImage, Range, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, DstLayout);
 			Barrier.Execute(CmdBuffer);
 		}
 	}
@@ -84,18 +85,20 @@ namespace Vulkan
 		: pDevice(pInDevice),
 		  PixelFormat(descriptor->format),
 		  Width(descriptor->Width),
-		  Height(descriptor->Height)
+		  Height(descriptor->Height),
+		  pAcquireImageSemaphore(nullptr)
 	{
 		CreateSwapchain();
-		for (uint32 index = 0; index < RenderingDoneSemaphores.Size(); ++index)
-		{
-			RenderingDoneSemaphores[index] = new VulkanSemaphore(pInDevice);
-		}
+		//for (uint32 index = 0; index < RenderingDoneSemaphores.Size(); ++index)
+		//{
+		//	RenderingDoneSemaphores[index] = new VulkanSemaphore(pInDevice);
+		//}
 	}
 
 	VulkanViewport::~VulkanViewport()
 	{
-		pAcquireImageSemaphore = nullptr;
+		if(pAcquireImageSemaphore)
+			delete pAcquireImageSemaphore;
 		delete pSwapchain;
 	}
 
@@ -105,7 +108,7 @@ namespace Vulkan
 
 	bool VulkanViewport::AcquireImageIndex()
 	{
-		int32 NewImageIndex = pSwapchain->AcquireImageIndex(pAcquireImageSemaphore);
+		int32 NewImageIndex = pSwapchain->AcquireImageIndex(&pAcquireImageSemaphore);
 		if (NewImageIndex != -1)
 		{
 			AcquiredImageIndex = NewImageIndex;

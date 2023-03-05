@@ -44,7 +44,7 @@ namespace Vulkan
 
 		WEngine::WArray<VkSemaphore> WaitingSemaphores;
 		WaitingSemaphores.Reserve(CmdBuffer->GetWaitingSemaphores().Size());
-		for (const WEngine::WSharedPtr<VulkanSemaphore>& Semaphore : CmdBuffer->GetWaitingSemaphores())
+		for (const VulkanSemaphore* Semaphore : CmdBuffer->GetWaitingSemaphores())
 		{
 			WaitingSemaphores.Push(Semaphore->GetHandle());
 		}

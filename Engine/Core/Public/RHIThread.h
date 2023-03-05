@@ -26,7 +26,7 @@ namespace WEngine
 
 	public:
 
-		class WEvent *m_pRenderingThreadSyncEvent;
+		WEvent *m_pRenderingThreadSyncEvent;
 
 	};
 

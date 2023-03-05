@@ -39,7 +39,8 @@ namespace Vulkan
 
 		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
 		WEngine::WArray<VkClearValue> ClearValues(FramebufferDescriptor->AttachmentCount);
-		ClearValues[0].color = {1.0f, 0, 0, 0};
+		ClearValues[0].color = { 1.0f, 0, 0, 0 };
+		ClearValues[1].color = { 1.0f, 0, 0, 0 };
 		VkRenderPassBeginInfo Info = {};
 		{
 			Info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -47,7 +48,8 @@ namespace Vulkan
 			Info.framebuffer = Framebuffer->GetHandle();
 			Info.clearValueCount = ClearValues.Size();
 			Info.pClearValues = ClearValues.GetData();
-			Info.renderArea = { (int)FramebufferDescriptor->extent.width, (int)FramebufferDescriptor->extent.height };
+			Info.renderArea.offset = { 0, 0 };
+			Info.renderArea.extent = { FramebufferDescriptor->extent.width, FramebufferDescriptor->extent.height };
 		}
 		vkCmdBeginRenderPass(CmdBuffer->GetHandle(), &Info, VK_SUBPASS_CONTENTS_INLINE);
 		CmdBuffer->State = VulkanCommandBuffer::ECmdState::IsInsideRenderPass;
@@ -69,8 +71,8 @@ namespace Vulkan
 			VkPipelineStageFlags SrcPipelineStage, DstPipelineStage;
 			VkAccessFlags SrcAccess, DstAccess;
 			VkImageLayout SrcLayout, DstLayout;
-			GetVkStageAndAccessFlags(Transition.AccessBefore, false, SrcPipelineStage, SrcAccess, SrcLayout);
-			GetVkStageAndAccessFlags(Transition.AccessAfter, false, DstPipelineStage, DstAccess, DstLayout);
+			GetVkStageAndAccessFlags(Transition.AccessBefore, Transition.Texture->IsDepthFormat(), SrcPipelineStage, SrcAccess, SrcLayout);
+			GetVkStageAndAccessFlags(Transition.AccessAfter, Transition.Texture->IsDepthFormat(), DstPipelineStage, DstAccess, DstLayout);
 
 			if (Transition.Type == RHIBarrierDescriptor::EType::Texture)
 			{

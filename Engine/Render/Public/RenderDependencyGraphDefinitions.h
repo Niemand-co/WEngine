@@ -4,6 +4,50 @@
 
 class WRDGAllocator : public WEngine::Allocator<6>
 {
+public:
+
+	template<typename ObjectType, typename ...Args>
+	ObjectType* AllocateObject(Args... args)
+	{
+		TrackedAlloc<ObjectType>* Object = (TrackedAlloc<ObjectType>*)Allocate(sizeof(TrackedAlloc<ObjectType>));
+		::new (Object) TrackedAlloc<ObjectType>(args...);
+		TrackedObjects.Push(Object);
+		return Object->Get();
+	}
+
+	void Clear()
+	{
+		for (TrackedBase* Alloc : TrackedObjects)
+		{
+			Alloc->~TrackedBase();
+		}
+		TrackedObjects.Clear();
+	}
+
+	static WRDGAllocator* GetAllocator()
+	{
+		return (WRDGAllocator*)Get();
+	}
+
+private:
+
+	struct TrackedBase
+	{
+		virtual ~TrackedBase() = default;
+	};
+
+	template<typename ObjectType>
+	struct TrackedAlloc : TrackedBase
+	{
+		template<typename... Args>
+		TrackedAlloc(Args... args) : Object(args...) {}
+
+		ObjectType* Get() { return &Object; }
+
+		ObjectType Object;
+	};
+
+	WEngine::WArray<TrackedBase*> TrackedObjects;
 
 };
 
@@ -100,7 +144,7 @@ public:
 	template<typename AllocObjectType, typename... Args>
 	AllocObjectType* Allocate(Args... args)
 	{
-		AllocObjectType* object = (AllocObjectType*)WRDGAllocator::Get()->Allocate(sizeof(AllocObjectType));
+		AllocObjectType* object = WRDGAllocator::GetAllocator()->AllocateObject<AllocObjectType>(args...);
 		::new (object) AllocObjectType(args...);
 		Insert(static_cast<ObjectType*>(object));
 		return object;
@@ -124,6 +168,11 @@ public:
 	HandleType End() const
 	{
 		return HandleType(Array.Size());
+	}
+
+	void Clear()
+	{
+		Array.Clear();
 	}
 
 private:

@@ -12,10 +12,6 @@ public:
 
 	void Submit(RHIRenderCommandList& CmdList);
 
-private:
-
-	WEngine::WArray<class RHIBarrierDescriptor> Transitions;
-
 };
 
 class WRDGPass
@@ -130,6 +126,8 @@ public:
 
 	void Execute();
 
+	void Clear();
+
 	template<typename ParameterStructType>
 	ParameterStructType* AllocateParameterStruct();
 
@@ -195,8 +193,7 @@ private:
 template<typename ParameterStructType>
 inline ParameterStructType* WRDGBuilder::AllocateParameterStruct()
 {
-	ParameterStructType* Parameter = (ParameterStructType*)WRDGAllocator::Get()->Allocate(sizeof(ParameterStructType));
-	::new (Parameter) ParameterStructType();
+	ParameterStructType* Parameter = WRDGAllocator::GetAllocator()->AllocateObject<ParameterStructType>();
 	return Parameter;
 }
 

@@ -4,7 +4,7 @@
 namespace WEngine
 {
 
-	class WEventWin : public WEvent
+	class WEventWin
 	{
 	public:
 
@@ -12,11 +12,15 @@ namespace WEngine
 
 		virtual ~WEventWin();
 
-		virtual void Wait() override;
+		void Wait();
 
-		virtual void Reset() override;
+		void Reset();
 
-		virtual void Trigger() override;
+		void Trigger();
+
+		//void* operator new(size_t size);
+
+		//void operator delete(void* pData);
 
 	private:
 

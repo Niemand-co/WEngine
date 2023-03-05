@@ -73,7 +73,7 @@ struct Extent
 {
 	uint32 width = 0;
 	uint32 height = 0;
-	uint32 depth = 0;
+	uint32 depth = 1;
 };
 
 enum class Dimension

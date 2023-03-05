@@ -14,9 +14,9 @@ namespace Vulkan
 
 		virtual ~VulkanSwapchain();
 
-		int32 AcquireImageIndex(WEngine::WSharedPtr<VulkanSemaphore>& OutSemaphore);
+		int32 AcquireImageIndex(class VulkanSemaphore** OutSemaphore);
 
-		int32 Present(RHIQueue* Queue, WEngine::WSharedPtr<VulkanSemaphore>& RenderingDoneSemaphore);
+		int32 Present(RHIQueue* Queue, class VulkanSemaphore* RenderingDoneSemaphore);
 
 		void Recreate();
 
@@ -36,7 +36,7 @@ namespace Vulkan
 
 		VkSurfaceCapabilitiesKHR SurfaceCapabilities;
 
-		WEngine::WArray<WEngine::WSharedPtr<VulkanSemaphore>> ImageAcquireSemaphore;
+		WEngine::WArray<VulkanSemaphore*> ImageAcquireSemaphore;
 
 		WEngine::WArray<WFenceRHIRef> ImageAcquireFence;
 

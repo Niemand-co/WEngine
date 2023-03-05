@@ -1,8 +1,8 @@
 #pragma once
 #include "HAL/Public/WRunnable.h"
-#include "HAL/Public/WEvent.h"
 #include "HAL/Public/PlatformProcess.h"
 #include "HAL/Public/Platform.h"
+#include "HAL/Public/WScopeLock.h"
 
 #define NUM_WORKING_THREAD 8
 #define ENQUEUE_RENDERER_COMMAND(LAMBDA) WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, LAMBDA), WEngine::EThreadProperty::RenderThread)
@@ -96,12 +96,13 @@ namespace WEngine
 	public:
 
 		WGraphEvent()
-			: m_event(PlatformProcess::CreateWEvent())
+			: m_event(new WEventWin())
 		{
 		}
 
 		~WGraphEvent()
 		{
+			delete m_event;
 		}
 
 		void Wait()
@@ -119,19 +120,19 @@ namespace WEngine
 			m_event->Trigger();
 		}
 
-		void* operator new(size_t size)
-		{
-			return NormalAllocator::Get()->Allocate(size);
-		}
+		//void* operator new(size_t size)
+		//{
+		//	return NormalAllocator::Get()->Allocate(size);
+		//}
 
-		void operator delete(void* pData)
-		{
-			NormalAllocator::Get()->Deallocate(pData);
-		}
+		//void operator delete(void* pData)
+		//{
+		//	NormalAllocator::Get()->Deallocate(pData);
+		//}
 
 	private:
 
-		WSharedPtr<WEvent> m_event;
+		WEvent *m_event;
 
 		WQueue<class WGraphTaskBase*> m_waitingTasks;
 
@@ -149,29 +150,35 @@ namespace WEngine
 			return new TTask(args...);
 		}
 
-		void* operator new(size_t size)
-		{
-			return NormalAllocator::Get()->Allocate(size);
-		}
+		//void* operator new(size_t size)
+		//{
+		//	return NormalAllocator::Get()->Allocate(size);
+		//}
 
-		void operator delete(void* pData)
-		{
-			NormalAllocator::Get()->Deallocate(pData);
-		}
+		//void operator delete(void* pData)
+		//{
+		//	NormalAllocator::Get()->Deallocate(pData);
+		//}
 
 		WGraphTaskBase(bool bInShouldDestroy)
-			: m_pTaskEvent(new WGraphEvent()), m_bShouldDestroyAfterExecution(bInShouldDestroy)
+			: m_bShouldDestroyAfterExecution(bInShouldDestroy)
 		{
-
+			WScopeLock lock(&Section);
+			m_pTaskEvent = new WGraphEvent();
 		}
 
-		~WGraphTaskBase() = default;
+		~WGraphTaskBase()
+		{
+			delete m_pTaskEvent;
+		}
 
 	protected:
 
-		WSharedPtr<WGraphEvent> m_pTaskEvent;
+		WGraphEvent* m_pTaskEvent;
 
 		uint8 m_bShouldDestroyAfterExecution : 1;
+
+		WCriticalSection Section;
 
 	};
 
@@ -250,7 +257,7 @@ namespace WEngine
 		{
 			WQueue<WGraphTaskBase*> TaskQueue;
 
-			class WEvent *StallingEvent = nullptr;
+			WEvent *StallingEvent = nullptr;
 
 			uint8_t bQuitForReturn : 1 = false;
 

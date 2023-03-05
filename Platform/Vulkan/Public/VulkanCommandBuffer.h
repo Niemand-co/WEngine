@@ -18,9 +18,9 @@ namespace Vulkan
 
 		virtual void ExecuteCommandBuffer(RHICommandBuffer* pCommandBuffer) override;
 
-		void AddWaitingSemaphore(uint32 WaitingStageMask, WEngine::WSharedPtr<class VulkanSemaphore>& pSemaphore);
+		void AddWaitingSemaphore(uint32 WaitingStageMask, class VulkanSemaphore* pSemaphore);
 
-		const WEngine::WArray<WEngine::WSharedPtr<VulkanSemaphore>>& GetWaitingSemaphores() { return WaitingSemaphores; }
+		const WEngine::WArray<class VulkanSemaphore*>& GetWaitingSemaphores() { return WaitingSemaphores; }
 
 		const WEngine::WArray<uint32> GetWaitingStageMasks() { return WaitingStageMasks; }
 
@@ -98,11 +98,11 @@ namespace Vulkan
 
 		uint8 m_isSecondary : 1;
 
-		WEngine::WArray<WEngine::WSharedPtr<VulkanSemaphore>> WaitingSemaphores;
+		WEngine::WArray<class VulkanSemaphore*> WaitingSemaphores;
 
 		WEngine::WArray<uint32> WaitingStageMasks;
 
-		WEngine::WArray<WEngine::WSharedPtr<VulkanSemaphore>> SubmittedWaitingSemaphores;
+		WEngine::WArray<class VulkanSemaphore*> SubmittedWaitingSemaphores;
 
 		VulkanFence *pFence;
 
@@ -133,7 +133,7 @@ namespace Vulkan
 
 		void SubmitImmediateCommandBuffer(uint32 NumSignalSemaphore = 0u, VulkanSemaphore* pSemaphores = nullptr);
 
-		void SubmitActiveCommandBufferFromPresent(WEngine::WSharedPtr<VulkanSemaphore>& SignaleSemaphore);
+		void SubmitActiveCommandBufferFromPresent(VulkanSemaphore* SignaleSemaphore);
 
 		void WaitForCommandBuffer(VulkanCommandBuffer *CmdBuffer, double Time = 10.0);
 
@@ -153,13 +153,13 @@ namespace Vulkan
 
 		VulkanCommandBuffer *ImmediateCmdBuffer;
 
-		WEngine::WArray<WEngine::WSharedPtr<class VulkanSemaphore>> RenderingDoneSemaphores;
+		WEngine::WArray<class VulkanSemaphore*> RenderingDoneSemaphores;
 
-		WEngine::WSharedPtr<class VulkanSemaphore> pActiveSemaphore;
+		class VulkanSemaphore* pActiveSemaphore;
 
-		WEngine::WArray<WEngine::WSharedPtr<class VulkanSemaphore>> ImmediateDoneSemaphores;
+		WEngine::WArray<class VulkanSemaphore*> ImmediateDoneSemaphores;
 
-		WEngine::WSharedPtr<class VulkanSemaphore> pImmediateSemaphore;
+		class VulkanSemaphore* pImmediateSemaphore;
 
 	};
 

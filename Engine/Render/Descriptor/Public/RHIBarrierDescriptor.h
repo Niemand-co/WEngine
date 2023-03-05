@@ -122,7 +122,7 @@ public:
 
 	const WEngine::WArray<RHIBarrierDescriptor>& GetBarrierBatches() const { return Batches; }
 
-private:
+protected:
 
 	WEngine::WArray<RHIBarrierDescriptor> Batches;
 

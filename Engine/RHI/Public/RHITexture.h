@@ -31,6 +31,20 @@ public:
 
 	ETextureCreateFlags GetFlags() const { return Flags; }
 
+	bool IsStencilFormat() const
+	{
+		return PixelFormat == Format::D16_UNORM_S8_UINT || PixelFormat == Format::D24_UNORM_S8_UINT || PixelFormat == Format::D32_SFLOAT_S8_UINT;
+	}
+
+	bool IsDepthFormat() const
+	{
+		return PixelFormat == Format::D16_Unorm ||
+			   PixelFormat == Format::D16_UNORM_S8_UINT ||
+			   PixelFormat == Format::D24_UNORM_S8_UINT ||
+			   PixelFormat == Format::D32_SFloat ||
+			   PixelFormat == Format::D32_SFLOAT_S8_UINT;
+	}
+
 	virtual void* GetTextureRHIBase() { return nullptr; }
 
 protected:
@@ -68,7 +82,7 @@ public:
 
 	virtual uint32 GetHeight() const override { return Height; }
 
-	virtual uint32 GetDepth() const override { return 0; }
+	virtual uint32 GetDepth() const override { return 1; }
 
 	virtual uint32 GetLayerCount() const override { return 1; }
 

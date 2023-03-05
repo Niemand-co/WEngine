@@ -4,7 +4,7 @@
 GameScene::GameScene(const WEngine::WString& name)
 	: Layer(name)
 {
-	Viewport = new WSceneViewport(1920, 1080, Format::A16R16G16B16_SFloat);
+	Viewport = new WSceneViewport(1920, 1080, Format::B8G8R8A8_UNorm);
 	Camera->SetRenderer<DeferredRenderer>(Scene.Get(), Viewport.Get());
 }
 
@@ -54,23 +54,11 @@ void GameScene::Tick(WEngine::TimeStep timeStep)
 		Scene->UpdateLightInfosForScene();
 
 		Scene->UpdatePrimitiveInfosForScene();
-	}
-	), WEngine::EThreadProperty::RenderThread);
 
-	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [this]()
-	{
 		Scene->StartFrame(Viewport.Get());
-	}
-	), WEngine::EThreadProperty::RenderThread);
 
-	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [this]()
-	{
 		this->StartRendering();
-	}
-	), WEngine::EThreadProperty::RenderThread);
 
-	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [this]()
-	{
 		Scene->EndFrame(Viewport.Get());
 		
 	}), WEngine::EThreadProperty::RenderThread);

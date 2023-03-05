@@ -94,6 +94,18 @@ namespace WEngine
 	}
 
 	template<typename T>
+	constexpr T&& Forward(T& _Val)
+	{
+		return static_cast<T&&>(_Val);
+	}
+
+	template<typename T>
+	constexpr remove_reference<T>::type& Forward(typename remove_reference<T>::type& _Val)
+	{
+		return static_cast<remove_reference<T>::type&>(_Val);
+	}
+
+	template<typename T>
 	constexpr remove_reference<T>::type RemoveTemp(T&& _Val) noexcept
 	{
 		return static_cast<remove_reference<T>::type>(_Val);

@@ -1,9 +1,12 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanSwapchain.h"
 #include "Platform/Vulkan/Public/VulkanInstance.h"
-#include "Platform/Vulkan/Public/VulkanDevice.h"
-#include "Platform/Vulkan/Public/VulkanQueue.h"
 #include "Platform/Vulkan/Public/VulkanGPU.h"
+#include "Platform/Vulkan/Public/VulkanDevice.h"
+#include "Platform/Vulkan/Public/VulkanContext.h"
+#include "Platform/Vulkan/Public/VulkanQueue.h"
+#include "Platform/Vulkan/Public/VulkanPipelineBarrier.h"
+#include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 #include "Platform/GLFWWindow/Public/GLFWWindow.h"
 #include "Render/Public/RenderTarget.h"
 
@@ -61,6 +64,8 @@ namespace Vulkan
 			pInfo->imageExtent.height = pInfo->imageExtent.height < SurfaceCapabilities.minImageExtent.height ? SurfaceCapabilities.minImageExtent.height : pInfo->imageExtent.height;
 			pInfo->imageExtent.width = pInfo->imageExtent.width > SurfaceCapabilities.maxImageExtent.width ? SurfaceCapabilities.maxImageExtent.width : pInfo->imageExtent.width;
 			pInfo->imageExtent.height = pInfo->imageExtent.height > SurfaceCapabilities.maxImageExtent.height ? SurfaceCapabilities.maxImageExtent.height : pInfo->imageExtent.height;
+
+			pInfo->imageUsage = SurfaceCapabilities.supportedUsageFlags;
 		}
 
 		/** Check the present mode support on this device */
@@ -114,6 +119,14 @@ namespace Vulkan
 		OutImages.Resize(NumSwapchainImageCount);
 		vkGetSwapchainImagesKHR(pDevice->GetHandle(), Swapchain, &NumSwapchainImageCount, OutImages.GetData());
 
+		VulkanPipelineBarrier Barrier;
+		VkImageSubresourceRange Range = VulkanPipelineBarrier::GetTextureSubresourceRange(IMAGE_ASPECT_COLOR, 0, 1, 0, 1);
+		for (uint32 ImageIndex = 0; ImageIndex < NumSwapchainImageCount; ++ImageIndex)
+		{
+			Barrier.AddTransition(OutImages[ImageIndex], Range, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+		}
+		Barrier.Execute(static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager()->GetImmediateCommandBuffer());
+
 		RecreateInfo = *pInfo;
 
 		ImageAcquireSemaphore.Reserve(pInfo->minImageCount);
@@ -137,12 +150,12 @@ namespace Vulkan
 		vkDestroySurfaceKHR(pInstance->GetHandle(), Surface, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
-	int32 VulkanSwapchain::AcquireImageIndex(WEngine::WSharedPtr<VulkanSemaphore>& OutSemaphore)
+	int32 VulkanSwapchain::AcquireImageIndex(VulkanSemaphore** OutSemaphore)
 	{
 		uint32 ImageIndex = 0;
 		const uint32 PreSemaphoreID = SemaphoreID;
 		SemaphoreID = (SemaphoreID + 1) % ImageAcquireSemaphore.Size();
-
+		
 #if VULKAN_USE_FENCE_ACQUIRE_IMAGE
 		ImageAcquireFence[SemaphoreID]->Reset();
 		VkFence Fence = static_cast<VulkanFence*>(ImageAcquireFence[SemaphoreID].Get())->GetHandle();
@@ -164,7 +177,7 @@ namespace Vulkan
 			return (int32)EState::SurfaceLost;
 		}
 
-		OutSemaphore = ImageAcquireSemaphore[SemaphoreID];
+		*OutSemaphore = ImageAcquireSemaphore[SemaphoreID];
 
 #if VULKAN_USE_FENCE_ACQUIRE_IMAGE
 		ImageAcquireFence[SemaphoreID]->Wait();
@@ -174,7 +187,7 @@ namespace Vulkan
 		return CurrentImageIndex;
 	}
 
-	int32 VulkanSwapchain::Present(RHIQueue* Queue, WEngine::WSharedPtr<VulkanSemaphore>& RenderingDoneSemaphore)
+	int32 VulkanSwapchain::Present(RHIQueue* Queue, VulkanSemaphore* RenderingDoneSemaphore)
 	{
 
 		VkPresentInfoKHR Info = {};
@@ -182,7 +195,7 @@ namespace Vulkan
 			Info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 			Info.swapchainCount = 1;
 			Info.pSwapchains = &Swapchain;
-			if (RenderingDoneSemaphore.Get())
+			if (RenderingDoneSemaphore)
 			{
 				VkSemaphore Semaphore = RenderingDoneSemaphore->GetHandle();
 				Info.waitSemaphoreCount = 1;
