@@ -40,10 +40,6 @@ public:
 
 	virtual void UpdateRHIResource() override;
 
-	static void GenerateVertexInputDescription();
-
-	static RHIVertexInputDescriptor GetVertexInputDescriptor();
-
 public:
 
 	struct VertexStream
@@ -58,10 +54,6 @@ private:
 	WEngine::WArray<VertexStream> m_streams;
 
 	WEngine::WArray<VertexComponent> m_vertices;
-
-	static VertexBindingDescription* m_bindingDescription;
-
-	static WEngine::WArray<VertexAttributeDescription*> m_attributeDescriptions;
 	
 };
 

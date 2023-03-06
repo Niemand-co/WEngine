@@ -7,7 +7,7 @@ class RHIVertexInputDescriptor
 {
 public:
 
-	RHIVertexInputDescriptor();
+	RHIVertexInputDescriptor() = default;
 
 	~RHIVertexInputDescriptor() = default;
 

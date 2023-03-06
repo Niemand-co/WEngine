@@ -26,7 +26,7 @@ public:
 
 	virtual WFramebufferRHIRef GetOrCreateFramebuffer(class RHIFramebufferDescriptor* descriptor, class RHIRenderPass* RenderPass) = 0;
 
-	virtual WPsoRHIRef CreatePipelineStateObject(class RHIPipelineStateObjectDescriptor *descriptor) = 0;
+	virtual WPsoRHIRef GetOrCreateGraphicsPipelineState(class RHIPipelineStateObjectDescriptor *descriptor) = 0;
 
 	virtual WTexture2DRHIRef CreateTexture2D(class RHITextureDescriptor* descriptor) = 0;
 

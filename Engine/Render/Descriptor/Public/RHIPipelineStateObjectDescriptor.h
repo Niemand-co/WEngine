@@ -5,13 +5,15 @@
 #include "Render/Descriptor/Public/RHIPipelineResourceLayoutDescriptor.h"
 #include "Render/Descriptor/Public/RHIRasterizationStateDescriptor.h"
 
-class RHIPipelineStateObjectDescriptor
+#define MaxGraphicsPipelineShaderNum 3
+
+class RHIGraphicsPipelineStateDescriptor
 {
 public:
 
-	RHIPipelineStateObjectDescriptor() = default;
+	RHIGraphicsPipelineStateDescriptor() = default;
 
-	~RHIPipelineStateObjectDescriptor() = default;
+	~RHIGraphicsPipelineStateDescriptor() = default;
 
 public:
 
@@ -21,12 +23,24 @@ public:
 
 	RHIDepthStencilDescriptor DepthStencilState;
 
-	class WShader* pShader = nullptr;
+	class WShader* Shaders[MaxGraphicsPipelineShaderNum] = {};
 
-	unsigned int shaderCount = 0;
-
-	RHIPipelineResourceLayoutDescriptor DescriptorSetLayout;
+	RHIPipelineResourceLayoutDescriptor DescriptorSetLayoutInfo;
 
 	RHIRasterizationStateDescriptor RasterizationState;
+
+};
+
+class RHIComputePipelineStateDescriptor
+{
+public:
+
+	RHIComputePipelineStateDescriptor() = default;
+
+	~RHIComputePipelineStateDescriptor() = default;
+
+public:
+
+	
 
 };

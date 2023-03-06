@@ -6,11 +6,7 @@ public:
 
 	virtual ~RHIShader() = default;
 
-	virtual const char* GetEntry();
-
 protected:
-
-	WEngine::WString m_entryName;
 
 };
 

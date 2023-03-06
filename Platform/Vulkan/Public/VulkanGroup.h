@@ -5,14 +5,16 @@ class VulkanGroup : public RHIGroup
 {
 public:
 
-	VulkanGroup(VkDescriptorSet *pDescriptorSet);
+	VulkanGroup(class VulkanDevice *pInDevice);
 
 	virtual ~VulkanGroup();
 
-	VkDescriptorSet* GetHandle();
+	VkDescriptorSet GetHandle() const { return DescriptorSet; }
 
 private:
 
-	VkDescriptorSet *m_pDescriptorSet;	
+	VulkanDevice *pDevice;
+
+	VkDescriptorSet DescriptorSet;	
 
 };

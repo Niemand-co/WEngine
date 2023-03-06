@@ -29,7 +29,6 @@ class RHIGroupLayoutDescriptor;
 class RHIGroupDescriptor;
 class RHIUpdateResourceDescriptor;
 class RHIPipelineResourceLayoutDescriptor;
-class RHIPipelineStateObjectDescriptor;
 class RHISubmitDescriptor;
 class RHIBarrierDescriptor;
 
@@ -83,7 +82,7 @@ public:
 
 	virtual RHIPipelineResourceLayout* CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor *descriptor);
 
-	virtual RHIPipelineStateObject* CreatePSO(RHIPipelineStateObjectDescriptor *descriptor);
+	virtual RHIPipelineStateObject* CreatePSO(class RHIGraphicsPipelineStateDescriptor *descriptor);
 
 	virtual WViewportRHIRef CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, Format InFormat);
 

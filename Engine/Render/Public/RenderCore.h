@@ -251,3 +251,10 @@ enum class PrimitiveTopology
 	LineStrip,
 	PointList,
 };
+
+enum class ShaderStage : uint8
+{
+	Vertex = 0,
+	Geometry = 1,
+	Pixel = 2,
+};

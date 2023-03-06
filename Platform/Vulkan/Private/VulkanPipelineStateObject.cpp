@@ -1,21 +1,23 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanPipelineStateObject.h"
+#include "Platform/Vulkan/Public/VulkanDevice.h"
 
 namespace Vulkan
 {
 
-	VulkanPipelineStateObject::VulkanPipelineStateObject(VkPipeline* pipeline)
-		: m_pipeline(pipeline)
+	WEngine::WHashMap<uint32, VulkanGraphicsPipelineStateObject*> VulkanPipelineStateManager::GraphicsPipelines = WEngine::WHashMap<uint32, VulkanGraphicsPipelineStateObject*>();
+
+	WEngine::WHashMap<uint32, VulkanComputePipelineStateObject*> VulkanPipelineStateManager::ComputePipelines = WEngine::WHashMap<uint32, VulkanComputePipelineStateObject*>();
+
+	VulkanGraphicsPipelineStateObject::VulkanGraphicsPipelineStateObject(VulkanDevice *pInDevice, VkGraphicsPipelineCreateInfo *pInfo)
+		: pDevice(pInDevice)
 	{
+		vkCreateGraphicsPipelines(pDevice->GetHandle(), VK_NULL_HANDLE, 1, pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Pipeline);
 	}
 
-	VulkanPipelineStateObject::~VulkanPipelineStateObject()
+	VulkanGraphicsPipelineStateObject::~VulkanGraphicsPipelineStateObject()
 	{
-	}
-
-	VkPipeline* VulkanPipelineStateObject::GetHandle()
-	{
-		return m_pipeline;
+		vkDestroyPipeline(pDevice->GetHandle(), Pipeline, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
 }

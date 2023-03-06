@@ -1,18 +1,27 @@
 #pragma once
 #include "RHI/Public/RHIGroupLayout.h"
 
-class VulkanGroupLayout : public RHIGroupLayout
+namespace Vulkan
 {
-public:
 
-	VulkanGroupLayout(VkDescriptorSetLayout *pDescriptorSetLayout, unsigned int bindingCount);
+	class VulkanGroupLayout : public RHIGroupLayout
+	{
+	public:
 
-	virtual ~VulkanGroupLayout();
+		VulkanGroupLayout(class VulkanDevice* pInDevice);
 
-	VkDescriptorSetLayout* GetHandle();
+		virtual ~VulkanGroupLayout();
 
-private:
+		VkDescriptorSetLayout GetHandle() const { return DescriptorSetLayout; }
 
-	VkDescriptorSetLayout *m_pDescriptorSetLayout;
+	private:
 
-};
+		VulkanDevice *pDevice;
+
+		VkDescriptorSetLayout DescriptorSetLayout;
+
+		WEngine::WArray<VkDescriptorSetLayoutBinding> Bindings;
+
+	};
+
+}

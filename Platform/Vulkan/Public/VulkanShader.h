@@ -8,15 +8,17 @@ namespace Vulkan
 	{
 	public:
 	
-		VulkanShaderBase(VkShaderModule *shaderModule);
+		VulkanShaderBase(class VulkanDevice *pInDevice, VkShaderModuleCreateInfo* pInfo);
 
 		virtual ~VulkanShaderBase();
 
-		VkShaderModule* GetShaderModule() const { return m_shaderModule; }
+		VkShaderModule GetShaderModule() const { return ShaderModule; }
 
 	private:
 
-		VkShaderModule *m_shaderModule;
+		VulkanDevice *pDevice;
+
+		VkShaderModule ShaderModule;
 
 	};
 
@@ -24,7 +26,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanVertexShader(VkShaderModule* shaderModule);
+		VulkanVertexShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo* pInfo);
 
 		virtual ~VulkanVertexShader();
 
@@ -34,7 +36,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanGeometryShader(VkShaderModule* shaderModule);
+		VulkanGeometryShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo* pInfo);
 
 		virtual ~VulkanGeometryShader();
 
@@ -44,7 +46,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanPixelShader(VkShaderModule* shaderModule);
+		VulkanPixelShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo* pInfo);
 
 		virtual ~VulkanPixelShader();
 
@@ -54,7 +56,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanComputeShader(VkShaderModule* shaderModule);
+		VulkanComputeShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo* pInfo);
 
 		virtual ~VulkanComputeShader();
 

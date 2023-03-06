@@ -18,8 +18,6 @@ protected:
 
 	ShaderCodeBlob Blob;
 
-	
-
 };
 
 class WVertexShader : public WShader
@@ -36,6 +34,8 @@ public:
 	void ReleaseRHIResource() override;
 
 	void UpdateRHIResource() override;
+
+	WVertexShaderRHIRef GetRHI() const { return Shader; }
 
 private:
 
@@ -58,6 +58,8 @@ public:
 
 	void UpdateRHIResource() override;
 
+	WPixelShaderRHIRef GetRHI() const { return Shader; }
+
 private:
 
 	WPixelShaderRHIRef Shader;
@@ -79,6 +81,8 @@ public:
 
 	void UpdateRHIResource() override;
 
+	WGeometryShaderRHIRef GetRHI() const { return Shader; }
+
 private:
 
 	WGeometryShaderRHIRef Shader;
@@ -99,6 +103,8 @@ public:
 	void ReleaseRHIResource() override;
 
 	void UpdateRHIResource() override;
+
+	WComputeShaderRHIRef GetRHI() const { return Shader; }
 
 private:
 
