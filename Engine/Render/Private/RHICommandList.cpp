@@ -35,6 +35,11 @@ void RHIRenderCommandList::BeginTransition(WEngine::WArray<RHIBarrierDescriptor>
     RHIContext::GetContext()->RHIBeginTransition(Transitions);
 }
 
+void RHIRenderCommandList::SetGraphicsPipelineState(RHIGraphicsPipelineStateDescriptor* GraphicsPipelineState)
+{
+    RHIContext::GetContext()->RHISetGraphicsPipelineState(GraphicsPipelineState);
+}
+
 void RHIRenderCommandList::DrawIndexedPrimitive(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount)
 {
 }

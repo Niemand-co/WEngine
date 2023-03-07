@@ -4,9 +4,9 @@ class WMeshBatchElement
 {
 public:
 
-	WMeshBatchElement();
+	WMeshBatchElement() = default;
 
-	~WMeshBatchElement();
+	~WMeshBatchElement() = default;
 
 private:
 
@@ -20,9 +20,9 @@ class WMeshBatch
 {
 public:
 
-	WMeshBatch();
+	WMeshBatch() = default;
 
-	~WMeshBatch();
+	~WMeshBatch() = default;
 
 private:
 

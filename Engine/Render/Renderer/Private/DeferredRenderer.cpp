@@ -11,6 +11,7 @@
 #include "Render/Public/RenderDependencyGraphResource.h"
 #include "Render/Public/RenderDependencyGraphParameter.h"
 #include "Render/Public/Viewport.h"
+#include "Render/Descriptor/Public/RHIPipelineStateObjectDescriptor.h"
 #include "RHI/Public/RHIViewport.h"
 
 DeferredRenderer::DeferredRenderer(CameraComponent* pCamera, WViewport *Viewport)
@@ -55,6 +56,8 @@ void DeferredRenderer::InitView()
 		WEngine::CascadedShadowMap::UpdateSplices(CSMMaps, m_pCamera->m_nearPlane, m_pCamera->m_farPlane);
 		WEngine::CascadedShadowMap::UpdatePSSMMatrices(CSMMaps, glm::inverse(m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix()), static_cast<DirectionalLightInfo*>(MainLight)->LightDirection);
 	}
+
+	const WEngine::WArray<PrimitiveInfo*>& ShadowCasters = Scene->GetDynamicShadowCaster();
 }
 
 void DeferredRenderer::RenderPrePass()
@@ -153,6 +156,14 @@ void DeferredRenderer::SetupBasePass(WViewport* Viewport)
 
 	GraphBuilder->AddPass("BasePass", Parameters, [](RHIRenderCommandList& CmdList)
 		{
+			RHIGraphicsPipelineStateDescriptor PSODescriptor = {};
+			{
+				PSODescriptor.Shaders[(uint8)ShaderStage::Vertex] = WShaderLibrary::GetShader("OpaqueVert");
+				PSODescriptor.Shaders[(uint8)ShaderStage::Pixel] = WShaderLibrary::GetShader("OpaqueFrag");
+
+				
+			}
+			CmdList.SetGraphicsPipelineState(&PSODescriptor);
 			CmdList.DrawIndexedPrimitive(3, 0, 1);
 		});
 }

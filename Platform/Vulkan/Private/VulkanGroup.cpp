@@ -1,12 +1,18 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanGroup.h"
+#include "Platform/Vulkan/Public/VulkanDevice.h"
 
-VulkanGroup::VulkanGroup(VulkanDevice* pInDevice)
-	: pDevice(pInDevice)
+namespace Vulkan
 {
+
+	VulkanGroup::VulkanGroup(VulkanDevice* pInDevice)
+		: pDevice(pInDevice)
+	{
 	
-}
+	}
 
-VulkanGroup::~VulkanGroup()
-{
+	VulkanGroup::~VulkanGroup()
+	{
+	}
+
 }

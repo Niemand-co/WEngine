@@ -10,18 +10,18 @@ public:
 
 public:
 
-	bool blendEnabled;
+	bool blendEnabled = true;
 
-	BlendFactor colorSrcFactor;
+	BlendFactor colorSrcFactor = BlendFactor::FactorSrcAlpha;
 
-	BlendFactor colorDstFactor;
+	BlendFactor colorDstFactor = BlendFactor::FactorOneMinusSrcAlpha;
 
-	BlendOP colorBlendOP;
+	BlendOP colorBlendOP = BlendOP::BlendAdd;
 
-	BlendFactor alphaSrcFactor;
+	BlendFactor alphaSrcFactor = BlendFactor::FactorZero;
 
-	BlendFactor alphaDstFactor;
+	BlendFactor alphaDstFactor = BlendFactor::FactorOne;
 
-	BlendOP alphaBlendOP;
+	BlendOP alphaBlendOP = BlendOP::BlendAdd;
 
 };

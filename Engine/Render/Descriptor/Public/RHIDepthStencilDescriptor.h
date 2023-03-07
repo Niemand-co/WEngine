@@ -10,28 +10,28 @@ public:
 
 public:
 
-	bool stencilTestEnabled;
+	bool stencilTestEnabled = false;
 
-	CompareOP stencilCompareOP;
+	CompareOP stencilCompareOP = CompareOP::NotEqual;
 
-	StencilFailedOP stencilFailedOP;
+	StencilFailedOP stencilFailedOP = StencilFailedOP::Keep;
 
-	StencilFailedOP depthFailedOP;
+	StencilFailedOP depthFailedOP = StencilFailedOP::Keep;
 
-	StencilFailedOP passOP;
+	StencilFailedOP passOP = StencilFailedOP::Replace;
 
-	unsigned int stencilRef;
+	uint32 stencilRef = 1;
 
-	bool depthTestEnabled;
+	bool depthTestEnabled = true;
 
-	bool depthWriteEnabled;
+	bool depthWriteEnabled = true;
 
-	bool depthBoundsTest;
+	bool depthBoundsTest = false;
 
-	float maxDepth;
+	float maxDepth = 0.0f;
 
-	float minDepth;
+	float minDepth = 1.0f;
 
-	CompareOP depthCompareOP;
+	CompareOP depthCompareOP = CompareOP::Greater;
 
 };

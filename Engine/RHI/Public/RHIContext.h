@@ -98,6 +98,8 @@ public:
 
 	virtual void CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY) = 0;
 
+	virtual void RHISetGraphicsPipelineState(class RHIGraphicsPipelineStateDescriptor *descriptor) = 0;
+
 public:
 
 	static inline RHIContext* GetContext() { return g_pContext; }

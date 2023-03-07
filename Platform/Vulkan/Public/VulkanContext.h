@@ -26,6 +26,8 @@ namespace Vulkan
 
 		virtual void CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY) override;
 
+		virtual void RHISetGraphicsPipelineState(class RHIGraphicsPipelineStateDescriptor* descriptor) override;
+
 	private:
 
 		VulkanCommandBufferManager *pCommandBufferManager;

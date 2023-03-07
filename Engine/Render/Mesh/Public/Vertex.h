@@ -44,7 +44,7 @@ public:
 
 	struct VertexStream
 	{
-		const WEngine::WSharedPtr<class WVertexBuffer> m_pVertexBuffer = nullptr;
+		const WEngine::WSharedPtr<class WVertexBuffer> pVertexBuffer = nullptr;
 		uint32 Offset = 0;
 		uint16 Stride = 0;
 	};

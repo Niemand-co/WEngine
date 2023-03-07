@@ -36,13 +36,13 @@ public:
 
 	void EndFrame(class WViewport *viewport);
 
-	WEngine::WArray<PrimitiveInfo*> GetOpaqueAndMaskPrimitives() const { return m_opaqueAndMaskPrimitives; }
+	const WEngine::WArray<PrimitiveInfo*>& GetOpaqueAndMaskPrimitives() const { return m_opaqueAndMaskPrimitives; }
 
-	WEngine::WArray<PrimitiveInfo*> GetTranslucentPrimitives() const { return m_translucentPrimitives; }
+	const WEngine::WArray<PrimitiveInfo*>& GetTranslucentPrimitives() const { return m_translucentPrimitives; }
 
-	WEngine::WArray<PrimitiveInfo*> GetDynamicShadowCaster() const { return m_dynamicShadowCaster; }
+	const WEngine::WArray<PrimitiveInfo*>& GetDynamicShadowCaster() const { return m_dynamicShadowCaster; }
 
-	WEngine::WArray<LightInfo*> GetLightInfos() const { return m_lights; }
+	const WEngine::WArray<LightInfo*>& GetLightInfos() const { return m_lights; }
 
 	LightInfo* GetMainLightInfo() const { return m_pMainLight; }
 

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanPipelineStateObject.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
+#include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 
 namespace Vulkan
 {
@@ -18,6 +19,11 @@ namespace Vulkan
 	VulkanGraphicsPipelineStateObject::~VulkanGraphicsPipelineStateObject()
 	{
 		vkDestroyPipeline(pDevice->GetHandle(), Pipeline, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+	}
+
+	void VulkanGraphicsPipelineStateObject::Bind(RHICommandBuffer* CmdBuffer)
+	{
+		vkCmdBindPipeline(static_cast<VulkanCommandBuffer*>(CmdBuffer)->GetHandle(), VK_PIPELINE_BIND_POINT_GRAPHICS, Pipeline);
 	}
 
 }

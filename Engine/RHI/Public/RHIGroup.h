@@ -1,6 +1,6 @@
 #pragma once
 
-class RHIGroup
+class RHIGroup : public RHIResource
 {
 public:
 

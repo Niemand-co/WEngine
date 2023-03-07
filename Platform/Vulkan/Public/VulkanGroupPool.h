@@ -1,20 +1,25 @@
 #pragma once
 #include "RHI/Public/RHIGroupPool.h"
 
-class VulkanGroupPool : public RHIGroupPool
+namespace Vulkan
 {
-public:
 
-	VulkanGroupPool(VkDescriptorPool *pDescriptorPool, RHIGroupLayout *pGroupLayout, VkDevice *pDevice);
+	class VulkanGroupPool : public RHIGroupPool
+	{
+	public:
 
-	virtual ~VulkanGroupPool();
+		VulkanGroupPool(class VulkanDevice *pInDevice, VkDescriptorPoolCreateInfo* pInfo);
 
-	virtual WEngine::WArray<RHIGroup*> GetGroup(unsigned int count = 1) override;
+		virtual ~VulkanGroupPool();
 
-private:
+		virtual WEngine::WArray<RHIGroup*> GetGroup(unsigned int count = 1) override;
 
-	VkDescriptorPool *m_pDescriptorSetPool;
+	private:
 
-	VkDevice *m_pDevice;
+		VulkanDevice *pDevice;
 
-};
+		VkDescriptorPool DescriptorSetPool;
+
+	};
+
+}

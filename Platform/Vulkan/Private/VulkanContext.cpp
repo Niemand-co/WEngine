@@ -169,4 +169,10 @@ namespace Vulkan
 		}
 	}
 
+	void VulkanContext::RHISetGraphicsPipelineState(RHIGraphicsPipelineStateDescriptor* descriptor)
+	{
+		WPsoRHIRef Pipeline = pDevice->GetOrCreateGraphicsPipelineState(descriptor);
+		Pipeline->Bind(pCommandBufferManager->GetActiveCommandBuffer());
+	}
+
 }

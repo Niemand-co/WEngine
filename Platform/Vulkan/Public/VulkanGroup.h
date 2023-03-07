@@ -1,20 +1,25 @@
 #pragma once
 #include "RHI/Public/RHIGroup.h"
 
-class VulkanGroup : public RHIGroup
+namespace Vulkan
 {
-public:
 
-	VulkanGroup(class VulkanDevice *pInDevice);
+	class VulkanGroup : public RHIGroup
+	{
+	public:
 
-	virtual ~VulkanGroup();
+		VulkanGroup(class VulkanDevice *pInDevice);
 
-	VkDescriptorSet GetHandle() const { return DescriptorSet; }
+		virtual ~VulkanGroup();
 
-private:
+		VkDescriptorSet GetHandle() const { return DescriptorSet; }
 
-	VulkanDevice *pDevice;
+	private:
 
-	VkDescriptorSet DescriptorSet;	
+		VulkanDevice *pDevice;
 
-};
+		VkDescriptorSet DescriptorSet;	
+
+	};
+
+}

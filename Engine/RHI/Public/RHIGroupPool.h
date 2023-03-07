@@ -3,7 +3,7 @@
 class RHIGroup;
 class RHIGroupLayout;
 
-class RHIGroupPool
+class RHIGroupPool : public RHIResource
 {
 public:
 

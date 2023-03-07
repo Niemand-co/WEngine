@@ -12,6 +12,8 @@ namespace Vulkan
 
 		virtual ~VulkanGraphicsPipelineStateObject();
 
+		virtual void Bind(class RHICommandBuffer *CmdBuffer) override;
+
 		VkPipeline GetHandle() const { return Pipeline; }
 
 	private:

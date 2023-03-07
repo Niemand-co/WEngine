@@ -738,29 +738,22 @@ namespace Vulkan
 
 	RHIGroupPool* VulkanDevice::CreateGroupPool(RHIGroupPoolDescriptor* descriptor)
 	{
-		VkDescriptorPoolSize *pDescriptorPoolSizes = (VkDescriptorPoolSize*)NormalAllocator::Get()->Allocate(descriptor->pGroupLayout->bindingCount * sizeof(VkDescriptorPoolSize));
+		WEngine::WArray<VkDescriptorPoolSize> DescriptorPoolSizes(descriptor->pGroupLayout->bindingCount);
 		for (unsigned int i = 0; i < descriptor->pGroupLayout->bindingCount; ++i)
 		{
-			::new (pDescriptorPoolSizes + i) VkDescriptorPoolSize();
-			pDescriptorPoolSizes[i].descriptorCount = descriptor->pGroupLayout->pBindingResources[i].count;
-			pDescriptorPoolSizes[i].type = WEngine::ToVulkan(descriptor->pGroupLayout->pBindingResources[i].type);
+			DescriptorPoolSizes[i].descriptorCount = descriptor->pGroupLayout->pBindingResources[i].count;
+			DescriptorPoolSizes[i].type = WEngine::ToVulkan(descriptor->pGroupLayout->pBindingResources[i].type);
 		}
 
-		VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
+		VkDescriptorPoolCreateInfo DescriptorPoolCreateInfo = {};
 		{
-			descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-			descriptorPoolCreateInfo.maxSets = descriptor->maxSetCount;
-			descriptorPoolCreateInfo.poolSizeCount = descriptor->pGroupLayout->bindingCount;
-			descriptorPoolCreateInfo.pPoolSizes = pDescriptorPoolSizes;
+			DescriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+			DescriptorPoolCreateInfo.maxSets = descriptor->maxSetCount;
+			DescriptorPoolCreateInfo.poolSizeCount = DescriptorPoolSizes.Size();
+			DescriptorPoolCreateInfo.pPoolSizes = DescriptorPoolSizes.GetData();
 		}
 
-		VkDescriptorPool *pDescriptorPool = (VkDescriptorPool*)NormalAllocator::Get()->Allocate(sizeof(VkDescriptorPool));
-		RE_ASSERT(vkCreateDescriptorPool(pDevice, &descriptorPoolCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pDescriptorPool) == VK_SUCCESS, "Failed to Create Descriptor Pool.");
-
-		RHIGroupPool *groupPool = (RHIGroupPool*)NormalAllocator::Get()->Allocate(sizeof(VulkanGroupPool));
-		::new (groupPool) VulkanGroupPool(pDescriptorPool, descriptor->pGroupLayout, &pDevice);
-
-		return groupPool;
+		return new VulkanGroupPool(this, &DescriptorPoolCreateInfo);
 	}
 
 	RHIScissor* VulkanDevice::CreateScissor(RHIScissorDescriptor* descriptor)
