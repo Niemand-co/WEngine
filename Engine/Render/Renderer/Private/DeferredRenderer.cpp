@@ -57,7 +57,7 @@ void DeferredRenderer::InitView()
 		WEngine::CascadedShadowMap::UpdatePSSMMatrices(CSMMaps, glm::inverse(m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix()), static_cast<DirectionalLightInfo*>(MainLight)->LightDirection);
 	}
 
-	const WEngine::WArray<PrimitiveInfo*>& ShadowCasters = Scene->GetDynamicShadowCaster();
+	
 }
 
 void DeferredRenderer::RenderPrePass()
@@ -96,9 +96,17 @@ void DeferredRenderer::ComputeVisibility()
 	const WEngine::WArray<PrimitiveInfo*>& OpaqueAndMaskPrimitives = Scene->GetOpaqueAndMaskPrimitives();
 	const WEngine::WArray<PrimitiveInfo*>& TranslucentPrimitives = Scene->GetTranslucentPrimitives();
 
+	FrustumCulling(OpaqueAndMaskPrimitives);
+	FrustumCulling(TranslucentPrimitives);
+
+
+}
+
+void DeferredRenderer::FrustumCulling(const WEngine::WArray<PrimitiveInfo*>& Primitives)
+{
 	WEngine::WArray<glm::vec3> Frustum(8);
 	{
-		TransformComponent *Transformer = m_pCamera->GetOwner()->GetComponent<TransformComponent>();
+		TransformComponent* Transformer = m_pCamera->GetOwner()->GetComponent<TransformComponent>();
 		glm::vec3 Forward = m_pCamera->GetForward();
 		glm::vec3 NearCenter = Transformer->GetPosition() + Forward * m_pCamera->m_nearPlane;
 		glm::vec3 FarCenter = Transformer->GetPosition() + Forward * m_pCamera->m_farPlane;
@@ -124,22 +132,25 @@ void DeferredRenderer::ComputeVisibility()
 		Frustum[6] = FarCenter + FarUp + FarRight;
 		Frustum[7] = FarCenter + FarUp - FarRight;
 	}
-	
-	WEngine::WTaskGraph::Get()->ParallelFor(OpaqueAndMaskPrimitives.Size(), [this, &OpaqueAndMaskPrimitives, &Frustum](uint32 index)
-	{
-		PrimitiveInfo *info = OpaqueAndMaskPrimitives[index];
-		const BoundingBox& box = info->Proxy->GetBoundingBox();
 
-		if ((bUseBoxTest ? IsBoxInFrustum(Frustum, box.BoxMin, box.BoxMax) : true) && (bUseSphereTest ? IsSphereInFrustum(Frustum, glm::vec3(), 0.0f) : true))
+	WEngine::WTaskGraph::Get()->ParallelFor(Primitives.Size(), [this, &Primitives, &Frustum](uint32 index)
 		{
-			Views[index].Visibility = true;
-		}
-		else
-		{
-			Views[index].Visibility = false;
-		}
-	});
+			PrimitiveInfo* info = Primitives[index];
+			const BoundingBox& box = info->Proxy->GetBoundingBox();
 
+			if ((bUseBoxTest ? IsBoxInFrustum(Frustum, box.BoxMin, box.BoxMax) : true) && (bUseSphereTest ? IsSphereInFrustum(Frustum, glm::vec3(), 0.0f) : true))
+			{
+				Views[index].Visibility = true;
+			}
+			else
+			{
+				Views[index].Visibility = false;
+			}
+		});
+}
+
+void DeferredRenderer::OcclusionCulling(const WEngine::WArray<PrimitiveInfo*>& Primitives)
+{
 }
 
 void DeferredRenderer::SetupBasePass(WViewport* Viewport)

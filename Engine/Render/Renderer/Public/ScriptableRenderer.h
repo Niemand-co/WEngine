@@ -1,6 +1,6 @@
 #pragma once
 #include "Render/Public/Scene.h"
-#include "Render/Mesh/Public/MeshBatch.h"
+#include "Scene/Public/SceneManagement.h"
 
 class ScriptableRenderPass;
 
@@ -75,5 +75,7 @@ protected:
 	WEngine::WArray<SceneViewInfo> Views;
 
 	WEngine::WArray<WMeshBatch*> Batches;
+
+	WMeshCollector Collector;
 
 };

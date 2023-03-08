@@ -4,7 +4,7 @@
 class RHIRenderTarget;
 class RenderTexture;
 
-class WRenderTarget : public WTexture2D
+class WRenderTarget : public RenderResource
 {
 public:
 
@@ -18,7 +18,7 @@ public:
 
 	~WRenderTarget() = default;
 
-private:
+protected:
 
 	WTexture2DRHIRef Texture;
 

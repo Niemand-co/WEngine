@@ -2,12 +2,13 @@
 #include "Render/Public/RenderResource.h"
 #include "Render/Public/RenderTarget.h"
 
-class WViewport : public RenderResource
+class WViewport : public WRenderTarget
 {
 public:
 
 	WViewport(uint32 InWidth, uint32 InHeight, Format InFormat)
-		: Width(InWidth),
+		: WRenderTarget(InWidth, InHeight, InFormat),
+		  Width(InWidth),
 		  Height(InHeight),
 		  PixelFormat(InFormat)
 	{
