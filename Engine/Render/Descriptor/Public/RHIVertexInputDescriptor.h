@@ -11,12 +11,14 @@ public:
 
 	~RHIVertexInputDescriptor() = default;
 
+	void Generate(WEngine::WArray<class VertexInputElement>& Elements);
+
 public:
 
-	VertexBindingDescription *bindingDescription;
+	VertexBindingDescription BindingDescriptions[MaxVertexInputElementCount];
 
-	VertexAttributeDescription **pAttributeDescription;
+	VertexAttributeDescription AttributeDescriptions[MaxVertexInputElementCount];
 
-	unsigned int attributeDescriptionCount;
+	uint32 attributeDescriptionCount;
 
 };

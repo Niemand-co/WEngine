@@ -439,6 +439,18 @@ struct WResolveRect
 	}
 };
 
+enum
+{
+	MaxVertexInputElementCount = 17,
+	MaxVertexInputElementCount_NumBits = 5,
+};
+
+enum
+{
+	MaxSimultaneousRenderTargets = 8,
+	MaxSimultaneousRenderTargets_NumBits = 4,
+};
+
 enum class ETextureCreateFlags : uint32
 {
 	TextureCreate_None                    = 0,

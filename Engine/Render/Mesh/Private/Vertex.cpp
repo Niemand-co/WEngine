@@ -76,3 +76,24 @@ void WVertexFactory::UpdateRHIResource()
 {
 	//m_pVertexBuffer->UpdateRHIResource();
 }
+
+void WLocalVertexFactory::GetPSOVertexInputElements(EInputType Type, WEngine::WArray<VertexInputElement>& Elements)
+{
+	Elements.Push(VertexInputElement(0, 0, 12, VertexElementType::VET_Float3, false));
+
+	switch (Type)
+	{
+	case EInputType::Default:
+		Elements.Push(VertexInputElement(13, 0, 0, VertexElementType::VET_UInt, true));
+		break;
+	case EInputType::PositionOnly:
+		Elements.Push(VertexInputElement(1, 0, 0, VertexElementType::VET_UInt, true));
+		break;
+	case EInputType::PositionAndNormal:
+		Elements.Push(VertexInputElement(2, 4, 0, VertexElementType::VET_PackedNormal, false));
+		Elements.Push(VertexInputElement(1, 0, 0, VertexElementType::VET_UInt, true));
+		break;
+	default:
+		break;
+	}
+}

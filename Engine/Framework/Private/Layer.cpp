@@ -19,7 +19,7 @@ namespace WEngine
 
 	void Layer::StartRendering()
 	{
-		Camera->GetRenderer()->Render();
+		
 	}
 
 }

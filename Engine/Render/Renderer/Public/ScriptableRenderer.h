@@ -52,7 +52,7 @@ protected:
 
 struct SceneViewInfo
 {
-	uint8 Visibility : 1;
+	WEngine::WBitArray PrimitiveVisibilityMap;
 };
 
 class SceneRenderer : public ScriptableRenderer
@@ -65,6 +65,8 @@ public:
 	}
 
 	virtual ~SceneRenderer() = default;
+
+	void GatherDynamicMeshElements();
 
 	void SetScene(RScene *inScene) { Scene = inScene; }
 

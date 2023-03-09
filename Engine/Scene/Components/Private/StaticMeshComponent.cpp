@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Scene/Components/Public/StaticMeshComponent.h"
+#include "Render/Mesh/Public/MeshBatch.h"
+#include "Scene/Public/SceneManagement.h"
 
 StaticMeshComponent::StaticMeshComponent(GameObject* pGameObject, WStaticMesh* pMesh)
 	: PrimitiveComponent(pGameObject), m_pMesh(pMesh)
@@ -37,6 +39,16 @@ PrimitiveProxy* StaticMeshComponent::GetPrimitiveProxy()
 void StaticMeshProxy::DrawStaticMesh(RHICommandListBase* CmdList)
 {
 	
+}
+
+void StaticMeshProxy::GetDynamicMeshElements(WEngine::WArray<class SceneViewInfo>& Views, WMeshCollector& Collector)
+{
+	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
+	{
+		WMeshBatch& Mesh = Collector.AllocateMesh();
+		WMeshBatchElement& Element = Mesh.Elements[0];
+		
+	}
 }
 
 void StaticMeshProxy::GenerateBoundingBox()

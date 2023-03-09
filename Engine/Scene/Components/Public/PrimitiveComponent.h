@@ -57,6 +57,8 @@ struct PrimitiveProxy
 
 	virtual void DrawDynamicMesh(RHICommandListBase* CmdList) = 0;
 
+	virtual void GetDynamicMeshElements(WEngine::WArray<class SceneViewInfo>& Views, class WMeshCollector& Collector) {}
+
 	virtual void GenerateBoundingBox() = 0;
 
 	virtual const BoundingBox& GetBoundingBox() = 0;
@@ -99,32 +101,35 @@ struct PrimitiveInfo
 		
 	}
 
+	enum class PrimitiveMask : uint8
+	{
+		None        = 0,
+		Dynamic     = 0x01 << 0,
+		Translucent = 0x01 << 1,
+	};
+
 	PrimitiveProxy* GetProxy() const { return Proxy; }
 
 	static void AddToScene(RHICommandListBase *CmdList, RScene *scene, WEngine::WArray<PrimitiveInfo*>& primitives)
 	{
-		for (PrimitiveInfo* info : primitives)
+		for (uint32 PrimitiveIndex = 0; PrimitiveIndex < primitives.Size(); ++PrimitiveIndex)
 		{
-			if (info->bTranslucent)
+			if (primitives[PrimitiveIndex]->bTranslucent)
 			{
-				scene->m_translucentPrimitives.Push(info);
-			}
-			else
-			{
-				scene->m_opaqueAndMaskPrimitives.Push(info);
+				scene->m_primitiveMasks[PrimitiveIndex] |= (uint8)PrimitiveMask::Translucent;
 			}
 
-			if (info->bCastShadow)
+			if (primitives[PrimitiveIndex]->bCastShadow)
 			{
-				scene->m_dynamicShadowCaster.Push(info);
+				scene->m_primitiveMasks[PrimitiveIndex] |= (uint8)PrimitiveMask::Dynamic;
 			}
 
-			if (info->bStatic)
+			if (primitives[PrimitiveIndex]->bStatic)
 			{
-				info->Proxy->DrawStaticMesh(CmdList);
+				primitives[PrimitiveIndex]->Proxy->DrawStaticMesh(CmdList);
 			}
 
-			info->Proxy->GenerateBoundingBox();
+			primitives[PrimitiveIndex]->Proxy->GenerateBoundingBox();
 		}
 	}
 
@@ -150,3 +155,4 @@ struct PrimitiveInfo
 
 };
 
+ENUM_CLASS_FLAGS(PrimitiveInfo::PrimitiveMask);

@@ -93,16 +93,22 @@ void DeferredRenderer::RenderPostEffect()
 
 void DeferredRenderer::ComputeVisibility()
 {
-	const WEngine::WArray<PrimitiveInfo*>& OpaqueAndMaskPrimitives = Scene->GetOpaqueAndMaskPrimitives();
-	const WEngine::WArray<PrimitiveInfo*>& TranslucentPrimitives = Scene->GetTranslucentPrimitives();
+	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
+	{
+		SceneViewInfo& ViewInfo = Views[ViewIndex];
 
-	FrustumCulling(OpaqueAndMaskPrimitives);
-	FrustumCulling(TranslucentPrimitives);
+		ViewInfo.PrimitiveVisibilityMap.Init(Scene->GetPrimitives().Size(), false);
 
+		{
+			const WEngine::WArray<PrimitiveInfo*>& Primitives = Scene->GetPrimitives();
+			FrustumCulling(Primitives, ViewInfo);
+			OcclusionCulling(Primitives, ViewInfo);
+		}
+	}
 
 }
 
-void DeferredRenderer::FrustumCulling(const WEngine::WArray<PrimitiveInfo*>& Primitives)
+void DeferredRenderer::FrustumCulling(const WEngine::WArray<PrimitiveInfo*>& Primitives, SceneViewInfo& ViewInfo)
 {
 	WEngine::WArray<glm::vec3> Frustum(8);
 	{
@@ -133,23 +139,19 @@ void DeferredRenderer::FrustumCulling(const WEngine::WArray<PrimitiveInfo*>& Pri
 		Frustum[7] = FarCenter + FarUp - FarRight;
 	}
 
-	WEngine::WTaskGraph::Get()->ParallelFor(Primitives.Size(), [this, &Primitives, &Frustum](uint32 index)
+	WEngine::WTaskGraph::Get()->ParallelFor(Primitives.Size(), [this, &ViewInfo, &Primitives, &Frustum](uint32 index)
 		{
 			PrimitiveInfo* info = Primitives[index];
 			const BoundingBox& box = info->Proxy->GetBoundingBox();
 
 			if ((bUseBoxTest ? IsBoxInFrustum(Frustum, box.BoxMin, box.BoxMax) : true) && (bUseSphereTest ? IsSphereInFrustum(Frustum, glm::vec3(), 0.0f) : true))
 			{
-				Views[index].Visibility = true;
-			}
-			else
-			{
-				Views[index].Visibility = false;
+				ViewInfo.PrimitiveVisibilityMap[index] = true;
 			}
 		});
 }
 
-void DeferredRenderer::OcclusionCulling(const WEngine::WArray<PrimitiveInfo*>& Primitives)
+void DeferredRenderer::OcclusionCulling(const WEngine::WArray<PrimitiveInfo*>& Primitives, SceneViewInfo& ViewInfo)
 {
 }
 

@@ -32,9 +32,9 @@ private:
 
 	void ComputeVisibility();
 
-	void FrustumCulling(const WEngine::WArray<class PrimitiveInfo*>& Primitives);
+	void FrustumCulling(const WEngine::WArray<class PrimitiveInfo*>& Primitives, SceneViewInfo& ViewInfo);
 
-	void OcclusionCulling(const WEngine::WArray<class PrimitiveInfo*>& Primitives);
+	void OcclusionCulling(const WEngine::WArray<class PrimitiveInfo*>& Primitives, SceneViewInfo& ViewInfo);
 
 	void SetupBasePass(class WViewport *Viewport);
 

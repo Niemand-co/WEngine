@@ -1,8 +1,6 @@
 #pragma once
 #include "Utils/Container/Public/WArray.h"
 
-#define MaxSimultaneousRenderTargets 8
-
 enum class Format
 {
 	R8_SInt = 0,
@@ -257,4 +255,28 @@ enum class ShaderStage : uint8
 	Vertex = 0,
 	Geometry = 1,
 	Pixel = 2,
+};
+
+enum class VertexElementType : uint32
+{
+	VET_Float1,
+	VET_Float2,
+	VET_Float3,
+	VET_Float4,
+	VET_UByte4,
+	VET_UByte4N,
+	VET_Color,
+	VET_PackedNormal,
+	VET_Short2,
+	VET_Short4,
+	VET_Short2N,
+	VET_Short4N,
+	VET_Half2,
+	VET_Half4,
+	VET_UShort2,
+	VET_UShort4,
+	VET_UShort2N,
+	VET_UShort4N,
+	VET_URGB10A2N,
+	VET_UInt
 };

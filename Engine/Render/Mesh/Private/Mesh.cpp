@@ -9,18 +9,14 @@
 #define PI 3.1415926535
 
 WStaticMesh::WStaticMesh(const char *name)
-	: m_name(name), m_id(m_name),
-	  VertexBuffer(nullptr),
-	  IndexBuffer(nullptr)
+	: m_name(name), m_id(m_name)
 {
 	m_boundingBox.BoxMax = glm::vec3(FLOAT_MIN, FLOAT_MIN, FLOAT_MIN);
 	m_boundingBox.BoxMin = glm::vec3(FLOAT_MAX, FLOAT_MAX, FLOAT_MAX);
 }
 
 WStaticMesh::WStaticMesh(const WEngine::WString& name)
-	: m_name(name), m_id(name),
-	  VertexBuffer(nullptr),
-	  IndexBuffer(nullptr)
+	: m_name(name), m_id(name)
 {
 	m_boundingBox.BoxMax = glm::vec3(FLOAT_MIN, FLOAT_MIN, FLOAT_MIN);
 	m_boundingBox.BoxMin = glm::vec3(FLOAT_MAX, FLOAT_MAX, FLOAT_MAX);
@@ -28,16 +24,6 @@ WStaticMesh::WStaticMesh(const WEngine::WString& name)
 
 WStaticMesh::~WStaticMesh()
 {
-}
-
-WVertexBufferRHIRef WStaticMesh::GetVertexBuffer()
-{
-	return VertexBuffer;
-}
-
-WIndexBufferRHIRef WStaticMesh::GetIndexBuffer()
-{
-	return IndexBuffer;
 }
 
 void WStaticMesh::GenerateBoundingBox()
@@ -52,22 +38,6 @@ void WStaticMesh::GenerateBoundingBox()
 		m_boundingBox.BoxMin.y = m_boundingBox.BoxMin.y > vertex.Position.y ? vertex.Position.y : m_boundingBox.BoxMin.y;
 		m_boundingBox.BoxMin.z = m_boundingBox.BoxMin.z > vertex.Position.z ? vertex.Position.z : m_boundingBox.BoxMin.z;
 	}
-}
-
-void WStaticMesh::InitRHIResource()
-{
-	VertexBuffer = GetRenderCommandList()->CreateVertexBuffer(sizeof(VertexComponent), m_vertices.Size());
-	IndexBuffer = GetRenderCommandList()->CreateIndexBuffer(m_indices.Size());
-}
-
-void WStaticMesh::ReleaseRHIResource()
-{
-	VertexBuffer = nullptr;
-	IndexBuffer = nullptr;
-}
-
-void WStaticMesh::UpdateRHIResource()
-{
 }
 
 WStaticMesh* WStaticMesh::GetSphere()

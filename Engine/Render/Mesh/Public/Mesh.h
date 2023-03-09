@@ -10,7 +10,12 @@ struct BoundingBox
 	glm::vec3 BoxMax;
 };
 
-class WStaticMesh : public RenderResource
+class WStaticMeshRenderData
+{
+
+};
+
+class WStaticMesh
 {
 public:
 
@@ -24,19 +29,9 @@ public:
 
 	~WStaticMesh();
 
-	WVertexBufferRHIRef GetVertexBuffer();
-
-	WIndexBufferRHIRef GetIndexBuffer();
-
 	void GenerateBoundingBox();
 
 	const BoundingBox& GetBoundingBox() { return m_boundingBox; }
-
-	virtual void InitRHIResource() override;
-
-	virtual void ReleaseRHIResource() override;
-
-	virtual void UpdateRHIResource() override;
 
 	void* operator new(size_t size)
 	{
@@ -61,10 +56,6 @@ public:
 private:
 
 	WEngine::WString m_name;
-
-	WVertexBufferRHIRef VertexBuffer;
-
-	WIndexBufferRHIRef IndexBuffer;
 
 	const WEngine::WGuid<WEngine::WString> m_id;
 

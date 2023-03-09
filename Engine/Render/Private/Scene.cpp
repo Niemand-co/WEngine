@@ -55,6 +55,7 @@ void RScene::UpdatePrimitiveInfosForScene()
 			for (; index < size && m_primitives[index]->GetProxy()->type == removedInfo->GetProxy()->type; ++index);
 			WEngine::Swap(&m_primitives[index - 1], &m_primitives[removedIndex]);
 			WEngine::Swap(&m_primitiveMatrices[index - 1], &m_primitiveMatrices[removedIndex]);
+			WEngine::Swap(&m_primitiveMasks[index - 1], &m_primitiveMasks[removedIndex]);
 		}
 		m_primitives.Resize(size - 1);
 	}
@@ -63,6 +64,7 @@ void RScene::UpdatePrimitiveInfosForScene()
 	{
 		m_primitives.Push(addedInfo);
 		m_primitiveMatrices.Push(addedInfo->Owner->GetComponent<TransformComponent>()->GetLocalToWorldMatrix());
+		m_primitiveMasks.Push((uint8)PrimitiveInfo::PrimitiveMask::None);
 		uint32 size = m_primitives.Size();
 		if (size == 1)continue;
 		while (m_primitives[size - 1]->GetProxy()->type != m_primitives[size - 2]->GetProxy()->type)
@@ -72,6 +74,7 @@ void RScene::UpdatePrimitiveInfosForScene()
 			if (index == 0 && m_primitives[index]->GetProxy()->type != m_primitives[size - 1]->GetProxy()->type)break;
 			WEngine::Swap(&m_primitives[index + 1], &m_primitives[size - 1]);
 			WEngine::Swap(&m_primitiveMatrices[index + 1], &m_primitiveMatrices[size - 1]);
+			WEngine::Swap(&m_primitiveMasks[index + 1], &m_primitiveMasks[size - 1]);
 		}
 	}
 

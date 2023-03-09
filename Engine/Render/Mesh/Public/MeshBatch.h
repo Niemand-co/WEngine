@@ -8,7 +8,7 @@ public:
 
 	~WMeshBatchElement() = default;
 
-private:
+public:
 
 	WEngine::WSharedPtr<class WIndexBuffer> IndexBuffer;
 
@@ -24,9 +24,9 @@ public:
 
 	~WMeshBatch() = default;
 
-private:
+public:
 
-	WEngine::WArray<WMeshBatchElement*> Elements;
+	WEngine::WArray<WMeshBatchElement> Elements = WEngine::WArray<WMeshBatchElement>(1);
 
 	WEngine::WSharedPtr<class WVertexFactory> VertexFactory;
 
