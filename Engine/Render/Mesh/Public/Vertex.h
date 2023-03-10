@@ -18,12 +18,12 @@ class RHIVertexInputDescriptor;
 
 struct VertexComponent
 {
-	glm::vec3 Position;
-	glm::vec3 Normal;
-	glm::vec3 Tangent;
-	glm::vec3 BiTangent;
-	glm::vec3 Color;
-	glm::vec2 UVs[8];
+	glm::vec3 Position = glm::vec3();
+	glm::vec3 Normal = glm::vec3();
+	glm::vec3 Tangent = glm::vec3();
+	glm::vec3 BiTangent = glm::vec3();
+	glm::vec3 Color = glm::vec3();
+	glm::vec2 UVs[8] = {};
 };
 
 enum class EInputType : uint8
@@ -35,7 +35,7 @@ enum class EInputType : uint8
 
 struct WVertexStreamComponent
 {
-	const WEngine::WSharedPtr<class WVertexBuffer> pVertexBuffer = nullptr;
+	const class WVertexBuffer* pVertexBuffer = nullptr;
 	uint32 Offset = 0;
 	uint16 Stride = 0;
 };
@@ -77,10 +77,6 @@ public:
 	virtual void ReleaseRHIResource() override;
 
 	virtual void UpdateRHIResource() override;
-
-private:
-
-	WEngine::WArray<VertexComponent> m_vertices;
 	
 };
 
@@ -93,6 +89,14 @@ public:
 	virtual ~WLocalVertexFactory();
 
 	static void GetPSOVertexInputElements(EInputType Type, WEngine::WArray<VertexInputElement>& Elements);
+
+	void SetData(const WStaticMeshDataType& InData) { Data = InData; }
+
+	const WStaticMeshDataType& GetData() const { return Data; }
+
+private:
+
+	WStaticMeshDataType Data;
 
 };
 

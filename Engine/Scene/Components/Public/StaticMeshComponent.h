@@ -49,6 +49,8 @@ struct StaticMeshProxy : public PrimitiveProxy
 
 	enum { type = 1 };
 
-	WStaticMesh*Mesh;
+	WStaticMesh *Mesh;
+
+	WStaticMeshRenderData *RenderData;
 
 };

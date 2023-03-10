@@ -1,5 +1,8 @@
 #pragma once
 #include "Editor/Public/Ray.h"
+#include "Render/Mesh/Public/Vertex.h"
+#include "Render/Mesh/Public/StaticMeshVertexBuffer.h"
+#include "Render/Mesh/Public/StaticMeshIndexBuffer.h"
 
 struct VertexComponent;
 class RHIBuffer;
@@ -10,12 +13,30 @@ struct BoundingBox
 	glm::vec3 BoxMax;
 };
 
-class WStaticMeshRenderData
+struct StaticMeshLodResource
 {
+	uint8 bCastShadow : 1;
 
+	uint8 bForceOpaque : 1;
+
+	WStaticMeshVertexBuffer VertexBuffer;
+
+	WStaticMeshIndexBuffer IndexBuffer;
+	
 };
 
-class WStaticMesh
+struct WStaticMeshRenderData
+{
+	WEngine::WArray<StaticMeshLodResource> LodResources;
+
+	WEngine::WArray<WLocalVertexFactory> Factories;
+
+	WStaticMesh *Owner;
+
+	void InitResources();
+};
+
+class WStaticMesh : public RenderResource
 {
 public:
 
@@ -29,19 +50,17 @@ public:
 
 	~WStaticMesh();
 
+	const WStaticMeshRenderData* GetRenderData() const { return &RenderData; }
+
 	void GenerateBoundingBox();
 
 	const BoundingBox& GetBoundingBox() { return m_boundingBox; }
 
-	void* operator new(size_t size)
-	{
-		return NormalAllocator::Get()->Allocate(size);
-	}
+	virtual void InitRHIResource() override;
 
-	void operator delete(void* pData)
-	{
-		NormalAllocator::Get()->Deallocate(pData);
-	}
+	virtual void ReleaseRHIResource() override;
+
+	virtual void UpdateRHIResource() override;
 
 public:
 
@@ -57,11 +76,13 @@ private:
 
 	WEngine::WString m_name;
 
-	const WEngine::WGuid<WEngine::WString> m_id;
+	const WEngine::WGuid<WEngine::WString> Id;
 
-	WEngine::WArray<VertexComponent> m_vertices;
+	WStaticMeshRenderData RenderData;
 
-	WEngine::WArray<uint32> m_indices;
+	WEngine::WArray<VertexComponent> Vertices;
+
+	WEngine::WArray<uint32> Indices;
 
 	BoundingBox m_boundingBox;
 

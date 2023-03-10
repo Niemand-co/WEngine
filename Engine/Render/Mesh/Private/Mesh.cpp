@@ -1,22 +1,28 @@
 #include "pch.h"
 #include "Render/Mesh/Public/Mesh.h"
-#include "Render/Mesh/Public/Vertex.h"
-#include "Render/Descriptor/Public/RHIVertexInputDescriptor.h"
-#include "Render/Descriptor/Public/RHIBufferDescriptor.h"
-#include "RHI/Public/RHIContext.h"
-#include "RHI/Public/RHIBuffer.h"
 
 #define PI 3.1415926535
 
+void WStaticMeshRenderData::InitResources()
+{
+	LodResources.Resize(1);
+	Factories.Resize(1);
+
+	for (uint32 LodIndex = 0; LodIndex < LodResources.Size(); ++LodIndex)
+	{
+		LodResources[LodIndex].IndexBuffer.InitRHIResource();
+	}
+}
+
 WStaticMesh::WStaticMesh(const char *name)
-	: m_name(name), m_id(m_name)
+	: m_name(name), Id(m_name)
 {
 	m_boundingBox.BoxMax = glm::vec3(FLOAT_MIN, FLOAT_MIN, FLOAT_MIN);
 	m_boundingBox.BoxMin = glm::vec3(FLOAT_MAX, FLOAT_MAX, FLOAT_MAX);
 }
 
 WStaticMesh::WStaticMesh(const WEngine::WString& name)
-	: m_name(name), m_id(name)
+	: m_name(name), Id(name)
 {
 	m_boundingBox.BoxMax = glm::vec3(FLOAT_MIN, FLOAT_MIN, FLOAT_MIN);
 	m_boundingBox.BoxMin = glm::vec3(FLOAT_MAX, FLOAT_MAX, FLOAT_MAX);
@@ -28,7 +34,7 @@ WStaticMesh::~WStaticMesh()
 
 void WStaticMesh::GenerateBoundingBox()
 {
-	for (VertexComponent& vertex : m_vertices)
+	for (VertexComponent& vertex : Vertices)
 	{
 		m_boundingBox.BoxMax.x = m_boundingBox.BoxMax.x < vertex.Position.x ? vertex.Position.x : m_boundingBox.BoxMax.x;
 		m_boundingBox.BoxMax.y = m_boundingBox.BoxMax.y < vertex.Position.y ? vertex.Position.y : m_boundingBox.BoxMax.y;
@@ -38,6 +44,19 @@ void WStaticMesh::GenerateBoundingBox()
 		m_boundingBox.BoxMin.y = m_boundingBox.BoxMin.y > vertex.Position.y ? vertex.Position.y : m_boundingBox.BoxMin.y;
 		m_boundingBox.BoxMin.z = m_boundingBox.BoxMin.z > vertex.Position.z ? vertex.Position.z : m_boundingBox.BoxMin.z;
 	}
+}
+
+void WStaticMesh::InitRHIResource()
+{
+	RenderData.InitResources();
+}
+
+void WStaticMesh::ReleaseRHIResource()
+{
+}
+
+void WStaticMesh::UpdateRHIResource()
+{
 }
 
 WStaticMesh* WStaticMesh::GetSphere()
@@ -224,7 +243,6 @@ bool WMeshLibrary::LoadMesh(const WEngine::WString& Path)
 
 		WStaticMesh *mesh = new WStaticMesh(MeshName);
 		ProcessNode(objectScene->mRootNode, objectScene, mesh);
-		BeginInitResource(mesh);
 		Meshes.Insert(MeshName, mesh);
 	}
 }
@@ -267,17 +285,20 @@ bool WMeshLibrary::ProcessPrimitive(const aiMesh* Primitive, const aiScene* Obje
 			}
 			if (Primitive->HasTextureCoords(VertexIndex))
 			{
-				aiVector3D* uv = Primitive->mTextureCoords[VertexIndex];
-				vertex.UV = glm::vec3(uv->x, uv->y, uv->z);
+				for (uint32 UVChannel = 0; UVChannel < Primitive->GetNumUVChannels(); ++UVChannel)
+				{
+					aiVector3D uv = Primitive->mTextureCoords[UVChannel][VertexIndex];
+					vertex.UVs[UVChannel] = glm::vec3(uv.x, uv.y, uv.z);
+				}
 			}
 		}
-		Mesh->m_vertices.Push(vertex);
+		Mesh->Vertices.Push(vertex);
 	}
 	for (size_t FaceIndex = 0; FaceIndex < Primitive->mNumFaces; ++FaceIndex)
 	{
 		aiFace& face = Primitive->mFaces[FaceIndex];
 		for(size_t i = 0; i < face.mNumIndices; ++i)
-			Mesh->m_indices.Push(face.mIndices[i]);
+			Mesh->Indices.Push(face.mIndices[i]);
 	}
 	return true;
 }
