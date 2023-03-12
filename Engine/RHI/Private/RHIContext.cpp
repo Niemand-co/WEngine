@@ -48,32 +48,35 @@ void RHIContext::Init(RHIBackend backend)
 	}
 }
 
-WVertexBufferRHIRef RHIContext::CreateVertexBuffer(size_t stride, size_t count)
+WVertexBufferRHIRef RHIContext::CreateVertexBuffer(uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
 {
 	RHIBufferDescriptor descriptor = {};
 	{
-		descriptor.count = count;
-		descriptor.stride = stride;
+		descriptor.Count = InCount;
+		descriptor.Stride = InStride;
+		descriptor.Usage = InUsage;
 	}
 	return pDevice->CreateVertexBuffer(&descriptor);
 }
 
-WIndexBufferRHIRef RHIContext::CreateIndexBuffer(size_t count)
+WIndexBufferRHIRef RHIContext::CreateIndexBuffer(uint32 InCount, EBufferUsageFlags InUsage)
 {
 	RHIBufferDescriptor descriptor = {};
 	{
-		descriptor.count = count;
-		descriptor.stride = sizeof(uint32);
+		descriptor.Count = InCount;
+		descriptor.Stride = sizeof(uint32);
+		descriptor.Usage = InUsage;
 	}
 	return pDevice->CreateIndexBuffer(&descriptor);
 }
 
-WUniformBufferRHIRef RHIContext::CreateUniformBuffer(size_t stride, size_t count)
+WUniformBufferRHIRef RHIContext::CreateUniformBuffer(uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
 {
 	RHIBufferDescriptor descriptor = {};
 	{
-		descriptor.count = count;
-		descriptor.stride = stride;
+		descriptor.Count = InCount;
+		descriptor.Stride = InStride;
+		descriptor.Usage = InUsage;
 	}
 	return pDevice->CreateUniformBuffer(&descriptor);
 }

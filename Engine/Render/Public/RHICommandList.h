@@ -60,11 +60,11 @@ public:
 
 	void CopyImageToBackBuffer(class RHITexture *SrcTexture, class RHITexture *DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY);
 
-	WVertexBufferRHIRef CreateVertexBuffer(size_t stride, size_t count);
+	WVertexBufferRHIRef CreateVertexBuffer(uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage);
 
-	WIndexBufferRHIRef CreateIndexBuffer(size_t count);
+	WIndexBufferRHIRef CreateIndexBuffer(uint32 InCount, EBufferUsageFlags InUsage);
 
-	WUniformBufferRHIRef CreateUniformBuffer(size_t stride, size_t count);
+	WUniformBufferRHIRef CreateUniformBuffer(uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage);
 
 	WVertexShaderRHIRef CreateVertexShader(ShaderCodeBlob& blob);
 

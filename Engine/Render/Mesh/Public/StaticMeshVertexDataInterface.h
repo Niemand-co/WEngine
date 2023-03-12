@@ -14,11 +14,13 @@ public:
 
 	virtual void ResizeBuffer(uint32 NumVertices) = 0;
 
-	virtual void Empty(uint32 NumVertices) = 0;
+	virtual void Empty() = 0;
 
 	virtual uint32 GetNum() const = 0;
 
 	virtual uint8* GetData() const = 0;
+
+	virtual uint32 GetStride() const = 0;
 
 	virtual size_t GetSize() const = 0;
 

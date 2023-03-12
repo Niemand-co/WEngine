@@ -186,6 +186,13 @@ namespace WEngine
 	{
 		return ((__underlying_type(Enum))Flags & (__underlying_type(Enum))Contains) != 0;
 	}
+
+	template<typename T>
+	constexpr T Align(T Val, uint64 Alignment)
+	{
+		return (T)(((uint64)Val + Alignment - 1) & ~(Alignment - 1));
+	}
+
 }
 
 #define ENUM_CLASS_FLAGS(Enum) \

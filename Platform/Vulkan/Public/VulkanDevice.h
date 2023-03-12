@@ -93,6 +93,8 @@ namespace Vulkan
 
 		VkDevice GetHandle() const { return pDevice; }
 
+		class VulkanMemoryManager* GetMemoryManager() const { return pMemoryManager; }
+
 	private:
 
 		VkImageUsageFlags GetImageUsage(ETextureCreateFlags Flag);
@@ -100,6 +102,8 @@ namespace Vulkan
 	private:
 
 		VkDevice pDevice;
+
+		VulkanMemoryManager *pMemoryManager;
 
 		WEngine::WArray<QueueStack> m_queues;
 

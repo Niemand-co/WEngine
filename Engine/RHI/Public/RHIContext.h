@@ -42,11 +42,11 @@ public:
 
 	static void Init(RHIBackend backend);
 
-	WVertexBufferRHIRef CreateVertexBuffer(size_t stride, size_t count);
+	WVertexBufferRHIRef CreateVertexBuffer(uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage);
 
-	WIndexBufferRHIRef CreateIndexBuffer(size_t count);
+	WIndexBufferRHIRef CreateIndexBuffer(uint32 InCount, EBufferUsageFlags InUsage);
 
-	WUniformBufferRHIRef CreateUniformBuffer(size_t stride, size_t count);
+	WUniformBufferRHIRef CreateUniformBuffer(uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage);
 
 	WDynamicUniformBufferRHIRef* CreateDynamicUniformBuffer(size_t stride, size_t count);
 

@@ -30,6 +30,7 @@
 
 enum class EBufferUsageFlags : uint32
 {
+	BF_None            = 0x0,
 	BF_TransferSrc     = 0x00000001,
 	BF_TransferDst     = 0x00000002,
 	BF_UniformTexel    = 0x00000004,
@@ -39,7 +40,10 @@ enum class EBufferUsageFlags : uint32
 	BF_IndexBuffer     = 0x00000040,
 	BF_VertexBuffer    = 0x00000080,
 	BF_IndirectBuffer  = 0x00000100,
-	BF_SRV             = 0x00020000,
+	BF_SRV             = 0x00000200,
+	BF_UAV             = 0x00000400,
+	BF_Dynamic         = 0x00000800,
+	BF_CPUAccessable   = 0x00001000,
 };
 
 enum class EImageUsageFlags : uint32

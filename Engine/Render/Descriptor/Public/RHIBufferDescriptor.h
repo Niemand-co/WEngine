@@ -1,26 +1,20 @@
 #pragma once
 
-namespace Vulkan
-{
-	class VulkanDevice;
-}
-
 class RHIBufferDescriptor
 {
 
-	friend class RHIContext;
-	friend class Vulkan::VulkanDevice;
-
 public:
 
-	RHIBufferDescriptor();
+	RHIBufferDescriptor() = default;
 
 	~RHIBufferDescriptor() = default;
 
 public:
 
-	size_t stride;
+	uint32 Stride = 0;
 
-	size_t count;
+	uint32 Count = 0;
+
+	EBufferUsageFlags Usage = EBufferUsageFlags::BF_None;
 
 };

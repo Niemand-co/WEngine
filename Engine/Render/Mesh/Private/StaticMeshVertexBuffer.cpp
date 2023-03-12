@@ -5,9 +5,9 @@
 #include "Render/Mesh/Public/Vertex.h"
 
 WStaticMeshVertexBuffer::WStaticMeshVertexBuffer()
+	: TangentData(new WStaticMeshVertexData<WTangentData>),
+	  TexCoordsData(new WStaticMeshVertexData<glm::vec2>)
 {
-	TangentData = new WStaticMeshVertexData<WTangentData>();
-	TexCoordsData = new WStaticMeshVertexData<glm::vec2>();
 }
 
 WStaticMeshVertexBuffer::~WStaticMeshVertexBuffer()
@@ -33,6 +33,8 @@ void WStaticMeshVertexBuffer::Init(const WEngine::WArray<VertexComponent>& InVer
 
 void WStaticMeshVertexBuffer::InitRHIResource()
 {
+	TangentBuffer = GetRenderCommandList()->CreateVertexBuffer(TangentData->GetStride(), TangentData->GetNum(), EBufferUsageFlags::BF_VertexBuffer);
+	TexCoordsBuffer = GetRenderCommandList()->CreateVertexBuffer(TexCoordsData->GetStride(), TexCoordsData->GetNum(), EBufferUsageFlags::BF_VertexBuffer);
 }
 
 void WStaticMeshVertexBuffer::ReleaseRHIResource()

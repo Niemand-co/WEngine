@@ -12,23 +12,18 @@ class WVertexBuffer : public WBuffer
 {
 public:
 
-	WVertexBuffer(size_t inStride, size_t inCount);
+	WVertexBuffer() = default;
 
-	virtual ~WVertexBuffer();
+	virtual ~WVertexBuffer() = default;
 
-	virtual void InitRHIResource() override;
+	virtual void ReleaseRHIResource() override
+	{
+		Buffer = nullptr;
+	}
 
-	virtual void ReleaseRHIResource() override;
+protected:
 
-	virtual void UpdateRHIResource() override;
-
-private:
-
-	WVertexBufferRHIRef Buffer;
-
-	size_t Stride;
-
-	size_t Count;
+	WEngine::WSharedPtr<RHIVertexBuffer> Buffer;
 
 };
 
@@ -38,21 +33,18 @@ class WIndexBuffer : public WBuffer
 {
 public:
 
-	WIndexBuffer(size_t inCount);
+	WIndexBuffer() = default;
 
-	virtual ~WIndexBuffer();
+	virtual ~WIndexBuffer() = default;
 
-	virtual void InitRHIResource() override;
+	virtual void ReleaseRHIResource() override
+	{
+		Buffer = nullptr;
+	}
 
-	virtual void ReleaseRHIResource() override;
+protected:
 
-	virtual void UpdateRHIResource() override;
-
-private:
-
-	WIndexBufferRHIRef Buffer;
-
-	size_t Count;
+	WEngine::WSharedPtr<RHIIndexBuffer> Buffer;
 
 };
 
@@ -62,23 +54,18 @@ class WUniformBuffer : public WBuffer
 {
 public:
 
-	WUniformBuffer(size_t inStride, size_t inCount);
+	WUniformBuffer() = default;
 
-	virtual ~WUniformBuffer();
+	virtual ~WUniformBuffer() = default;
 
-	virtual void InitRHIResource() override;
+	virtual void ReleaseRHIResource() override
+	{
+		Buffer = nullptr;
+	}
 
-	virtual void ReleaseRHIResource() override;
+protected:
 
-	virtual void UpdateRHIResource() override;
-
-private:
-
-	WUniformBufferRHIRef Buffer;
-
-	size_t Stride;
-
-	size_t Count;
+	WEngine::WSharedPtr<RHIUniformBuffer> Buffer;
 
 };
 
@@ -88,19 +75,9 @@ class WDynamicUniform : public WUniformBuffer
 {
 public:
 
-	WDynamicUniform(size_t inStride, size_t inCount);
+	WDynamicUniform() = default;
 
-	virtual ~WDynamicUniform();
-
-	virtual void InitRHIResource() override;
-
-	virtual void ReleaseRHIResource() override;
-
-	virtual void UpdateRHIResource() override;
-
-private:
-
-	WDynamicUniformBufferRHIRef Buffer;
+	virtual ~WDynamicUniform() = default;
 
 };
 

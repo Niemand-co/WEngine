@@ -9,8 +9,14 @@ public:
 
 	virtual ~WStaticMeshIndexBuffer();
 
+	void Init(const WEngine::WArray<uint32>& InIndices);
+
+	virtual void InitRHIResource() override;
+
+	virtual void UpdateRHIResource() override;
+
 private:
 
-	
+	WStaticMeshVertexDataInterface *IndexData;
 
 };

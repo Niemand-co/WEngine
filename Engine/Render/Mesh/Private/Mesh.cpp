@@ -3,13 +3,38 @@
 
 #define PI 3.1415926535
 
-void WStaticMeshRenderData::InitResources()
+void WStaticMeshVertexBuffers::Init(const WEngine::WArray<VertexComponent>& InVertices)
+{
+	MeshBuffer.Init(InVertices);
+	PositionBuffer.Init(InVertices);
+	ColorBuffer.Init(InVertices);
+}
+
+void WStaticMeshVertexBuffers::InitResources()
+{
+	MeshBuffer.InitRHIResource();
+	PositionBuffer.InitRHIResource();
+	ColorBuffer.InitRHIResource();
+}
+
+
+void WStaticMeshRenderData::Init(const WEngine::WArray<VertexComponent>& InVertices, const WEngine::WArray<uint32>& InIndices)
 {
 	LodResources.Resize(1);
 	Factories.Resize(1);
 
 	for (uint32 LodIndex = 0; LodIndex < LodResources.Size(); ++LodIndex)
 	{
+		LodResources[LodIndex].VertexBuffer.Init(InVertices);
+		LodResources[LodIndex].IndexBuffer.Init(InIndices);
+	}
+}
+
+void WStaticMeshRenderData::InitResources()
+{
+	for (uint32 LodIndex = 0; LodIndex < LodResources.Size(); ++LodIndex)
+	{
+		LodResources[LodIndex].VertexBuffer.InitResources();
 		LodResources[LodIndex].IndexBuffer.InitRHIResource();
 	}
 }
@@ -48,6 +73,7 @@ void WStaticMesh::GenerateBoundingBox()
 
 void WStaticMesh::InitRHIResource()
 {
+	RenderData.Init(Vertices, Indices);
 	RenderData.InitResources();
 }
 

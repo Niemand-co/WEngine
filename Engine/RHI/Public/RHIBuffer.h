@@ -7,41 +7,22 @@ class RHIBuffer : public RHIResource
 {
 public:
 
-	RHIBuffer();
+	RHIBuffer(uint32 InNum, uint32 InStride, EBufferUsageFlags InUsage)
+		: Num(InNum), Stride(InStride), Usage(InUsage)
+	{
+	}
 
 	virtual ~RHIBuffer() = default;
 
-	virtual void LoadData(void *pData, size_t size, size_t offset = 0) = 0;
-
-	virtual void Flush(size_t range) = 0;
-
-	virtual void Resize(size_t count) = 0;
-
-	void SetDataSize(size_t size);
-
-	inline size_t Size() const { return m_size; }
-
-	inline size_t Alignment() const { return m_dynamicAlignment; }
-
-	inline bool IsDynamic() { return m_isDynamic; }
-
-	BufferResourceInfo* GetBufferInfo();
-
-	virtual void* GetBufferRHIBase() { return nullptr; }
+	virtual void* GetBufferRHIBase() = 0;
 
 protected:
 
-	size_t m_size;
+	uint32 Num;
 
-	size_t m_capacity;
+	uint32 Stride;
 
-	bool m_isDynamic;
-
-	size_t m_dataSize;
-
-	size_t m_dynamicAlignment;
-
-	BufferResourceInfo *m_pInfos;
+	EBufferUsageFlags Usage;
 
 };
 
@@ -49,14 +30,24 @@ class RHIVertexBuffer : public RHIBuffer
 {
 public:
 
+	RHIVertexBuffer(uint32 InNum, uint32 InStride, EBufferUsageFlags InUsage)
+		: RHIBuffer(InNum, InStride, InUsage)
+	{
+	}
+
 	virtual ~RHIVertexBuffer() = default;
 
 };
 
 
-class RHIDynamicVertexBuffer : public RHIBuffer
+class RHIDynamicVertexBuffer : public RHIVertexBuffer
 {
 public:
+
+	RHIDynamicVertexBuffer(uint32 InNum, uint32 InStride, EBufferUsageFlags InUsage)
+		: RHIVertexBuffer(InNum, InStride, InUsage)
+	{
+	}
 
 	virtual ~RHIDynamicVertexBuffer() = default;
 
@@ -67,6 +58,11 @@ class RHIIndexBuffer : public RHIBuffer
 {
 public:
 
+	RHIIndexBuffer(uint32 InNum, uint32 InStride, EBufferUsageFlags InUsage)
+		: RHIBuffer(InNum, InStride, InUsage)
+	{
+	}
+
 	virtual ~RHIIndexBuffer() = default;
 
 };
@@ -76,6 +72,11 @@ class RHIUniformBuffer : public RHIBuffer
 {
 public:
 
+	RHIUniformBuffer(uint32 InNum, uint32 InStride, EBufferUsageFlags InUsage)
+		: RHIBuffer(InNum, InStride, InUsage)
+	{
+	}
+
 	virtual ~RHIUniformBuffer() = default;
 
 };
@@ -84,6 +85,11 @@ public:
 class RHIDynamicUniformBuffer : public RHIUniformBuffer
 {
 public:
+
+	RHIDynamicUniformBuffer(uint32 InNum, uint32 InStride, EBufferUsageFlags InUsage)
+		: RHIUniformBuffer(InNum, InStride, InUsage)
+	{
+	}
 
 	virtual ~RHIDynamicUniformBuffer() = default;
 

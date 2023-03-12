@@ -12,7 +12,7 @@ public:
 
 	virtual void ResizeBuffer(uint32 NumVertices) override;
 
-	virtual void Empty(uint32 NumVertices) override;
+	virtual void Empty() override;
 
 	virtual uint32 GetNum() const { return Data.Size() }
 
@@ -35,7 +35,7 @@ inline void WStaticMeshVertexData<DataType>::ResizeBuffer(uint32 NumVertices)
 }
 
 template<typename DataType>
-inline void WStaticMeshVertexData<DataType>::Empty(uint32 NumVertices)
+inline void WStaticMeshVertexData<DataType>::Empty()
 {
 	Data.Resize(0);
 }

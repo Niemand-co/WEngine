@@ -53,19 +53,19 @@ void RHIRenderCommandList::CopyImageToBackBuffer(RHITexture* SrcTexture, RHIText
     RHIContext::GetContext()->CopyImageToBackBuffer(SrcTexture, DstTexture, SrcSizeX, SrcSizeY, DstSizeX, DstSizeY);
 }
 
-WVertexBufferRHIRef RHIRenderCommandList::CreateVertexBuffer(size_t stride, size_t count)
+WVertexBufferRHIRef RHIRenderCommandList::CreateVertexBuffer(uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
 {
-    return RHIContext::GetContext()->CreateVertexBuffer(stride, count);
+    return RHIContext::GetContext()->CreateVertexBuffer(InStride, InCount);
 }
 
-WIndexBufferRHIRef RHIRenderCommandList::CreateIndexBuffer(size_t count)
+WIndexBufferRHIRef RHIRenderCommandList::CreateIndexBuffer(uint32 InCount, EBufferUsageFlags InUsage)
 {
-    return RHIContext::GetContext()->CreateIndexBuffer(count);
+    return RHIContext::GetContext()->CreateIndexBuffer(InCount);
 }
 
-WUniformBufferRHIRef RHIRenderCommandList::CreateUniformBuffer(size_t stride, size_t count)
+WUniformBufferRHIRef RHIRenderCommandList::CreateUniformBuffer(uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
 {
-    return RHIContext::GetContext()->CreateUniformBuffer(stride, count);
+    return RHIContext::GetContext()->CreateUniformBuffer(InStride, InCount);
 }
 
 WVertexShaderRHIRef RHIRenderCommandList::CreateVertexShader(ShaderCodeBlob& blob)

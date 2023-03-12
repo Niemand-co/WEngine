@@ -2,49 +2,62 @@
 #include "Platform/Vulkan/Public/VulkanBuffer.h"
 #include "Render/Descriptor/Public/RHIBufferDescriptor.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
+#include "Platform/Vulkan/Allocator/Public/VulkanMemoryManager.h"
 #include "Platform/Vulkan/Public/VulkanGPU.h"
 
 namespace Vulkan
 {
 
-	VulkanBufferBase::VulkanBufferBase(VulkanDevice *pInDevice, VkBufferCreateInfo *pInfo, uint32 memoryType)
+	VulkanBufferBase::VulkanBufferBase(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor)
 		: pDevice(pInDevice)
 	{
-		vkCreateBuffer(pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Buffer);
+		const bool bDynamic = WEngine::EnumHasFlags(pDescriptor->Usage, EBufferUsageFlags::BF_IndexBuffer);
+		const bool bUniform = WEngine::EnumHasFlags(pDescriptor->Usage, EBufferUsageFlags::BF_UniformBuffer);
+		const bool bRenderResource = WEngine::EnumHasFlags(pDescriptor->Usage, EBufferUsageFlags::BF_SRV);
+		const bool bCopySrc = WEngine::EnumHasFlags(pDescriptor->Usage, EBufferUsageFlags::BF_TransferSrc);
+		const bool bCopyDst = WEngine::EnumHasFlags(pDescriptor->Usage, EBufferUsageFlags::BF_TransferDst);
+		const bool bIndirect = WEngine::EnumHasFlags(pDescriptor->Usage, EBufferUsageFlags::BF_IndirectBuffer);
+		const bool bCPUAccess = WEngine::EnumHasFlags(pDescriptor->Usage, EBufferUsageFlags::BF_CPUAccessable);
 
-		vkGetBufferMemoryRequirements(pInDevice->GetHandle(), Buffer, &MemoryRequirements);
+		VkBufferUsageFlags BufferUsageFlags = bUniform ? VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT : (WEngine::EnumHasFlags(pDescriptor->Usage, EBufferUsageFlags::BF_VertexBuffer) ? VK_BUFFER_USAGE_VERTEX_BUFFER_BIT : VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 
-		unsigned int index = 0;
-		GPUFeature feature = pInDevice->GetGPU()->GetFeature();
-		for (; index < feature.memorySupports.Size(); ++index)
-		{
-			if (feature.memorySupports[index]->type == MemoryType::LocalMemory && (feature.memorySupports[index]->properties & memoryType) == memoryType)
-			{
-				break;
-			}
-		}
-		RE_ASSERT(feature.memorySupports.Size() > index, "No Suitable Memory Heap Exists.");
+		BufferUsageFlags |= bCopySrc ? VK_BUFFER_USAGE_TRANSFER_SRC_BIT : 0;
+		BufferUsageFlags |= bCopyDst ? VK_BUFFER_USAGE_TRANSFER_DST_BIT : 0;
+		BufferUsageFlags |= (bRenderResource && !bUniform) ? VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT : 0;
+		BufferUsageFlags |= bIndirect ? VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT : 0;
+		BufferUsageFlags |= bCPUAccess ? VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT : 0;
 
-		VkMemoryAllocateInfo MemoryAllocateInfo = {};
-		{
-			MemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-			MemoryAllocateInfo.allocationSize = MemoryRequirements.size;
-			MemoryAllocateInfo.memoryTypeIndex = index;
-		}
+		VkMemoryPropertyFlags MemoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+		MemoryPropertyFlags |= bCPUAccess ? VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT : 0;
 
-		RE_ASSERT(vkAllocateMemory(pInDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DeviceMemory) == VK_SUCCESS, "Failed to Allocate Memory.");
+		pDevice->GetMemoryManager()->AllocateBuffer(Buffer, Allocation, BufferUsageFlags, MemoryPropertyFlags);
 
-		vkBindBufferMemory(pInDevice->GetHandle(), Buffer, DeviceMemory, 0);
+
 	}
 
 	VulkanBufferBase::~VulkanBufferBase()
 	{
-		vkDestroyBuffer(pDevice->GetHandle(), Buffer, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
-		vkFreeMemory(pDevice->GetHandle(), DeviceMemory, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		pDevice->GetMemoryManager()->DeallocateBuffer(Buffer, Allocation);
 	}
 
-	VulkanVertexBuffer::VulkanVertexBuffer(VulkanDevice* pInDevice, VkBufferCreateInfo *pInfo, uint32 memoryType)
-		: VulkanBufferBase(pInDevice, pInfo, memoryType)
+	void* VulkanBufferBase::Lock(uint32 Size, uint32 Offset, bool bRead)
+	{
+		if (bRead)
+		{
+
+		}
+		else
+		{
+			
+		}
+	}
+
+	void VulkanBufferBase::Unlock(bool bRead)
+	{
+	}
+
+	VulkanVertexBuffer::VulkanVertexBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor)
+		: RHIVertexBuffer(pDescriptor->Count, pDescriptor->Stride, pDescriptor->Usage), VulkanBufferBase(pInDevice, pDescriptor)
 	{
 		
 	}
@@ -53,8 +66,8 @@ namespace Vulkan
 	{
 	}
 
-	VulkanDynamicVertexBuffer::VulkanDynamicVertexBuffer(VulkanDevice* pInDevice, VkBufferCreateInfo* pInfo, uint32 memoryType)
-		: VulkanBufferBase(pInDevice, pInfo, memoryType)
+	VulkanDynamicVertexBuffer::VulkanDynamicVertexBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor)
+		: RHIDynamicVertexBuffer(pDescriptor->Count, pDescriptor->Stride, pDescriptor->Usage), VulkanBufferBase(pInDevice, pDescriptor)
 	{
 	}
 
@@ -62,8 +75,8 @@ namespace Vulkan
 	{
 	}
 
-	VulkanIndexBuffer::VulkanIndexBuffer(VulkanDevice* pInDevice, VkBufferCreateInfo* pInfo, uint32 memoryType)
-		: VulkanBufferBase(pInDevice, pInfo, memoryType)
+	VulkanIndexBuffer::VulkanIndexBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor)
+		: RHIIndexBuffer(pDescriptor->Count, pDescriptor->Stride, pDescriptor->Usage), VulkanBufferBase(pInDevice, pDescriptor)
 	{
 	}
 
@@ -71,8 +84,8 @@ namespace Vulkan
 	{
 	}
 
-	VulkanUniformBuffer::VulkanUniformBuffer(VulkanDevice* pInDevice, VkBufferCreateInfo* pInfo, uint32 memoryType)
-		: VulkanBufferBase(pInDevice, pInfo, memoryType)
+	VulkanUniformBuffer::VulkanUniformBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor)
+		: RHIUniformBuffer(pDescriptor->Count, pDescriptor->Stride, pDescriptor->Usage), VulkanBufferBase(pInDevice, pDescriptor)
 	{
 	}
 
@@ -80,12 +93,30 @@ namespace Vulkan
 	{
 	}
 
-	VulkanDynamicUniformBuffer::VulkanDynamicUniformBuffer(VulkanDevice* pInDevice, VkBufferCreateInfo* pInfo, uint32 memoryType)
-		: VulkanBufferBase(pInDevice, pInfo, memoryType)
+	VulkanDynamicUniformBuffer::VulkanDynamicUniformBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor)
+		: RHIDynamicUniformBuffer(pDescriptor->Count, pDescriptor->Stride, pDescriptor->Usage), VulkanBufferBase(pInDevice, pDescriptor)
 	{
 	}
 
 	VulkanDynamicUniformBuffer::~VulkanDynamicUniformBuffer()
+	{
+	}
+
+	VulkanStagingBuffer::VulkanStagingBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor)
+		: VulkanBufferBase(pInDevice, pDescriptor)
+	{
+	}
+
+	VulkanStagingBuffer::~VulkanStagingBuffer()
+	{
+	}
+
+	void* VulkanStagingBuffer::Map()
+	{
+		return nullptr;
+	}
+
+	void VulkanStagingBuffer::UnMap()
 	{
 	}
 

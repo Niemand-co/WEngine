@@ -3,6 +3,8 @@
 #include "Render/Mesh/Public/Vertex.h"
 #include "Render/Mesh/Public/StaticMeshVertexBuffer.h"
 #include "Render/Mesh/Public/StaticMeshIndexBuffer.h"
+#include "Render/Mesh/Public/PositionVertexBuffer.h"
+#include "Render/Mesh/Public/ColorVertexBuffer.h"
 
 struct VertexComponent;
 class RHIBuffer;
@@ -13,13 +15,35 @@ struct BoundingBox
 	glm::vec3 BoxMax;
 };
 
+class WStaticMeshVertexBuffers
+{
+public:
+
+	WStaticMeshVertexBuffers() = default;
+
+	~WStaticMeshVertexBuffers() = default;
+
+	void Init(const WEngine::WArray<VertexComponent>& InVertices);
+
+	void InitResources();
+
+public:
+
+	WStaticMeshVertexBuffer MeshBuffer;
+
+	WPositionVertexBuffer PositionBuffer;
+
+	WColorVertexBuffer ColorBuffer;
+
+};
+
 struct StaticMeshLodResource
 {
 	uint8 bCastShadow : 1;
 
 	uint8 bForceOpaque : 1;
 
-	WStaticMeshVertexBuffer VertexBuffer;
+	WStaticMeshVertexBuffers VertexBuffer;
 
 	WStaticMeshIndexBuffer IndexBuffer;
 	
@@ -32,6 +56,8 @@ struct WStaticMeshRenderData
 	WEngine::WArray<WLocalVertexFactory> Factories;
 
 	WStaticMesh *Owner;
+
+	void Init(const WEngine::WArray<VertexComponent>& InVertices, const WEngine::WArray<uint32>& InIndices);
 
 	void InitResources();
 };
