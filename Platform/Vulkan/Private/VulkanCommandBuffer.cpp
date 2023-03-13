@@ -361,4 +361,12 @@ namespace Vulkan
 		CmdBuffer->RefreshFenceState();
 	}
 
+	void VulkanCommandBufferManager::RefreshFenceState()
+	{
+		for (uint32 Index = 0; Index < pCommandPool->CmdBuffers.Size(); ++Index)
+		{
+			pCommandPool->CmdBuffers[Index]->RefreshFenceState();
+		}
+	}
+
 }

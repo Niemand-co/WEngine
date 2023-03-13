@@ -17,6 +17,27 @@ void WStaticMeshVertexBuffers::InitResources()
 	ColorBuffer.InitRHIResource();
 }
 
+void StaticMeshFactories::InitResource(const StaticMeshLodResource& LodResource)
+{
+	{
+		WStaticMeshDataType Data;
+		LodResource.VertexBuffer.PositionBuffer.BindgPositionVertexBuffer(Data);
+		LodResource.VertexBuffer.MeshBuffer.BindMeshVertexBuffer(Data);
+
+		VertexFactory.SetData(Data);
+	}
+
+	{
+		WStaticMeshDataType Data;
+		LodResource.VertexBuffer.PositionBuffer.BindgPositionVertexBuffer(Data);
+		LodResource.VertexBuffer.MeshBuffer.BindMeshVertexBuffer(Data);
+		LodResource.VertexBuffer.ColorBuffer.BindColorVertexBuffer(Data);
+
+		VertexFactoryWithColor.SetData(Data);
+	}
+
+}
+
 
 void WStaticMeshRenderData::Init(const WEngine::WArray<VertexComponent>& InVertices, const WEngine::WArray<uint32>& InIndices)
 {
@@ -36,6 +57,7 @@ void WStaticMeshRenderData::InitResources()
 	{
 		LodResources[LodIndex].VertexBuffer.InitResources();
 		LodResources[LodIndex].IndexBuffer.InitRHIResource();
+		Factories[LodIndex].InitResource(LodResources[LodIndex]);
 	}
 }
 

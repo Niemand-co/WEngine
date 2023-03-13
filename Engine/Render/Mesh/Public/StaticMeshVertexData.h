@@ -18,9 +18,9 @@ public:
 
 	virtual uint8* GetData() const { return (uint8*)Data.GetData(); }
 
-	virtual uint32 GetStride() const { return sizeof(DataType); }
+	virtual uint32 GetStride() const { return 8 * sizeof(DataType); }
 
-	virtual size_t GetSize() const { return sizeof(DataType) * Data.Size(); }
+	virtual size_t GetSize() const { return 8 * sizeof(DataType) * Data.Size(); }
 
 private:
 

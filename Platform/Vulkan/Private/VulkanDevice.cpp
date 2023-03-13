@@ -17,6 +17,7 @@ namespace Vulkan
 		RE_ASSERT(vkCreateDevice(*pInGPU->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &pDevice) == VK_SUCCESS, "Failed to Create Device.");
 
 		pMemoryManager = new VulkanMemoryManager(this);
+		pStagingBufferManager = new VulkanStagingBufferManager(this);
 	}
 
 	VulkanDevice::~VulkanDevice()
@@ -923,9 +924,21 @@ namespace Vulkan
 		CmdBufferMgr->PrepareForNewActiveCmdBuffer();
 	}
 
+	void VulkanDevice::PrepareForCPURead()
+	{
+		VulkanCommandBufferManager *CmdBufferMgr = static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager();
+		VulkanCommandBuffer *ActiveCmdBuffer = CmdBufferMgr->GetActiveCommandBuffer();
+		if (ActiveCmdBuffer && ActiveCmdBuffer->HasBegun())
+		{
+			CmdBufferMgr->SubmitActiveCommandBuffer();
+			CmdBufferMgr->WaitForCommandBuffer(ActiveCmdBuffer);
+		}
+	}
+
 	void VulkanDevice::Wait()
 	{
 		vkDeviceWaitIdle(pDevice);
+		static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager()->RefreshFenceState();
 	}
 
 	VkImageUsageFlags VulkanDevice::GetImageUsage(ETextureCreateFlags Flag)

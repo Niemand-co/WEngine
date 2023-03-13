@@ -16,6 +16,8 @@ public:
 
 	virtual void UpdateRHIResource() override;
 
+	void BindgPositionVertexBuffer(class WStaticMeshDataType& Data) const;
+
 private:
 
 	WStaticMeshVertexDataInterface *PositionData;

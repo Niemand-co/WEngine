@@ -38,6 +38,7 @@ struct WVertexStreamComponent
 	const class WVertexBuffer* pVertexBuffer = nullptr;
 	uint32 Offset = 0;
 	uint16 Stride = 0;
+	VertexElementType Type = VertexElementType::VET_Float1;
 };
 
 struct VertexInputElement

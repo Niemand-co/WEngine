@@ -31,3 +31,8 @@ void WColorVertexBuffer::InitRHIResource()
 void WColorVertexBuffer::UpdateRHIResource()
 {
 }
+
+void WColorVertexBuffer::BindColorVertexBuffer(WStaticMeshDataType& Data) const
+{
+	Data.ColorComponent = WVertexStreamComponent(this, 0, ColorData->GetStride(), VertexElementType::VET_Float3);
+}

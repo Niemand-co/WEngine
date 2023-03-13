@@ -49,11 +49,20 @@ struct StaticMeshLodResource
 	
 };
 
+struct StaticMeshFactories
+{
+	WLocalVertexFactory VertexFactory;
+
+	WLocalVertexFactory VertexFactoryWithColor;
+
+	void InitResource(const StaticMeshLodResource& LodResource);
+};
+
 struct WStaticMeshRenderData
 {
 	WEngine::WArray<StaticMeshLodResource> LodResources;
 
-	WEngine::WArray<WLocalVertexFactory> Factories;
+	WEngine::WArray<StaticMeshFactories> Factories;
 
 	WStaticMesh *Owner;
 

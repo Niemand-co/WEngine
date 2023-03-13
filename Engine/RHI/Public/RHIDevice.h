@@ -34,7 +34,7 @@ public:
 
 	virtual WTexture3DRHIRef CreateTexture3D(class RHITextureDescriptor* descriptor) = 0;
 
-	virtual WTextureViewRHIRef CreateTextureView(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture) = 0;;
+	virtual WTextureViewRHIRef CreateTextureView(class RHITextureViewDescriptor* descriptor, class RHITexture* InTexture) = 0;;
 
 	virtual class RHISampler* CreateSampler(class RHISamplerDescriptor * descriptor) = 0;
 
@@ -71,6 +71,8 @@ public:
 	virtual void ResetFences(class RHIFence *pFences, unsigned int count) = 0;
 
 	virtual void SubmitCommandsAndFlushGPU() = 0;
+
+	virtual void PrepareForCPURead() = 0;
 
 	virtual void Wait() = 0;
 

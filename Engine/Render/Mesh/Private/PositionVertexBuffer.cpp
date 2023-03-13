@@ -31,3 +31,8 @@ void WPositionVertexBuffer::InitRHIResource()
 void WPositionVertexBuffer::UpdateRHIResource()
 {
 }
+
+void WPositionVertexBuffer::BindgPositionVertexBuffer(WStaticMeshDataType& Data) const
+{
+	Data.PositionComponent = WVertexStreamComponent(this, 0, PositionData->GetStride(), VertexElementType::VET_Float3);
+}

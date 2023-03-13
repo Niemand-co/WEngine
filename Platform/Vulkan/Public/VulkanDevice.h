@@ -47,9 +47,9 @@ namespace Vulkan
 
 		virtual WTexture3DRHIRef CreateTexture3D(RHITextureDescriptor* descriptor) override;
 
-		virtual WTextureViewRHIRef CreateTextureView(class RHITextureViewDescriptor* descriptor, RHITexture* InTexture) override;
+		virtual WTextureViewRHIRef CreateTextureView(RHITextureViewDescriptor* descriptor, RHITexture* InTexture) override;
 
-		WTextureViewRHIRef CreateTextureView(class RHITextureViewDescriptor* descriptor, VkImage InImage);
+		WTextureViewRHIRef CreateTextureView(RHITextureViewDescriptor* descriptor, VkImage InImage);
 
 		virtual RHISampler* CreateSampler(RHISamplerDescriptor * descriptor) override;
 
@@ -87,6 +87,8 @@ namespace Vulkan
 
 		virtual void SubmitCommandsAndFlushGPU() override;
 
+		virtual void PrepareForCPURead() override;
+
 		virtual void Wait() override;
 
 		VulkanGPU* GetGPU() const { return pGPU; }
@@ -94,6 +96,8 @@ namespace Vulkan
 		VkDevice GetHandle() const { return pDevice; }
 
 		class VulkanMemoryManager* GetMemoryManager() const { return pMemoryManager; }
+
+		class VulkanStagingBufferManager* GetStagingBufferManager() const { return pStagingBufferManager; }
 
 	private:
 
@@ -104,6 +108,8 @@ namespace Vulkan
 		VkDevice pDevice;
 
 		VulkanMemoryManager *pMemoryManager;
+
+		VulkanStagingBufferManager *pStagingBufferManager;
 
 		WEngine::WArray<QueueStack> m_queues;
 

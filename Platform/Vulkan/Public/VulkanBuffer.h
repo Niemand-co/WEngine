@@ -14,7 +14,7 @@ namespace Vulkan
 
 		void* Lock(uint32 Size, uint32 Offset, bool bRead = false);
 
-		void Unlock(bool bRead = false);
+		void Unlock();
 
 		VkBuffer GetHandle() const { return Buffer; }
 
@@ -25,11 +25,21 @@ namespace Vulkan
 
 	protected:
 
+		struct PendingEntry
+		{
+			uint32 Size = 0;
+			uint32 Offset = 0;
+			uint8 bRead : 1;
+			VulkanStagingBuffer* PendingBuffer = 0;
+		};
+
 		VkBuffer Buffer;
 
 		VulkanDevice *pDevice;
 
 		class VulkanAllocation *Allocation;
+
+		PendingEntry PendingLock;
 
 	};
 
@@ -125,22 +135,34 @@ namespace Vulkan
 
 	};
 
-	class VulkanStagingBuffer : public VulkanBufferBase
+	class VulkanStagingBuffer : public RHIResource
 	{
 	public:
 
-		VulkanStagingBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor);
+		VulkanStagingBuffer(class VulkanDevice* pInDevice, VkBuffer& InBuffer, class VulkanAllocation* InAllocation);
 
 		virtual ~VulkanStagingBuffer();
 
-		void* Map();
+		void Map(uint32 Size, uint32 Offset);
 
 		void UnMap();
 
+		void* GetMappedPointer() const { return MappedPointer; }
+
+		VkBuffer GetHandle() const { return Buffer; }
+
 	private:
+
+		VulkanDevice *pDevice;
+
+		VkBuffer Buffer;
+
+		VulkanAllocation *Allocation;
 
 		void *MappedPointer;
 
-	}
+		friend class VulkanStagingBufferManager;
+
+	};
 
 }

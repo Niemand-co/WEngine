@@ -16,6 +16,8 @@ public:
 
 	virtual ~WVertexBuffer() = default;
 
+	WEngine::WSharedPtr<RHIVertexBuffer>& GetRHI() { return Buffer; }
+
 	virtual void ReleaseRHIResource() override
 	{
 		Buffer = nullptr;

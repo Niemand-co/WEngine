@@ -15,6 +15,8 @@ public:
 
 	uint32 Count = 0;
 
+	uint8 *Data;
+
 	EBufferUsageFlags Usage = EBufferUsageFlags::BF_None;
 
 };

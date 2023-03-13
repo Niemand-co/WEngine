@@ -7,11 +7,11 @@ class RenderResource
 {
 public:
 	
-	virtual void InitRHIResource() = 0;
+	virtual void InitRHIResource() {}
 
-	virtual void ReleaseRHIResource() = 0;
+	virtual void ReleaseRHIResource() {}
 
-	virtual void UpdateRHIResource() = 0;
+	virtual void UpdateRHIResource() {}
 
 	bool WaitForRHIResourceReady() { ReasourceReadyEvent->Wait(); }
 

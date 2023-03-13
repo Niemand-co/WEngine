@@ -141,6 +141,8 @@ namespace Vulkan
 
 		bool HasPendingImmediateCmdBuffer() const { return ImmediateCmdBuffer != nullptr; }
 
+		void RefreshFenceState();
+
 	private:
 
 		VulkanDevice *pDevice;

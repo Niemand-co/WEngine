@@ -15,6 +15,8 @@ public:
 
 	virtual void UpdateRHIResource() override;
 
+	void BindColorVertexBuffer(class WStaticMeshDataType& Data) const;
+
 private:
 
 	class WStaticMeshVertexDataInterface *ColorData;

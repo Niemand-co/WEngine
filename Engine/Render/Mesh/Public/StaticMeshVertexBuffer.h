@@ -18,13 +18,19 @@ public:
 
 	virtual void UpdateRHIResource() override;
 
+	void BindMeshVertexBuffer(class WStaticMeshDataType& Data) const;
+
 private:
 
-	WVertexBufferRHIRef TangentBuffer;
+	class WTangentVertexBuffer : public WVertexBuffer
+	{
+	} TangentBuffer;
 
 	WStaticMeshVertexDataInterface *TangentData;
 
-	WVertexBufferRHIRef TexCoordsBuffer;
+	class WTexCoordsVertexBuffer : public WVertexBuffer
+	{
+	} TexCoordsBuffer;
 
 	WStaticMeshVertexDataInterface* TexCoordsData;
 };
