@@ -2,6 +2,11 @@
 #include "Render/Public/Viewport.h"
 #include "Event/Public/Input.h"
 
+void WViewport::BeginRenderFrame()
+{
+	GetRenderCommandList()->BeginDrawingViewport(ViewportRHI);
+}
+
 void WViewport::InitRHIResource()
 {
 	DepthStencil = GetRenderCommandList()->CreateTexture2D(Width, Height, Format::D32_SFLOAT_S8_UINT, 1, {}, ETextureCreateFlags::TextureCreate_DepthStencil);

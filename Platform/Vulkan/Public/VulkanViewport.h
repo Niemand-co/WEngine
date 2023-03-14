@@ -24,7 +24,7 @@ namespace Vulkan
 
 		void WaitForFrameEvenCompletion();
 
-		virtual RHITexture* GetRenderTarget() const;
+		virtual WTexture2DRHIRef GetRenderTarget() const;
 
 	private:
 

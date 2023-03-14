@@ -45,9 +45,15 @@ void StaticMeshProxy::GetDynamicMeshElements(WEngine::WArray<class SceneViewInfo
 {
 	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
 	{
-		WMeshBatch& Mesh = Collector.AllocateMesh();
-		WMeshBatchElement& Element = Mesh.Elements[0];
-		
+		for (uint32 LodIndex = 0; LodIndex < RenderData->LodResources.Size(); ++LodIndex)
+		{
+			WMeshBatch& Mesh = Collector.AllocateMesh();
+			WMeshBatchElement& Element = Mesh.Elements[0];
+
+			Mesh.VertexFactory = &RenderData->Factories[LodIndex].VertexFactory;
+
+			Element.IndexBuffer = &RenderData->LodResources[LodIndex].IndexBuffer;
+		}
 	}
 }
 

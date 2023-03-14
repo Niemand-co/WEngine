@@ -10,9 +10,9 @@ public:
 
 public:
 
-	WEngine::WSharedPtr<class WIndexBuffer> IndexBuffer;
+	class WIndexBuffer *IndexBuffer;
 
-	WEngine::WSharedPtr<class WUniformBuffer> UniformBuffer;
+	class WUniformBuffer *UniformBuffer;
 
 };
 
@@ -28,8 +28,8 @@ public:
 
 	WEngine::WArray<WMeshBatchElement> Elements = WEngine::WArray<WMeshBatchElement>(1);
 
-	WEngine::WSharedPtr<class WVertexFactory> VertexFactory;
+	class WVertexFactory* VertexFactory;
 
-	WEngine::WSharedPtr<class MaterialProxy> Material;
+	class MaterialProxy* Material;
 
 };

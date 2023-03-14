@@ -2,11 +2,8 @@
 #include "Render/Renderer/Public/DeferredRenderer.h"
 #include "Render/Public/Scene.h"
 #include "Render/Public/Shader.h"
-#include "Scene/Components/Public/CameraComponent.h"
 #include "Scene/Components/Public/PrimitiveComponent.h"
 #include "Scene/Components/Public/DirectionalLightComponent.h"
-#include "Render/Public/SceneVisibility.h"
-#include "Render/Passes/Public/DeferredBasePass.h"
 #include "Render/Public/RenderDependencyGraph.h"
 #include "Render/Public/RenderDependencyGraphResource.h"
 #include "Render/Public/RenderDependencyGraphParameter.h"
@@ -14,11 +11,10 @@
 #include "Render/Descriptor/Public/RHIPipelineStateObjectDescriptor.h"
 #include "RHI/Public/RHIViewport.h"
 
-DeferredRenderer::DeferredRenderer(CameraComponent* pCamera, WViewport *Viewport)
-	: SceneRenderer(pCamera, Viewport)
+DeferredRenderer::DeferredRenderer(const WSceneViewFamily* InViewFamily)
+	: SceneRenderer(InViewFamily)
 {
 	GraphBuilder = new WRDGBuilder();
-	SetupBasePass(Viewport);
 }
 
 DeferredRenderer::~DeferredRenderer()
@@ -29,138 +25,45 @@ void DeferredRenderer::Render()
 {
 	InitView();
 
-	RenderPrePass();
+	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
+	{
+		WViewInfo& View = Views[ViewIndex];
 
-	RenderBasePass();
+		RenderPrePass(View);
 
-	RenderShadowPass();
+		RenderBasePass(View);
 
-	RenderLightPass();
+		RenderShadowPass(View);
 
-	RenderSkybox();
+		RenderLightPass(View);
 
-	RenderTranslucent();
+		RenderSkybox(View);
 
-	RenderPostEffect();
+		RenderTranslucent(View);
 
+		RenderPostEffect(View);
+
+	}
 	GraphBuilder->Execute();
 }
 
 void DeferredRenderer::InitView()
 {
 	ComputeVisibility();
-
-	LightInfo *MainLight = Scene->GetMainLightInfo();
-	if (MainLight)
-	{
-		WEngine::CascadedShadowMap::UpdateSplices(CSMMaps, m_pCamera->m_nearPlane, m_pCamera->m_farPlane);
-		WEngine::CascadedShadowMap::UpdatePSSMMatrices(CSMMaps, glm::inverse(m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix()), static_cast<DirectionalLightInfo*>(MainLight)->LightDirection);
-	}
-
 	
 }
 
-void DeferredRenderer::RenderPrePass()
+void DeferredRenderer::RenderPrePass(WViewInfo& View)
 {
 
 }
 
-void DeferredRenderer::RenderBasePass()
+void DeferredRenderer::RenderBasePass(WViewInfo& View)
 {
+	glm::vec2 ViewRect = View.ViewMatrices.Rect;
+	WRDGTexture * GBuffer0 = GraphBuilder->RegisterExternalTexture(View.Family->RenderTarget->GetHandle());
 
-}
-
-void DeferredRenderer::RenderShadowPass()
-{
-}
-
-void DeferredRenderer::RenderLightPass()
-{
-	RE_LOG("Render Light Pass");
-}
-
-void DeferredRenderer::RenderSkybox()
-{
-}
-
-void DeferredRenderer::RenderTranslucent()
-{
-}
-
-void DeferredRenderer::RenderPostEffect()
-{
-}
-
-void DeferredRenderer::ComputeVisibility()
-{
-	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
-	{
-		SceneViewInfo& ViewInfo = Views[ViewIndex];
-
-		ViewInfo.PrimitiveVisibilityMap.Init(Scene->GetPrimitives().Size(), false);
-
-		{
-			const WEngine::WArray<PrimitiveInfo*>& Primitives = Scene->GetPrimitives();
-			FrustumCulling(Primitives, ViewInfo);
-			OcclusionCulling(Primitives, ViewInfo);
-		}
-	}
-
-}
-
-void DeferredRenderer::FrustumCulling(const WEngine::WArray<PrimitiveInfo*>& Primitives, SceneViewInfo& ViewInfo)
-{
-	WEngine::WArray<glm::vec3> Frustum(8);
-	{
-		TransformComponent* Transformer = m_pCamera->GetOwner()->GetComponent<TransformComponent>();
-		glm::vec3 Forward = m_pCamera->GetForward();
-		glm::vec3 NearCenter = Transformer->GetPosition() + Forward * m_pCamera->m_nearPlane;
-		glm::vec3 FarCenter = Transformer->GetPosition() + Forward * m_pCamera->m_farPlane;
-		glm::vec3 Up = glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), Forward);
-		glm::vec3 Right = glm::cross(Forward, Up);
-		float arctanHalfFov = glm::tan(m_pCamera->m_fov * 0.5f);
-		float NearHeight = arctanHalfFov * m_pCamera->m_nearPlane * 2.0f;
-		float NearWidth = NearHeight * m_pCamera->m_aspect;
-		float FarHeight = arctanHalfFov * m_pCamera->m_farPlane * 2.0f;
-		float FarWidth = FarHeight * m_pCamera->m_aspect;
-		glm::vec3 NearUp = Up * NearHeight;
-		glm::vec3 NearRight = Right * NearWidth;
-		glm::vec3 FarUp = Up * FarHeight;
-		glm::vec3 FarRight = Right * FarWidth;
-
-		Frustum[0] = NearCenter - NearUp - NearRight;
-		Frustum[1] = NearCenter - NearUp + NearRight;
-		Frustum[2] = NearCenter + NearUp + NearRight;
-		Frustum[3] = NearCenter + NearUp - NearRight;
-
-		Frustum[4] = FarCenter - FarUp - FarRight;
-		Frustum[5] = FarCenter - FarUp + FarRight;
-		Frustum[6] = FarCenter + FarUp + FarRight;
-		Frustum[7] = FarCenter + FarUp - FarRight;
-	}
-
-	WEngine::WTaskGraph::Get()->ParallelFor(Primitives.Size(), [this, &ViewInfo, &Primitives, &Frustum](uint32 index)
-		{
-			PrimitiveInfo* info = Primitives[index];
-			const BoundingBox& box = info->Proxy->GetBoundingBox();
-
-			if ((bUseBoxTest ? IsBoxInFrustum(Frustum, box.BoxMin, box.BoxMax) : true) && (bUseSphereTest ? IsSphereInFrustum(Frustum, glm::vec3(), 0.0f) : true))
-			{
-				ViewInfo.PrimitiveVisibilityMap[index] = true;
-			}
-		});
-}
-
-void DeferredRenderer::OcclusionCulling(const WEngine::WArray<PrimitiveInfo*>& Primitives, SceneViewInfo& ViewInfo)
-{
-}
-
-void DeferredRenderer::SetupBasePass(WViewport* Viewport)
-{
-	glm::vec2 Resolution = m_pCamera->GetResolution();
-	WRDGTexture* GBuffer0 = GraphBuilder->RegisterExternalTexture(Viewport->GetRHI()->GetRenderTarget());
-
-	const WRDGTextureDesc DepthDesc = WRDGTextureDesc::GetTexture2DDesc(Format::D16_Unorm, { (uint32)Resolution.x, (uint32)Resolution.y, 1u }, { 0.0f, 0.0f, 0.0f, 0.0f });
+	const WRDGTextureDesc DepthDesc = WRDGTextureDesc::GetTexture2DDesc(Format::D16_Unorm, { (uint32)ViewRect.x, (uint32)ViewRect.y, 1u }, { 0.0f, 0.0f, 0.0f, 0.0f });
 	WRDGTexture* DepthBuffer = GraphBuilder->CreateTexture(DepthDesc, "Depth");
 
 	DeferredBasePassParameters* Parameters = GraphBuilder->AllocateParameterStruct<DeferredBasePassParameters>();
@@ -174,9 +77,30 @@ void DeferredRenderer::SetupBasePass(WViewport* Viewport)
 				PSODescriptor.Shaders[(uint8)ShaderStage::Vertex] = WShaderLibrary::GetShader("OpaqueVert");
 				PSODescriptor.Shaders[(uint8)ShaderStage::Pixel] = WShaderLibrary::GetShader("OpaqueFrag");
 
-				
+
 			}
 			CmdList.SetGraphicsPipelineState(&PSODescriptor);
 			CmdList.DrawIndexedPrimitive(3, 0, 1);
 		});
+}
+
+void DeferredRenderer::RenderShadowPass(WViewInfo& View)
+{
+}
+
+void DeferredRenderer::RenderLightPass(WViewInfo& View)
+{
+	RE_LOG("Render Light Pass");
+}
+
+void DeferredRenderer::RenderSkybox(WViewInfo& View)
+{
+}
+
+void DeferredRenderer::RenderTranslucent(WViewInfo& View)
+{
+}
+
+void DeferredRenderer::RenderPostEffect(WViewInfo& View)
+{
 }

@@ -16,6 +16,8 @@ public:
 
 	virtual void UpdateRHIResource() override;
 
+	virtual WTexture2DRHIRef GetHandle() const { return Texture; }
+
 	~WRenderTarget() = default;
 
 protected:

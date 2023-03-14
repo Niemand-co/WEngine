@@ -4,7 +4,7 @@
 #include "Render/Public/Scene.h"
 
 CameraComponent::CameraComponent(GameObject* pGameObject, const float& fov, const float& aspect, const float& nearPlane, const float& farPlane)
-	: m_fov(fov), m_aspect(aspect), m_nearPlane(nearPlane), m_farPlane(farPlane), m_renderer(nullptr), m_pInfo(nullptr), Component(pGameObject)
+	: m_fov(fov), m_aspect(aspect), m_nearPlane(nearPlane), m_farPlane(farPlane), m_pInfo(nullptr), Component(pGameObject)
 {
 	phi = 0.0f;
 	theta = 0.0f;
@@ -27,11 +27,6 @@ glm::mat4x4 CameraComponent::GetProjectionMatrix()
 {
 	UpdateProjectionMatrix();
 	return m_projectionMatrix;
-}
-
-ScriptableRenderer* CameraComponent::GetRenderer()
-{
-	return m_renderer;
 }
 
 CameraInfo* CameraComponent::GetCameraInfo()

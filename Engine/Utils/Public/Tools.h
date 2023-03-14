@@ -70,6 +70,9 @@ namespace WEngine
 	struct remove_const<const T> { typedef T type; };
 
 	template<typename T>
+	struct remove_const<const T*> { typedef T* type; };
+
+	template<typename T>
 	struct remove_const_and_reference { typedef T type; };
 
 	template<typename T>
@@ -97,6 +100,12 @@ namespace WEngine
 	constexpr T&& Forward(T& _Val)
 	{
 		return static_cast<T&&>(_Val);
+	}
+
+	template<typename T>
+	remove_const<T>::type RemoveConst(T _Val)
+	{
+		return const_cast<remove_const<T>::type>(_Val);
 	}
 
 	template<typename T>

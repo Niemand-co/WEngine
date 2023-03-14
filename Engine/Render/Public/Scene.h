@@ -14,6 +14,8 @@ public:
 
 	~RScene();
 
+	EShadingPath GetShadingPath() const { return ShadingPath; }
+
 	void AddPrimitive(class PrimitiveComponent *primitive);
 
 	void RemovePrimitive(PrimitiveComponent *primitive);
@@ -32,17 +34,15 @@ public:
 
 	void UpdateCameraInfoForScene();
 
-	void StartFrame(class WViewport *viewport);
-
-	void EndFrame(class WViewport *viewport);
-
 	const WEngine::WArray<PrimitiveInfo*>& GetPrimitives() const { return m_primitives; }
 
 	const WEngine::WArray<uint8>& GetPrimitiveMasks() const { return m_primitiveMasks; }
 
 	const WEngine::WArray<PrimitiveInfo*>& GetDynamicShadowCaster() const { return m_dynamicShadowCaster; }
 
-	const WEngine::WArray<LightInfo*>& GetLightInfos() const { return m_lights; }
+	const WEngine::WArray<LightInfo*>& GetLights() const { return m_lights; }
+
+	const WEngine::WArray<CameraInfo*>& GetCameras() const { return m_cameras; }
 
 	LightInfo* GetMainLightInfo() const { return m_pMainLight; }
 
@@ -95,5 +95,7 @@ private:
 	WEngine::WSet<CameraInfo*> m_addedCameras;
 
 	WEngine::WSet<CameraInfo*> m_removedCameras;
+
+	EShadingPath ShadingPath;
 
 };

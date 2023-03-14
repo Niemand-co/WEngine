@@ -1,13 +1,6 @@
 #pragma once
 #include "Scene/Components/Public/Component.h"
 #include "Scene/Components/Public/TransformComponent.h"
-#include "Render/Renderer/Public/DeferredRenderer.h"
-
-class GameObject;
-class ScriptableRenderer;
-class RHITextureView;
-class RHITexture;
-struct CameraInfo;
 
 class CameraComponent : public Component
 {
@@ -33,12 +26,7 @@ public:
 
 	glm::vec3 GetForward() const { return m_forward; }
 
-	template<typename T>
-	void SetRenderer(RScene* Scene, class WViewport* Viewport);
-
-	ScriptableRenderer* GetRenderer();
-
-	CameraInfo* GetCameraInfo();
+	struct CameraInfo* GetCameraInfo();
 
 	glm::vec2& GetResolution() { return m_resolution; }
 
@@ -70,10 +58,6 @@ private:
 
 	glm::mat4x4 m_projectionMatrix;
 
-	ScriptableRenderer *m_renderer;
-
-	WEngine::WArray<RHITexture*> m_textureResources;
-
 	CameraInfo *m_pInfo;
 
 	glm::vec3 m_forward;
@@ -93,11 +77,7 @@ struct CameraInfo
 		  MatrixV(camera->GetViewMatrix()),
 		  MatrixP(camera->GetProjectionMatrix()),
 		  MatrixVP(MatrixP * MatrixV),
-		  Fov(camera->m_fov),
-		  FarClip(camera->m_farPlane),
-		  NearClip(camera->m_nearPlane),
-		  Aspect(camera->m_aspect),
-		  Renderer(camera->m_renderer),
+		  Direction(camera->GetOwner()->GetComponent<TransformComponent>()->GetForward()),
 		  Owner(camera->GetOwner()),
 		  bMarkedDirty(false)
 	{
@@ -125,29 +105,12 @@ struct CameraInfo
 	
 	glm::mat4x4 MatrixVP;
 	
-	float Fov;
-	
-	float FarClip;
-	
-	float NearClip;
-	
-	float Aspect;
-
-	ScriptableRenderer* Renderer;
+	glm::vec3 Direction;
 
 	GameObject *Owner;
 
 	uint8 bMarkedDirty : 1;
 };
-
-template<typename T>
-void CameraComponent::SetRenderer(RScene* Scene, WViewport *Viewport)
-{
-	m_renderer = new T(this, Viewport);
-	SceneRenderer* renderer = dynamic_cast<SceneRenderer*>(m_renderer);
-	if (renderer != nullptr)
-		renderer->SetScene(Scene);
-}
 
 //namespace WEngine
 //{

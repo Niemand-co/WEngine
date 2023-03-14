@@ -57,7 +57,7 @@ struct PrimitiveProxy
 
 	virtual void DrawDynamicMesh(RHICommandListBase* CmdList) = 0;
 
-	virtual void GetDynamicMeshElements(WEngine::WArray<class SceneViewInfo>& Views, class WMeshCollector& Collector) {}
+	virtual void GetDynamicMeshElements(WEngine::WArray<class WViewInfo>& Views, class WMeshCollector& Collector) {}
 
 	virtual void GenerateBoundingBox() = 0;
 

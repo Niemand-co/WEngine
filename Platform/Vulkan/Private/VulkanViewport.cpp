@@ -209,7 +209,7 @@ namespace Vulkan
 		LastFrameCmdBuffer = static_cast<VulkanQueue*>(RHIContext::GetContext()->GetQueue())->GetLastSubmittedCmdBuffer();
 	}
 
-	RHITexture* VulkanViewport::GetRenderTarget() const
+	WTexture2DRHIRef VulkanViewport::GetRenderTarget() const
 	{
 		return RenderingBackBuffer.Get();
 	}

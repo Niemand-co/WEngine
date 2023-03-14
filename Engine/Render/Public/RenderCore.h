@@ -1,6 +1,13 @@
 #pragma once
 #include "Utils/Container/Public/WArray.h"
 
+enum class EShadingPath : uint8
+{
+	Forward,
+	Deferred,
+	ForwardPlus,
+};
+
 enum class Format
 {
 	R8_SInt = 0,

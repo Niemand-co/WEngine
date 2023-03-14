@@ -19,6 +19,8 @@ public:
 
 	virtual ~WViewport() = default;
 
+	virtual void BeginRenderFrame();
+
 	virtual void ProcessInput() = 0;
 
 	virtual void InitRHIResource() override;
@@ -26,6 +28,8 @@ public:
 	virtual void ReleaseRHIResource() override;
 
 	virtual void UpdateRHIResource() override;
+
+	virtual WTexture2DRHIRef GetHandle() const override { return ViewportRHI->GetRenderTarget(); }
 
 	WViewportRHIRef GetRHI() const { return ViewportRHI; }
 

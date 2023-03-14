@@ -21,8 +21,6 @@ private:
 	
 	bool m_isMoving;
 
-	CameraComponent *m_sceneCamera;
-
 };
 
 class SandBox : public WEngine::Application

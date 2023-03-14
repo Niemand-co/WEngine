@@ -3,13 +3,12 @@
 #include "Scene/Components/Public/InstancedStaticMeshComponent.h"
 #include "Scene/Components/Public/DirectionalLightComponent.h"
 #include "Scene/Components/Public/CameraComponent.h"
-#include "Render/Renderer/Public/DeferredRenderer.h"
-#include "Render/Public/Viewport.h"
 
 RScene* RScene::g_activeScene = nullptr;
 
 RScene::RScene()
-	: m_pMainLight(nullptr)
+	: m_pMainLight(nullptr),
+	  ShadingPath(EShadingPath::Deferred)
 {
 }
 
@@ -186,14 +185,4 @@ void RScene::UpdateCameraInfoForScene()
 	{
 		info->UpdateInfo();
 	}
-}
-
-void RScene::StartFrame(WViewport* viewport)
-{
-	GetRenderCommandList()->BeginDrawingViewport(viewport->GetRHI());
-}
-
-void RScene::EndFrame(WViewport* viewport)
-{
-	GetRenderCommandList()->EndDrawingViewport(viewport->GetRHI(), true);
 }

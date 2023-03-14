@@ -42,6 +42,10 @@ namespace WEngine
 
 		virtual ~Layer() = default;
 
+		void StartFrame();
+
+		void EndFrame();
+
 		void StartRendering();
 
 	protected:

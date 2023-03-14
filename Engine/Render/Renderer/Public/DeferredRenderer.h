@@ -6,7 +6,7 @@ class DeferredRenderer : public SceneRenderer
 {
 public:
 
-	DeferredRenderer(CameraComponent *pCamera, class WViewport* Viewport);
+	DeferredRenderer(const WSceneViewFamily *InViewFamily);
 
 	virtual ~DeferredRenderer();
 
@@ -14,39 +14,25 @@ public:
 
 	void InitView();
 
-	void RenderPrePass();
+	void RenderPrePass(WViewInfo &View);
 
-	void RenderBasePass();
+	void RenderBasePass(WViewInfo& View);
 
-	void RenderShadowPass();
+	void RenderShadowPass(WViewInfo& View);
 
-	void RenderLightPass();
+	void RenderLightPass(WViewInfo& View);
 
-	void RenderSkybox();
+	void RenderSkybox(WViewInfo& View);
 
-	void RenderTranslucent();
+	void RenderTranslucent(WViewInfo& View);
 
-	void RenderPostEffect();
-
-private:
-
-	void ComputeVisibility();
-
-	void FrustumCulling(const WEngine::WArray<class PrimitiveInfo*>& Primitives, SceneViewInfo& ViewInfo);
-
-	void OcclusionCulling(const WEngine::WArray<class PrimitiveInfo*>& Primitives, SceneViewInfo& ViewInfo);
-
-	void SetupBasePass(class WViewport *Viewport);
+	void RenderPostEffect(WViewInfo& View);
 
 private:
 
 	CSMShadowMapPack CSMMaps;
 
 	uint8 bRenderPrePass : 1;
-
-	uint8 bUseSphereTest : 1;
-
-	uint8 bUseBoxTest : 1;
 
 	float MaxDrawDistance;
 

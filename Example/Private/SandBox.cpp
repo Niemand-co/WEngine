@@ -5,7 +5,6 @@ GameScene::GameScene(const WEngine::WString& name)
 	: Layer(name)
 {
 	Viewport = new WSceneViewport(1920, 1080, Format::B8G8R8A8_UNorm);
-	Camera->SetRenderer<DeferredRenderer>(Scene.Get(), Viewport.Get());
 }
 
 GameScene::~GameScene()
@@ -55,11 +54,11 @@ void GameScene::Tick(WEngine::TimeStep timeStep)
 
 		Scene->UpdatePrimitiveInfosForScene();
 
-		Scene->StartFrame(Viewport.Get());
+		StartFrame(Viewport.Get());
 
 		this->StartRendering();
 
-		Scene->EndFrame(Viewport.Get());
+		EndFrame(Viewport.Get());
 		
 	}), WEngine::EThreadProperty::RenderThread);
 	
