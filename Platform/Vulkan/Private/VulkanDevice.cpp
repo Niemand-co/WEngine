@@ -311,17 +311,17 @@ namespace Vulkan
 
 		VkVertexInputBindingDescription vertexInputBindgDescription = {};
 		{
-			vertexInputBindgDescription.binding = descriptor->VertexInputAttrib.bindingDescription->slot;
-			vertexInputBindgDescription.stride = descriptor->VertexInputAttrib.bindingDescription->stride;
+			vertexInputBindgDescription.binding = descriptor->VertexInputAttrib.BindingDescriptions->slot;
+			vertexInputBindgDescription.stride = descriptor->VertexInputAttrib.BindingDescriptions->stride;
 			vertexInputBindgDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 		}
 		WEngine::WArray<VkVertexInputAttributeDescription> VertexInputAttributeDescriptions;
 		for(unsigned int i = 0; i < descriptor->VertexInputAttrib.attributeDescriptionCount; ++i)
 		{
-			VertexInputAttributeDescriptions[i].binding = descriptor->VertexInputAttrib.pAttributeDescription[i]->slot;
-			VertexInputAttributeDescriptions[i].location = descriptor->VertexInputAttrib.pAttributeDescription[i]->location;
-			VertexInputAttributeDescriptions[i].offset = descriptor->VertexInputAttrib.pAttributeDescription[i]->offset;
-			VertexInputAttributeDescriptions[i].format = WEngine::ToVulkan(descriptor->VertexInputAttrib.pAttributeDescription[i]->format);
+			VertexInputAttributeDescriptions[i].binding = descriptor->VertexInputAttrib.AttributeDescriptions[i].slot;
+			VertexInputAttributeDescriptions[i].location = descriptor->VertexInputAttrib.AttributeDescriptions[i].location;
+			VertexInputAttributeDescriptions[i].offset = descriptor->VertexInputAttrib.AttributeDescriptions[i].offset;
+			VertexInputAttributeDescriptions[i].format = WEngine::ToVulkan(descriptor->VertexInputAttrib.AttributeDescriptions[i].format);
 		}
 		VkPipelineVertexInputStateCreateInfo VertexInputStateCreateInfo = {};
 		{
@@ -603,101 +603,27 @@ namespace Vulkan
 
 	WVertexBufferRHIRef VulkanDevice::CreateVertexBuffer(RHIBufferDescriptor* descriptor)
 	{
-		size_t bufferSize = descriptor->stride * descriptor->count;
-		VkBufferCreateInfo info = {};
-		{
-			info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-			info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-			info.size = bufferSize;
-			info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		}
-		
-		return new VulkanVertexBuffer(this, &info, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		return new VulkanVertexBuffer(this, descriptor);
 	}
 
 	WDynamicVertexBufferRHIRef VulkanDevice::CreateDynamicVertexBuffer(RHIBufferDescriptor* descriptor)
 	{
-		size_t bufferSize = descriptor->Stride * descriptor->Count;
-		size_t minUBOSize = pGPU->GetFeature().minUBOAlignment;
-		bufferSize = (bufferSize + minUBOSize - 1) & ~(minUBOSize - 1);
-		VkBufferCreateInfo info = {};
-		{
-			info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-			info.size = bufferSize;
-			info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-			info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-
-			if (WEngine::EnumHasFlags(descriptor->Usage, EBufferUsageFlags::BF_SRV))
-				info.usage |= VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
-			if (WEngine::EnumHasFlags(descriptor->Usage, EBufferUsageFlags::BF_TransferDst))
-				info.usage |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-			if (WEngine::EnumHasFlags(descriptor->Usage, EBufferUsageFlags::BF_TransferSrc))
-				info.usage |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-			if (WEngine::EnumHasFlags(descriptor->Usage, EBufferUsageFlags::BF_UAV))
-				info.usage |= VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT;
-		}
-
-		return new VulkanDynamicVertexBuffer(this, &info, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		return new VulkanDynamicVertexBuffer(this, descriptor);
 	}
 
 	WIndexBufferRHIRef VulkanDevice::CreateIndexBuffer(RHIBufferDescriptor* descriptor)
 	{
-		size_t bufferSize = descriptor->Stride * descriptor->Count;
-		VkBufferCreateInfo info = {};
-		{
-			info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-			info.size = bufferSize;
-			info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-			info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-
-			if(WEngine::EnumHasFlags(descriptor->Usage, EBufferUsageFlags::BF_SRV))
-				info.usage |= VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
-			if(WEngine::EnumHasFlags(descriptor->Usage, EBufferUsageFlags::BF_TransferDst))
-				info.usage |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-			if (WEngine::EnumHasFlags(descriptor->Usage, EBufferUsageFlags::BF_TransferSrc))
-				info.usage |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-			if(WEngine::EnumHasFlags(descriptor->Usage, EBufferUsageFlags::BF_UAV))
-				info.usage |= VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT;
-		}
-
-		return new VulkanIndexBuffer(this, &info, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		return new VulkanIndexBuffer(this, descriptor);
 	}
 
 	WUniformBufferRHIRef VulkanDevice::CreateUniformBuffer(RHIBufferDescriptor* descriptor)
 	{
-		size_t bufferSize = descriptor->Stride * descriptor->Count;
-		VkBufferCreateInfo info = {};
-		{
-			info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-			info.size = bufferSize;
-			info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-			info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-
-			if (WEngine::EnumHasFlags(descriptor->Usage, EBufferUsageFlags::BF_TransferDst))
-				info.usage |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-			if (WEngine::EnumHasFlags(descriptor->Usage, EBufferUsageFlags::BF_TransferSrc))
-				info.usage |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-			if (WEngine::EnumHasFlags(descriptor->Usage, EBufferUsageFlags::BF_UAV))
-				info.usage |= VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT;
-		}
-
-		return new VulkanUniformBuffer(this, &info, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		return new VulkanUniformBuffer(this, descriptor);
 	}
 
 	WDynamicUniformBufferRHIRef VulkanDevice::CreateDynamicUniformBuffer(RHIBufferDescriptor* descriptor)
 	{
-		size_t bufferSize = descriptor->stride * descriptor->count;
-		size_t minUBOSize = pGPU->GetFeature().minUBOAlignment;
-		bufferSize = (bufferSize + minUBOSize - 1) & ~(minUBOSize - 1);
-		VkBufferCreateInfo info = {};
-		{
-			info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-			info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-			info.size = bufferSize;
-			info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		}
-
-		return new VulkanDynamicUniformBuffer(this, &info, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		return new VulkanDynamicUniformBuffer(this, descriptor);
 	}
 
 	RHIGroup* VulkanDevice::CreateResourceGroup(RHIGroupDescriptor* descriptor)
@@ -823,7 +749,7 @@ namespace Vulkan
 			pWriteDescriptorSets[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			pWriteDescriptorSets[i].descriptorCount = descriptor->pBindingResources[i].count;
 			pWriteDescriptorSets[i].descriptorType = WEngine::ToVulkan(descriptor->pBindingResources[i].type);
-			pWriteDescriptorSets[i].dstSet = *static_cast<VulkanGroup*>(descriptor->pGroup)->GetHandle();
+			pWriteDescriptorSets[i].dstSet = static_cast<VulkanGroup*>(descriptor->pGroup)->GetHandle();
 			pWriteDescriptorSets[i].dstBinding = descriptor->pBindingResources[i].bindingSlot;
 			pWriteDescriptorSets[i].pBufferInfo = pDescriptorBufferInfos[i];
 		}
@@ -862,7 +788,7 @@ namespace Vulkan
 			pWriteDescriptorSets[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			pWriteDescriptorSets[i].descriptorCount = descriptor->pBindingResources[i].count;
 			pWriteDescriptorSets[i].descriptorType = WEngine::ToVulkan(descriptor->pBindingResources[i].type);
-			pWriteDescriptorSets[i].dstSet = *static_cast<VulkanGroup*>(descriptor->pGroup)->GetHandle();
+			pWriteDescriptorSets[i].dstSet = static_cast<VulkanGroup*>(descriptor->pGroup)->GetHandle();
 			pWriteDescriptorSets[i].dstBinding = descriptor->pBindingResources[i].bindingSlot;
 			pWriteDescriptorSets[i].pImageInfo = pDescriptorImageInfos[i];
 		}

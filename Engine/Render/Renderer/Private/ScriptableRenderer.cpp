@@ -102,3 +102,25 @@ WViewInfo::WViewInfo(const WSceneViewInfo& SceneViewInfo)
 	: WSceneViewInfo(SceneViewInfo)
 {
 }
+
+void WViewInfo::SetupViewParameters(SceneViewUniformBufferParameters& Parameters)
+{
+	Parameters.ViewMatrix = ViewMatrices.ViewMatrix;
+	Parameters.ProjectionMatrix = ViewMatrices.ProjectionMatrix;
+	Parameters.ViewProjectionMatrix = ViewMatrices.ViewProjectionMatrix;
+	Parameters.ViewLocation = ViewLocation;
+}
+
+void WViewInfo::CreateUniformBuffer(SceneViewUniformBufferParameters& Parameters)
+{
+	ViewUniformBuffer = SceneViewUniformBufferParameters::CreateUniformBuffer((uint8*)&Parameters, sizeof(Parameters), 1, EBufferUsageFlags::BF_UniformBuffer);
+}
+
+void WViewInfo::InitRHIResources()
+{
+	SceneViewUniformBufferParameters Parameters;
+
+	SetupViewParameters(Parameters);
+
+	CreateUniformBuffer(Parameters);
+}

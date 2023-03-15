@@ -2,13 +2,13 @@
 
 #define ENCODER_EXECUTE(command) static_cast<RHIRenderCommandList*>(CmdList)->command
 
-class RHICommandListBase;
+struct RHICommandListBase;
 
-class RHICommandBase
+struct RHICommandBase
 {
 	virtual void ExecuteAndDestruct(RHICommandListBase *CmdList) = 0;
 
-	RHICommandBase *next;
+	RHICommandBase *next = nullptr;
 };
 
 template<typename T>

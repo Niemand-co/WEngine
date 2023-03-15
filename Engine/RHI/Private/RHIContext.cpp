@@ -48,35 +48,38 @@ void RHIContext::Init(RHIBackend backend)
 	}
 }
 
-WVertexBufferRHIRef RHIContext::CreateVertexBuffer(uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
+WVertexBufferRHIRef RHIContext::CreateVertexBuffer(uint8 *InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
 {
 	RHIBufferDescriptor descriptor = {};
 	{
 		descriptor.Count = InCount;
 		descriptor.Stride = InStride;
 		descriptor.Usage = InUsage;
+		descriptor.Data = InContents;
 	}
 	return pDevice->CreateVertexBuffer(&descriptor);
 }
 
-WIndexBufferRHIRef RHIContext::CreateIndexBuffer(uint32 InCount, EBufferUsageFlags InUsage)
+WIndexBufferRHIRef RHIContext::CreateIndexBuffer(uint8* InContents, uint32 InCount, EBufferUsageFlags InUsage)
 {
 	RHIBufferDescriptor descriptor = {};
 	{
 		descriptor.Count = InCount;
 		descriptor.Stride = sizeof(uint32);
 		descriptor.Usage = InUsage;
+		descriptor.Data = InContents;
 	}
 	return pDevice->CreateIndexBuffer(&descriptor);
 }
 
-WUniformBufferRHIRef RHIContext::CreateUniformBuffer(uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
+WUniformBufferRHIRef RHIContext::CreateUniformBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
 {
 	RHIBufferDescriptor descriptor = {};
 	{
 		descriptor.Count = InCount;
 		descriptor.Stride = InStride;
 		descriptor.Usage = InUsage;
+		descriptor.Data = InContents;
 	}
 	return pDevice->CreateUniformBuffer(&descriptor);
 }
@@ -244,7 +247,7 @@ RHIPipelineResourceLayout* RHIContext::CreatePipelineResourceLayout(RHIPipelineR
 	return pDevice->CreatePipelineResourceLayout(descriptor);
 }
 
-RHIPipelineStateObject* RHIContext::CreatePSO(RHIPipelineStateObjectDescriptor* descriptor)
+RHIPipelineStateObject* RHIContext::CreatePSO(RHIGraphicsPipelineStateObjectDescriptor* descriptor)
 {
 	return pDevice->CreatePipelineStateObject(descriptor);
 }

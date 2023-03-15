@@ -22,6 +22,16 @@ public:
 
 	const class RHIContext* GetContext() const { return m_pContext; }
 
+	void Execute();
+
+	void* AllocCommand(int32 InSize, int32 InAlignment);
+
+	template<typename T>
+	void* AllocCommand()
+	{
+		return AllocCommand(sizeof(T), alignof(T));
+	}
+
 protected:
 
 	virtual ~RHICommandListBase() = default;
@@ -29,6 +39,9 @@ protected:
 protected:
 
 	RHIContext *m_pContext;
+
+	struct RHICommandBase *Root         = nullptr;
+	struct RHICommandBase **CommandLink = nullptr;
 
 };
 
@@ -60,11 +73,11 @@ public:
 
 	void CopyImageToBackBuffer(class RHITexture *SrcTexture, class RHITexture *DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY);
 
-	WVertexBufferRHIRef CreateVertexBuffer(uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage);
+	WVertexBufferRHIRef CreateVertexBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage);
 
-	WIndexBufferRHIRef CreateIndexBuffer(uint32 InCount, EBufferUsageFlags InUsage);
+	WIndexBufferRHIRef CreateIndexBuffer(uint8* InContents, uint32 InCount, EBufferUsageFlags InUsage);
 
-	WUniformBufferRHIRef CreateUniformBuffer(uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage);
+	WUniformBufferRHIRef CreateUniformBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage);
 
 	WVertexShaderRHIRef CreateVertexShader(ShaderCodeBlob& blob);
 

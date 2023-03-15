@@ -37,8 +37,8 @@ void WStaticMeshVertexBuffer::Init(const WEngine::WArray<VertexComponent>& InVer
 
 void WStaticMeshVertexBuffer::InitRHIResource()
 {
-	TangentBuffer.GetRHI() = GetRenderCommandList()->CreateVertexBuffer(TangentData->GetStride(), TangentData->GetNum(), EBufferUsageFlags::BF_VertexBuffer);
-	TexCoordsBuffer.GetRHI() = GetRenderCommandList()->CreateVertexBuffer(TexCoordsData->GetStride(), TexCoordsData->GetNum(), EBufferUsageFlags::BF_VertexBuffer);
+	TangentBuffer.GetRHI() = GetRenderCommandList()->CreateVertexBuffer(TangentData->GetData(), TangentData->GetStride(), TangentData->GetNum(), EBufferUsageFlags::BF_VertexBuffer);
+	TexCoordsBuffer.GetRHI() = GetRenderCommandList()->CreateVertexBuffer(TangentData->GetData(), TexCoordsData->GetStride(), TexCoordsData->GetNum(), EBufferUsageFlags::BF_VertexBuffer);
 }
 
 void WStaticMeshVertexBuffer::ReleaseRHIResource()

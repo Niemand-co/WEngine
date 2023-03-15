@@ -1,10 +1,30 @@
 #include "pch.h"
 #include "Render/Public/RHICommandList.h"
-#include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
+#include "Render/Public/RHICommand.h"
 #include "Render/Public/Buffer.h"
 #include "RHI/Public/RHIHeads.h"
 
+#define ALLOC_COMMAND(...) ::new (AllocCommand<__VA_ARGS__>()) __VA_ARGS__
+
 RHIRenderCommandList* RHIRenderCommandList::g_instance = nullptr;
+
+void RHICommandListBase::Execute()
+{
+    while (*CommandLink != nullptr)
+    {
+        RHICommandBase *Command = *CommandLink;
+        CommandLink = &Command->next;
+        Command->ExecuteAndDestruct(this);
+    }
+}
+
+void* RHICommandListBase::AllocCommand(int32 InSize, int32 InAlignment)
+{
+    RHICommandBase *Result = (RHICommandBase*)NormalAllocator::Get()->Allocate(InSize);
+    *CommandLink = Result;
+    CommandLink = &Result->next;
+    return Result;
+}
 
 RHIRenderCommandList::RHIRenderCommandList()
 {
@@ -42,10 +62,12 @@ void RHIRenderCommandList::SetGraphicsPipelineState(RHIGraphicsPipelineStateDesc
 
 void RHIRenderCommandList::DrawIndexedPrimitive(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount)
 {
+    ALLOC_COMMAND(RHICommandDrawIndexedPrimitive)(indexCount, firstIndex, instanceCount);
 }
 
 void RHIRenderCommandList::SetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth)
 {
+    ALLOC_COMMAND(RHICommandSetViewport)(X, X + Width, Y, Y + Height, MinDepth, MaxDepth);
 }
 
 void RHIRenderCommandList::CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY)
@@ -53,19 +75,19 @@ void RHIRenderCommandList::CopyImageToBackBuffer(RHITexture* SrcTexture, RHIText
     RHIContext::GetContext()->CopyImageToBackBuffer(SrcTexture, DstTexture, SrcSizeX, SrcSizeY, DstSizeX, DstSizeY);
 }
 
-WVertexBufferRHIRef RHIRenderCommandList::CreateVertexBuffer(uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
+WVertexBufferRHIRef RHIRenderCommandList::CreateVertexBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
 {
-    return RHIContext::GetContext()->CreateVertexBuffer(InStride, InCount);
+    return RHIContext::GetContext()->CreateVertexBuffer(InContents, InStride, InCount, InUsage);
 }
 
-WIndexBufferRHIRef RHIRenderCommandList::CreateIndexBuffer(uint32 InCount, EBufferUsageFlags InUsage)
+WIndexBufferRHIRef RHIRenderCommandList::CreateIndexBuffer(uint8* InContents, uint32 InCount, EBufferUsageFlags InUsage)
 {
-    return RHIContext::GetContext()->CreateIndexBuffer(InCount);
+    return RHIContext::GetContext()->CreateIndexBuffer(InContents, InCount, InUsage);
 }
 
-WUniformBufferRHIRef RHIRenderCommandList::CreateUniformBuffer(uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
+WUniformBufferRHIRef RHIRenderCommandList::CreateUniformBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
 {
-    return RHIContext::GetContext()->CreateUniformBuffer(InStride, InCount);
+    return RHIContext::GetContext()->CreateUniformBuffer(InContents, InStride, InCount, InUsage);
 }
 
 WVertexShaderRHIRef RHIRenderCommandList::CreateVertexShader(ShaderCodeBlob& blob)

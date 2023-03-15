@@ -90,8 +90,8 @@ void WLocalVertexFactory::GetPSOVertexInputElements(EInputType Type, WEngine::WA
 		Elements.Push(VertexInputElement(1, 0, 0, VertexElementType::VET_UInt, true));
 		break;
 	case EInputType::PositionAndNormal:
-		Elements.Push(VertexInputElement(2, 4, 0, VertexElementType::VET_PackedNormal, false));
-		Elements.Push(VertexInputElement(1, 0, 0, VertexElementType::VET_UInt, true));
+		Elements.Push(VertexInputElement(1, 4, 0, VertexElementType::VET_PackedNormal, false));
+		Elements.Push(VertexInputElement(2, 0, 0, VertexElementType::VET_UInt, true));
 		break;
 	default:
 		break;

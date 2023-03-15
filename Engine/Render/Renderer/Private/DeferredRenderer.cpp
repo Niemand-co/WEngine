@@ -51,6 +51,10 @@ void DeferredRenderer::InitView()
 {
 	ComputeVisibility();
 	
+	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
+	{
+		Views[ViewIndex].InitRHIResources();
+	}
 }
 
 void DeferredRenderer::RenderPrePass(WViewInfo& View)
@@ -63,12 +67,10 @@ void DeferredRenderer::RenderBasePass(WViewInfo& View)
 	glm::vec2 ViewRect = View.ViewMatrices.Rect;
 	WRDGTexture * GBuffer0 = GraphBuilder->RegisterExternalTexture(View.Family->RenderTarget->GetHandle());
 
-	const WRDGTextureDesc DepthDesc = WRDGTextureDesc::GetTexture2DDesc(Format::D16_Unorm, { (uint32)ViewRect.x, (uint32)ViewRect.y, 1u }, { 0.0f, 0.0f, 0.0f, 0.0f });
-	WRDGTexture* DepthBuffer = GraphBuilder->CreateTexture(DepthDesc, "Depth");
-
 	DeferredBasePassParameters* Parameters = GraphBuilder->AllocateParameterStruct<DeferredBasePassParameters>();
 	Parameters->RenderTarget.ColorTextures[0].Texture = GBuffer0;
-	Parameters->RenderTarget.DepthStencilTexture.Texture = DepthBuffer;
+
+	DeferredBasePassParameters::GetStructMetaData()->GetLayout();
 
 	GraphBuilder->AddPass("BasePass", Parameters, [](RHIRenderCommandList& CmdList)
 		{

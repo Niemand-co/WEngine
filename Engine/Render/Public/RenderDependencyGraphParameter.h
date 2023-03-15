@@ -472,7 +472,17 @@ struct WParameterTypeInfo<WRDGRenderTargetBinding*>
 	static constexpr WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
 };
 
-#define BEGIN_SHADER_PARAMETERS_STRUCT(STRUCT_NAME)\
+#define EMPTY_UNIFORMBUFFER_CREATE_FUNCTION return nullptr;
+
+#define NORMAL_UNIFORM_BUFFER_CREATE_FUNCTION return GetRenderCommandList()->CreateUniformBuffer(InContents, InStride, InCount, InUsage);
+
+#define BEGIN_SHADER_PARAMETERS_STRUCT(STRUCT_NAME) \
+		BEGIN_SHADER_PARAMETERS_STRUCT_INTERNAL(STRUCT_NAME, EMPTY_UNIFORMBUFFER_CREATE_FUNCTION)
+
+#define BEGIN_UNIFORM_BUFFER_STRUCT(STRUCT_NAME) \
+		BEGIN_SHADER_PARAMETERS_STRUCT_INTERNAL(STRUCT_NAME, NORMAL_UNIFORM_BUFFER_CREATE_FUNCTION)
+
+#define BEGIN_SHADER_PARAMETERS_STRUCT_INTERNAL(STRUCT_NAME, UNIFORM_BUFFER_CREATE_FUNCTION)\
 	__declspec(align(16)) struct STRUCT_NAME\
 	{\
 	public:\
@@ -481,6 +491,10 @@ struct WParameterTypeInfo<WRDGRenderTargetBinding*>
 		{\
 			static WShaderParameterMetaData MetaData(#STRUCT_NAME, GetMembers());\
 			return &MetaData;\
+		}\
+		static WUniformBufferRHIRef CreateUniformBuffer(uint8 *InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)\
+		{\
+			UNIFORM_BUFFER_CREATE_FUNCTION\
 		}\
 	private:\
 		typedef STRUCT_NAME ThisStruct;\
@@ -508,7 +522,13 @@ private:\
 	}\
 	typedef FuncPtrIdentity##PARAMETER_NAME
 
-#define END_SHADER_PARAMETERS_STRUCT\
+#define END_SHADER_PARAMETERS_STRUCT \
+		END_SHADER_PARAMETERS_STRUCT_INTERNAL
+
+#define END_UNIFORM_BUFFER_STRUCT \
+		END_SHADER_PARAMETERS_STRUCT_INTERNAL
+
+#define END_SHADER_PARAMETERS_STRUCT_INTERNAL\
 	LastFuncPtrIdentity;\
 		static WEngine::WArray<WParameterMember> GetMembers()\
 		{\

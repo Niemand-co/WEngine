@@ -1,5 +1,13 @@
 #pragma once
 #include "Scene/Components/Public/CameraComponent.h"
+#include "Render/Public/RenderDependencyGraphParameter.h"
+
+BEGIN_UNIFORM_BUFFER_STRUCT(SceneViewUniformBufferParameters)
+	SHADER_PARAMETER(glm::mat4, ViewMatrix)
+	SHADER_PARAMETER(glm::mat4, ProjectionMatrix)
+	SHADER_PARAMETER(glm::mat4, ViewProjectionMatrix)
+	SHADER_PARAMETER(glm::vec3, ViewLocation)
+END_UNIFORM_BUFFER_STRUCT
 
 struct WViewMatrices
 {
@@ -25,6 +33,8 @@ struct WSceneViewInfo
 	glm::vec3 ViewLocation;
 
 	glm::vec3 ViewDirection;
+
+	WUniformBufferRHIRef ViewUniformBuffer;
 
 	class WSceneViewFamily* Family = nullptr;
 

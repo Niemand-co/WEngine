@@ -25,7 +25,7 @@ void WPositionVertexBuffer::Init(const WEngine::WArray<VertexComponent>& InVerti
 
 void WPositionVertexBuffer::InitRHIResource()
 {
-	Buffer = GetRenderCommandList()->CreateVertexBuffer(PositionData->GetStride(), PositionData->GetNum(), EBufferUsageFlags::BF_VertexBuffer);
+	Buffer = GetRenderCommandList()->CreateVertexBuffer(PositionData->GetData(), PositionData->GetStride(), PositionData->GetNum(), EBufferUsageFlags::BF_VertexBuffer);
 }
 
 void WPositionVertexBuffer::UpdateRHIResource()
