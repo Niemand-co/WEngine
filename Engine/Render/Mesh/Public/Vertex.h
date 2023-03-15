@@ -85,9 +85,9 @@ class WLocalVertexFactory : public WVertexFactory
 {
 public:
 
-	WLocalVertexFactory();
+	WLocalVertexFactory() = default;
 
-	virtual ~WLocalVertexFactory();
+	virtual ~WLocalVertexFactory() = default;
 
 	static void GetPSOVertexInputElements(EInputType Type, WEngine::WArray<VertexInputElement>& Elements);
 

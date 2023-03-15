@@ -3,7 +3,7 @@
 #include "Render/Descriptor/Public/RHIBlendDescriptor.h"
 #include "Render/Descriptor/Public/RHIDepthStencilDescriptor.h"
 #include "Render/Descriptor/Public/RHIPipelineResourceLayoutDescriptor.h"
-#include "Render/Descriptor/Public/RHIRasterizationStateDescriptor.h"
+#include "Render/Descriptor/Public/RHIRasterizationDescriptor.h"
 
 #define MaxGraphicsPipelineShaderNum 3
 
@@ -27,7 +27,7 @@ public:
 
 	RHIPipelineResourceLayoutDescriptor DescriptorSetLayoutInfo;
 
-	RHIRasterizationStateDescriptor RasterizationState;
+	RHIRasterizationDescriptor RasterizationState;
 
 };
 

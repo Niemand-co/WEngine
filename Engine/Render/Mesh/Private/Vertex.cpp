@@ -84,6 +84,9 @@ void WLocalVertexFactory::GetPSOVertexInputElements(EInputType Type, WEngine::WA
 	switch (Type)
 	{
 	case EInputType::Default:
+		Elements.Push(VertexInputElement(1, 16, 12, VertexElementType::VET_Float3, false));
+		Elements.Push(VertexInputElement(2, 32, 12, VertexElementType::VET_Float3, false));
+		Elements.Push(VertexInputElement(3, 48, 12, VertexElementType::VET_Float3, false));
 		Elements.Push(VertexInputElement(13, 0, 0, VertexElementType::VET_UInt, true));
 		break;
 	case EInputType::PositionOnly:

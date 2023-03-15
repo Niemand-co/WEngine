@@ -1,12 +1,12 @@
 #pragma once
 
-class RHIRasterizationStateDescriptor
+class RHIRasterizationDescriptor
 {
 public:
 
-	RHIRasterizationStateDescriptor() = default;
+	RHIRasterizationDescriptor() = default;
 
-	~RHIRasterizationStateDescriptor() = default;
+	~RHIRasterizationDescriptor() = default;
 
 public:
 
