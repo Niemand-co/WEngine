@@ -8,6 +8,14 @@ enum class EShadingPath : uint8
 	ForwardPlus,
 };
 
+enum class EVertexInputType : uint8
+{
+	Default,
+	PositionOnly,
+	PositionAndNormal,
+	PositionAndColor,
+};
+
 enum class Format
 {
 	R8_SInt = 0,

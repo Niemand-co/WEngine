@@ -11,8 +11,6 @@ public:
 
 	~RHIVertexInputDescriptor() = default;
 
-	void Generate(WEngine::WArray<class VertexInputElement>& Elements);
-
 public:
 
 	VertexBindingDescription BindingDescriptions[MaxVertexInputElementCount];

@@ -26,13 +26,6 @@ struct VertexComponent
 	glm::vec2 UVs[8] = {};
 };
 
-enum class EInputType : uint8
-{
-	Default = 0,
-	PositionOnly,
-	PositionAndNormal,
-};
-
 struct WVertexStreamComponent
 {
 	const class WVertexBuffer* pVertexBuffer = nullptr;
@@ -43,10 +36,11 @@ struct WVertexStreamComponent
 
 struct VertexInputElement
 {
-	uint32 AttribIndex = 0;
+	uint32 SteamIndex = 0;
 	uint32 Offset = 0;
-	uint32 Stride = 0;
 	VertexElementType Type = VertexElementType::VET_Float1;
+	uint32 AttribIndex = 0;
+	uint32 Stride = 0;
 	bool bUseInstance = false;
 };
 
@@ -89,11 +83,13 @@ public:
 
 	virtual ~WLocalVertexFactory() = default;
 
-	static void GetPSOVertexInputElements(EInputType Type, WEngine::WArray<VertexInputElement>& Elements);
-
 	void SetData(const WStaticMeshDataType& InData) { Data = InData; }
 
 	const WStaticMeshDataType& GetData() const { return Data; }
+
+	static void GetPSOVertexInputElements(EVertexInputType Type, WEngine::WArray<VertexInputElement>& Elements);
+
+	static RHIVertexInputDescriptor GetDeclaration(const WEngine::WArray<VertexInputElement>& Elements);
 
 private:
 

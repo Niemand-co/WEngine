@@ -1,24 +1,6 @@
 #pragma once
 #include "Scene/Components/Public/Component.h"
 
-class RHIShader;
-
-struct SurfaceData
-{
-	union
-	{
-		glm::vec4 buffer0;
-		struct { glm::vec3 albedo; float roughness; };
-	};
-
-	union
-	{
-		glm::vec4 buffer1;
-		struct { float mettalic, y, z, w; };
-	};
-
-};
-
 enum Property
 {
 	Float = 0,
@@ -47,10 +29,6 @@ public:
 
 	void SetShader(RHIShader* shader);
 
-	RHIShader* GetShader();
-
-	SurfaceData GetSurfaceData();
-
 	void SetColor(glm::vec4 color);
 
 	void SetRoughness(float roughness);
@@ -67,6 +45,13 @@ private:
 	float metallic;
 
 	RHIShader* m_shader;
+};
+
+struct MaterialProxy
+{
+	MaterialProxy(MaterialComponent* Material)
+	{
+	}
 };
 
 

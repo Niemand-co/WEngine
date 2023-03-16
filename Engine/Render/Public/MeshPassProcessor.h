@@ -52,13 +52,22 @@ class WMeshPassProcessor
 {
 public:
 
-	WMeshPassProcessor();
+	WMeshPassProcessor(class RScene *InScene, class WSceneViewInfo *InView, EVertexInputType VertexInputType)
+		: Scene(InScene),
+		  View(InView)
+	{
+	}
 
-	~WMeshPassProcessor();
+	~WMeshPassProcessor() = default;
 
 	void BuildMeshDrawCommand(
 	const WMeshBatch MeshBatch,
-	const WMeshPassProcessorRenderState& RenderState,
-	const );
+	const WMeshPassProcessorRenderState& RenderState);
+
+private:
+
+	RScene *Scene;
+
+	WSceneViewInfo *View;
 
 };
