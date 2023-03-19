@@ -162,25 +162,25 @@ namespace WEngine
 		return VK_IMAGE_VIEW_TYPE_MAX_ENUM;
 	}
 
-	static VkCompareOp ToVulkan(CompareOP op)
+	static VkCompareOp ToVulkan(ECompareOP op)
 	{
 		switch (op)
 		{
-		case CompareOP::Greater:
+		case ECompareOP::Greater:
 			return VK_COMPARE_OP_GREATER;
-		case CompareOP::GE:
+		case ECompareOP::GE:
 			return VK_COMPARE_OP_GREATER_OR_EQUAL;
-		case CompareOP::Less:
+		case ECompareOP::Less:
 			return VK_COMPARE_OP_LESS;
-		case CompareOP::LE:
+		case ECompareOP::LE:
 			return VK_COMPARE_OP_LESS_OR_EQUAL;
-		case CompareOP::Euqal:
+		case ECompareOP::Euqal:
 			return VK_COMPARE_OP_EQUAL;
-		case CompareOP::NotEqual:
+		case ECompareOP::NotEqual:
 			return VK_COMPARE_OP_NOT_EQUAL;
-		case CompareOP::Always:
+		case ECompareOP::Always:
 			return VK_COMPARE_OP_ALWAYS;
-		case CompareOP::Never:
+		case ECompareOP::Never:
 			return VK_COMPARE_OP_NEVER;
 		default:
 			break;
@@ -188,15 +188,15 @@ namespace WEngine
 		return VK_COMPARE_OP_MAX_ENUM;
 	}
 
-	static VkStencilOp ToVulkan(StencilFailedOP op)
+	static VkStencilOp ToVulkan(EStencilFailedOP op)
 	{
 		switch (op)
 		{
-		case StencilFailedOP::Keep:
+		case EStencilFailedOP::Keep:
 			return VK_STENCIL_OP_KEEP;
-		case StencilFailedOP::Replace:
+		case EStencilFailedOP::Replace:
 			return VK_STENCIL_OP_REPLACE;
-		case StencilFailedOP::Zero:
+		case EStencilFailedOP::Zero:
 			return VK_STENCIL_OP_ZERO;
 		default:
 			RE_ASSERT(false, "Error Type Stencil Failed Operation");
@@ -204,25 +204,25 @@ namespace WEngine
 		return VK_STENCIL_OP_MAX_ENUM;
 	}
 
-	static VkBlendFactor ToVulkan(BlendFactor factor)
+	static VkBlendFactor ToVulkan(EBlendFactor factor)
 	{
 		switch (factor)
 		{
-		case BlendFactor::FactorOne:
+		case EBlendFactor::FactorOne:
 			return VK_BLEND_FACTOR_ONE;
-		case BlendFactor::FactorZero:
+		case EBlendFactor::FactorZero:
 			return VK_BLEND_FACTOR_ZERO;
-		case BlendFactor::FactorSrcAlpha:
+		case EBlendFactor::FactorSrcAlpha:
 			return VK_BLEND_FACTOR_SRC_ALPHA;
-		case BlendFactor::FactorDstAlpha:
+		case EBlendFactor::FactorDstAlpha:
 			return VK_BLEND_FACTOR_DST_ALPHA;
-		case BlendFactor::FactorOneMinusSrcAlpha:
+		case EBlendFactor::FactorOneMinusSrcAlpha:
 			return VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-		case BlendFactor::FactorOneMinusDstAlpha:
+		case EBlendFactor::FactorOneMinusDstAlpha:
 			return VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA;
-		case BlendFactor::FactorConstantAlpha:
+		case EBlendFactor::FactorConstantAlpha:
 			return VK_BLEND_FACTOR_CONSTANT_ALPHA;
-		case BlendFactor::FactorOneMinusConstantAlpha:
+		case EBlendFactor::FactorOneMinusConstantAlpha:
 			return VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA;
 		default:
 			RE_ASSERT(false, "Error Type Blend Factor.");
@@ -230,19 +230,19 @@ namespace WEngine
 		return VK_BLEND_FACTOR_MAX_ENUM;
 	}
 
-	static VkBlendOp ToVulkan(BlendOP op)
+	static VkBlendOp ToVulkan(EBlendOP op)
 	{
 		switch (op)
 		{
-		case BlendOP::BlendAdd:
+		case EBlendOP::BlendAdd:
 			return VK_BLEND_OP_ADD;
-		case BlendOP::BlendSubtract:
+		case EBlendOP::BlendSubtract:
 			return VK_BLEND_OP_SUBTRACT;
-		case BlendOP::BlendReverse_Subtract:
+		case EBlendOP::BlendReverse_Subtract:
 			return VK_BLEND_OP_REVERSE_SUBTRACT;
-		case BlendOP::BlendMin:
+		case EBlendOP::BlendMin:
 			return VK_BLEND_OP_MIN;
-		case BlendOP::BlendMax:
+		case EBlendOP::BlendMax:
 			return VK_BLEND_OP_MAX;
 		default:
 			RE_ASSERT(false, "Error Type Blend Operation.");
@@ -354,15 +354,15 @@ namespace WEngine
 		return VK_IMAGE_LAYOUT_MAX_ENUM;
 	}
 
-	static VkFilter ToVulkan(Filter filter)
+	static VkFilter ToVulkan(EFilter filter)
 	{
 		switch (filter)
 		{
-		case Filter::Linear:
+		case EFilter::Linear:
 			return VK_FILTER_LINEAR;
-		case Filter::Nearest:
+		case EFilter::Nearest:
 			return VK_FILTER_NEAREST;
-		case Filter::Cube:
+		case EFilter::Cube:
 			return VK_FILTER_CUBIC_IMG;
 		default:
 			RE_ASSERT(false, "Error Type Filter.");
@@ -370,15 +370,15 @@ namespace WEngine
 		return VK_FILTER_MAX_ENUM;
 	}
 
-	static VkPolygonMode ToVulkan(PolygonMode mode)
+	static VkPolygonMode ToVulkan(EPolygonMode mode)
 	{
 		switch (mode)
 		{
-		case PolygonMode::Triangle:
+		case EPolygonMode::Triangle:
 			return VK_POLYGON_MODE_FILL;
-		case PolygonMode::Line:
+		case EPolygonMode::Line:
 			return VK_POLYGON_MODE_LINE;
-		case PolygonMode::Point:
+		case EPolygonMode::Point:
 			return VK_POLYGON_MODE_POINT;
 		default:
 			RE_ASSERT(false, "Error Type Polygon Mode.");
@@ -386,24 +386,42 @@ namespace WEngine
 		return VK_POLYGON_MODE_MAX_ENUM;
 	}
 
-	static VkPrimitiveTopology ToVulkan(PrimitiveTopology topology)
+	static VkPrimitiveTopology ToVulkan(EPrimitiveTopology topology)
 	{
 		switch (topology)
 		{
-		case PrimitiveTopology::TriangleList:
+		case EPrimitiveTopology::TriangleList:
 			return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-		case PrimitiveTopology::TriangleStrip:
+		case EPrimitiveTopology::TriangleStrip:
 			return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
-		case PrimitiveTopology::LineList:
+		case EPrimitiveTopology::LineList:
 			return VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
-		case PrimitiveTopology::LineStrip:
+		case EPrimitiveTopology::LineStrip:
 			return VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
-		case PrimitiveTopology::PointList:
+		case EPrimitiveTopology::PointList:
 			return VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
 		default:
 			RE_ASSERT(false, "Error Type Primitive Topology.");
 		}
 		return VK_PRIMITIVE_TOPOLOGY_MAX_ENUM;
+	}
+
+	static VkCullModeFlags ToVulkan(ECullMode CullMode)
+	{
+		switch (CullMode)
+		{
+		case ECullMode::None:
+			return VK_CULL_MODE_NONE;
+		case ECullMode::Front:
+			return VK_CULL_MODE_FRONT_BIT;
+		case ECullMode::Back:
+			return VK_CULL_MODE_BACK_BIT;
+		case ECullMode::FrontAndBack:
+			return VK_CULL_MODE_FRONT_AND_BACK;
+		default:
+			RE_ASSERT(false, "Error Type Cull Mode.");
+		}
+		return VK_CULL_MODE_FLAG_BITS_MAX_ENUM;
 	}
 
 }
@@ -468,6 +486,51 @@ enum class ETextureCreateFlags : uint32
 };
 ENUM_CLASS_FLAGS(ETextureCreateFlags)
 
+struct RHIBlendStateInitializer
+{
+	bool bEnableBlend = true;
+	EBlendOP ColorBlendOp = EBlendOP::BlendAdd;
+	EBlendFactor ColorSrcFactor = EBlendFactor::FactorOne;
+	EBlendFactor ColorDstFactor = EBlendFactor::FactorZero;
+	EBlendOP AlphaBlendOp = EBlendOP::BlendAdd;
+	EBlendFactor AlphaSrcFactor = EBlendFactor::FactorOne;
+	EBlendFactor AlphaDstFactor = EBlendFactor::FactorZero;
+};
+
+struct RHIDepthStencilStateInitializer
+{
+	bool bEnableDepthTest = true;
+	bool bEnableDepthWrite = true;
+	ECompareOP DepthCompareOp = ECompareOP::NotEqual;
+	bool bEnableFrontStencil = false;
+	ECompareOP FrontStencilCompareOp = ECompareOP::Always;
+	EStencilFailedOP FrontStencilFailedOp = EStencilFailedOP::Keep;
+	EStencilFailedOP FrontDepthFailedOp = EStencilFailedOP::Keep;
+	EStencilFailedOP FrontStencilPassOp = EStencilFailedOP::Replace;
+	bool bEnableBackStencil = false;
+	ECompareOP BackStencilCompareOp = ECompareOP::Always;
+	EStencilFailedOP BackStencilFailedOp = EStencilFailedOP::Keep;
+	EStencilFailedOP BackDepthFailedOp = EStencilFailedOP::Keep;
+	EStencilFailedOP BackStencilPassOp = EStencilFailedOP::Replace;
+	uint8 StencilReadMask = 0xFF;
+	uint8 StencilWriteMask = 0xFF;
+};
+
+struct RHIRasterizationStateInitializer
+{
+	ECullMode CullMode = ECullMode::None;
+	EPolygonMode PolygonMode = EPolygonMode::Triangle;
+	EPrimitiveTopology PrimitiveTopology = EPrimitiveTopology::TriangleList;
+	bool bEnableDepthClamp = false;
+	bool bEnableDiscard = false;
+	bool bClockWise = false;
+};
+
+struct RHIMultiSampleStateInitializer
+{
+
+};
+
 typedef class RHIVertexBuffer* WVertexBufferRHIRef;
 typedef class RHIDynamicVertexBuffer* WDynamicVertexBufferRHIRef;
 typedef class RHIIndexBuffer* WIndexBufferRHIRef;
@@ -491,3 +554,9 @@ typedef class RHIViewport* WViewportRHIRef;
 typedef class RHIRenderPass* WRenderPassRHIRef;
 typedef class RHIFramebuffer* WFramebufferRHIRef;
 typedef class RHIPipelineStateObject* WPsoRHIRef;
+
+typedef class RHIBlendState* WBlendStateRHIRef;
+typedef class RHIDepthStencilState* WDepthStencilStateRHIRef;
+typedef class RHIRasterizationState* WRasterizationStateRHIRef;
+typedef class RHIMultiSampleState* WMultiSampleStateRHIRef;
+typedef class RHIVertexInputState* WVertexInputStateRHIRef;

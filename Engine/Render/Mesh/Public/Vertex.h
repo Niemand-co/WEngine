@@ -1,4 +1,5 @@
 #pragma once
+#include "Render/Descriptor/Public/RHIVertexInputDescriptor.h"
 
 struct VertexBindingDescription
 {
@@ -31,14 +32,14 @@ struct WVertexStreamComponent
 	const class WVertexBuffer* pVertexBuffer = nullptr;
 	uint32 Offset = 0;
 	uint16 Stride = 0;
-	VertexElementType Type = VertexElementType::VET_Float1;
+	EVertexElementType Type = EVertexElementType::VET_Float1;
 };
 
 struct VertexInputElement
 {
 	uint32 SteamIndex = 0;
 	uint32 Offset = 0;
-	VertexElementType Type = VertexElementType::VET_Float1;
+	EVertexElementType Type = EVertexElementType::VET_Float1;
 	uint32 AttribIndex = 0;
 	uint32 Stride = 0;
 	bool bUseInstance = false;
@@ -89,11 +90,15 @@ public:
 
 	static void GetPSOVertexInputElements(EVertexInputType Type, WEngine::WArray<VertexInputElement>& Elements);
 
-	static RHIVertexInputDescriptor GetDeclaration(const WEngine::WArray<VertexInputElement>& Elements);
+	void SetDeclaration(RHIVertexInputDescriptor& InDeclaration) {}
+
+	RHIVertexInputDescriptor& GetDeclaration() {}
 
 private:
 
 	WStaticMeshDataType Data;
+
+	RHIVertexInputDescriptor Declaration;
 
 };
 

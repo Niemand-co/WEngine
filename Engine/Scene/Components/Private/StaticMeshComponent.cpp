@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Scene/Components/Public/StaticMeshComponent.h"
 #include "Render/Mesh/Public/MeshBatch.h"
+#include "Render/Public/SceneView.h"
 #include "Scene/Public/SceneManagement.h"
 
 StaticMeshComponent::StaticMeshComponent(GameObject* pGameObject, WStaticMesh* pMesh)
@@ -41,7 +42,7 @@ void StaticMeshProxy::DrawStaticMesh(RHICommandListBase* CmdList)
 	
 }
 
-void StaticMeshProxy::GetDynamicMeshElements(WEngine::WArray<class SceneViewInfo>& Views, WMeshCollector& Collector)
+void StaticMeshProxy::GetDynamicMeshElements(WEngine::WArray<WSceneViewInfo>& Views, WMeshCollector& Collector)
 {
 	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
 	{

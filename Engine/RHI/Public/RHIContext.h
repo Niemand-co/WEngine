@@ -82,23 +82,37 @@ public:
 
 	virtual RHIPipelineResourceLayout* CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor *descriptor);
 
-	virtual RHIPipelineStateObject* CreatePSO(class RHIGraphicsPipelineStateDescriptor *descriptor);
-
 	virtual WViewportRHIRef CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, Format InFormat);
 
 	virtual void RHIBeginDrawingViewport(class RHIViewport* Viewport) = 0;
 
 	virtual void RHIEndDrawingViewport(class RHIViewport* Viewport, bool bPresent) = 0;
 
-	virtual void RHIBeginRenderPass(class RHIRenderPassDescriptor* RenderPasDescriptor, class RHIFramebufferDescriptor* FramebufferDescriptor) = 0;
+	virtual WRenderPassRHIRef RHIBeginRenderPass(class RHIRenderPassDescriptor* RenderPasDescriptor, class RHIFramebufferDescriptor* FramebufferDescriptor) = 0;
 
 	virtual void RHIEndRenderPass() = 0;
+
+	virtual void RHISetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth) = 0;
+
+	virtual void RHISetScissor() = 0;
+
+	virtual void RHIDrawIndexedPrimitive(uint32 indexCount, uint32 firstIndex, uint32 instanceCount) = 0;
 
 	virtual void RHIBeginTransition(WEngine::WArray<class RHIBarrierDescriptor>& Transitions) = 0;
 
 	virtual void CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY) = 0;
 
 	virtual void RHISetGraphicsPipelineState(class RHIGraphicsPipelineStateDescriptor *descriptor) = 0;
+
+	virtual WBlendStateRHIRef CreateBlendState(const RHIBlendStateInitializer& Initializer) = 0;
+
+	virtual WDepthStencilStateRHIRef CreateDepthStencilState(const RHIDepthStencilStateInitializer& Initializer) = 0;
+
+	virtual WRasterizationStateRHIRef CreateRasterizationState(const RHIRasterizationStateInitializer& Initializer) = 0;
+
+	virtual WMultiSampleStateRHIRef CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer) = 0;
+
+	virtual WVertexInputStateRHIRef CreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements) = 0;
 
 public:
 

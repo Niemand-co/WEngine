@@ -32,7 +32,7 @@ namespace Vulkan
 		}
 	}
 
-	void VulkanContext::RHIBeginRenderPass(RHIRenderPassDescriptor* RenderPasDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor)
+	WRenderPassRHIRef VulkanContext::RHIBeginRenderPass(RHIRenderPassDescriptor* RenderPasDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor)
 	{
 		VulkanRenderPass *Pass = static_cast<VulkanRenderPass*>(pDevice->GetOrCreateRenderPass(RenderPasDescriptor));
 		VulkanFramebuffer *Framebuffer = static_cast<VulkanFramebuffer*>(pDevice->GetOrCreateFramebuffer(FramebufferDescriptor, Pass));
@@ -53,6 +53,7 @@ namespace Vulkan
 		}
 		vkCmdBeginRenderPass(CmdBuffer->GetHandle(), &Info, VK_SUBPASS_CONTENTS_INLINE);
 		CmdBuffer->State = VulkanCommandBuffer::ECmdState::IsInsideRenderPass;
+		return Pass;
 	}
 
 	void VulkanContext::RHIEndRenderPass()
@@ -60,6 +61,23 @@ namespace Vulkan
 		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
 		vkCmdEndRenderPass(CmdBuffer->GetHandle());
 		CmdBuffer->State = VulkanCommandBuffer::ECmdState::IsInsideBegin;
+	}
+
+	void VulkanContext::RHISetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth)
+	{
+		VulkanCommandBuffer* CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
+		VkViewport Viewport = { X, Y, Width, Height, MinDepth, MaxDepth };
+		vkCmdSetViewport(CmdBuffer->GetHandle(), 0, 1, &Viewport);
+	}
+
+	void VulkanContext::RHISetScissor()
+	{
+	}
+
+	void VulkanContext::RHIDrawIndexedPrimitive(uint32 indexCount, uint32 firstIndex, uint32 instanceCount)
+	{
+		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
+		vkCmdDrawIndexed(CmdBuffer->GetHandle(), indexCount, instanceCount, firstIndex, 0, 0);
 	}
 
 	void VulkanContext::RHIBeginTransition(WEngine::WArray<RHIBarrierDescriptor>& Transitions)
@@ -173,6 +191,31 @@ namespace Vulkan
 	{
 		WPsoRHIRef Pipeline = pDevice->GetOrCreateGraphicsPipelineState(descriptor);
 		Pipeline->Bind(pCommandBufferManager->GetActiveCommandBuffer());
+	}
+
+	WBlendStateRHIRef VulkanContext::CreateBlendState(const RHIBlendStateInitializer& Initializer)
+	{
+		return new VulkanBlendState(Initializer);
+	}
+
+	WDepthStencilStateRHIRef VulkanContext::CreateDepthStencilState(const RHIDepthStencilStateInitializer& Initializer)
+	{
+		return new VulkanDepthStencilState(Initializer);
+	}
+
+	WRasterizationStateRHIRef VulkanContext::CreateRasterizationState(const RHIRasterizationStateInitializer& Initializer)
+	{
+		return new VulkanRasterizationState(Initializer);
+	}
+
+	WMultiSampleStateRHIRef VulkanContext::CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer)
+	{
+		return new VulkanMultiSampleState(Initializer);
+	}
+
+	WVertexInputStateRHIRef VulkanContext::CreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements)
+	{
+		return new VulkanVertexInputState(InElements);
 	}
 
 }

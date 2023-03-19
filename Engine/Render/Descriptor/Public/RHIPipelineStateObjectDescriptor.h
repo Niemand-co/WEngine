@@ -1,9 +1,7 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIVertexInputDescriptor.h"
-#include "Render/Descriptor/Public/RHIBlendDescriptor.h"
-#include "Render/Descriptor/Public/RHIDepthStencilDescriptor.h"
-#include "Render/Descriptor/Public/RHIPipelineResourceLayoutDescriptor.h"
-#include "Render/Descriptor/Public/RHIRasterizationDescriptor.h"
+#include "RHI/Public/RHIBlendState.h"
+#include "RHI/Public/RHIDepthStencilState.h"
+#include "RHI/Public/RHIRasterizationState.h"
 
 #define MaxGraphicsPipelineShaderNum 3
 
@@ -17,17 +15,23 @@ public:
 
 public:
 
-	RHIVertexInputDescriptor VertexInputAttrib;
-
-	RHIBlendDescriptor BlendState;
-
-	RHIDepthStencilDescriptor DepthStencilState;
+	uint8 RenderTargetCount = 0;
 
 	class WShader* Shaders[MaxGraphicsPipelineShaderNum] = {};
 
+	WBlendStateRHIRef BlendStates[MaxSimultaneousRenderTargets] = {};
+
+	RHIVertexInputDescriptor VertexInputAttrib;
+
+	WDepthStencilStateRHIRef DepthStencilState;
+
+	WRasterizationStateRHIRef RasterizationState;
+
+	WMultiSampleStateRHIRef MultiSampleState;
+
 	RHIPipelineResourceLayoutDescriptor DescriptorSetLayoutInfo;
 
-	RHIRasterizationDescriptor RasterizationState;
+	WRenderPassRHIRef RenderPass;
 
 };
 

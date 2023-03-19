@@ -59,7 +59,7 @@ public:
 
 	void EndDrawingViewport(RHIViewport *Viewport, bool bPresent);
 
-	void BeginRenderPass(class RHIRenderPassDescriptor *RenderPasDescriptor, class RHIFramebufferDescriptor *FramebufferDescriptor);
+	WRenderPassRHIRef BeginRenderPass(class RHIRenderPassDescriptor *RenderPasDescriptor, class RHIFramebufferDescriptor *FramebufferDescriptor);
 
 	void EndRenderPass();
 
@@ -67,7 +67,7 @@ public:
 
 	void SetGraphicsPipelineState(class RHIGraphicsPipelineStateDescriptor* GraphicsPipelineState);
 
-	void DrawIndexedPrimitive(unsigned int indexCount, unsigned int firstIndex, unsigned int instanceCount);
+	void DrawIndexedPrimitive(uint32 indexCount, uint32 firstIndex, uint32 instanceCount);
 
 	void SetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth);
 
@@ -96,6 +96,16 @@ public:
 	WTextureViewRHIRef CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, class RHITexture* InTexture);
 
 	WViewportRHIRef CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, Format InFormat);
+
+	WBlendStateRHIRef CreateBlendState(const RHIBlendStateInitializer& Initializer);
+
+	WDepthStencilStateRHIRef CreateDepthStencilState(const RHIDepthStencilStateInitializer& Initializer);
+
+	WRasterizationStateRHIRef CreateRasterizationState(const RHIRasterizationStateInitializer& Initializer);
+
+	WMultiSampleStateRHIRef CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer);
+
+	WVertexInputStateRHIRef CreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements);
 
 public:
 

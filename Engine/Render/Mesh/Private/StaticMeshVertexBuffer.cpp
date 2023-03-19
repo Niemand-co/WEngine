@@ -51,11 +51,11 @@ void WStaticMeshVertexBuffer::UpdateRHIResource()
 
 void WStaticMeshVertexBuffer::BindMeshVertexBuffer(WStaticMeshDataType& Data) const
 {
-	Data.NormalComponent = WVertexStreamComponent(&TangentBuffer, offsetof(WTangentData, Normal), TangentData->GetStride(), VertexElementType::VET_Float3);
-	Data.TangentComponent = WVertexStreamComponent(&TangentBuffer, offsetof(WTangentData, Tangent), TangentData->GetStride(), VertexElementType::VET_Float3);
+	Data.NormalComponent = WVertexStreamComponent(&TangentBuffer, offsetof(WTangentData, Normal), TangentData->GetStride(), EVertexElementType::VET_Float3);
+	Data.TangentComponent = WVertexStreamComponent(&TangentBuffer, offsetof(WTangentData, Tangent), TangentData->GetStride(), EVertexElementType::VET_Float3);
 
 	for (uint32 UVChannel = 0; UVChannel < 8; ++UVChannel)
 	{
-		Data.TexCoordsComponent[UVChannel] = WVertexStreamComponent(&TexCoordsBuffer, UVChannel * sizeof(glm::vec2), TexCoordsData->GetStride(), VertexElementType::VET_Float2);
+		Data.TexCoordsComponent[UVChannel] = WVertexStreamComponent(&TexCoordsBuffer, UVChannel * sizeof(glm::vec2), TexCoordsData->GetStride(), EVertexElementType::VET_Float2);
 	}
 }

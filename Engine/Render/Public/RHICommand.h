@@ -1,6 +1,6 @@
 #pragma once
 
-#define ENCODER_EXECUTE(command) static_cast<RHIRenderCommandList*>(CmdList)->command
+#define ENCODER_EXECUTE(command) RHIContext::GetContext()->command
 
 struct RHICommandListBase;
 

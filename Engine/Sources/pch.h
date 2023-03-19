@@ -78,6 +78,7 @@
 #include "Utils/Public/NamingSystem.h"
 #include "HAL/Public/TaskGraph.h"
 #include "Render/Public/RenderDependencyGraphDefinitions.h"
+#include "RHI/Public/RHIStaticState.h"
 
 //-----------------------Vulkan-------------------------------
 #include "Platform/Vulkan/Public/VulkanResource.h"

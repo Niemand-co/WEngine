@@ -2,6 +2,7 @@
 #include "HAL/Public/TaskGraph.h"
 #include "Core/Public/AnyThread.h"
 #include "HAL/Public/WThread.h"
+#include "HAL/Public/Platform.h"
 
 namespace WEngine
 {
@@ -149,4 +150,24 @@ namespace WEngine
 		}
 	}
 
+}
+
+bool IsRenderThread()
+{
+	return WEngine::PlatformProcess::GetCurrentThreadId() == WEngine::WTaskGraph::Get()->m_threads[(uint32)WEngine::EThreadProperty::RenderThread]->pThread->GetPID();
+}
+
+bool IsOutOfRenderThread()
+{
+	return WEngine::PlatformProcess::GetCurrentThreadId() != WEngine::WTaskGraph::Get()->m_threads[(uint32)WEngine::EThreadProperty::RenderThread]->pThread->GetPID();
+}
+
+bool IsRHIThread()
+{
+	return WEngine::PlatformProcess::GetCurrentThreadId() == WEngine::WTaskGraph::Get()->m_threads[(uint32)WEngine::EThreadProperty::RHIThread]->pThread->GetPID();
+}
+
+bool IsOutOfRHIThread()
+{
+	return WEngine::PlatformProcess::GetCurrentThreadId() != WEngine::WTaskGraph::Get()->m_threads[(uint32)WEngine::EThreadProperty::RHIThread]->pThread->GetPID();
 }

@@ -26,3 +26,8 @@
 #include "Platform/Vulkan/Public/VulkanScissor.h"
 #include "Platform/Vulkan/Public/VulkanViewport.h"
 #include "Platform/Vulkan/Public/VulkanPipelineBarrier.h"
+#include "Platform/Vulkan/Public/VulkanBlendState.h"
+#include "Platform/Vulkan/Public/VulkanDepthStencilState.h"
+#include "Platform/Vulkan/Public/VulkanRasterizationState.h"
+#include "Platform/Vulkan/Public/VulkanMultiSampleState.h"
+#include "Platform/Vulkan/Public/VulkanVertexInputState.h"

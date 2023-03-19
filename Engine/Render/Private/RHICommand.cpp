@@ -8,22 +8,22 @@
 
 void RHICommandBeginRenderPass::Execute(RHICommandListBase* CmdList)
 {
-	ENCODER_EXECUTE(BeginRenderPass)(RenderPassDescriptor, FramebufferDescriptor);
+	ENCODER_EXECUTE(RHIBeginRenderPass)(RenderPassDescriptor, FramebufferDescriptor);
 }
 
 void RHICommandEndRenderPass::Execute(RHICommandListBase* CmdList)
 {
-	ENCODER_EXECUTE(EndRenderPass)();
+	ENCODER_EXECUTE(RHIEndRenderPass)();
 }
 
 void RHICommandDrawIndexedPrimitive::Execute(RHICommandListBase* CmdList)
 {
-	ENCODER_EXECUTE(DrawIndexedPrimitive)(indexCount, firstIndex, instanceCount);
+	ENCODER_EXECUTE(RHIDrawIndexedPrimitive)(indexCount, firstIndex, instanceCount);
 }
 
 void RHICommandSetViewport::Execute(RHICommandListBase* CmdList)
 {
-	ENCODER_EXECUTE(SetViewport)(MinX, MinY, MaxX - MinX, MaxY - MaxY, MinZ, MaxZ);
+	ENCODER_EXECUTE(RHISetViewport)(MinX, MinY, MaxX - MinX, MaxY - MaxY, MinZ, MaxZ);
 }
 
 void RHICommandSetScissor::Execute(RHICommandListBase* CmdList)

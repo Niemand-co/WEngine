@@ -274,40 +274,39 @@ namespace Vulkan
 		
 		WEngine::WArray<VkPipelineShaderStageCreateInfo> ShaderStageCreateInfos;
 		ShaderStageCreateInfos.Reserve(3);
-		if (descriptor->Shaders[(uint8)ShaderStage::Vertex])
+		if (descriptor->Shaders[(uint8)EShaderStage::Vertex])
 		{
 			VkPipelineShaderStageCreateInfo ShaderStageCreateInfo = {};
 			{
 				ShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 				ShaderStageCreateInfo.pName = "VSMain";
 				ShaderStageCreateInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-				ShaderStageCreateInfo.module = static_cast<VulkanVertexShader*>(static_cast<WVertexShader*>(descriptor->Shaders[(uint8)ShaderStage::Vertex])->GetRHI())->GetShaderModule();
+				ShaderStageCreateInfo.module = static_cast<VulkanVertexShader*>(static_cast<WVertexShader*>(descriptor->Shaders[(uint8)EShaderStage::Vertex])->GetRHI())->GetShaderModule();
 			}
 			ShaderStageCreateInfos.Push(ShaderStageCreateInfo);
 		}
-		if (descriptor->Shaders[(uint8)ShaderStage::Geometry])
+		if (descriptor->Shaders[(uint8)EShaderStage::Geometry])
 		{
 			VkPipelineShaderStageCreateInfo ShaderStageCreateInfo = {};
 			{
 				ShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 				ShaderStageCreateInfo.pName = "GSMain";
 				ShaderStageCreateInfo.stage = VK_SHADER_STAGE_GEOMETRY_BIT;
-				ShaderStageCreateInfo.module = static_cast<VulkanGeometryShader*>(static_cast<WGeometryShader*>(descriptor->Shaders[(uint8)ShaderStage::Vertex])->GetRHI())->GetShaderModule();
+				ShaderStageCreateInfo.module = static_cast<VulkanGeometryShader*>(static_cast<WGeometryShader*>(descriptor->Shaders[(uint8)EShaderStage::Vertex])->GetRHI())->GetShaderModule();
 			}
 			ShaderStageCreateInfos.Push(ShaderStageCreateInfo);
 		}
-		if (descriptor->Shaders[(uint8)ShaderStage::Pixel])
+		if (descriptor->Shaders[(uint8)EShaderStage::Pixel])
 		{
 			VkPipelineShaderStageCreateInfo ShaderStageCreateInfo = {};
 			{
 				ShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 				ShaderStageCreateInfo.pName = "PSMain";
 				ShaderStageCreateInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-				ShaderStageCreateInfo.module = static_cast<VulkanPixelShader*>(static_cast<WPixelShader*>(descriptor->Shaders[(uint8)ShaderStage::Vertex])->GetRHI())->GetShaderModule();
+				ShaderStageCreateInfo.module = static_cast<VulkanPixelShader*>(static_cast<WPixelShader*>(descriptor->Shaders[(uint8)EShaderStage::Vertex])->GetRHI())->GetShaderModule();
 			}
 			ShaderStageCreateInfos.Push(ShaderStageCreateInfo);
 		}
-
 
 		VkVertexInputBindingDescription vertexInputBindgDescription = {};
 		{
@@ -332,91 +331,17 @@ namespace Vulkan
 			VertexInputStateCreateInfo.pVertexAttributeDescriptions = VertexInputAttributeDescriptions.GetData();
 		}
 
-		VkPipelineInputAssemblyStateCreateInfo InputAssemblyStateCreateInfo = {};
+		WEngine::WArray<VkPipelineColorBlendAttachmentState> ColorBlendAttachments(descriptor->RenderTargetCount);
+		for (uint32 AttachmentIndex = 0; AttachmentIndex < descriptor->RenderTargetCount; ++AttachmentIndex)
 		{
-			InputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-			InputAssemblyStateCreateInfo.topology = WEngine::ToVulkan(descriptor->RasterizationState.primitivePology);
-			InputAssemblyStateCreateInfo.primitiveRestartEnable = VK_FALSE;
+			ColorBlendAttachments[AttachmentIndex] = (static_cast<VulkanBlendState*>(descriptor->BlendStates[AttachmentIndex])->ColorBlendAttachmentState);
 		}
-
-		VkPipelineViewportStateCreateInfo ViewportStateCreateInfo = {};
-		{
-			ViewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-			ViewportStateCreateInfo.scissorCount = 1;
-			ViewportStateCreateInfo.pScissors = {};
-			ViewportStateCreateInfo.viewportCount = 1;
-			ViewportStateCreateInfo.pViewports = {};
-		}
-
-		VkPipelineRasterizationStateCreateInfo RasterizationStateCreateInfo = {};
-		{
-			RasterizationStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-			RasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
-			RasterizationStateCreateInfo.rasterizerDiscardEnable = VK_FALSE;
-			RasterizationStateCreateInfo.polygonMode = WEngine::ToVulkan(descriptor->RasterizationState.polygonMode);
-			RasterizationStateCreateInfo.lineWidth = descriptor->RasterizationState.lineWidth;
-			RasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
-			RasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
-			RasterizationStateCreateInfo.depthBiasEnable = VK_FALSE;
-			RasterizationStateCreateInfo.depthBiasConstantFactor = 0.0f;
-			RasterizationStateCreateInfo.depthBiasClamp = 0.0f;
-			RasterizationStateCreateInfo.depthBiasSlopeFactor = 0.0f;
-		}
-
-		VkPipelineMultisampleStateCreateInfo MultisampleStateCreateInfo = {};
-		{
-			MultisampleStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-			MultisampleStateCreateInfo.sampleShadingEnable = VK_FALSE;
-			MultisampleStateCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-			MultisampleStateCreateInfo.minSampleShading = 1.0f;
-			MultisampleStateCreateInfo.pSampleMask = nullptr;
-			MultisampleStateCreateInfo.alphaToCoverageEnable = VK_FALSE;
-			MultisampleStateCreateInfo.alphaToOneEnable = VK_FALSE;
-		}
-
-		VkPipelineColorBlendAttachmentState ColorBlendAttachmentState = {};
-		{
-			ColorBlendAttachmentState.blendEnable = descriptor->BlendState.blendEnabled;
-			ColorBlendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-			ColorBlendAttachmentState.srcColorBlendFactor = WEngine::ToVulkan(descriptor->BlendState.colorSrcFactor);
-			ColorBlendAttachmentState.dstColorBlendFactor = WEngine::ToVulkan(descriptor->BlendState.colorDstFactor);
-			ColorBlendAttachmentState.colorBlendOp = WEngine::ToVulkan(descriptor->BlendState.colorBlendOP);
-			ColorBlendAttachmentState.srcAlphaBlendFactor = WEngine::ToVulkan(descriptor->BlendState.alphaSrcFactor);
-			ColorBlendAttachmentState.dstAlphaBlendFactor = WEngine::ToVulkan(descriptor->BlendState.alphaDstFactor);
-			ColorBlendAttachmentState.alphaBlendOp = WEngine::ToVulkan(descriptor->BlendState.alphaBlendOP);
-		}
-
-		VkPipelineDepthStencilStateCreateInfo DepthStencilStateCreateInfo = {};
-		{
-			DepthStencilStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-			DepthStencilStateCreateInfo.stencilTestEnable = descriptor->DepthStencilState.stencilTestEnabled;
-			DepthStencilStateCreateInfo.back.failOp = WEngine::ToVulkan(descriptor->DepthStencilState.stencilFailedOP);
-			DepthStencilStateCreateInfo.back.compareMask = 0xFF;
-			DepthStencilStateCreateInfo.back.writeMask = 0xFF;
-			DepthStencilStateCreateInfo.back.passOp = WEngine::ToVulkan(descriptor->DepthStencilState.passOP);
-			DepthStencilStateCreateInfo.back.depthFailOp = WEngine::ToVulkan(descriptor->DepthStencilState.depthFailedOP);
-			DepthStencilStateCreateInfo.back.compareOp = WEngine::ToVulkan(descriptor->DepthStencilState.stencilCompareOP);
-			DepthStencilStateCreateInfo.back.reference = descriptor->DepthStencilState.stencilRef;
-			DepthStencilStateCreateInfo.front = DepthStencilStateCreateInfo.back;
-			DepthStencilStateCreateInfo.depthTestEnable = descriptor->DepthStencilState.depthTestEnabled;
-			DepthStencilStateCreateInfo.depthCompareOp = WEngine::ToVulkan(descriptor->DepthStencilState.depthCompareOP);
-			DepthStencilStateCreateInfo.depthWriteEnable = descriptor->DepthStencilState.depthWriteEnabled;
-			DepthStencilStateCreateInfo.depthBoundsTestEnable = descriptor->DepthStencilState.depthBoundsTest;
-			DepthStencilStateCreateInfo.maxDepthBounds = descriptor->DepthStencilState.maxDepth;
-			DepthStencilStateCreateInfo.minDepthBounds = descriptor->DepthStencilState.minDepth;
-		}
-
 		VkPipelineColorBlendStateCreateInfo ColorBlendStateCreateInfo = {};
 		{
 			ColorBlendStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-			ColorBlendStateCreateInfo.attachmentCount = 1;
-			ColorBlendStateCreateInfo.pAttachments = &ColorBlendAttachmentState;
-			ColorBlendStateCreateInfo.logicOpEnable = VK_FALSE;
-			ColorBlendStateCreateInfo.logicOp = VK_LOGIC_OP_COPY;
-			ColorBlendStateCreateInfo.blendConstants[0] = 0.0f;
-			ColorBlendStateCreateInfo.blendConstants[1] = 0.0f;
-			ColorBlendStateCreateInfo.blendConstants[2] = 0.0f;
-			ColorBlendStateCreateInfo.blendConstants[3] = 0.0f;
+			ColorBlendStateCreateInfo.attachmentCount = ColorBlendAttachments.Size();
+			ColorBlendStateCreateInfo.pAttachments = ColorBlendAttachments.GetData();
+			ColorBlendStateCreateInfo.logicOpEnable = false;
 		}
 
 		VkDynamicState dynamicStates[3] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_LINE_WIDTH };
@@ -427,12 +352,6 @@ namespace Vulkan
 			dynamicStateCreateInfo.pDynamicStates = dynamicStates;
 		}
 
-		VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo = {};
-		{
-			PipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-			PipelineLayoutCreateInfo.
-		}
-
 		VkGraphicsPipelineCreateInfo GraphicsPipelineCreateInfo = {};
 		{
 			GraphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -440,15 +359,15 @@ namespace Vulkan
 			GraphicsPipelineCreateInfo.stageCount = 0;
 			//graphicsPipelineCreateInfo.pStages = shaderStageCreateInfos.GetData();
 			GraphicsPipelineCreateInfo.pVertexInputState = &VertexInputStateCreateInfo;
-			GraphicsPipelineCreateInfo.pInputAssemblyState = &InputAssemblyStateCreateInfo;
-			GraphicsPipelineCreateInfo.pViewportState = &ViewportStateCreateInfo;
-			GraphicsPipelineCreateInfo.pRasterizationState = &RasterizationStateCreateInfo;
-			GraphicsPipelineCreateInfo.pMultisampleState = &MultisampleStateCreateInfo;
-			GraphicsPipelineCreateInfo.pDepthStencilState = &DepthStencilStateCreateInfo;
+			GraphicsPipelineCreateInfo.pInputAssemblyState = &static_cast<VulkanRasterizationState*>(descriptor->RasterizationState)->InputAssemblyStateCreateInfo;
+			GraphicsPipelineCreateInfo.pViewportState = nullptr;
+			GraphicsPipelineCreateInfo.pRasterizationState = &static_cast<VulkanRasterizationState*>(descriptor->RasterizationState)->RasterizationStateCreateInfo;
+			GraphicsPipelineCreateInfo.pMultisampleState = &static_cast<VulkanMultiSampleState*>(descriptor->MultiSampleState)->MultiSampleStateCreateInfo;
+			GraphicsPipelineCreateInfo.pDepthStencilState = &static_cast<VulkanDepthStencilState*>(descriptor->DepthStencilState)->DepthStencilStateCreateInfo;
 			GraphicsPipelineCreateInfo.pColorBlendState = &ColorBlendStateCreateInfo;
 			GraphicsPipelineCreateInfo.pDynamicState = &dynamicStateCreateInfo;
 			GraphicsPipelineCreateInfo.layout = *static_cast<VulkanPipelineResourceLayout*>(descriptor->pipelineResourceLayout)->GetHandle();
-			GraphicsPipelineCreateInfo.renderPass = static_cast<VulkanRenderPass*>(descriptor->renderPass)->GetHandle();
+			GraphicsPipelineCreateInfo.renderPass = static_cast<VulkanRenderPass*>(descriptor->RenderPass)->GetHandle();
 			GraphicsPipelineCreateInfo.subpass = 0;
 			GraphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
 			//graphicsPipelineCreateInfo.basePipelineIndex = -1;

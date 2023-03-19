@@ -7,6 +7,14 @@
 #define NUM_WORKING_THREAD 8
 #define ENQUEUE_RENDERER_COMMAND(LAMBDA) WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, LAMBDA), WEngine::EThreadProperty::RenderThread)
 
+bool IsRenderThread();
+
+bool IsOutOfRenderThread();
+
+bool IsRHIThread();
+
+bool IsOutOfRHIThread();
+
 namespace WEngine
 {
 
@@ -22,7 +30,7 @@ namespace WEngine
 		uint8_t          bAttached   = false;
 	};
 
-	enum EThreadProperty : unsigned int
+	enum EThreadProperty : uint32
 	{
 		None               = 0u,
 		GameThread         = 1u,
@@ -88,6 +96,11 @@ namespace WEngine
 	private:
 
 		WThreadPack* m_threads[NUM_WORKING_THREAD];
+
+		friend bool ::IsRenderThread();
+		friend bool ::IsOutOfRenderThread();
+		friend bool ::IsRHIThread();
+		friend bool ::IsOutOfRHIThread();
 
 	};
 

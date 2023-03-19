@@ -159,7 +159,7 @@ enum class EncoderType
 	Compute,
 };
 
-enum class CompareOP
+enum class ECompareOP : uint8
 {
 	Greater = 0,
 	GE,
@@ -171,21 +171,21 @@ enum class CompareOP
 	Never
 };
 
-enum class StencilFailedOP
+enum class EStencilFailedOP : uint8
 {
 	Keep = 0,
 	Replace,
 	Zero
 };
 
-enum class DepthFailedOP
+enum class EDepthFailedOP : uint8
 {
 	Keep = 0,
 	Replace,
 	Zero
 };
 
-enum class BlendFactor
+enum class EBlendFactor : uint8
 {
 	FactorOne,
 	FactorZero,
@@ -197,7 +197,7 @@ enum class BlendFactor
 	FactorOneMinusConstantAlpha,
 };
 
-enum class BlendOP
+enum class EBlendOP : uint8
 {
 	BlendAdd = 0,
 	BlendSubtract,
@@ -242,21 +242,21 @@ enum class ResourceType
 	CombinedImageSampler,
 };
 
-enum class Filter
+enum class EFilter : uint8
 {
 	Linear = 0,
 	Nearest,
 	Cube,
 };
 
-enum class PolygonMode
+enum class EPolygonMode : uint8
 {
 	Triangle = 0,
 	Line,
 	Point,
 };
 
-enum class PrimitiveTopology
+enum class EPrimitiveTopology : uint8
 {
 	TriangleList = 0,
 	TriangleStrip,
@@ -265,14 +265,22 @@ enum class PrimitiveTopology
 	PointList,
 };
 
-enum class ShaderStage : uint8
+enum class ECullMode : uint8
+{
+	None,
+	Front,
+	Back,
+	FrontAndBack,
+};
+
+enum class EShaderStage : uint8
 {
 	Vertex = 0,
 	Geometry = 1,
 	Pixel = 2,
 };
 
-enum class VertexElementType : uint32
+enum class EVertexElementType : uint32
 {
 	VET_Float1,
 	VET_Float2,

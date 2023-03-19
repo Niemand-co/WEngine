@@ -54,11 +54,11 @@ void GameScene::Tick(WEngine::TimeStep timeStep)
 
 		Scene->UpdatePrimitiveInfosForScene();
 
-		StartFrame(Viewport.Get());
+		StartFrame();
 
-		this->StartRendering();
+		StartRendering();
 
-		EndFrame(Viewport.Get());
+		EndFrame();
 		
 	}), WEngine::EThreadProperty::RenderThread);
 	

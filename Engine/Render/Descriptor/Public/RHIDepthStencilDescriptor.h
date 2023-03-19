@@ -12,13 +12,13 @@ public:
 
 	bool stencilTestEnabled = false;
 
-	CompareOP stencilCompareOP = CompareOP::NotEqual;
+	ECompareOP stencilCompareOP = ECompareOP::NotEqual;
 
-	StencilFailedOP stencilFailedOP = StencilFailedOP::Keep;
+	EStencilFailedOP stencilFailedOP = EStencilFailedOP::Keep;
 
-	StencilFailedOP depthFailedOP = StencilFailedOP::Keep;
+	EStencilFailedOP depthFailedOP = EStencilFailedOP::Keep;
 
-	StencilFailedOP passOP = StencilFailedOP::Replace;
+	EStencilFailedOP passOP = EStencilFailedOP::Replace;
 
 	uint32 stencilRef = 1;
 
@@ -32,6 +32,6 @@ public:
 
 	float minDepth = 1.0f;
 
-	CompareOP depthCompareOP = CompareOP::Greater;
+	ECompareOP depthCompareOP = ECompareOP::Greater;
 
 };

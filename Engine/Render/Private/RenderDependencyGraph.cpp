@@ -361,7 +361,8 @@ void WRDGBuilder::ExecutePass(WRDGPass* Pass)
 
 	RHIRenderPassDescriptor RenderPassdescriptor = Pass->Parameters.GetRenderPassInfo();
 	RHIFramebufferDescriptor FramebufferDescriptor = Pass->Parameters.GetFramebufferInfo();
-	GetRenderCommandList()->BeginRenderPass(&RenderPassdescriptor, &FramebufferDescriptor);
+	WRenderPassRHIRef RenderPass = GetRenderCommandList()->BeginRenderPass(&RenderPassdescriptor, &FramebufferDescriptor);
+	Pass->Execute(CmdList, RenderPass);
 	GetRenderCommandList()->EndRenderPass();
 }
 
