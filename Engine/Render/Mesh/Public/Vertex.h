@@ -37,7 +37,7 @@ struct WVertexStreamComponent
 
 struct VertexInputElement
 {
-	uint32 SteamIndex = 0;
+	uint32 StreamIndex = 0;
 	uint32 Offset = 0;
 	EVertexElementType Type = EVertexElementType::VET_Float1;
 	uint32 AttribIndex = 0;

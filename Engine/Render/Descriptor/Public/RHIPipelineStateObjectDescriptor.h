@@ -21,7 +21,7 @@ public:
 
 	WBlendStateRHIRef BlendStates[MaxSimultaneousRenderTargets] = {};
 
-	RHIVertexInputDescriptor VertexInputAttrib;
+	WVertexInputStateRHIRef VertexInputState;
 
 	WDepthStencilStateRHIRef DepthStencilState;
 

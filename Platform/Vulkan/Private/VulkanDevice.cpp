@@ -308,29 +308,6 @@ namespace Vulkan
 			ShaderStageCreateInfos.Push(ShaderStageCreateInfo);
 		}
 
-		VkVertexInputBindingDescription vertexInputBindgDescription = {};
-		{
-			vertexInputBindgDescription.binding = descriptor->VertexInputAttrib.BindingDescriptions->slot;
-			vertexInputBindgDescription.stride = descriptor->VertexInputAttrib.BindingDescriptions->stride;
-			vertexInputBindgDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-		}
-		WEngine::WArray<VkVertexInputAttributeDescription> VertexInputAttributeDescriptions;
-		for(unsigned int i = 0; i < descriptor->VertexInputAttrib.attributeDescriptionCount; ++i)
-		{
-			VertexInputAttributeDescriptions[i].binding = descriptor->VertexInputAttrib.AttributeDescriptions[i].slot;
-			VertexInputAttributeDescriptions[i].location = descriptor->VertexInputAttrib.AttributeDescriptions[i].location;
-			VertexInputAttributeDescriptions[i].offset = descriptor->VertexInputAttrib.AttributeDescriptions[i].offset;
-			VertexInputAttributeDescriptions[i].format = WEngine::ToVulkan(descriptor->VertexInputAttrib.AttributeDescriptions[i].format);
-		}
-		VkPipelineVertexInputStateCreateInfo VertexInputStateCreateInfo = {};
-		{
-			VertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-			VertexInputStateCreateInfo.vertexBindingDescriptionCount = 1;
-			VertexInputStateCreateInfo.pVertexBindingDescriptions = &vertexInputBindgDescription;
-			VertexInputStateCreateInfo.vertexAttributeDescriptionCount = VertexInputAttributeDescriptions.Size();
-			VertexInputStateCreateInfo.pVertexAttributeDescriptions = VertexInputAttributeDescriptions.GetData();
-		}
-
 		WEngine::WArray<VkPipelineColorBlendAttachmentState> ColorBlendAttachments(descriptor->RenderTargetCount);
 		for (uint32 AttachmentIndex = 0; AttachmentIndex < descriptor->RenderTargetCount; ++AttachmentIndex)
 		{
@@ -355,10 +332,9 @@ namespace Vulkan
 		VkGraphicsPipelineCreateInfo GraphicsPipelineCreateInfo = {};
 		{
 			GraphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-			//graphicsPipelineCreateInfo.stageCount = shaderStageCreateInfos.Size();
-			GraphicsPipelineCreateInfo.stageCount = 0;
-			//graphicsPipelineCreateInfo.pStages = shaderStageCreateInfos.GetData();
-			GraphicsPipelineCreateInfo.pVertexInputState = &VertexInputStateCreateInfo;
+			GraphicsPipelineCreateInfo.stageCount = ShaderStageCreateInfos.Size();
+			GraphicsPipelineCreateInfo.pStages = ShaderStageCreateInfos.GetData();
+			GraphicsPipelineCreateInfo.pVertexInputState = &static_cast<VulkanVertexInputState*>(descriptor->VertexInputState)->VertexInputStateCreateInfo;
 			GraphicsPipelineCreateInfo.pInputAssemblyState = &static_cast<VulkanRasterizationState*>(descriptor->RasterizationState)->InputAssemblyStateCreateInfo;
 			GraphicsPipelineCreateInfo.pViewportState = nullptr;
 			GraphicsPipelineCreateInfo.pRasterizationState = &static_cast<VulkanRasterizationState*>(descriptor->RasterizationState)->RasterizationStateCreateInfo;

@@ -4,6 +4,7 @@
 #include "Platform/Vulkan/Encoder/Public/VulkanComputeEncoder.h"
 #include "Render/Descriptor/Public/RHIBarrierDescriptor.h"
 #include "Render/Descriptor/Public/RHIFramebufferDescriptor.h"
+#include "Render/Mesh/Public/Vertex.h"
 
 namespace Vulkan
 {
@@ -215,7 +216,16 @@ namespace Vulkan
 
 	WVertexInputStateRHIRef VulkanContext::CreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements)
 	{
-		return new VulkanVertexInputState(InElements);
+		uint32 VertexInputID = WEngine::MemCrc32(InElements.GetData(), sizeof(VertexInputElement) * InElements.Size());
+		VulkanVertexInputState* VertexInput = VulkanVertexInputStateManager::GetVertexInput(VertexInputID);
+		if (VertexInput)
+		{
+			return VertexInput;
+		}
+		VertexInput = new VulkanVertexInputState(InElements);
+		VulkanVertexInputStateManager::AddVertexInput(VertexInputID, VertexInput);
+
+		return VertexInput;
 	}
 
 }

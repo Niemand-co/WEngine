@@ -13,6 +13,6 @@ public:
 
 protected:
 
-	WEngine::WArray<class VertexInputElement> Elements;
+	WEngine::WArray<struct VertexInputElement> Elements;
 
 };

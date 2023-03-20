@@ -20,9 +20,35 @@ namespace Vulkan
 
 		VkPipelineVertexInputStateCreateInfo VertexInputStateCreateInfo = {};
 
-		uint32 NumVertexBindings = 0;
+		WEngine::WArray<VkVertexInputBindingDescription> Bindings;
 
-		uint32 NumVertexAttributes = 0;
+		WEngine::WHashMap<uint32, uint32> BindingToStream;
+
+		friend class VulkanDevice;
+
+	};
+
+	class VulkanVertexInputStateManager
+	{
+	public:
+
+		static VulkanVertexInputState* GetVertexInput(uint32 ID)
+		{
+			if (VertexInputs.Find(ID))
+			{
+				return VertexInputs[ID];
+			}
+			return nullptr;
+		}
+
+		static void AddVertexInput(uint32 ID, VulkanVertexInputState* VertexInput)
+		{
+			VertexInputs[ID] = VertexInput;
+		}
+
+	public:
+
+		static WEngine::WHashMap<uint32, VulkanVertexInputState*> VertexInputs;
 
 	};
 

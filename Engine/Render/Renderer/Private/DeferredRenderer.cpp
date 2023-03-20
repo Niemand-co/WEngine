@@ -73,22 +73,27 @@ void DeferredRenderer::RenderBasePass(WViewInfo& View)
 	DeferredBasePassParameters::GetStructMetaData()->GetLayout();
 
 	GraphBuilder->AddPass("BasePass", Parameters, [](RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
+	{
+		RHIGraphicsPipelineStateDescriptor PSODescriptor = {};
 		{
-			RHIGraphicsPipelineStateDescriptor PSODescriptor = {};
-			{
-				PSODescriptor.Shaders[(uint8)EShaderStage::Vertex] = WShaderLibrary::GetShader("OpaqueVert");
-				PSODescriptor.Shaders[(uint8)EShaderStage::Pixel] = WShaderLibrary::GetShader("OpaqueFrag");
+			PSODescriptor.Shaders[(uint8)EShaderStage::Vertex] = WShaderLibrary::GetShader("OpaqueVert");
+			PSODescriptor.Shaders[(uint8)EShaderStage::Pixel] = WShaderLibrary::GetShader("OpaqueFrag");
 
-				PSODescriptor.RenderTargetCount = 1;
-				PSODescriptor.BlendStates[0] = TStaticBlendStateRHI<true, EBlendOP::BlendAdd, EBlendFactor::FactorSrcAlpha, EBlendFactor::FactorOneMinusSrcAlpha>::GetRHI();
-				PSODescriptor.DepthStencilState = TStaticDepthStencilStateRHI<true, true, ECompareOP::Greater>::GetRHI();
-				PSODescriptor.RasterizationState = TStaticRasterizationStateRHI<ECullMode::Back>::GetRHI();
-				PSODescriptor.MultiSampleState = TStaticMultiSampleStateRHI<>::GetRHI();
-				PSODescriptor.RenderPass = RenderPass;
-			}
-			CmdList.SetGraphicsPipelineState(&PSODescriptor);
-			CmdList.DrawIndexedPrimitive(3, 0, 1);
-		});
+			PSODescriptor.RenderTargetCount = 1;
+			PSODescriptor.BlendStates[0] = TStaticBlendStateRHI<true, EBlendOP::BlendAdd, EBlendFactor::FactorSrcAlpha, EBlendFactor::FactorOneMinusSrcAlpha>::GetRHI();
+			PSODescriptor.DepthStencilState = TStaticDepthStencilStateRHI<true, true, ECompareOP::Greater>::GetRHI();
+			PSODescriptor.RasterizationState = TStaticRasterizationStateRHI<ECullMode::Back>::GetRHI();
+			PSODescriptor.MultiSampleState = TStaticMultiSampleStateRHI<>::GetRHI();
+			PSODescriptor.RenderPass = RenderPass;
+
+			WEngine::WArray<VertexInputElement> Elements;
+			WLocalVertexFactory::GetPSOVertexInputElements(EVertexInputType::PositionAndNormal, Elements);
+
+			PSODescriptor.VertexInputState = CmdList.CreateVertexInputState(Elements);
+		}
+		CmdList.SetGraphicsPipelineState(&PSODescriptor);
+		CmdList.DrawIndexedPrimitive(3, 0, 1);
+	});
 }
 
 void DeferredRenderer::RenderShadowPass(WViewInfo& View)

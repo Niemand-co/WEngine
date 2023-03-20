@@ -424,6 +424,53 @@ namespace WEngine
 		return VK_CULL_MODE_FLAG_BITS_MAX_ENUM;
 	}
 
+	static VkFormat ToVulkan(EVertexElementType VertexType)
+	{
+		switch (VertexType)
+		{
+		case EVertexElementType::VET_Float1:
+			return VK_FORMAT_R32_SFLOAT;
+		case EVertexElementType::VET_Float2:
+			return VK_FORMAT_R32G32_SFLOAT;
+		case EVertexElementType::VET_Float3:
+			return VK_FORMAT_R32G32B32_SFLOAT;
+		case EVertexElementType::VET_UByte4:
+			return VK_FORMAT_R8G8B8A8_UINT;
+		case EVertexElementType::VET_UByte4N:
+		case EVertexElementType::VET_Color:
+			return VK_FORMAT_R8G8B8A8_UNORM;
+		case EVertexElementType::VET_PackedNormal:
+			return VK_FORMAT_R8G8B8A8_SNORM;
+		case EVertexElementType::VET_Short2:
+			return VK_FORMAT_R16G16_SINT;
+		case EVertexElementType::VET_Short4:
+			return VK_FORMAT_R16G16B16A16_SINT;
+		case EVertexElementType::VET_Short2N:
+			return VK_FORMAT_R16G16_SNORM;
+		case EVertexElementType::VET_Short4N:
+			return VK_FORMAT_R16G16B16A16_SNORM;
+		case EVertexElementType::VET_Half2:
+			return VK_FORMAT_R16G16_SFLOAT;
+		case EVertexElementType::VET_Half4:
+			return VK_FORMAT_R16G16B16A16_SFLOAT;
+		case EVertexElementType::VET_UShort2:
+			return VK_FORMAT_R16G16_UINT;
+		case EVertexElementType::VET_UShort4:
+			return VK_FORMAT_R16G16B16A16_UINT;
+		case EVertexElementType::VET_UShort2N:
+			return VK_FORMAT_R16G16_UNORM;
+		case EVertexElementType::VET_UShort4N:
+			return VK_FORMAT_R16G16B16A16_UNORM;
+		case EVertexElementType::VET_URGB10A2N:
+			return VK_FORMAT_A2B10G10R10_UNORM_PACK32;
+		case EVertexElementType::VET_UInt:
+			return VK_FORMAT_R32_UINT;
+		default:
+			RE_ASSERT(false, "Error Type Vertex Type.");
+		}
+		return VK_FORMAT_MAX_ENUM;
+	}
+
 }
 
 enum class EState : int32
