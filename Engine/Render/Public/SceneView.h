@@ -32,7 +32,7 @@ struct WSceneViewInfo
 
 	glm::vec3 ViewLocation;
 
-	glm::vec3 ViewDirection;
+	glm::vec2 Resolution;
 
 	WUniformBufferRHIRef ViewUniformBuffer;
 
@@ -65,7 +65,7 @@ private:
 
 	class WRenderTarget *RenderTarget;
 
-	WEngine::WArray<WSceneViewInfo> Views;
+	WEngine::WArray<WSceneViewInfo*> Views;
 
 	friend class SceneRenderer;
 	friend class DeferredRenderer;

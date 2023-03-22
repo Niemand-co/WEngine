@@ -23,6 +23,8 @@ DeferredRenderer::~DeferredRenderer()
 
 void DeferredRenderer::Render()
 {
+	PrepareViewForRendering();
+
 	InitView();
 
 	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
@@ -60,40 +62,6 @@ void DeferredRenderer::InitView()
 void DeferredRenderer::RenderPrePass(WViewInfo& View)
 {
 
-}
-
-void DeferredRenderer::RenderBasePass(WViewInfo& View)
-{
-	glm::vec2 ViewRect = View.ViewMatrices.Rect;
-	WRDGTexture * GBuffer0 = GraphBuilder->RegisterExternalTexture(View.Family->RenderTarget->GetHandle());
-
-	DeferredBasePassParameters* Parameters = GraphBuilder->AllocateParameterStruct<DeferredBasePassParameters>();
-	Parameters->RenderTarget.ColorTextures[0].Texture = GBuffer0;
-
-	DeferredBasePassParameters::GetStructMetaData()->GetLayout();
-
-	GraphBuilder->AddPass("BasePass", Parameters, [](RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
-	{
-		RHIGraphicsPipelineStateDescriptor PSODescriptor = {};
-		{
-			PSODescriptor.Shaders[(uint8)EShaderStage::Vertex] = WShaderLibrary::GetShader("OpaqueVert");
-			PSODescriptor.Shaders[(uint8)EShaderStage::Pixel] = WShaderLibrary::GetShader("OpaqueFrag");
-
-			PSODescriptor.RenderTargetCount = 1;
-			PSODescriptor.BlendStates[0] = TStaticBlendStateRHI<true, EBlendOP::BlendAdd, EBlendFactor::FactorSrcAlpha, EBlendFactor::FactorOneMinusSrcAlpha>::GetRHI();
-			PSODescriptor.DepthStencilState = TStaticDepthStencilStateRHI<true, true, ECompareOP::Greater>::GetRHI();
-			PSODescriptor.RasterizationState = TStaticRasterizationStateRHI<ECullMode::Back>::GetRHI();
-			PSODescriptor.MultiSampleState = TStaticMultiSampleStateRHI<>::GetRHI();
-			PSODescriptor.RenderPass = RenderPass;
-
-			WEngine::WArray<VertexInputElement> Elements;
-			WLocalVertexFactory::GetPSOVertexInputElements(EVertexInputType::PositionAndNormal, Elements);
-
-			PSODescriptor.VertexInputState = CmdList.CreateVertexInputState(Elements);
-		}
-		CmdList.SetGraphicsPipelineState(&PSODescriptor);
-		CmdList.DrawIndexedPrimitive(3, 0, 1);
-	});
 }
 
 void DeferredRenderer::RenderShadowPass(WViewInfo& View)

@@ -22,29 +22,39 @@ public:
 
 	~WMeshPassProcessorRenderState() = default;
 
-	void SetDepthStencilState(RHIDepthStencilDescriptor& InDepthStencilState) { DepthStencilState = InDepthStencilState; }
+	void SetDepthStencilState(const WDepthStencilStateRHIRef& InDepthStencilState) { DepthStencilState = InDepthStencilState; }
 
-	void SetBlendState(RHIBlendDescriptor& InBlendState) { BlendState = InBlendState; }
+	void SetBlendState(uint32 AttachmentIndex, const WBlendStateRHIRef& InBlendState) { BlendStates[AttachmentIndex] = InBlendState; }
 
-	void SetRasterizationState(RHIRasterizationDescriptor& InRasterizationState) { RasterizationState = InRasterizationState; }
+	void SetRasterizationState(const WRasterizationStateRHIRef& InRasterizationState) { RasterizationState = InRasterizationState; }
 
-	const RHIDepthStencilDescriptor& GetDepthStencilState() const { return DepthStencilState; }
+	void SetMultiSampleState(const WMultiSampleStateRHIRef& InMultiSampleState) { MultiSampleState = InMultiSampleState; }
 
-	const RHIBlendDescriptor& GetBlendState() const { return BlendState; }
+	const WDepthStencilStateRHIRef& GetDepthStencilState() const { return DepthStencilState; }
 
-	const RHIRasterizationDescriptor& GetRasterizationState() const { return RasterizationState; }
+	const WBlendStateRHIRef& GetBlendState(uint32 AttachmentIndex) const { return BlendStates[AttachmentIndex]; }
+
+	const WRasterizationStateRHIRef& GetRasterizationState() const { return RasterizationState; }
+
+	const WMultiSampleStateRHIRef& GetMultiSamlpState() const { return MultiSampleState; }
 
 private:
 
-	RHIDepthStencilDescriptor DepthStencilState;
+	WDepthStencilStateRHIRef DepthStencilState = nullptr;
 
-	RHIBlendDescriptor BlendState;
+	WBlendStateRHIRef BlendStates[MaxSimultaneousRenderTargets] = {0};
 
-	RHIRasterizationDescriptor RasterizationState;
+	WRasterizationStateRHIRef RasterizationState = nullptr;
 
-	WUniformBufferRHIRef ViewUniformBuffer;
+	WMultiSampleStateRHIRef MultiSampleState = nullptr;
 
-	WUniformBufferRHIRef PassUniformBuffer;
+	WUniformBufferRHIRef ViewUniformBuffer = nullptr;
+
+	WUniformBufferRHIRef PassUniformBuffer = nullptr;
+
+	uint32 RenderTargetCount = 0;
+
+	friend class WMeshPassProcessor;
 
 };
 
@@ -52,22 +62,25 @@ class WMeshPassProcessor
 {
 public:
 
-	WMeshPassProcessor(class RScene *InScene, class WSceneViewInfo *InView, EVertexInputType VertexInputType)
+	WMeshPassProcessor(const class RScene* InScene, const WViewInfo* InView)
 		: Scene(InScene),
 		  View(InView)
 	{
 	}
 
-	~WMeshPassProcessor() = default;
+	virtual ~WMeshPassProcessor() = default;
 
+	template<typename PassShaderType>
 	void BuildMeshDrawCommand(
 	const WMeshBatch MeshBatch,
-	const WMeshPassProcessorRenderState& RenderState);
+	const WMeshPassProcessorRenderState& RenderState,
+	PassShaderType *PassShader,
+	EPassFeature Feature);
 
 private:
 
-	RScene *Scene;
+	const RScene *Scene;
 
-	WSceneViewInfo *View;
+	const WSceneViewInfo *View;
 
 };

@@ -73,6 +73,8 @@ public:
 	virtual void ReleaseRHIResource() override;
 
 	virtual void UpdateRHIResource() override;
+
+	virtual WVertexInputStateRHIRef GetVertexInput() = 0;
 	
 };
 
@@ -90,15 +92,11 @@ public:
 
 	static void GetPSOVertexInputElements(EVertexInputType Type, WEngine::WArray<VertexInputElement>& Elements);
 
-	void SetDeclaration(RHIVertexInputDescriptor& InDeclaration) {}
-
-	RHIVertexInputDescriptor& GetDeclaration() {}
+	virtual WVertexInputStateRHIRef GetVertexInput(EVertexInputType Type) override;
 
 private:
 
 	WStaticMeshDataType Data;
-
-	RHIVertexInputDescriptor Declaration;
 
 };
 

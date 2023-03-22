@@ -77,6 +77,7 @@ struct CameraInfo
 		  MatrixV(camera->GetViewMatrix()),
 		  MatrixP(camera->GetProjectionMatrix()),
 		  MatrixVP(MatrixP * MatrixV),
+		  Resolution(camera->m_resolution),
 		  Direction(camera->GetOwner()->GetComponent<TransformComponent>()->GetForward()),
 		  Owner(camera->GetOwner()),
 		  bMarkedDirty(false)
@@ -104,6 +105,8 @@ struct CameraInfo
 	glm::mat4x4 MatrixP;
 	
 	glm::mat4x4 MatrixVP;
+
+	glm::vec2 Resolution;
 	
 	glm::vec3 Direction;
 

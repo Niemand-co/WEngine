@@ -70,14 +70,14 @@ void RHIRenderCommandList::DrawIndexedPrimitive(uint32 indexCount, uint32 firstI
     RHIContext::GetContext()->RHIDrawIndexedPrimitive(indexCount, firstIndex, instanceCount);
 }
 
-void RHIRenderCommandList::SetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth)
+void RHIRenderCommandList::SetViewport(float MinX, float MinY, float MaxX, float MaxY, float MinDepth, float MaxDepth)
 {
     if (IsOutOfRenderThread() && IsOutOfRHIThread())
     {
-        ALLOC_COMMAND(RHICommandSetViewport)(X, X + Width, Y, Y + Height, MinDepth, MaxDepth);
+        ALLOC_COMMAND(RHICommandSetViewport)(MinX, MaxX, MinY, MaxY, MinDepth, MaxDepth);
         return;
     }
-    RHIContext::GetContext()->RHISetViewport(X, Y, Width, Height, MinDepth, MaxDepth);
+    RHIContext::GetContext()->RHISetViewport(MinX, MinY, MaxX - MinX, MaxY - MinY, MinDepth, MaxDepth);
 }
 
 void RHIRenderCommandList::CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY)

@@ -5,27 +5,8 @@
 #include "Scene/Public/GameObject.h"
 
 MaterialComponent::MaterialComponent(GameObject* pGameObject)
-	: Component(pGameObject), albedo(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)), roughness(0.5f), metallic(0.0f), m_shader(nullptr)
+	: Component(pGameObject), albedo(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)), roughness(0.5f), metallic(0.0f)
 {
-}
-
-void MaterialComponent::SetShader(RHIShader* shader)
-{
-	m_shader = shader;
-}
-
-RHIShader* MaterialComponent::GetShader()
-{
-	return m_shader;
-}
-
-SurfaceData MaterialComponent::GetSurfaceData()
-{
-	SurfaceData surfaceData = {};
-	surfaceData.albedo = albedo;
-	surfaceData.roughness = roughness;
-	surfaceData.mettalic = metallic;
-	return surfaceData;
 }
 
 void MaterialComponent::SetColor(glm::vec4 color)

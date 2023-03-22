@@ -50,7 +50,7 @@ file(GLOB PASS_INCLUDE Engine/Render/Passes/Public/*.h)
 file(GLOB PIPELINE_INCLUDE Engine/Render/RenderPipeline/Public/*.h)
 file(GLOB DESCR_INCLUDE Engine/Render/Descriptor/Public/*.h)
 file(GLOB MESH_INCLUDE Engine/Render/Mesh/Public/*.h)
-file(GLOB RENDER_INCLUDE Engine/Render/Public/*.h)
+file(GLOB RENDER_INCLUDE Engine/Render/Public/*.h Engine/Render/Public/*.inl)
 file(GLOB RENDERER_INCLUDE Engine/Render/Renderer/Public/*.h)
 
 file(GLOB COREH_INCLUDE Engine/Core/*.h)

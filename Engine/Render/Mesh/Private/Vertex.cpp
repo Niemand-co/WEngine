@@ -43,3 +43,10 @@ void WLocalVertexFactory::GetPSOVertexInputElements(EVertexInputType Type, WEngi
 		break;
 	}
 }
+
+WVertexInputStateRHIRef WLocalVertexFactory::GetVertexInput(EVertexInputType Type)
+{
+	WEngine::WArray<VertexInputElement> Elements;
+	GetPSOVertexInputElements(Type, Elements);
+	return GetRenderCommandList()->CreateVertexInputState(Elements);
+}

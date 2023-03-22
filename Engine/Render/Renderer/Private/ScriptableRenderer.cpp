@@ -20,8 +20,19 @@ SceneRenderer::SceneRenderer(const WSceneViewFamily* InViewFamily)
 	Views.Resize(ViewFamily->Views.Size());
 	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
 	{
-		Views[ViewIndex] = WViewInfo(ViewFamily->Views[ViewIndex]);
+		Views[ViewIndex] = WViewInfo(*ViewFamily->Views[ViewIndex]);
 		Views[ViewIndex].Family = WEngine::RemoveConst(ViewFamily);
+	}
+}
+
+void SceneRenderer::PrepareViewForRendering()
+{
+	for (int ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
+	{
+		WViewInfo& View = Views[ViewIndex];
+		View.ViewRect.Min = {0, 0};
+		View.ViewRect.Max.X = View.ViewRect.Min.X + (int)View.Resolution.x;
+		View.ViewRect.Max.Y = View.ViewRect.Min.Y + (int)View.Resolution.y;
 	}
 }
 
@@ -39,9 +50,9 @@ void SceneRenderer::ComputeVisibility()
 			OcclusionCulling(Primitives, ViewInfo);
 		}
 
-		GatherDynamicMeshElements(ViewInfo);
 	}
 
+	GatherDynamicMeshElements(Views, ViewFamily);
 }
 
 void SceneRenderer::FrustumCulling(const WEngine::WArray<PrimitiveInfo*>& Primitives, WViewInfo& ViewInfo)
@@ -65,7 +76,7 @@ void SceneRenderer::OcclusionCulling(const WEngine::WArray<PrimitiveInfo*>& Prim
 {
 }
 
-void SceneRenderer::GatherDynamicMeshElements(WViewInfo& View)
+void SceneRenderer::GatherDynamicMeshElements(const WEngine::WArray<WViewInfo>& Views, const WSceneViewFamily *InFamily)
 {
 	const WEngine::WArray<PrimitiveInfo*>& Primitives = Scene->GetPrimitives();
 	const WEngine::WArray<uint8>& PrimitiveMasks = Scene->GetPrimitiveMasks();
@@ -75,7 +86,7 @@ void SceneRenderer::GatherDynamicMeshElements(WViewInfo& View)
 	{
 		if ((PrimitiveMasks[PrimitiveIndex] & (uint8)PrimitiveInfo::PrimitiveMask::Dynamic) > 0)
 		{
-			Primitives[PrimitiveIndex]->Proxy->GetDynamicMeshElements(Views, Collector);
+			Primitives[PrimitiveIndex]->Proxy->GetDynamicMeshElements(InFamily->Views, Collector);
 		}
 	}
 }
@@ -101,6 +112,7 @@ SceneRenderer* SceneRenderer::CreateRenderer(const WSceneViewFamily* InViewFamil
 WViewInfo::WViewInfo(const WSceneViewInfo& SceneViewInfo)
 	: WSceneViewInfo(SceneViewInfo)
 {
+	ViewRect = {0, 0, 0, 0};
 }
 
 void WViewInfo::SetupViewParameters(SceneViewUniformBufferParameters& Parameters)

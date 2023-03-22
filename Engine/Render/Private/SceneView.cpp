@@ -6,7 +6,7 @@
 WSceneViewInfo::WSceneViewInfo(CameraInfo* Camera)
 	: ViewMatrices(Camera),
 	  ViewLocation(Camera->Position),
-	  ViewDirection(Camera->Direction)
+	  Resolution(Camera->Resolution)
 {
 }
 
@@ -42,6 +42,6 @@ WSceneViewFamily::WSceneViewFamily(WViewport* InViewport, RScene* InScene)
 	Views.Resize(Cameras.Size());
 	for (uint32 CameraIndex = 0; CameraIndex < Cameras.Size(); ++CameraIndex)
 	{
-		Views[CameraIndex] = WSceneViewInfo(Cameras[CameraIndex]);
+		Views[CameraIndex] = new WSceneViewInfo(Cameras[CameraIndex]);
 	}
 }

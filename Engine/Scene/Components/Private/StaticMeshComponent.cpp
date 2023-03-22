@@ -42,7 +42,7 @@ void StaticMeshProxy::DrawStaticMesh(RHICommandListBase* CmdList)
 	
 }
 
-void StaticMeshProxy::GetDynamicMeshElements(WEngine::WArray<WSceneViewInfo>& Views, WMeshCollector& Collector)
+void StaticMeshProxy::GetDynamicMeshElements(const WEngine::WArray<WSceneViewInfo*>& Views, WMeshCollector& Collector)
 {
 	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
 	{

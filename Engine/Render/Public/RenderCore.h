@@ -89,6 +89,17 @@ struct Extent
 	uint32 depth = 1;
 };
 
+struct IntRect
+{
+	struct IntCorner
+	{
+		int X, Y;
+	};
+
+	IntCorner Min;
+	IntCorner Max;
+};
+
 enum class Dimension
 {
 	Texture1D = 0,
@@ -302,4 +313,11 @@ enum class EVertexElementType : uint32
 	VET_UShort4N,
 	VET_URGB10A2N,
 	VET_UInt
+};
+
+enum class EPassFeature : uint8
+{
+	Default,
+	PositionOnly,
+	PositionAndNormal,
 };

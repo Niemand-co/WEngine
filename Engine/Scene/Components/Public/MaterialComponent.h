@@ -27,8 +27,6 @@ public:
 
 	virtual void ShowInInspector() override;
 
-	void SetShader(RHIShader* shader);
-
 	void SetColor(glm::vec4 color);
 
 	void SetRoughness(float roughness);
@@ -44,7 +42,6 @@ private:
 	[[Range(0, 1)]]
 	float metallic;
 
-	RHIShader* m_shader;
 };
 
 struct MaterialProxy

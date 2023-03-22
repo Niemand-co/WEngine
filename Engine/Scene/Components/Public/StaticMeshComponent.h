@@ -41,7 +41,7 @@ struct StaticMeshProxy : public PrimitiveProxy
 
 	virtual void DrawDynamicMesh(RHICommandListBase* CmdList) override {}
 
-	virtual void GetDynamicMeshElements(WEngine::WArray<WSceneViewInfo>& Views, WMeshCollector& Collector) override;
+	virtual void GetDynamicMeshElements(const WEngine::WArray<WSceneViewInfo*>& Views, WMeshCollector& Collector) override;
 
 	virtual void GenerateBoundingBox() override;
 

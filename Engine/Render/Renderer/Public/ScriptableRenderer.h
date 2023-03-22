@@ -27,6 +27,8 @@ public:
 
 struct WViewInfo : public WSceneViewInfo
 {
+	IntRect ViewRect = {0, 0, 0, 0};
+
 	WEngine::WBitArray PrimitiveVisibilityMap;
 
 	WViewInfo() = default;
@@ -47,13 +49,15 @@ public:
 
 	virtual ~SceneRenderer() = default;
 
+	void PrepareViewForRendering();
+
 	void ComputeVisibility();
 
 	void FrustumCulling(const WEngine::WArray<class PrimitiveInfo*>& Primitives, WViewInfo& ViewInfo);
 
 	void OcclusionCulling(const WEngine::WArray<class PrimitiveInfo*>& Primitives, WViewInfo& ViewInfo);
 
-	void GatherDynamicMeshElements(WViewInfo& View);
+	void GatherDynamicMeshElements(const WEngine::WArray<WViewInfo>& Views, const WSceneViewFamily* InFamily);
 
 	void SetScene(RScene *inScene) { Scene = inScene; }
 

@@ -1,18 +1,37 @@
 #pragma once
-#include "Render/Passes/Public/ScriptableRenderPass.h"
+#include "Render/Public/Shader.h"
+#include "Render/Public/MeshPassProcessor.h"
+#include "Render/Public/MeshPassProcessor.inl"
+#include "Render/Public/RenderDependencyGraphParameter.h"
 
-class DeferredBasePass : public ScriptableRenderPass
+class WDeferredBasePassVS : public WMaterialShader
 {
 public:
 
-	DeferredBasePass();
+	WDeferredBasePassVS();
 
-	virtual ~DeferredBasePass();
+	virtual ~WDeferredBasePassVS();
 
-	virtual void InitRHIResource() override;
+	virtual void GetParametersBinding(class RScene* Scene, MaterialProxy* Material) override;
 
-	virtual void ReleaseRHIResource() override;
+	WVertexShaderRHIRef GetVertexShader() const { return VertexShaderRHI; }
 
-	virtual void UpdateRHIResource() override;
+private:
+
+	WVertexShaderRHIRef VertexShaderRHI;
+
+};
+
+class WDeferredBasePassMeshProcessor : public WMeshPassProcessor
+{
+public:
+
+	WDeferredBasePassMeshProcessor(const class RScene *InScene, const WViewInfo* InView, const WMeshPassProcessorRenderState& InRenderState);
+
+	virtual ~WDeferredBasePassMeshProcessor() = default;
+
+private:
+
+	const WMeshPassProcessorRenderState RenderState;
 
 };

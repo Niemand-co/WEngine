@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Render/Public/MeshPassProcessor.h"
+#include "Render/Public/MeshPassProcessor.inl"
 #include "Render/Mesh/Public/MeshBatch.h"
 #include "Render/Mesh/Public/Vertex.h"
 #include "Render/Public/Scene.h"

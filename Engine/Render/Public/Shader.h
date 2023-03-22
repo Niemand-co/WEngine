@@ -7,10 +7,7 @@ class WShader : public RenderResource
 {
 public:
 
-	WShader(ShaderCodeBlob& inBlob)
-		: Blob(inBlob)
-	{
-	}
+	WShader() = default;
 
 	virtual ~WShader() = default;
 
@@ -20,72 +17,15 @@ protected:
 
 };
 
-class WVertexShader : public WShader
+class WMaterialShader : public WShader
 {
 public:
 
-	WVertexShader(ShaderCodeBlob& inBlob)
-		: WShader(inBlob)
-	{
-	}
+	WMaterialShader() = default;
 
-	void InitRHIResource() override;
+	virtual ~WMaterialShader() = default;
 
-	void ReleaseRHIResource() override;
-
-	void UpdateRHIResource() override;
-
-	WVertexShaderRHIRef GetRHI() const { return Shader; }
-
-private:
-
-	WVertexShaderRHIRef Shader;
-
-};
-
-class WPixelShader : public WShader
-{
-public:
-
-	WPixelShader(ShaderCodeBlob& inBlob)
-		: WShader(inBlob)
-	{
-	}
-
-	void InitRHIResource() override;
-
-	void ReleaseRHIResource() override;
-
-	void UpdateRHIResource() override;
-
-	WPixelShaderRHIRef GetRHI() const { return Shader; }
-
-private:
-
-	WPixelShaderRHIRef Shader;
-
-};
-
-class WGeometryShader : public WShader
-{
-public:
-
-	WGeometryShader(ShaderCodeBlob& inBlob)
-		: WShader(inBlob)
-	{
-	}
-
-	void InitRHIResource() override;
-
-	void ReleaseRHIResource() override;
-
-	void UpdateRHIResource() override;
-
-	WGeometryShaderRHIRef GetRHI() const { return Shader; }
-
-private:
-
-	WGeometryShaderRHIRef Shader;
+	virtual void GetParametersBinding(class RScene *Scene, class MaterialProxy *Material) = 0;
 
 };
 
