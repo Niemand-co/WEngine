@@ -11,10 +11,6 @@ public:
 
 	virtual ~WShader() = default;
 
-protected:
-
-	ShaderCodeBlob Blob;
-
 };
 
 class WMaterialShader : public WShader

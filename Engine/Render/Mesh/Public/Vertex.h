@@ -74,7 +74,7 @@ public:
 
 	virtual void UpdateRHIResource() override;
 
-	virtual WVertexInputStateRHIRef GetVertexInput() = 0;
+	virtual WVertexInputStateRHIRef GetVertexInput(EVertexInputType Type) = 0;
 	
 };
 

@@ -52,3 +52,29 @@ WDeferredBasePassMeshProcessor::WDeferredBasePassMeshProcessor(const RScene* InS
 	  RenderState(InRenderState)
 {
 }
+
+void WDeferredBasePassMeshProcessor::AddMeshBatch(const WMeshBatch& MeshBatch)
+{
+	MaterialProxy& Material = *MeshBatch.Material;
+	if (Scene->GetShadingPath() == EShadingPath::Forward)
+	{
+
+	}
+}
+
+bool WDeferredBasePassMeshProcessor::ProcessDeferredShadingPath(const WMeshBatch& MeshBatch, const MaterialProxy& Material)
+{
+	
+
+	return false;
+}
+
+bool WDeferredBasePassMeshProcessor::ProcessForwardShadingPath(const WMeshBatch& MeshBatch, const MaterialProxy& Material)
+{
+	return false;
+}
+
+bool WDeferredBasePassMeshProcessor::ProcessForwardPlusShadingPath(const WMeshBatch& MeshBatch, const MaterialProxy& Material)
+{
+	return false;
+}

@@ -12,7 +12,7 @@ public:
 
 	virtual ~WDeferredBasePassVS();
 
-	virtual void GetParametersBinding(class RScene* Scene, MaterialProxy* Material) override;
+	virtual void GetParametersBinding(class RScene* Scene, class MaterialProxy* Material) override;
 
 	WVertexShaderRHIRef GetVertexShader() const { return VertexShaderRHI; }
 
@@ -29,6 +29,16 @@ public:
 	WDeferredBasePassMeshProcessor(const class RScene *InScene, const WViewInfo* InView, const WMeshPassProcessorRenderState& InRenderState);
 
 	virtual ~WDeferredBasePassMeshProcessor() = default;
+
+	void AddMeshBatch(const class WMeshBatch& MeshBatch);
+
+private:
+
+	bool ProcessDeferredShadingPath(const WMeshBatch& MeshBatch, const MaterialProxy& Material);
+
+	bool ProcessForwardShadingPath(const WMeshBatch& MeshBatch, const MaterialProxy& Material);
+
+	bool ProcessForwardPlusShadingPath(const WMeshBatch& MeshBatch, const MaterialProxy& Material);
 
 private:
 

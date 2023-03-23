@@ -77,10 +77,16 @@ public:
 	PassShaderType *PassShader,
 	EPassFeature Feature);
 
-private:
+protected:
 
 	const RScene *Scene;
 
 	const WSceneViewInfo *View;
 
 };
+
+template<typename ShadingPath>
+void GetShaders()
+{
+
+}

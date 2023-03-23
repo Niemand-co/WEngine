@@ -22,7 +22,7 @@ public:
 
 protected:
 
-	WStaticMesh*m_pMesh;
+	WStaticMesh *m_pMesh;
 
 	uint8_t m_bCastShadow : 1;
 
@@ -32,7 +32,8 @@ struct StaticMeshProxy : public PrimitiveProxy
 {
 	StaticMeshProxy(StaticMeshComponent *primitive)
 		: PrimitiveProxy(primitive),
-		  Mesh(primitive->m_pMesh)
+		  Mesh(primitive->m_pMesh),
+		  RenderData(primitive->m_pMesh->GetRenderData())
 	{
 
 	}
@@ -51,6 +52,6 @@ struct StaticMeshProxy : public PrimitiveProxy
 
 	WStaticMesh *Mesh;
 
-	WStaticMeshRenderData *RenderData;
+	const WStaticMeshRenderData *RenderData;
 
 };
