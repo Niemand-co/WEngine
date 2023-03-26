@@ -6,7 +6,7 @@
 #include "Render/Descriptor/Public/RHIRasterizationDescriptor.h"
 
 class WMeshBatch;
-
+class WMaterialShader;
 
 class WMeshPassProcessorRenderState
 {
@@ -85,8 +85,27 @@ protected:
 
 };
 
-template<typename ShadingPath>
-void GetShaders()
+template<typename VertexType, typename GeometryType, typename PixelType>
+struct WMeshPassProcessorShader
 {
+public:
 
-}
+	WMeshPassProcessorShader() = default;
+
+	~WMeshPassProcessorShader() = default;
+
+	WVertexShaderRHIRef GetVertexShaderRHI() const { return VertexShader ? VertexShader->GetVertexShader() : nullptr; }
+
+	WGeometryShaderRHIRef GetGeometryShaderRHI() const { return GeometryShader ? GeometryShader->GetGeometryShader() : nullptr; }
+
+	WPixelShaderRHIRef GetPixelShaderRHI() const { return PixelShader ? PixelShader->GetPixelShader() : nullptr; }
+
+public:
+
+	VertexType *VertexShader = nullptr;
+
+	GeometryType *GeometryShader = nullptr;
+
+	PixelType *PixelShader = nullptr;
+
+};

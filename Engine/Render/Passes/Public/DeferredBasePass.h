@@ -14,11 +14,29 @@ public:
 
 	virtual void GetParametersBinding(class RScene* Scene, class MaterialProxy* Material) override;
 
-	WVertexShaderRHIRef GetVertexShader() const { return VertexShaderRHI; }
+	virtual WVertexShaderRHIRef GetVertexShader() const override { return VertexShaderRHI; }
 
 private:
 
 	WVertexShaderRHIRef VertexShaderRHI;
+
+};
+
+class WDeferredBasePassPS : public WMaterialShader
+{
+public:
+
+	WDeferredBasePassPS();
+
+	virtual ~WDeferredBasePassPS();
+
+	virtual void GetParametersBinding(RScene *Scene, MaterialProxy *Material) override;
+
+	virtual WPixelShaderRHIRef GetPixelShader() const override { return PixelShaderRHI; }
+
+private:
+
+	WPixelShaderRHIRef PixelShaderRHI;
 
 };
 
@@ -45,3 +63,5 @@ private:
 	const WMeshPassProcessorRenderState RenderState;
 
 };
+
+void GetBasePassShaders(WDeferredBasePassVS*& VertexShader, WDeferredBasePassPS*& PixelShader);

@@ -575,7 +575,12 @@ struct RHIRasterizationStateInitializer
 
 struct RHIMultiSampleStateInitializer
 {
-
+	bool bEnableSampleShading = false;
+	uint32 SampleCount = 1;
+	uint32 SampleMask = 0x00;
+	float MinSampleShading = 0.f;
+	bool bEnableAlphaToCoverage = false;
+	bool bEnableAlphaToOne = false;
 };
 
 typedef class RHIVertexBuffer* WVertexBufferRHIRef;

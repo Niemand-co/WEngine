@@ -35,6 +35,10 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch MeshBatch,
 		}
 
 		PipelineInfo.MultiSampleState = RenderState.MultiSampleState;
+
+		PipelineInfo.Shaders[EShaderStage::Vertex] = PassShader->GetVertexShaderRHI();
+		PipelineInfo.Shaders[EShaderStage::Geometry] = PassShader->GetPixelShaderRHI();
+		PipelineInfo.Shaders[EShaderStage::Pixel] = PassShader->GetVertexShaderRHI();
 	}
 
 

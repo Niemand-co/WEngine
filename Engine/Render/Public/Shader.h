@@ -21,16 +21,32 @@ public:
 
 	virtual ~WMaterialShader() = default;
 
+	void InitRHIResource() override {}
+
+	void ReleaseRHIResource() override {}
+
+	void UpdateRHIResource() override {}
+
 	virtual void GetParametersBinding(class RScene *Scene, class MaterialProxy *Material) = 0;
 
+	virtual WVertexShaderRHIRef GetVertexShader() const { return nullptr; }
+
+	virtual WGeometryShaderRHIRef GetGeometryShader() const { return nullptr; }
+
+	virtual WPixelShaderRHIRef GetPixelShader () const { return nullptr; }
+
+};
+
+class WDummyMaterialShader : public WMaterialShader
+{
+	virtual void GetParametersBinding(class RScene* Scene, class MaterialProxy* Material) override {}
 };
 
 class WComputeShader : public WShader
 {
 public:
 
-	WComputeShader(ShaderCodeBlob& inBlob)
-		: WShader(inBlob)
+	WComputeShader()
 	{
 	}
 
@@ -48,13 +64,28 @@ private:
 
 };
 
+template<typename ShaderType>
+class WShaderRefBase
+{
+public:
+
+	WShaderRefBase();
+
+	~WShaderRefBase();
+
+private:
+
+	ShaderType *Shader;
+	
+};
+
 size_t ShaderHash(WEngine::WGuid<WEngine::WString> key);
 
 class WShaderLibrary : public WEngine::NamingSystem
 {
 public:
 
-	static WShader* GetShader(const WEngine::WString& name)
+	static class RHIShader* GetShader(const WEngine::WString& name)
 	{
 		return Shaders[WEngine::WGuid(name)];
 	}
@@ -63,6 +94,6 @@ public:
 
 private:
 
-	static WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WShader*, ShaderHash> Shaders;
+	static WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, RHIShader*, ShaderHash> Shaders;
 
 };

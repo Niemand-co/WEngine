@@ -58,15 +58,25 @@ void WDeferredBasePassMeshProcessor::AddMeshBatch(const WMeshBatch& MeshBatch)
 	MaterialProxy& Material = *MeshBatch.Material;
 	if (Scene->GetShadingPath() == EShadingPath::Forward)
 	{
-
+		ProcessForwardShadingPath(MeshBatch, Material);
+	}
+	else if (Scene->GetShadingPath() == EShadingPath::Deferred)
+	{
+		ProcessDeferredShadingPath(MeshBatch, Material);
+	}
+	else if (Scene->GetShadingPath() == EShadingPath::ForwardPlus)
+	{
+		ProcessForwardPlusShadingPath(MeshBatch, Material);
 	}
 }
 
 bool WDeferredBasePassMeshProcessor::ProcessDeferredShadingPath(const WMeshBatch& MeshBatch, const MaterialProxy& Material)
 {
-	
+	WMeshPassProcessorShader<WDeferredBasePassVS, WDummyMaterialShader, WDeferredBasePassPS> BasePassShaders;
+	GetBasePassShaders(BasePassShaders.VertexShader, BasePassShaders.PixelShader);
 
-	return false;
+	BuildMeshDrawCommand(MeshBatch, RenderState, &BasePassShaders, EPassFeature::PositionAndNormal);
+	return true;
 }
 
 bool WDeferredBasePassMeshProcessor::ProcessForwardShadingPath(const WMeshBatch& MeshBatch, const MaterialProxy& Material)
@@ -77,4 +87,10 @@ bool WDeferredBasePassMeshProcessor::ProcessForwardShadingPath(const WMeshBatch&
 bool WDeferredBasePassMeshProcessor::ProcessForwardPlusShadingPath(const WMeshBatch& MeshBatch, const MaterialProxy& Material)
 {
 	return false;
+}
+
+void GetBasePassShaders(WDeferredBasePassVS*& VertexShader, WDeferredBasePassPS*& PixelShader)
+{
+	VertexShader = new WDeferredBasePassVS();
+	PixelShader = new WDeferredBasePassPS();
 }
