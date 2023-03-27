@@ -11,6 +11,12 @@ public:
 
 	virtual ~WShader() = default;
 
+	virtual WVertexShaderRHIRef GetVertexShader() const { return nullptr; }
+
+	virtual WGeometryShaderRHIRef GetGeometryShader() const { return nullptr; }
+
+	virtual WPixelShaderRHIRef GetPixelShader() const { return nullptr; }
+
 };
 
 class WMaterialShader : public WShader
@@ -28,12 +34,6 @@ public:
 	void UpdateRHIResource() override {}
 
 	virtual void GetParametersBinding(class RScene *Scene, struct MaterialProxy *Material) {}
-
-	virtual WVertexShaderRHIRef GetVertexShader() const { return nullptr; }
-
-	virtual WGeometryShaderRHIRef GetGeometryShader() const { return nullptr; }
-
-	virtual WPixelShaderRHIRef GetPixelShader () const { return nullptr; }
 
 };
 

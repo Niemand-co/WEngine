@@ -281,7 +281,7 @@ namespace Vulkan
 				ShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 				ShaderStageCreateInfo.pName = "VSMain";
 				ShaderStageCreateInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-				ShaderStageCreateInfo.module = static_cast<VulkanVertexShader*>(static_cast<WVertexShader*>(descriptor->Shaders[(uint8)EShaderStage::Vertex])->GetRHI())->GetShaderModule();
+				ShaderStageCreateInfo.module = static_cast<VulkanVertexShader*>(descriptor->Shaders[(uint8)EShaderStage::Vertex]->GetVertexShader())->GetShaderModule();
 			}
 			ShaderStageCreateInfos.Push(ShaderStageCreateInfo);
 		}
@@ -292,7 +292,7 @@ namespace Vulkan
 				ShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 				ShaderStageCreateInfo.pName = "GSMain";
 				ShaderStageCreateInfo.stage = VK_SHADER_STAGE_GEOMETRY_BIT;
-				ShaderStageCreateInfo.module = static_cast<VulkanGeometryShader*>(static_cast<WGeometryShader*>(descriptor->Shaders[(uint8)EShaderStage::Vertex])->GetRHI())->GetShaderModule();
+				ShaderStageCreateInfo.module = static_cast<VulkanGeometryShader*>(descriptor->Shaders[(uint8)EShaderStage::Vertex]->GetGeometryShader())->GetShaderModule();
 			}
 			ShaderStageCreateInfos.Push(ShaderStageCreateInfo);
 		}
@@ -303,7 +303,7 @@ namespace Vulkan
 				ShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 				ShaderStageCreateInfo.pName = "PSMain";
 				ShaderStageCreateInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-				ShaderStageCreateInfo.module = static_cast<VulkanPixelShader*>(static_cast<WPixelShader*>(descriptor->Shaders[(uint8)EShaderStage::Vertex])->GetRHI())->GetShaderModule();
+				ShaderStageCreateInfo.module = static_cast<VulkanPixelShader*>(descriptor->Shaders[(uint8)EShaderStage::Vertex]->GetPixelShader())->GetShaderModule();
 			}
 			ShaderStageCreateInfos.Push(ShaderStageCreateInfo);
 		}
@@ -342,7 +342,7 @@ namespace Vulkan
 			GraphicsPipelineCreateInfo.pDepthStencilState = &static_cast<VulkanDepthStencilState*>(descriptor->DepthStencilState)->DepthStencilStateCreateInfo;
 			GraphicsPipelineCreateInfo.pColorBlendState = &ColorBlendStateCreateInfo;
 			GraphicsPipelineCreateInfo.pDynamicState = &dynamicStateCreateInfo;
-			GraphicsPipelineCreateInfo.layout = *static_cast<VulkanPipelineResourceLayout*>(descriptor->pipelineResourceLayout)->GetHandle();
+			GraphicsPipelineCreateInfo.layout = ;
 			GraphicsPipelineCreateInfo.renderPass = static_cast<VulkanRenderPass*>(descriptor->RenderPass)->GetHandle();
 			GraphicsPipelineCreateInfo.subpass = 0;
 			GraphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
@@ -519,91 +519,6 @@ namespace Vulkan
 	WDynamicUniformBufferRHIRef VulkanDevice::CreateDynamicUniformBuffer(RHIBufferDescriptor* descriptor)
 	{
 		return new VulkanDynamicUniformBuffer(this, descriptor);
-	}
-
-	RHIGroup* VulkanDevice::CreateResourceGroup(RHIGroupDescriptor* descriptor)
-	{
-
-		return nullptr;
-	}
-
-	RHIGroupLayout* VulkanDevice::CreateGroupLayout(RHIGroupLayoutDescriptor *descriptor)
-	{
-		VkDescriptorSetLayoutBinding *pDescriptorSetLayoutBindings = (VkDescriptorSetLayoutBinding*)NormalAllocator::Get()->Allocate(descriptor->bindingCount * sizeof(VkDescriptorSetLayoutBinding));
-		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
-		{
-			::new (pDescriptorSetLayoutBindings + i) VkDescriptorSetLayoutBinding();
-			BindingResource *resource = (descriptor->pBindingResources) + i;
-			pDescriptorSetLayoutBindings[i].binding = resource->bindingSlot;
-			pDescriptorSetLayoutBindings[i].descriptorCount = resource->count;
-			pDescriptorSetLayoutBindings[i].descriptorType = WEngine::ToVulkan(resource->type);
-			pDescriptorSetLayoutBindings[i].stageFlags = resource->shaderStage;
-			pDescriptorSetLayoutBindings[i].pImmutableSamplers = nullptr;
-		}
-		
-		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
-		{
-			descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-			descriptorSetLayoutCreateInfo.bindingCount = descriptor->bindingCount;
-			descriptorSetLayoutCreateInfo.pBindings = pDescriptorSetLayoutBindings;
-		}
-
-		VkDescriptorSetLayout *pDescriptorSetLayout = (VkDescriptorSetLayout*)NormalAllocator::Get()->Allocate(sizeof(VkDescriptorSetLayout));
-		::new (pDescriptorSetLayout) VkDescriptorSetLayout();
-		RE_ASSERT(vkCreateDescriptorSetLayout(pDevice, &descriptorSetLayoutCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pDescriptorSetLayout) == VK_SUCCESS, "Failed to Create Descriptor Set Layout.");
-
-		VulkanGroupLayout *groupLayout = (VulkanGroupLayout*)NormalAllocator::Get()->Allocate(sizeof(VulkanGroupLayout));
-		::new (groupLayout) VulkanGroupLayout(pDescriptorSetLayout, descriptor->bindingCount);
-
-		groupLayout->bindingCount = descriptor->bindingCount;
-		groupLayout->pBindingResources = descriptor->pBindingResources;
-		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
-		{
-			BindingResource* resource = (descriptor->pBindingResources) + i;
-			pDescriptorSetLayoutBindings[i].~VkDescriptorSetLayoutBinding();
-		}
-		NormalAllocator::Get()->Deallocate(pDescriptorSetLayoutBindings);
-
-		return groupLayout;
-	}
-
-	RHIPipelineResourceLayout* VulkanDevice::CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor* descriptor)
-	{
-		VkPipelineLayoutCreateInfo layoutCreateInfo = {};
-		{
-			layoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-			layoutCreateInfo.setLayoutCount = descriptor->groupLayoutCount;
-			layoutCreateInfo.pSetLayouts = static_cast<VulkanGroupLayout*>(descriptor->pGroupLayout)->GetHandle();
-			layoutCreateInfo.pushConstantRangeCount = 0;
-			layoutCreateInfo.pPushConstantRanges = nullptr;
-		}
-		VkPipelineLayout* pLayout = (VkPipelineLayout*)NormalAllocator::Get()->Allocate(sizeof(VkPipelineLayout));
-		RE_ASSERT(vkCreatePipelineLayout(pDevice, &layoutCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pLayout) == VK_SUCCESS, "Failed to Create Pipeline Layout.");
-
-		RHIPipelineResourceLayout *pPipelineResourceLayout = (RHIPipelineResourceLayout*)NormalAllocator::Get()->Allocate(sizeof(VulkanPipelineResourceLayout));
-		::new (pPipelineResourceLayout) VulkanPipelineResourceLayout(pLayout);
-
-		return pPipelineResourceLayout;
-	}
-
-	RHIGroupPool* VulkanDevice::CreateGroupPool(RHIGroupPoolDescriptor* descriptor)
-	{
-		WEngine::WArray<VkDescriptorPoolSize> DescriptorPoolSizes(descriptor->pGroupLayout->bindingCount);
-		for (unsigned int i = 0; i < descriptor->pGroupLayout->bindingCount; ++i)
-		{
-			DescriptorPoolSizes[i].descriptorCount = descriptor->pGroupLayout->pBindingResources[i].count;
-			DescriptorPoolSizes[i].type = WEngine::ToVulkan(descriptor->pGroupLayout->pBindingResources[i].type);
-		}
-
-		VkDescriptorPoolCreateInfo DescriptorPoolCreateInfo = {};
-		{
-			DescriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-			DescriptorPoolCreateInfo.maxSets = descriptor->maxSetCount;
-			DescriptorPoolCreateInfo.poolSizeCount = DescriptorPoolSizes.Size();
-			DescriptorPoolCreateInfo.pPoolSizes = DescriptorPoolSizes.GetData();
-		}
-
-		return new VulkanGroupPool(this, &DescriptorPoolCreateInfo);
 	}
 
 	RHIScissor* VulkanDevice::CreateScissor(RHIScissorDescriptor* descriptor)
