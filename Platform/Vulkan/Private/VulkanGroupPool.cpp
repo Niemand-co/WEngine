@@ -8,7 +8,7 @@
 namespace Vulkan
 {
 
-	VulkanGroupPool::VulkanGroupPool(VulkanDevice *pInDevice, VkDescriptorPoolCreateInfo *pInfo)
+	VulkanGroupPool::VulkanGroupPool(VulkanDevice *pInDevice, VkDescriptorPoolCreateInfo *pInfo, VkDescriptorSetLayout InDescriptorSetLayout)
 		: pDevice(pInDevice)
 	{
 		vkCreateDescriptorPool(pDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DescriptorSetPool);
@@ -17,28 +17,21 @@ namespace Vulkan
 	VulkanGroupPool::~VulkanGroupPool()
 	{
 		vkDestroyDescriptorPool(pDevice->GetHandle(), DescriptorSetPool, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkDestroyDescriptorSetLayout(pDevice->GetHandle(), DescriptorSetLayout, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
-	WEngine::WArray<RHIGroup*> VulkanGroupPool::GetGroup(uint32 count)
+	VkDescriptorSet VulkanGroupPool::GetDescriptorSet()
 	{
-		WEngine::WArray<VkDescriptorSetLayout> layouts(count, *static_cast<VulkanGroupLayout*>(m_pGroupLayout)->GetHandle());
-		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
+		VkDescriptorSetAllocateInfo DescriptorSetAllocateInfo = {};
 		{
-			descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-			descriptorSetAllocateInfo.descriptorPool = DescriptorSetPool;
-			descriptorSetAllocateInfo.descriptorSetCount = count;
-			descriptorSetAllocateInfo.pSetLayouts = layouts.GetData();
+			DescriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			DescriptorSetAllocateInfo.descriptorPool = DescriptorSetPool;
+			DescriptorSetAllocateInfo.descriptorSetCount = 1;
+			DescriptorSetAllocateInfo.pSetLayouts = &DescriptorSetLayout;
 		}
-		VkDescriptorSet *pDescriptorSets = (VkDescriptorSet*)NormalAllocator::Get()->Allocate(count * sizeof(VkDescriptorSet));
-		vkAllocateDescriptorSets(pDevice->GetHandle(), &descriptorSetAllocateInfo, pDescriptorSets);
-
-		WEngine::WArray<RHIGroup*> groups(count);
-		for (unsigned int i = 0; i < count; ++i)
-		{
-			groups[i] = new VulkanGroup(pDevice);
-		}
-
-		return groups;
+		VkDescriptorSet DescriptorSet;
+		vkAllocateDescriptorSets(pDevice->GetHandle(), &DescriptorSetAllocateInfo, &DescriptorSet);
+		return DescriptorSet;
 	}
 
 }

@@ -18,7 +18,7 @@ void DeferredRenderer::RenderBasePass(WViewInfo& View)
 
 	WDeferredBasePassVS *Shader = new WDeferredBasePassVS();
 
-	GraphBuilder->AddPass("BasePass", Parameters, [&View](RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
+	GraphBuilder->AddPass("BasePass", Parameters, [&View, this](RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
 	{
 		CmdList.SetViewport(View.ViewRect.Min.X, View.ViewRect.Min.Y, View.ViewRect.Max.X, View.ViewRect.Max.Y, 0.0f, 1.0f);
 
@@ -30,6 +30,10 @@ void DeferredRenderer::RenderBasePass(WViewInfo& View)
 		RenderState.SetMultiSampleState(TStaticMultiSampleStateRHI<>::GetRHI());
 
 		WDeferredBasePassMeshProcessor Processor(View.Family->Scene, &View, RenderState);
+		for (uint32 MeshIndex = 0; MeshIndex < Batches.Size(); ++MeshIndex)
+		{
+			Processor.AddMeshBatch(*Batches[MeshIndex]);
+		}
 	});
 }
 
@@ -44,7 +48,7 @@ WDeferredBasePassVS::~WDeferredBasePassVS()
 
 void WDeferredBasePassVS::GetParametersBinding(RScene* Scene, MaterialProxy* Material)
 {
-	
+	WMaterialShader::GetParametersBinding(Scene, Material);
 }
 
 WDeferredBasePassMeshProcessor::WDeferredBasePassMeshProcessor(const RScene* InScene, const WViewInfo* InView, const WMeshPassProcessorRenderState& InRenderState)
@@ -75,7 +79,7 @@ bool WDeferredBasePassMeshProcessor::ProcessDeferredShadingPath(const WMeshBatch
 	WMeshPassProcessorShader<WDeferredBasePassVS, WDummyMaterialShader, WDeferredBasePassPS> BasePassShaders;
 	GetBasePassShaders(BasePassShaders.VertexShader, BasePassShaders.PixelShader);
 
-	BuildMeshDrawCommand(MeshBatch, RenderState, &BasePassShaders, EPassFeature::PositionAndNormal);
+	BuildMeshDrawCommand(MeshBatch, RenderState, &BasePassShaders, Material, EPassFeature::PositionAndNormal);
 	return true;
 }
 

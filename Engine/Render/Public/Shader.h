@@ -27,7 +27,7 @@ public:
 
 	void UpdateRHIResource() override {}
 
-	virtual void GetParametersBinding(class RScene *Scene, class MaterialProxy *Material) = 0;
+	virtual void GetParametersBinding(class RScene *Scene, struct MaterialProxy *Material) {}
 
 	virtual WVertexShaderRHIRef GetVertexShader() const { return nullptr; }
 
@@ -77,23 +77,4 @@ private:
 
 	ShaderType *Shader;
 	
-};
-
-size_t ShaderHash(WEngine::WGuid<WEngine::WString> key);
-
-class WShaderLibrary : public WEngine::NamingSystem
-{
-public:
-
-	static class RHIShader* GetShader(const WEngine::WString& name)
-	{
-		return Shaders[WEngine::WGuid(name)];
-	}
-
-	static bool LoadShader(const WEngine::WString& path);
-
-private:
-
-	static WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, RHIShader*, ShaderHash> Shaders;
-
 };

@@ -12,7 +12,7 @@ public:
 
 	virtual ~WDeferredBasePassVS();
 
-	virtual void GetParametersBinding(class RScene* Scene, class MaterialProxy* Material) override;
+	virtual void GetParametersBinding(RScene* Scene, MaterialProxy* Material) override;
 
 	virtual WVertexShaderRHIRef GetVertexShader() const override { return VertexShaderRHI; }
 

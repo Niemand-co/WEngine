@@ -7,6 +7,7 @@
 
 class WMeshBatch;
 class WMaterialShader;
+struct MaterialProxy;
 
 class WMeshPassProcessorRenderState
 {
@@ -75,6 +76,7 @@ public:
 	const WMeshBatch MeshBatch,
 	const WMeshPassProcessorRenderState& RenderState,
 	PassShaderType *PassShader,
+	MaterialProxy *Material,
 	EPassFeature Feature);
 
 protected:
