@@ -16,7 +16,7 @@ public:
 
 	virtual ~WVertexBuffer() = default;
 
-	WEngine::WSharedPtr<RHIVertexBuffer>& GetRHI() { return Buffer; }
+	WVertexBufferRHIRef GetRHI() { return Buffer.Get(); }
 
 	virtual void ReleaseRHIResource() override
 	{
@@ -39,6 +39,8 @@ public:
 
 	virtual ~WIndexBuffer() = default;
 
+	WIndexBufferRHIRef GetRHI() { return Buffer.Get(); }
+
 	virtual void ReleaseRHIResource() override
 	{
 		Buffer = nullptr;
@@ -59,6 +61,8 @@ public:
 	WUniformBuffer() = default;
 
 	virtual ~WUniformBuffer() = default;
+
+	WUniformBufferRHIRef GetRHI() { return Buffer.Get(); }
 
 	virtual void ReleaseRHIResource() override
 	{

@@ -46,6 +46,10 @@ struct StaticMeshLodResource
 	WStaticMeshVertexBuffers VertexBuffer;
 
 	WStaticMeshIndexBuffer IndexBuffer;
+
+	uint32 NumIndices;
+
+	uint32 NumVertices;
 	
 };
 
@@ -85,7 +89,7 @@ public:
 
 	~WStaticMesh();
 
-	const WStaticMeshRenderData* GetRenderData() const { return &RenderData; }
+	WStaticMeshRenderData* GetRenderData() { return &RenderData; }
 
 	void GenerateBoundingBox();
 

@@ -6,16 +6,22 @@
 #include "Render/Public/Scene.h"
 #include "Render/Public/SceneView.h"
 #include "Render/Descriptor/Public/RHIPipelineStateObjectDescriptor.h"
+#include "Render/Public/Buffer.h"
 
-void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch MeshBatch, const WMeshPassProcessorRenderState& RenderState)
+void WMeshDrawShaderBindings::Initialize(const WMeshPassProcessorShaderBase* Shaders)
 {
-	RHIGraphicsPipelineStateDescriptor PipelineInfo = {};
-	{
-		PipelineInfo.BlendState = RenderState.GetBlendState();
-		PipelineInfo.DepthStencilState = RenderState.GetDepthStencilState();
-		PipelineInfo.RasterizationState = RenderState.GetRasterizationState();
-		PipelineInfo.VertexInputAttrib = MeshBatch.VertexFactory->GetDeclaration();
-	}
+}
 
+void WMeshDrawCommand::SetParameters(const WMeshBatch& MeshBatch, uint32 MeshBatchElementIndex, const WMeshPassProcessorShaderBase* Shaders, uint32 InPipelineId)
+{
+	const WMeshBatchElement& Element = MeshBatch.Elements[MeshBatchElementIndex];
 
+	IndexBuffer = Element.IndexBuffer ? Element.IndexBuffer->GetRHI() : nullptr;
+	FirstIndex = Element.FirstIndex;
+	NumPrimitives = Element.NumPrimitives; 
+	NumInstances = Element.NumInstances;
+
+	PipelineId = InPipelineId;
+
+	ShaderBindings.Initialize(Shaders);
 }

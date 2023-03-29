@@ -52,6 +52,6 @@ struct StaticMeshProxy : public PrimitiveProxy
 
 	WStaticMesh *Mesh;
 
-	const WStaticMeshRenderData *RenderData;
+	WStaticMeshRenderData *RenderData;
 
 };

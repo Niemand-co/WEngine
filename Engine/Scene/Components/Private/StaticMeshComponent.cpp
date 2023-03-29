@@ -54,6 +54,9 @@ void StaticMeshProxy::GetDynamicMeshElements(const WEngine::WArray<WSceneViewInf
 			Mesh.VertexFactory = &RenderData->Factories[LodIndex].VertexFactory;
 
 			Element.IndexBuffer = &RenderData->LodResources[LodIndex].IndexBuffer;
+			Element.FirstIndex = 0;
+			Element.NumPrimitives = RenderData->LodResources[LodIndex].NumIndices / 3;
+			Element.NumInstances = 1;
 		}
 	}
 }

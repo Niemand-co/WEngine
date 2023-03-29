@@ -12,6 +12,12 @@ public:
 
 	class WIndexBuffer *IndexBuffer;
 
+	uint32 FirstIndex;
+
+	uint32 NumPrimitives;
+
+	uint32 NumInstances;
+
 	class WUniformBuffer *UniformBuffer;
 
 };

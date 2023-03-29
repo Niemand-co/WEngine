@@ -48,6 +48,8 @@ void WStaticMeshRenderData::Init(const WEngine::WArray<VertexComponent>& InVerti
 	{
 		LodResources[LodIndex].VertexBuffer.Init(InVertices);
 		LodResources[LodIndex].IndexBuffer.Init(InIndices);
+		LodResources[LodIndex].NumIndices = InIndices.Size();
+		LodResources[LodIndex].NumVertices = InVertices.Size();
 	}
 }
 

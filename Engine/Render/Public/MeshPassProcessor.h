@@ -87,8 +87,20 @@ protected:
 
 };
 
+class WMeshPassProcessorShaderBase
+{
+public:
+
+	virtual WVertexShaderRHIRef GetVertexShaderRHI() const = 0;
+
+	virtual WGeometryShaderRHIRef GetGeometryShaderRHI() const = 0;
+
+	virtual WPixelShaderRHIRef GetPixelShaderRHI() const = 0;
+
+};
+
 template<typename VertexType, typename GeometryType, typename PixelType>
-struct WMeshPassProcessorShader
+class WMeshPassProcessorShader : public WMeshPassProcessorShaderBase
 {
 public:
 
@@ -96,11 +108,11 @@ public:
 
 	~WMeshPassProcessorShader() = default;
 
-	WVertexShaderRHIRef GetVertexShaderRHI() const { return VertexShader ? VertexShader->GetVertexShader() : nullptr; }
+	virtual WVertexShaderRHIRef GetVertexShaderRHI() const override { return VertexShader ? VertexShader->GetVertexShader() : nullptr; }
 
-	WGeometryShaderRHIRef GetGeometryShaderRHI() const { return GeometryShader ? GeometryShader->GetGeometryShader() : nullptr; }
+	virtual WGeometryShaderRHIRef GetGeometryShaderRHI() const override { return GeometryShader ? GeometryShader->GetGeometryShader() : nullptr; }
 
-	WPixelShaderRHIRef GetPixelShaderRHI() const { return PixelShader ? PixelShader->GetPixelShader() : nullptr; }
+	virtual WPixelShaderRHIRef GetPixelShaderRHI() const override { return PixelShader ? PixelShader->GetPixelShader() : nullptr; }
 
 public:
 
@@ -109,5 +121,53 @@ public:
 	GeometryType *GeometryShader = nullptr;
 
 	PixelType *PixelShader = nullptr;
+
+};
+
+struct WMeshDrawShaderBindings
+{
+public:
+
+	WMeshDrawShaderBindings() = default;
+
+	~WMeshDrawShaderBindings() = default;
+
+	void Initialize(const WMeshPassProcessorShaderBase *Shaders);
+
+private:
+
+	
+
+};
+
+class WMeshDrawCommand
+{
+public:
+
+	WMeshDrawCommand() {}
+	WMeshDrawCommand(WMeshDrawCommand&& Other) = default;
+	WMeshDrawCommand(const WMeshDrawCommand& Other) = default;
+	WMeshDrawCommand& operator=(WMeshDrawCommand&& Other) = default;
+	WMeshDrawCommand& operator=(const WMeshDrawCommand& Other) = default;
+
+	void SetParameters(const WMeshBatch& MeshBatch, uint32 MeshBatchElementIndex, const WMeshPassProcessorShaderBase *Shaders, uint32 InPipelineId);
+
+	void SubmitDrawBegin();
+
+	void SubmitDrawEnd();
+
+private:
+
+	WIndexBufferRHIRef IndexBuffer;
+
+	uint32 FirstIndex;
+
+	uint32 NumPrimitives;
+
+	uint32 NumInstances;
+
+	uint32 PipelineId;
+
+	WMeshDrawShaderBindings ShaderBindings;
 
 };

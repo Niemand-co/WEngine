@@ -42,10 +42,10 @@ struct PrimitiveProxy
 {
 	PrimitiveProxy(PrimitiveComponent* primitive)
 		: bVisible(primitive->m_bVisible),
-		bStatic(primitive->m_bStatic),
-		bTranslucent(primitive->m_bTranslucent),
-		bCastShadow(primitive->m_bCastShadow),
-		Info(nullptr)
+		  bStatic(primitive->m_bStatic),
+		  bTranslucent(primitive->m_bTranslucent),
+		  bCastShadow(primitive->m_bCastShadow),
+		  Info(nullptr)
 	{
 	}
 
