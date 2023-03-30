@@ -2,11 +2,11 @@
 
 struct BindingResource;
 
-class RHIGroupLayout
+class RHIDescriptorSetLayout
 {
 public:
 
-	~RHIGroupLayout() = default;
+	~RHIDescriptorSetLayout() = default;
 
 public:
 

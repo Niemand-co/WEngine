@@ -3,6 +3,48 @@
 #include "Utils/Public/ShaderCodeBlob.h"
 #include "Utils/Public/NamingSystem.h"
 
+class ShaderMappingInfo
+{
+public:
+
+	ShaderMappingInfo(WMaterialShader *Shader);
+
+	~ShaderMappingInfo();
+
+private:
+
+	
+
+};
+
+struct WShaderBinding
+{
+public:
+
+	WShaderBinding() = default;
+
+	~WShaderBinding() = default;
+
+public:
+
+	uint32 Index = 0xffff;
+
+};
+
+struct WShaderParameterLayout
+{
+public:
+
+	WShaderParameterLayout() = default;
+
+	~WShaderParameterLayout() = default;
+
+public:
+
+	WEngine::WArray<WShaderBinding> ShaderBindings;
+
+};
+
 class WShader : public RenderResource
 {
 public:
@@ -23,6 +65,8 @@ class WMaterialShader : public WShader
 {
 public:
 
+	typedef WMaterialShader ShaderType;
+
 	WMaterialShader() = default;
 
 	virtual ~WMaterialShader() = default;
@@ -33,13 +77,12 @@ public:
 
 	void UpdateRHIResource() override {}
 
-	virtual void GetParametersBinding(class RScene *Scene, struct MaterialProxy *Material) {}
+	virtual void GetParametersBinding(const class WViewInfo* View, const struct MaterialProxy* Material) {}
 
 };
 
 class WDummyMaterialShader : public WMaterialShader
 {
-	virtual void GetParametersBinding(class RScene* Scene, class MaterialProxy* Material) override {}
 };
 
 class WComputeShader : public WShader

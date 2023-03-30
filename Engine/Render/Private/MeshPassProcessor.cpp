@@ -10,9 +10,12 @@
 
 void WMeshDrawShaderBindings::Initialize(const WMeshPassProcessorShaderBase* Shaders)
 {
+	if (Shaders->GetVertexShader())
+	{
+	}
 }
 
-void WMeshDrawCommand::SetParameters(const WMeshBatch& MeshBatch, uint32 MeshBatchElementIndex, const WMeshPassProcessorShaderBase* Shaders, uint32 InPipelineId)
+void WMeshDrawCommand::SetParameters(const WMeshBatch& MeshBatch, uint32 MeshBatchElementIndex, const WMeshPassProcessorShaderBase* Shaders, const RHIGraphicsPipelineStateDescriptor& InPipelineDescriptor)
 {
 	const WMeshBatchElement& Element = MeshBatch.Elements[MeshBatchElementIndex];
 
@@ -21,7 +24,19 @@ void WMeshDrawCommand::SetParameters(const WMeshBatch& MeshBatch, uint32 MeshBat
 	NumPrimitives = Element.NumPrimitives; 
 	NumInstances = Element.NumInstances;
 
-	PipelineId = InPipelineId;
+	PipelineDescriptor = InPipelineDescriptor;
 
 	ShaderBindings.Initialize(Shaders);
+}
+
+void WMeshDrawCommand::SubmitDrawBegin(WRenderPassRHIRef RenderPass)
+{
+	PipelineDescriptor.RenderPass = RenderPass;
+
+	GetRenderCommandList()->SetGraphicsPipelineState(&PipelineDescriptor);
+}
+
+void WMeshDrawCommand::SubmitDrawEnd()
+{
+	GetRenderCommandList()->DrawIndexedPrimitive(NumPrimitives * 3, FirstIndex, NumInstances);
 }

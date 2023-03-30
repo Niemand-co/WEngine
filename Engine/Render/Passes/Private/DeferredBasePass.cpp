@@ -46,9 +46,10 @@ WDeferredBasePassVS::~WDeferredBasePassVS()
 {
 }
 
-void WDeferredBasePassVS::GetParametersBinding(RScene* Scene, MaterialProxy* Material)
+void WDeferredBasePassVS::GetParametersBinding(const WViewInfo *View, const MaterialProxy* Material)
 {
-	WMaterialShader::GetParametersBinding(Scene, Material);
+	WMaterialShader::GetParametersBinding(View, Material);
+	
 }
 
 WDeferredBasePassMeshProcessor::WDeferredBasePassMeshProcessor(const RScene* InScene, const WViewInfo* InView, const WMeshPassProcessorRenderState& InRenderState)

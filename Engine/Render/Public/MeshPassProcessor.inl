@@ -1,10 +1,10 @@
 #pragma once
 
 template<typename PassShaderType>
-void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch MeshBatch,
+void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 											  const WMeshPassProcessorRenderState& RenderState,
 											  PassShaderType *PassShader,
-											  MaterialProxy *Material,
+											  const MaterialProxy& Material,
 											  EPassFeature Feature)
 {
 	RHIGraphicsPipelineStateDescriptor PipelineInfo = {};
@@ -42,9 +42,7 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch MeshBatch,
 		PipelineInfo.Shaders[EShaderStage::Pixel] = PassShader->GetVertexShaderRHI();
 	}
 
-	if (PassShader->VertexShader)
-	{
-		PassShader->VertexShader->GetParameterBinding();
-	}
+	WMeshDrawCommand DrawCommand;
+	DrawCommand.SetParameters(MeshBatch, 0, PassShader, )
 
 }

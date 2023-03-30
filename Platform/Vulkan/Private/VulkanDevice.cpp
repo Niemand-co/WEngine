@@ -329,6 +329,13 @@ namespace Vulkan
 			dynamicStateCreateInfo.pDynamicStates = dynamicStates;
 		}
 
+		WEngine::WArray<WShaderParameterLayout> Layouts;
+		for(uint32 SetIndex = 0; SetIndex < Layouts.Size(); ++SetIndex)
+		{
+			WEngine::WArray<VkDescriptorSetLayoutBinding> Bindings(Layouts[SetIndex].ShaderBindings.Size());
+
+		}
+
 		VkGraphicsPipelineCreateInfo GraphicsPipelineCreateInfo = {};
 		{
 			GraphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;

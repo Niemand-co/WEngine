@@ -4,13 +4,13 @@
 namespace Vulkan
 {
 
-	class VulkanGroupLayout : public RHIGroupLayout
+	class VulkanDescriptorSetLayout : public RHIDescriptorSetLayout
 	{
 	public:
 
-		VulkanGroupLayout(class VulkanDevice* pInDevice);
+		VulkanDescriptorSetLayout(class VulkanDevice* pInDevice);
 
-		virtual ~VulkanGroupLayout();
+		virtual ~VulkanDescriptorSetLayout();
 
 		VkDescriptorSetLayout GetHandle() const { return DescriptorSetLayout; }
 
@@ -21,6 +21,11 @@ namespace Vulkan
 		VkDescriptorSetLayout DescriptorSetLayout;
 
 		WEngine::WArray<VkDescriptorSetLayoutBinding> Bindings;
+
+	};
+
+	class VulkanDescriptorSetLayoutManager : public RHIResource
+	{
 
 	};
 

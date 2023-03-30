@@ -63,7 +63,7 @@ class WMeshPassProcessor
 {
 public:
 
-	WMeshPassProcessor(const class RScene* InScene, const WViewInfo* InView)
+	WMeshPassProcessor(const class RScene* InScene, const struct WViewInfo* InView)
 		: Scene(InScene),
 		  View(InView)
 	{
@@ -73,17 +73,17 @@ public:
 
 	template<typename PassShaderType>
 	void BuildMeshDrawCommand(
-	const WMeshBatch MeshBatch,
+	const WMeshBatch& MeshBatch,
 	const WMeshPassProcessorRenderState& RenderState,
 	PassShaderType *PassShader,
-	MaterialProxy *Material,
+	const MaterialProxy& Material,
 	EPassFeature Feature);
 
 protected:
 
 	const RScene *Scene;
 
-	const WSceneViewInfo *View;
+	const WViewInfo *View;
 
 };
 
@@ -96,6 +96,12 @@ public:
 	virtual WGeometryShaderRHIRef GetGeometryShaderRHI() const = 0;
 
 	virtual WPixelShaderRHIRef GetPixelShaderRHI() const = 0;
+
+	virtual WMaterialShader* GetVertexShader() const = 0;
+
+	virtual WMaterialShader* GetGeometryShader() const = 0;
+
+	virtual WMaterialShader* GetPixelShader() const = 0;
 
 };
 
@@ -113,6 +119,12 @@ public:
 	virtual WGeometryShaderRHIRef GetGeometryShaderRHI() const override { return GeometryShader ? GeometryShader->GetGeometryShader() : nullptr; }
 
 	virtual WPixelShaderRHIRef GetPixelShaderRHI() const override { return PixelShader ? PixelShader->GetPixelShader() : nullptr; }
+
+	virtual WMaterialShader* GetVertexShader() const { return VertexShader; }
+
+	virtual WMaterialShader* GetGeometryShader() const { return GeometryShader; } 
+
+	virtual WMaterialShader* GetPixelShader() const { return PixelShader; }
 
 public:
 
@@ -136,7 +148,7 @@ public:
 
 private:
 
-	
+	WEngine::WArray<WShaderParameterLayout> Layouts;
 
 };
 
@@ -150,9 +162,9 @@ public:
 	WMeshDrawCommand& operator=(WMeshDrawCommand&& Other) = default;
 	WMeshDrawCommand& operator=(const WMeshDrawCommand& Other) = default;
 
-	void SetParameters(const WMeshBatch& MeshBatch, uint32 MeshBatchElementIndex, const WMeshPassProcessorShaderBase *Shaders, uint32 InPipelineId);
+	void SetParameters(const WMeshBatch& MeshBatch, uint32 MeshBatchElementIndex, const WMeshPassProcessorShaderBase *Shaders, const class RHIGraphicsPipelineStateDescriptor& InPipelineDescriptor);
 
-	void SubmitDrawBegin();
+	void SubmitDrawBegin(WRenderPassRHIRef RenderPass);
 
 	void SubmitDrawEnd();
 
@@ -166,7 +178,7 @@ private:
 
 	uint32 NumInstances;
 
-	uint32 PipelineId;
+	RHIGraphicsPipelineStateDescriptor PipelineDescriptor;
 
 	WMeshDrawShaderBindings ShaderBindings;
 

@@ -5,7 +5,7 @@
 namespace Vulkan
 {
 
-	VulkanGroupLayout::VulkanGroupLayout(VulkanDevice* pInDevice)
+	VulkanDescriptorSetLayout::VulkanDescriptorSetLayout(VulkanDevice* pInDevice)
 		: pDevice(pInDevice)
 	{
 		VkDescriptorSetLayoutCreateInfo DescriptorSetLayoutCreateInfo = {};
@@ -17,8 +17,9 @@ namespace Vulkan
 		vkCreateDescriptorSetLayout(pDevice->GetHandle(), &DescriptorSetLayoutCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DescriptorSetLayout);
 	}
 
-	VulkanGroupLayout::~VulkanGroupLayout()
+	VulkanDescriptorSetLayout::~VulkanDescriptorSetLayout()
 	{
+		vkDestroyDescriptorSetLayout(pDevice->GetHandle(), DescriptorSetLayout, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
 
 }

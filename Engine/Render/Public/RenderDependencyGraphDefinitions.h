@@ -253,6 +253,8 @@ enum class EUniformBaseType : uint16
 	UB_RDG_BUFFER_UAV,
 
 	UB_RTV,
+
+	UB_STRUCT,
 };
 
 enum class EPassFlag : uint16
