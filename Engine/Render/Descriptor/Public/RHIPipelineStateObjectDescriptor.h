@@ -3,8 +3,6 @@
 #include "RHI/Public/RHIDepthStencilState.h"
 #include "RHI/Public/RHIRasterizationState.h"
 
-#define MaxGraphicsPipelineShaderNum 3
-
 class RHIGraphicsPipelineStateDescriptor
 {
 public:
@@ -29,9 +27,9 @@ public:
 
 	WMultiSampleStateRHIRef MultiSampleState;
 
-	RHIPipelineResourceLayoutDescriptor DescriptorSetLayoutInfo;
-
 	WRenderPassRHIRef RenderPass;
+
+
 
 };
 

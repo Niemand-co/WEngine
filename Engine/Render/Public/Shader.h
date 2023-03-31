@@ -17,34 +17,6 @@ private:
 
 };
 
-struct WShaderBinding
-{
-public:
-
-	WShaderBinding() = default;
-
-	~WShaderBinding() = default;
-
-public:
-
-	uint32 Index = 0xffff;
-
-};
-
-struct WShaderParameterLayout
-{
-public:
-
-	WShaderParameterLayout() = default;
-
-	~WShaderParameterLayout() = default;
-
-public:
-
-	WEngine::WArray<WShaderBinding> ShaderBindings;
-
-};
-
 class WShader : public RenderResource
 {
 public:
@@ -105,19 +77,4 @@ private:
 
 	WComputeShaderRHIRef Shader;
 
-};
-
-template<typename ShaderType>
-class WShaderRefBase
-{
-public:
-
-	WShaderRefBase();
-
-	~WShaderRefBase();
-
-private:
-
-	ShaderType *Shader;
-	
 };

@@ -49,6 +49,10 @@ struct MaterialProxy
 	MaterialProxy(MaterialComponent* Material)
 	{
 	}
+
+	float Roughness;
+
+	float Metallic;
 };
 
 

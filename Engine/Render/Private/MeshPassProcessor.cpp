@@ -5,13 +5,17 @@
 #include "Render/Mesh/Public/Vertex.h"
 #include "Render/Public/Scene.h"
 #include "Render/Public/SceneView.h"
-#include "Render/Descriptor/Public/RHIPipelineStateObjectDescriptor.h"
 #include "Render/Public/Buffer.h"
+#include "Render/Public/Shader.h"
+#include "Render/Descriptor/Public/RHIPipelineStateObjectDescriptor.h"
 
 void WMeshDrawShaderBindings::Initialize(const WMeshPassProcessorShaderBase* Shaders)
 {
-	if (Shaders->GetVertexShader())
+	WMaterialShader *VertexShader = Shaders->GetVertexShader();
+	if (VertexShader)
 	{
+		ShaderBindingSlot& Slot = Slots[(uint8)EShaderStage::Vertex];
+		
 	}
 }
 

@@ -17,13 +17,16 @@ public:
 	virtual WVertexShaderRHIRef GetVertexShader() const override { return VertexShaderRHI; }
 
 	BEGIN_SHADER_PARAMETERS_STRUCT(WDeferredBasePassVSParameters)
+		SHADER_PARAMETER_STRUCT(SceneViewUniformBufferParameters, View)
 	END_SHADER_PARAMETERS_STRUCT
 
 private:
 
-private:
-
 	WVertexShaderRHIRef VertexShaderRHI;
+
+	WDeferredBasePassVSParameters Parameters;
+
+	class WUniformBuffer *UniformBuffer;
 
 };
 
@@ -39,9 +42,15 @@ public:
 
 	virtual WPixelShaderRHIRef GetPixelShader() const override { return PixelShaderRHI; }
 
+	BEGIN_SHADER_PARAMETERS_STRUCT(WDeferredBasePassPSParameters)
+		SHADER_PARAMETER(glm::vec3, Color)
+	END_SHADER_PARAMETERS_STRUCT
+
 private:
 
 	WPixelShaderRHIRef PixelShaderRHI;
+
+	WDeferredBasePassPSParameters Parameters;
 
 };
 

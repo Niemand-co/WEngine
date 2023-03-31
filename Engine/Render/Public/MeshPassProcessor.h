@@ -136,6 +136,13 @@ public:
 
 };
 
+struct ShaderBindingSlot
+{
+	uint32 Slot;
+	uint32 Count;
+	EUniformBaseType Type;
+};
+
 struct WMeshDrawShaderBindings
 {
 public:
@@ -148,7 +155,7 @@ public:
 
 private:
 
-	WEngine::WArray<WShaderParameterLayout> Layouts;
+	ShaderBindingSlot Slots[MaxGraphicsPipelineShaderNum];
 
 };
 

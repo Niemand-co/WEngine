@@ -34,7 +34,7 @@ struct WViewInfo : public WSceneViewInfo
 	WViewInfo() = default;
 	WViewInfo(const WSceneViewInfo& SceneViewInfo);
 
-	void SetupViewParameters(SceneViewUniformBufferParameters& Parameters);
+	void SetupViewParameters(SceneViewUniformBufferParameters& Parameters) const;
 
 	void CreateUniformBuffer(SceneViewUniformBufferParameters& Parameters);
 

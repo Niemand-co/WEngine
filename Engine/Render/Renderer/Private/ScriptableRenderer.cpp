@@ -115,7 +115,7 @@ WViewInfo::WViewInfo(const WSceneViewInfo& SceneViewInfo)
 	ViewRect = {0, 0, 0, 0};
 }
 
-void WViewInfo::SetupViewParameters(SceneViewUniformBufferParameters& Parameters)
+void WViewInfo::SetupViewParameters(SceneViewUniformBufferParameters& Parameters) const
 {
 	Parameters.ViewMatrix = ViewMatrices.ViewMatrix;
 	Parameters.ProjectionMatrix = ViewMatrices.ProjectionMatrix;

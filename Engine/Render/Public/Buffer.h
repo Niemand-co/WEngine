@@ -58,7 +58,12 @@ class WUniformBuffer : public WBuffer
 {
 public:
 
-	WUniformBuffer() = default;
+	WUniformBuffer() = delete;
+
+	WUniformBuffer(const ShaderParametersLayout* InLayout)
+		: Layout(InLayout)
+	{
+	}
 
 	virtual ~WUniformBuffer() = default;
 
@@ -70,6 +75,8 @@ public:
 	}
 
 protected:
+
+	const WShaderParameterLayout* Layout;
 
 	WEngine::WSharedPtr<RHIUniformBuffer> Buffer;
 

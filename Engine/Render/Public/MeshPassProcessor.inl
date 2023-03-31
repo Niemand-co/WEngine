@@ -43,6 +43,24 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 	}
 
 	WMeshDrawCommand DrawCommand;
-	DrawCommand.SetParameters(MeshBatch, 0, PassShader, )
+	//if (PassShader->GetVertexShader())
+	//{
+	//	PassShader->GetVertexShader()->GetParametersBinding(View, Material);
+	//}
+
+	//if (PassShader->GetGeometryShader())
+	//{
+	//	PassShader->GetGeometryShader()->GetParametersBinding(View, Material);
+	//}
+
+	//if (PassShader->GetPixelShader())
+	//{
+	//	PassShader->GetPixelShader()->GetParametersBinding(View, Material);
+	//}
+
+	for (uint32 ElementIndex = 0; ElementIndex < MeshBatch.Elements.Size(); ++ElementIndex)
+	{
+		DrawCommand.SetParameters(MeshBatch, ElementIndex, PassShader, PipelineInfo);
+	}
 
 }

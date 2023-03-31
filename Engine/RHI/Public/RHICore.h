@@ -516,6 +516,11 @@ enum
 	MaxSimultaneousRenderTargets_NumBits = 4,
 };
 
+enum
+{
+	MaxGraphicsPipelineShaderNum = 3,
+};
+
 enum class ETextureCreateFlags : uint32
 {
 	TextureCreate_None                    = 0,

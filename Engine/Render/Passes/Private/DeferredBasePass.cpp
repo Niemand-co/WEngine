@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Render/Passes/Public/DeferredBasePass.h"
 #include "Render/Renderer/Public/DeferredRenderer.h"
+#include "Render/Public/Buffer.h"
 #include "Render/Public/SceneView.h"
 #include "Render/Public/RenderTarget.h"
 #include "Render/Public/RenderDependencyGraph.h"
@@ -39,7 +40,7 @@ void DeferredRenderer::RenderBasePass(WViewInfo& View)
 
 WDeferredBasePassVS::WDeferredBasePassVS()
 {
-	
+	UniformBuffer = new WUniformBuffer(&Parameters.GetStructMetaData()->GetLayout());
 }
 
 WDeferredBasePassVS::~WDeferredBasePassVS()
@@ -49,7 +50,21 @@ WDeferredBasePassVS::~WDeferredBasePassVS()
 void WDeferredBasePassVS::GetParametersBinding(const WViewInfo *View, const MaterialProxy* Material)
 {
 	WMaterialShader::GetParametersBinding(View, Material);
-	
+	View->SetupViewParameters(Parameters.View);
+}
+
+WDeferredBasePassPS::WDeferredBasePassPS()
+{
+}
+
+WDeferredBasePassPS::~WDeferredBasePassPS()
+{
+}
+
+void WDeferredBasePassPS::GetParametersBinding(const WViewInfo* View, const MaterialProxy* Material)
+{
+	WMaterialShader::GetParametersBinding(View, Material);
+	Parameters.Color = glm::vec3(1, 0, 0);
 }
 
 WDeferredBasePassMeshProcessor::WDeferredBasePassMeshProcessor(const RScene* InScene, const WViewInfo* InView, const WMeshPassProcessorRenderState& InRenderState)

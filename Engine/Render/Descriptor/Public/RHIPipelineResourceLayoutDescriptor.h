@@ -12,6 +12,4 @@ public:
 
 	unsigned int groupLayoutCount;
 
-	RHIGroupLayout* pGroupLayout;
-
 };
