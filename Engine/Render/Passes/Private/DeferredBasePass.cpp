@@ -47,9 +47,9 @@ WDeferredBasePassVS::~WDeferredBasePassVS()
 {
 }
 
-void WDeferredBasePassVS::GetParametersBinding(const WViewInfo *View, const MaterialProxy* Material)
+void WDeferredBasePassVS::GetParametersBinding(const WViewInfo *View, const MaterialProxy* Material, WMeshDrawShaderBindings& Bindings)
 {
-	WMaterialShader::GetParametersBinding(View, Material);
+	WMaterialShader::GetParametersBinding(View, Material, Bindings);
 	View->SetupViewParameters(Parameters.View);
 }
 
@@ -61,10 +61,22 @@ WDeferredBasePassPS::~WDeferredBasePassPS()
 {
 }
 
-void WDeferredBasePassPS::GetParametersBinding(const WViewInfo* View, const MaterialProxy* Material)
+void WDeferredBasePassPS::GetParametersBinding(const WViewInfo* View, const MaterialProxy* Material, WMeshDrawShaderBindings& Bindings)
 {
-	WMaterialShader::GetParametersBinding(View, Material);
+	WMaterialShader::GetParametersBinding(View, Material, Bindings);
 	Parameters.Color = glm::vec3(1, 0, 0);
+	const ShaderParametersLayout& Layout = Parameters.GetStructMetaData()->GetLayout();
+
+	{
+		const WEngine::WArray<ShaderParametersLayout::ResourceInfo>& Uniforms = Layout.GetUniforms();
+		for (auto& Info : Uniforms)
+		{
+			Bindings.Add(Info.Type, 1);
+		}
+	}
+	const WEngine::WArray<ShaderParametersLayout::ResourceInfo>& Uniforms = Layout.GetTextures();
+
+
 }
 
 WDeferredBasePassMeshProcessor::WDeferredBasePassMeshProcessor(const RScene* InScene, const WViewInfo* InView, const WMeshPassProcessorRenderState& InRenderState)

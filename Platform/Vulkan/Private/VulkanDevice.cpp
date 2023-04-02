@@ -7,6 +7,7 @@
 #include "RHI/Public/RHIBuffer.h"
 #include "RHI/Public/RHIContext.h"
 #include "Render/Public/Shader.h"
+#include "Render/Public/MeshPassProcessor.h"
 
 namespace Vulkan
 {
@@ -329,11 +330,31 @@ namespace Vulkan
 			dynamicStateCreateInfo.pDynamicStates = dynamicStates;
 		}
 
-		WEngine::WArray<WShaderParameterLayout> Layouts;
-		for(uint32 SetIndex = 0; SetIndex < Layouts.Size(); ++SetIndex)
-		{
-			WEngine::WArray<VkDescriptorSetLayoutBinding> Bindings(Layouts[SetIndex].ShaderBindings.Size());
+		auto IsTextureResource = [](EUniformBaseType Type)->bool { return Type == EUniformBaseType::UB_TEXTURE ||
+																		  Type == EUniformBaseType::UB_SRV ||
+																		  Type == EUniformBaseType::UB_UAV; };
 
+		WMeshDrawShaderBindings *ShaderBindings = descriptor->ShaderBindings;
+		uint32 LayoutID = ShaderBindings->GetHashCode();
+		VulkanDescriptorSetLayout *DescriptorSetLayout = VulkanDescriptorSetLayoutManager::GetDescriptorSetLayout(LayoutID);
+		if (DescriptorSetLayout == nullptr)
+		{
+			for(uint32 ShaderStage = 0; ShaderStage < MaxGraphicsPipelineShaderNum; ++ShaderStage)
+			{
+				if (descriptor->Shaders[ShaderStage])
+				{
+					const WMeshDrawShaderBindings& Bindings = ShaderBindings[ShaderStage];
+					Bindings.EnumerateBindings([IsTextureResource](ShaderBindingSlot& Binding)
+					{
+						if (IsTextureResource(Binding.Type))
+						{
+						
+						}
+					});
+				}
+			}
+
+			VulkanDescriptorSetLayoutManager::AddDescriptorLayout(LayoutID, DescriptorSetLayout);
 		}
 
 		VkGraphicsPipelineCreateInfo GraphicsPipelineCreateInfo = {};

@@ -19,17 +19,17 @@ public:
 
 	WBlendStateRHIRef BlendStates[MaxSimultaneousRenderTargets] = {};
 
-	WVertexInputStateRHIRef VertexInputState;
+	WVertexInputStateRHIRef VertexInputState = nullptr;
 
-	WDepthStencilStateRHIRef DepthStencilState;
+	WDepthStencilStateRHIRef DepthStencilState = nullptr;
 
-	WRasterizationStateRHIRef RasterizationState;
+	WRasterizationStateRHIRef RasterizationState = nullptr;
 
-	WMultiSampleStateRHIRef MultiSampleState;
+	WMultiSampleStateRHIRef MultiSampleState = nullptr;
 
-	WRenderPassRHIRef RenderPass;
+	WRenderPassRHIRef RenderPass = nullptr;
 
-
+	WMeshDrawShaderBindings *ShaderBindings = nullptr;
 
 };
 

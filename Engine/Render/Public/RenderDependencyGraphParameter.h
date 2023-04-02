@@ -118,6 +118,10 @@ public:
 
 	bool HasRenderTarget() const { return RenderTargetOffset != kInvalidOffset; }
 
+	const WEngine::WArray<ResourceInfo>& GetUniforms() const { return UniformBuffers; }
+
+	const WEngine::WArray<ResourceInfo>& GetTextures() const { return GraphTextures; }
+
 private:
 
 	static const uint16 kInvalidOffset = WEngine::NumericLimits<uint16>::Max();

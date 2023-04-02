@@ -12,7 +12,7 @@ public:
 
 	virtual ~WDeferredBasePassVS();
 
-	virtual void GetParametersBinding(const WViewInfo* View, const MaterialProxy* Material) override;
+	virtual void GetParametersBinding(const WViewInfo* View, const MaterialProxy* Material, WMeshDrawShaderBindings& Bindings) override;
 
 	virtual WVertexShaderRHIRef GetVertexShader() const override { return VertexShaderRHI; }
 
@@ -38,7 +38,7 @@ public:
 
 	virtual ~WDeferredBasePassPS();
 
-	virtual void GetParametersBinding(const WViewInfo* View, const MaterialProxy* Material) override;
+	virtual void GetParametersBinding(const WViewInfo* View, const MaterialProxy* Material, WMeshDrawShaderBindings& Bindings) override;
 
 	virtual WPixelShaderRHIRef GetPixelShader() const override { return PixelShaderRHI; }
 

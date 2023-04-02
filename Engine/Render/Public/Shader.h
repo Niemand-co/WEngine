@@ -49,7 +49,7 @@ public:
 
 	void UpdateRHIResource() override {}
 
-	virtual void GetParametersBinding(const class WViewInfo* View, const struct MaterialProxy* Material) {}
+	virtual void GetParametersBinding(const class WViewInfo* View, const struct MaterialProxy* Material, struct WMeshDrawShaderBindings& Bindings) {}
 
 };
 

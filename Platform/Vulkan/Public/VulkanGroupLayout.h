@@ -26,6 +26,25 @@ namespace Vulkan
 
 	class VulkanDescriptorSetLayoutManager : public RHIResource
 	{
+	public:
+
+		static VulkanDescriptorSetLayout* GetDescriptorSetLayout(uint32 ID)
+		{
+			if (Layouts.Find(ID))
+			{
+				return Layouts[ID];
+			}
+			return nullptr;
+		}
+
+		static void AddDescriptorLayout(uint32 ID, VulkanDescriptorSetLayout* Layout)
+		{
+			Layouts[ID] = Layout;
+		}
+
+	private:
+
+		static WEngine::WHashMap<uint32, VulkanDescriptorSetLayout*> Layouts;
 
 	};
 

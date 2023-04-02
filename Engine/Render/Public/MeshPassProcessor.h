@@ -153,9 +153,24 @@ public:
 
 	void Initialize(const WMeshPassProcessorShaderBase *Shaders);
 
+	void Add(EUniformBaseType InType, uint32 InCount);
+
+	template<typename LAMBDA>
+	void EnumerateBindings(LAMBDA lambda) const
+	{
+		for (ShaderBindingSlot& Binding : Bindings)
+		{
+			lambda(Binding);
+		}
+	}
+
+	uint32 GetHashCode() const { return HashCode; }
+
 private:
 
-	ShaderBindingSlot Slots[MaxGraphicsPipelineShaderNum];
+	WEngine::WArray<ShaderBindingSlot> Bindings;
+
+	uint32 HashCode = 0;
 
 };
 
@@ -170,6 +185,8 @@ public:
 	WMeshDrawCommand& operator=(const WMeshDrawCommand& Other) = default;
 
 	void SetParameters(const WMeshBatch& MeshBatch, uint32 MeshBatchElementIndex, const WMeshPassProcessorShaderBase *Shaders, const class RHIGraphicsPipelineStateDescriptor& InPipelineDescriptor);
+
+	WMeshDrawShaderBindings& GetShaderBinding(uint32 ShaderStage);
 
 	void SubmitDrawBegin(WRenderPassRHIRef RenderPass);
 
@@ -187,6 +204,6 @@ private:
 
 	RHIGraphicsPipelineStateDescriptor PipelineDescriptor;
 
-	WMeshDrawShaderBindings ShaderBindings;
+	WMeshDrawShaderBindings ShaderBindings[MaxGraphicsPipelineShaderNum];
 
 };

@@ -43,20 +43,23 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 	}
 
 	WMeshDrawCommand DrawCommand;
-	//if (PassShader->GetVertexShader())
-	//{
-	//	PassShader->GetVertexShader()->GetParametersBinding(View, Material);
-	//}
+	if (PassShader->GetVertexShader())
+	{
+		ShaderBindingSlot& Slot = DrawCommand.GetShaderBinding(EShaderStage::Vertex);
+		PassShader->GetVertexShader()->GetParametersBinding(View, Material);
+	}
 
-	//if (PassShader->GetGeometryShader())
-	//{
-	//	PassShader->GetGeometryShader()->GetParametersBinding(View, Material);
-	//}
+	if (PassShader->GetGeometryShader())
+	{
+		ShaderBindingSlot& Slot = DrawCommand.GetShaderBinding(EShaderStage::Geometry);
+		PassShader->GetGeometryShader()->GetParametersBinding(View, Material);
+	}
 
-	//if (PassShader->GetPixelShader())
-	//{
-	//	PassShader->GetPixelShader()->GetParametersBinding(View, Material);
-	//}
+	if (PassShader->GetPixelShader())
+	{
+		ShaderBindingSlot& Slot = DrawCommand.GetShaderBinding(EShaderStage::Pixel);
+		PassShader->GetPixelShader()->GetParametersBinding(View, Material);
+	}
 
 	for (uint32 ElementIndex = 0; ElementIndex < MeshBatch.Elements.Size(); ++ElementIndex)
 	{
