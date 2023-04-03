@@ -2,7 +2,6 @@
 #include "Render/Passes/Public/DeferredBasePass.h"
 #include "Render/Renderer/Public/DeferredRenderer.h"
 #include "Render/Public/Buffer.h"
-#include "Render/Public/SceneView.h"
 #include "Render/Public/RenderTarget.h"
 #include "Render/Public/RenderDependencyGraph.h"
 #include "Scene/Components/Public/MaterialComponent.h"

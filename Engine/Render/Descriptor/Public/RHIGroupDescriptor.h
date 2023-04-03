@@ -6,12 +6,10 @@ class RHIGroupDescriptor
 {
 public:
 
-	RHIGroupDescriptor();
+	RHIGroupDescriptor() = default;
 
 	~RHIGroupDescriptor() = default;
 
 public:
-
-	WEngine::WArray<
 
 };

@@ -28,8 +28,6 @@ namespace Vulkan
 
 		virtual void BeginPass(RHIRenderPassBeginDescriptor* descriptor) override;
 
-		virtual void SetPipeline(RHIPipelineStateObject* pso) override;
-
 		virtual void SetViewport(const Viewport& viewports) override;
 
 		virtual void SetScissor(const Scissor& scissor) override;
@@ -38,15 +36,13 @@ namespace Vulkan
 
 		virtual void SetDepthTestEnable(bool enable) override;
 
-		virtual void SetPolygonTopology(PrimitiveTopology primitive) override;
+		virtual void SetPolygonTopology(EPrimitiveTopology primitive) override;
 
 		virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth /* = 0.0f */, unsigned int clearStencil /* = 1 */) override;
 
 		virtual void BindVertexBuffer(RHIBuffer* pBuffer) override;
 
 		virtual void BindIndexBuffer(RHIBuffer* pBuffer) override;
-
-		virtual void BindGroups(unsigned int groupCount, RHIGroup* pGroup, RHIPipelineResourceLayout* pPipelineResourceLayout, unsigned int offsetCount, unsigned int* offsets) override;
 
 		virtual void DrawVertexArray() override;
 

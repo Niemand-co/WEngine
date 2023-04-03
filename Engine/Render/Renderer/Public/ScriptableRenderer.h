@@ -9,7 +9,7 @@ public:
 
 	ScriptableRenderer() = default;
 
-	virtual ~ScriptableRenderer();
+	virtual ~ScriptableRenderer() = default;
 
 	virtual void Render() = 0;
 

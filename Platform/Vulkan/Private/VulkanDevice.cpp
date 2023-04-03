@@ -15,7 +15,7 @@ namespace Vulkan
 	VulkanDevice::VulkanDevice(VulkanGPU *pInGPU, VkDeviceCreateInfo* pInfo, WEngine::WArray<QueueStack>& InQueueStack)
 		: pGPU(pInGPU), m_queues(InQueueStack)
 	{
-		RE_ASSERT(vkCreateDevice(*pInGPU->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &pDevice) == VK_SUCCESS, "Failed to Create Device.");
+		RE_ASSERT(vkCreateDevice(*pInGPU->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Device) == VK_SUCCESS, "Failed to Create Device.");
 
 		pMemoryManager = new VulkanMemoryManager(this);
 		pStagingBufferManager = new VulkanStagingBufferManager(this);
@@ -85,7 +85,7 @@ namespace Vulkan
 		}
 
 		VkEvent* pEvent = (VkEvent*)NormalAllocator::Get()->Allocate(sizeof(VkEvent));
-		vkCreateEvent(pDevice, &eventCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pEvent);
+		vkCreateEvent(Device, &eventCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pEvent);
 		
 		RHIEvent *event = (RHIEvent*)NormalAllocator::Get()->Allocate(sizeof(VulkanEvent));
 		::new (event) VulkanEvent(pEvent);
@@ -245,7 +245,7 @@ namespace Vulkan
 				ImageViewCreateInfo.subresourceRange.levelCount = Surface.NumMip;
 				ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
 			}
-			vkCreateImageView(pDevice, &ImageViewCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &ImageViews[Index]);
+			vkCreateImageView(Device, &ImageViewCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &ImageViews[Index]);
 		}
 
 		VkFramebufferCreateInfo FramebufferCreateInfo = {};
@@ -266,7 +266,51 @@ namespace Vulkan
 
 	RHIPipelineStateObject* VulkanDevice::GetOrCreateGraphicsPipelineState(RHIGraphicsPipelineStateDescriptor* descriptor)
 	{
-		uint32 PipelineID = WEngine::MemCrc32(descriptor, sizeof(RHIGraphicsPipelineStateDescriptor));
+		auto IsTextureResource = [](EUniformBaseType Type)->bool { return Type == EUniformBaseType::UB_TEXTURE ||
+																		  Type == EUniformBaseType::UB_SRV ||
+																		  Type == EUniformBaseType::UB_UAV; };
+
+		WMeshDrawShaderBindings* ShaderBindings = descriptor->ShaderBindings;
+		WEngine::WArray<uint32> HashCodes(MaxGraphicsPipelineShaderNum);
+		WEngine::WArray<VkDescriptorSetLayout> DescriptorSetLayouts;
+		for (uint32 ShaderStage = 0; ShaderStage < MaxGraphicsPipelineShaderNum; ++ShaderStage)
+		{
+			const WMeshDrawShaderBindings& Bindings = ShaderBindings[ShaderStage];
+
+			uint32 LayoutID = Bindings.GetHashCode();
+			HashCodes[ShaderStage] = LayoutID;
+			VulkanDescriptorSetLayout *DescriptorSetLayout = VulkanDescriptorSetLayoutManager::GetDescriptorSetLayout(LayoutID);
+			if (DescriptorSetLayout)
+			{
+				DescriptorSetLayouts.Push(DescriptorSetLayout->GetHandle());
+				continue;
+			}
+
+			VkDescriptorSetLayoutCreateInfo DescriptorSetLayoutCreateInfo = {};
+			{
+				DescriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+			}
+			WEngine::WArray<VkDescriptorSetLayoutBinding> LayoutBindings;
+			Bindings.EnumerateBindings([IsTextureResource, &DescriptorSetLayoutCreateInfo, &LayoutBindings, ShaderStage](const ShaderBindingSlot& Binding)
+			{
+				DescriptorSetLayoutCreateInfo.bindingCount++;
+				if (IsTextureResource(Binding.Type))
+				{
+					LayoutBindings.Push(VkDescriptorSetLayoutBinding(Binding.Slot, VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, Binding.Count, WEngine::ToVulkan(EShaderStage(ShaderStage))));
+				}
+				else
+				{
+					LayoutBindings.Push(VkDescriptorSetLayoutBinding(Binding.Slot, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, Binding.Count, WEngine::ToVulkan(EShaderStage(ShaderStage))));
+				}
+			});
+
+			DescriptorSetLayout = new VulkanDescriptorSetLayout(this, &DescriptorSetLayoutCreateInfo);
+			DescriptorSetLayouts.Push(DescriptorSetLayout->GetHandle());
+			VulkanDescriptorSetLayoutManager::AddDescriptorLayout(LayoutID, DescriptorSetLayout);
+		}
+
+		uint32 PipelineLayoutID = WEngine::MemCrc32(HashCodes.GetData(), HashCodes.Size() * 4);
+		uint32 PipelineID = WEngine::MemCrc32(descriptor, sizeof(RHIGraphicsPipelineStateDescriptor), PipelineLayoutID);
 		VulkanGraphicsPipelineStateObject *Pipeline = VulkanPipelineStateManager::GetGraphicsPipelineState(PipelineID);
 		if (Pipeline)
 		{
@@ -330,32 +374,15 @@ namespace Vulkan
 			dynamicStateCreateInfo.pDynamicStates = dynamicStates;
 		}
 
-		auto IsTextureResource = [](EUniformBaseType Type)->bool { return Type == EUniformBaseType::UB_TEXTURE ||
-																		  Type == EUniformBaseType::UB_SRV ||
-																		  Type == EUniformBaseType::UB_UAV; };
-
-		WMeshDrawShaderBindings *ShaderBindings = descriptor->ShaderBindings;
-		uint32 LayoutID = ShaderBindings->GetHashCode();
-		VulkanDescriptorSetLayout *DescriptorSetLayout = VulkanDescriptorSetLayoutManager::GetDescriptorSetLayout(LayoutID);
-		if (DescriptorSetLayout == nullptr)
+		VkPipelineLayout PipelineLayout;
+		VkPipelineLayoutCreateInfo PipelineCreateInfo = {};
 		{
-			for(uint32 ShaderStage = 0; ShaderStage < MaxGraphicsPipelineShaderNum; ++ShaderStage)
-			{
-				if (descriptor->Shaders[ShaderStage])
-				{
-					const WMeshDrawShaderBindings& Bindings = ShaderBindings[ShaderStage];
-					Bindings.EnumerateBindings([IsTextureResource](ShaderBindingSlot& Binding)
-					{
-						if (IsTextureResource(Binding.Type))
-						{
-						
-						}
-					});
-				}
-			}
-
-			VulkanDescriptorSetLayoutManager::AddDescriptorLayout(LayoutID, DescriptorSetLayout);
+			PipelineCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+			PipelineCreateInfo.pushConstantRangeCount = 0;
+			PipelineCreateInfo.setLayoutCount = DescriptorSetLayouts.Size();
+			PipelineCreateInfo.pSetLayouts = DescriptorSetLayouts.GetData();
 		}
+		vkCreatePipelineLayout(Device, &PipelineCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &PipelineLayout);
 
 		VkGraphicsPipelineCreateInfo GraphicsPipelineCreateInfo = {};
 		{
@@ -370,7 +397,7 @@ namespace Vulkan
 			GraphicsPipelineCreateInfo.pDepthStencilState = &static_cast<VulkanDepthStencilState*>(descriptor->DepthStencilState)->DepthStencilStateCreateInfo;
 			GraphicsPipelineCreateInfo.pColorBlendState = &ColorBlendStateCreateInfo;
 			GraphicsPipelineCreateInfo.pDynamicState = &dynamicStateCreateInfo;
-			GraphicsPipelineCreateInfo.layout = ;
+			GraphicsPipelineCreateInfo.layout = PipelineLayout;
 			GraphicsPipelineCreateInfo.renderPass = static_cast<VulkanRenderPass*>(descriptor->RenderPass)->GetHandle();
 			GraphicsPipelineCreateInfo.subpass = 0;
 			GraphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
@@ -516,7 +543,7 @@ namespace Vulkan
 		}
 
 		VkSampler *pSampler = (VkSampler*)NormalAllocator::Get()->Allocate(sizeof(VkSampler));
-		RE_ASSERT(vkCreateSampler(pDevice, &samplerCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pSampler) == VK_SUCCESS, "Failed to Create Sampler.");
+		RE_ASSERT(vkCreateSampler(Device, &samplerCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pSampler) == VK_SUCCESS, "Failed to Create Sampler.");
 		
 		VulkanSampler *sampler = (VulkanSampler*)NormalAllocator::Get()->Allocate(sizeof(VulkanSampler));
 		::new (sampler) VulkanSampler(pSampler);
@@ -591,7 +618,7 @@ namespace Vulkan
 			pWriteDescriptorSets[i].dstBinding = descriptor->pBindingResources[i].bindingSlot;
 			pWriteDescriptorSets[i].pBufferInfo = pDescriptorBufferInfos[i];
 		}
-		vkUpdateDescriptorSets(pDevice, descriptor->bindingCount, pWriteDescriptorSets, 0, nullptr);
+		vkUpdateDescriptorSets(Device, descriptor->bindingCount, pWriteDescriptorSets, 0, nullptr);
 
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
@@ -630,7 +657,7 @@ namespace Vulkan
 			pWriteDescriptorSets[i].dstBinding = descriptor->pBindingResources[i].bindingSlot;
 			pWriteDescriptorSets[i].pImageInfo = pDescriptorImageInfos[i];
 		}
-		vkUpdateDescriptorSets(pDevice, descriptor->bindingCount, pWriteDescriptorSets, 0, nullptr);
+		vkUpdateDescriptorSets(Device, descriptor->bindingCount, pWriteDescriptorSets, 0, nullptr);
 
 		for (unsigned int i = 0; i < descriptor->bindingCount; ++i)
 		{
@@ -659,7 +686,7 @@ namespace Vulkan
 			fences.Push(static_cast<VulkanFence*>(pFences + i)->GetHandle());
 		}
 
-		vkWaitForFences(pDevice, count, fences.GetData(), waitForAll, (std::numeric_limits<uint64_t>::max)());
+		vkWaitForFences(Device, count, fences.GetData(), waitForAll, (std::numeric_limits<uint64_t>::max)());
 	}
 
 	void VulkanDevice::ResetFences(RHIFence* pFences, unsigned int count)
@@ -671,7 +698,7 @@ namespace Vulkan
 			fences.Push(static_cast<VulkanFence*>(pFences + i)->GetHandle());
 		}
 
-		RE_ASSERT(vkResetFences(pDevice, count, fences.GetData()) == VK_SUCCESS, "Failed to Reset Fences.");
+		RE_ASSERT(vkResetFences(Device, count, fences.GetData()) == VK_SUCCESS, "Failed to Reset Fences.");
 	}
 
 	void VulkanDevice::SubmitCommandsAndFlushGPU()
@@ -701,7 +728,7 @@ namespace Vulkan
 
 	void VulkanDevice::Wait()
 	{
-		vkDeviceWaitIdle(pDevice);
+		vkDeviceWaitIdle(Device);
 		static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager()->RefreshFenceState();
 	}
 

@@ -12,16 +12,16 @@ public:
 
 	bool blendEnabled = true;
 
-	BlendFactor colorSrcFactor = BlendFactor::FactorSrcAlpha;
+	EBlendFactor colorSrcFactor = EBlendFactor::FactorSrcAlpha;
 
-	BlendFactor colorDstFactor = BlendFactor::FactorOneMinusSrcAlpha;
+	EBlendFactor colorDstFactor = EBlendFactor::FactorOneMinusSrcAlpha;
 
-	BlendOP colorBlendOP = BlendOP::BlendAdd;
+	EBlendOP colorBlendOP = EBlendOP::BlendAdd;
 
-	BlendFactor alphaSrcFactor = BlendFactor::FactorZero;
+	EBlendFactor alphaSrcFactor = EBlendFactor::FactorZero;
 
-	BlendFactor alphaDstFactor = BlendFactor::FactorOne;
+	EBlendFactor alphaDstFactor = EBlendFactor::FactorOne;
 
-	BlendOP alphaBlendOP = BlendOP::BlendAdd;
+	EBlendOP alphaBlendOP = EBlendOP::BlendAdd;
 
 };

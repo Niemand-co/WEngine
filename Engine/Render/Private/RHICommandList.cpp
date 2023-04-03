@@ -42,7 +42,7 @@ void RHIRenderCommandList::EndDrawingViewport(RHIViewport* Viewport, bool bPrese
 
 WRenderPassRHIRef RHIRenderCommandList::BeginRenderPass(RHIRenderPassDescriptor* RenderPasDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor)
 {
-    RHIContext::GetContext()->RHIBeginRenderPass(RenderPasDescriptor, FramebufferDescriptor);
+    return RHIContext::GetContext()->RHIBeginRenderPass(RenderPasDescriptor, FramebufferDescriptor);
 }
 
 void RHIRenderCommandList::EndRenderPass()

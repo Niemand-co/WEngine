@@ -93,7 +93,7 @@ namespace Vulkan
 
 		VulkanGPU* GetGPU() const { return pGPU; }
 
-		VkDevice GetHandle() const { return pDevice; }
+		VkDevice GetHandle() const { return Device; }
 
 		class VulkanMemoryManager* GetMemoryManager() const { return pMemoryManager; }
 
@@ -105,7 +105,7 @@ namespace Vulkan
 
 	private:
 
-		VkDevice pDevice;
+		VkDevice Device;
 
 		VulkanMemoryManager *pMemoryManager;
 

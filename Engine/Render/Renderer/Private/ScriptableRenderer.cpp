@@ -5,14 +5,6 @@
 #include "Scene/Components/Public/PrimitiveComponent.h"
 #include "Render/Public/SceneVisibility.h"
 
-ScriptableRenderer::ScriptableRenderer()
-{
-}
-
-ScriptableRenderer::~ScriptableRenderer()
-{
-}
-
 SceneRenderer::SceneRenderer(const WSceneViewFamily* InViewFamily)
 	: ViewFamily(InViewFamily),
 	  Scene(InViewFamily->Scene)

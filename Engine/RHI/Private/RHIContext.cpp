@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "RHI/Public/RHIHeads.h"
 #include "RHI/Encoder/Public/RHIGraphicsEncoder.h"
-
 #include "Render/RenderPipeline/Public/ScriptableRenderPipeline.h"
 #include "Utils/Public/Window.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
@@ -218,20 +217,6 @@ RHIGroupLayout* RHIContext::CreateGroupLayout(RHIGroupLayoutDescriptor* descript
 	return pDevice->CreateGroupLayout(descriptor);
 }
 
-WEngine::WArray<RHIGroup*> RHIContext::CreateResourceGroup(RHIGroupDescriptor* descriptor)
-{
-	RHIGroupPoolDescriptor poolDescriptor = {};
-	{
-		poolDescriptor.pGroupLayout = descriptor->pGroupLayout;
-		poolDescriptor.maxSetCount = descriptor->count;
-	}
-	RHIGroupPool *pool = pDevice->CreateGroupPool(&poolDescriptor);
-
-	WEngine::WArray<RHIGroup*> group = pool->GetGroup(descriptor->count);
-
-	return group;
-}
-
 void RHIContext::UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
 {
 	pDevice->UpdateUniformResourceToGroup(descriptor);
@@ -245,11 +230,6 @@ void RHIContext::UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor* descr
 RHIPipelineResourceLayout* RHIContext::CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor* descriptor)
 {
 	return pDevice->CreatePipelineResourceLayout(descriptor);
-}
-
-RHIPipelineStateObject* RHIContext::CreatePSO(RHIGraphicsPipelineStateObjectDescriptor* descriptor)
-{
-	return pDevice->CreatePipelineStateObject(descriptor);
 }
 
 WViewportRHIRef RHIContext::CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, Format InFormat)

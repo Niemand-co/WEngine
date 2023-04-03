@@ -17,6 +17,6 @@ public:
 
 private:
 
-	WStaticMeshVertexDataInterface *IndexData;
+	class WStaticMeshVertexDataInterface *IndexData;
 
 };

@@ -32,14 +32,14 @@ namespace Vulkan
 		{
 			if (Pools.Find(ID))
 			{
-				VulkanGroupPool& Pool = Pools[ID];
-				return Pool.GetDescriptorSet();
+				return Pools[ID]->GetDescriptorSet();
 			}
+			return VK_NULL_HANDLE;
 		}
 
 	private:
 
-		static WEngine::WHashMap<uint32, VulkanGroupPool> Pools;
+		static WEngine::WHashMap<uint32, VulkanGroupPool*> Pools;
 
 	};
 

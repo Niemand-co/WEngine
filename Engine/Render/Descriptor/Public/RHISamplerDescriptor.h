@@ -10,8 +10,8 @@ public:
 
 public:
 
-	Filter minFilter;
+	EFilter minFilter;
 
-	Filter magFilter;
+	EFilter magFilter;
 
 };

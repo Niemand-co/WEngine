@@ -28,7 +28,7 @@
 #include "Render/Descriptor/Public/RHIAttachmentDescriptor.h"
 #include "Render/Descriptor/Public/RHISubPassDescriptor.h"
 #include "Render/Descriptor/Public/RHIBarrierDescriptor.h"
-#include "Render/Descriptor/Public/RHIRasterizationStateDescriptor.h"
+#include "Render/Descriptor/Public/RHIRasterizationDescriptor.h"
 #include "Render/Descriptor/Public/RHIScissorDescriptor.h"
 #include "Render/Descriptor/Public/RHIViewportDescriptor.h"
 #include "Render/Descriptor/Public/RHIFramebufferDescriptor.h"

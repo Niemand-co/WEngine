@@ -17,8 +17,6 @@ namespace Vulkan
 
 		VkPipelineLayout PipelineLayout;
 
-		WEngine::WArray<class VulkanGroupLayout> DescriptorSetLayouts;
-
 	};
 
 }

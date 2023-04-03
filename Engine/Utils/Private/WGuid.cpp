@@ -207,12 +207,6 @@ namespace WEngine
 		MD5Internal((byte*)data, strlen(data), A, B, C, D);
 	}
 
-	template <typename T>
-	FORCEINLINE constexpr T Align(T Val, uint64 Alignment)
-	{
-		return (T)(((uint64)Val + Alignment - 1) & ~(Alignment - 1));
-	}
-
 	uint32 CRCTablesSB8[8][256] =
 	{
 		{

@@ -4,8 +4,9 @@
 #include "Render/Descriptor/Public/RHIDepthStencilDescriptor.h"
 #include "Render/Descriptor/Public/RHIPipelineResourceLayoutDescriptor.h"
 #include "Render/Descriptor/Public/RHIRasterizationDescriptor.h"
+#include "Render/Descriptor/Public/RHIPipelineStateObjectDescriptor.h"
+#include "Render/Mesh/Public/MeshBatch.h"
 
-class WMeshBatch;
 class WMaterialShader;
 struct MaterialProxy;
 
@@ -158,7 +159,7 @@ public:
 	template<typename LAMBDA>
 	void EnumerateBindings(LAMBDA lambda) const
 	{
-		for (ShaderBindingSlot& Binding : Bindings)
+		for (const ShaderBindingSlot& Binding : Bindings)
 		{
 			lambda(Binding);
 		}

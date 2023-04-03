@@ -15,8 +15,6 @@ struct VertexAttributeDescription
 	Format format;
 };
 
-class RHIVertexInputDescriptor;
-
 struct VertexComponent
 {
 	glm::vec3 Position = glm::vec3();

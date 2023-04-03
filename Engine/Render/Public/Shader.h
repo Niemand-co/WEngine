@@ -3,20 +3,6 @@
 #include "Utils/Public/ShaderCodeBlob.h"
 #include "Utils/Public/NamingSystem.h"
 
-class ShaderMappingInfo
-{
-public:
-
-	ShaderMappingInfo(WMaterialShader *Shader);
-
-	~ShaderMappingInfo();
-
-private:
-
-	
-
-};
-
 class WShader : public RenderResource
 {
 public:

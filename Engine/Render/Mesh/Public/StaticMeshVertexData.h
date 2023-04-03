@@ -14,7 +14,7 @@ public:
 
 	virtual void Empty() override;
 
-	virtual uint32 GetNum() const { return Data.Size() }
+	virtual uint32 GetNum() const { return Data.Size(); }
 
 	virtual uint8* GetData() const { return (uint8*)Data.GetData(); }
 

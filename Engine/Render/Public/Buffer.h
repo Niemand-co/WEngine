@@ -16,7 +16,7 @@ public:
 
 	virtual ~WVertexBuffer() = default;
 
-	WVertexBufferRHIRef GetRHI() { return Buffer.Get(); }
+	WVertexBufferRHIRef& GetRHI() { return Buffer; }
 
 	virtual void ReleaseRHIResource() override
 	{
@@ -25,7 +25,7 @@ public:
 
 protected:
 
-	WEngine::WSharedPtr<RHIVertexBuffer> Buffer;
+	WVertexBufferRHIRef Buffer;
 
 };
 
@@ -39,7 +39,7 @@ public:
 
 	virtual ~WIndexBuffer() = default;
 
-	WIndexBufferRHIRef GetRHI() { return Buffer.Get(); }
+	WIndexBufferRHIRef& GetRHI() { return Buffer; }
 
 	virtual void ReleaseRHIResource() override
 	{
@@ -48,7 +48,7 @@ public:
 
 protected:
 
-	WEngine::WSharedPtr<RHIIndexBuffer> Buffer;
+	WIndexBufferRHIRef Buffer;
 
 };
 
@@ -60,14 +60,14 @@ public:
 
 	WUniformBuffer() = delete;
 
-	WUniformBuffer(const ShaderParametersLayout* InLayout)
+	WUniformBuffer(const class ShaderParametersLayout* InLayout)
 		: Layout(InLayout)
 	{
 	}
 
 	virtual ~WUniformBuffer() = default;
 
-	WUniformBufferRHIRef GetRHI() { return Buffer.Get(); }
+	WUniformBufferRHIRef& GetRHI() { return Buffer; }
 
 	virtual void ReleaseRHIResource() override
 	{
@@ -76,9 +76,9 @@ public:
 
 protected:
 
-	const WShaderParameterLayout* Layout;
+	const ShaderParametersLayout* Layout;
 
-	WEngine::WSharedPtr<RHIUniformBuffer> Buffer;
+	WUniformBufferRHIRef Buffer;
 
 };
 

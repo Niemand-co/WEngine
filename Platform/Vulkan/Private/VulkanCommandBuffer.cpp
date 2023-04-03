@@ -71,11 +71,6 @@ namespace Vulkan
 		State = ECmdState::IsInsideRenderPass;
 	}
 
-	void VulkanCommandBuffer::SetPipeline(RHIPipelineStateObject* pso)
-	{
-		vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *static_cast<VulkanPipelineStateObject*>(pso)->GetHandle());
-	}
-
 	void VulkanCommandBuffer::SetViewport(const Viewport& pViewport)
 	{
 		vkCmdSetViewport(CommandBuffer, 0, 1, {});
@@ -96,7 +91,7 @@ namespace Vulkan
 		vkCmdSetDepthTestEnable(CommandBuffer, enable);
 	}
 
-	void VulkanCommandBuffer::SetPolygonTopology(PrimitiveTopology primitive)
+	void VulkanCommandBuffer::SetPolygonTopology(EPrimitiveTopology primitive)
 	{
 		vkCmdSetPrimitiveTopology(CommandBuffer, WEngine::ToVulkan(primitive));
 	}
@@ -116,11 +111,6 @@ namespace Vulkan
 	void VulkanCommandBuffer::BindIndexBuffer(RHIBuffer* pBuffer)
 	{
 		vkCmdBindIndexBuffer(CommandBuffer, static_cast<VulkanIndexBuffer*>(pBuffer)->GetHandle(), 0, VK_INDEX_TYPE_UINT32);
-	}
-
-	void VulkanCommandBuffer::BindGroups(unsigned int groupCount, RHIGroup* pGroup, RHIPipelineResourceLayout* pPipelineResourceLayout, unsigned int offsetCount, unsigned int* offsets)
-	{
-		vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *static_cast<VulkanPipelineResourceLayout*>(pPipelineResourceLayout)->GetHandle(), 0, groupCount, static_cast<VulkanGroup*>(pGroup)->GetHandle(), offsetCount, offsets);
 	}
 
 	void VulkanCommandBuffer::DrawVertexArray()

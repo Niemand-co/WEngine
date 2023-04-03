@@ -10,10 +10,10 @@ public:
 
 public:
 
-	PolygonMode polygonMode = PolygonMode::Triangle;
+	EPolygonMode polygonMode = EPolygonMode::Triangle;
 
 	float lineWidth = 1.0f;
 
-	PrimitiveTopology primitivePology = PrimitiveTopology::TriangleList;
+	EPrimitiveTopology primitivePology = EPrimitiveTopology::TriangleList;
 
 };

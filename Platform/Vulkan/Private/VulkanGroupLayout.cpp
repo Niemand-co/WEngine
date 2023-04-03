@@ -5,21 +5,17 @@
 namespace Vulkan
 {
 
-	VulkanDescriptorSetLayout::VulkanDescriptorSetLayout(VulkanDevice* pInDevice)
+	VulkanDescriptorSetLayout::VulkanDescriptorSetLayout(VulkanDevice* pInDevice, VkDescriptorSetLayoutCreateInfo* pInfo)
 		: pDevice(pInDevice)
 	{
-		VkDescriptorSetLayoutCreateInfo DescriptorSetLayoutCreateInfo = {};
-		{
-			DescriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-			DescriptorSetLayoutCreateInfo.bindingCount = Bindings.Size();
-			DescriptorSetLayoutCreateInfo.pBindings = Bindings.GetData();
-		}
-		vkCreateDescriptorSetLayout(pDevice->GetHandle(), &DescriptorSetLayoutCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DescriptorSetLayout);
+		vkCreateDescriptorSetLayout(pDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DescriptorSetLayout);
 	}
 
 	VulkanDescriptorSetLayout::~VulkanDescriptorSetLayout()
 	{
 		vkDestroyDescriptorSetLayout(pDevice->GetHandle(), DescriptorSetLayout, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
 	}
+
+	WEngine::WHashMap<uint32, VulkanDescriptorSetLayout*> VulkanDescriptorSetLayoutManager::Layouts = WEngine::WHashMap<uint32, VulkanDescriptorSetLayout*>();
 
 }

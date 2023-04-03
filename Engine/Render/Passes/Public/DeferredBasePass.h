@@ -3,6 +3,7 @@
 #include "Render/Public/MeshPassProcessor.h"
 #include "Render/Public/MeshPassProcessor.inl"
 #include "Render/Public/RenderDependencyGraphParameter.h"
+#include "Render/Public/SceneView.h"
 
 class WDeferredBasePassVS : public WMaterialShader
 {

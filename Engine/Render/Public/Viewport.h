@@ -1,6 +1,6 @@
 #pragma once
-#include "Render/Public/RenderResource.h"
 #include "Render/Public/RenderTarget.h"
+#include "RHI/Public/RHIViewport.h"
 
 class WViewport : public WRenderTarget
 {

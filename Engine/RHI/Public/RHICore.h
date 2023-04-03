@@ -471,6 +471,22 @@ namespace WEngine
 		return VK_FORMAT_MAX_ENUM;
 	}
 
+	VkShaderStageFlags ToVulkan(EShaderStage Stage)
+	{
+		switch (Stage)
+		{
+		case EShaderStage::Vertex:
+			return VK_SHADER_STAGE_VERTEX_BIT;
+		case EShaderStage::Geometry:
+			return VK_SHADER_STAGE_GEOMETRY_BIT;
+		case EShaderStage::Pixel:
+			return VK_SHADER_STAGE_FRAGMENT_BIT;
+		default:
+			RE_ASSERT(false, "Error Type Shader Stage.")
+		}
+		return VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM;
+	}
+
 }
 
 enum class EState : int32

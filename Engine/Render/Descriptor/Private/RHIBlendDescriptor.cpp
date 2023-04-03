@@ -3,10 +3,10 @@
 
 RHIBlendDescriptor::RHIBlendDescriptor()
 {
-	alphaBlendOP = BlendOP::BlendAdd;
-	alphaSrcFactor = BlendFactor::FactorZero;
-	alphaDstFactor = BlendFactor::FactorZero;
-	colorBlendOP = BlendOP::BlendAdd;
-	colorSrcFactor = BlendFactor::FactorZero;
-	colorDstFactor = BlendFactor::FactorZero;
+	alphaBlendOP = EBlendOP::BlendAdd;
+	alphaSrcFactor = EBlendFactor::FactorZero;
+	alphaDstFactor = EBlendFactor::FactorZero;
+	colorBlendOP = EBlendOP::BlendAdd;
+	colorSrcFactor = EBlendFactor::FactorZero;
+	colorDstFactor = EBlendFactor::FactorZero;
 }

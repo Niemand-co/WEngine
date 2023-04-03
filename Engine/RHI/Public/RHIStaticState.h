@@ -117,7 +117,7 @@ public:
 			AlphaBlendOp,
 			AlphaSrcFactor,
 			AlphaDstFactor
-		}
+		};
 		StaticRHI = GetRenderCommandList()->CreateBlendState(Initializer);
 	}
 
@@ -153,9 +153,9 @@ public:
 			CullMode,
 			PolygonMode,
 			PrimitiveTopology,
-			bool bEnableDepthClamp,
-			bool bEnableDiscard,
-			bool bClockWise
+			bEnableDepthClamp,
+			bEnableDiscard,
+			bClockWise
 		};
 		StaticRHI = GetRenderCommandList()->CreateRasterizationState(Initializer);
 	}
@@ -179,7 +179,7 @@ class TStaticMultiSampleStateRHI : public TStaticStateRHI<TStaticMultiSampleStat
 	SampleCount,
 	SampleMask,
 	MinSampleShading,
-	bEnableAlphaToCoverage.
+	bEnableAlphaToCoverage,
 	bEnableAlphaToOne
 >, class RHIMultiSampleState>
 {
@@ -193,7 +193,7 @@ public:
 			SampleCount,
 			SampleMask,
 			MinSampleShading,
-			bEnableAlphaToCoverage.
+			bEnableAlphaToCoverage,
 			bEnableAlphaToOne
 		};
 		StaticRHI = GetRenderCommandList()->CreateMultiSampleState(Initializer);
@@ -201,6 +201,6 @@ public:
 
 public:
 
-	RHIMultiSampleState StaticRHI;
+	WMultiSampleStateRHIRef StaticRHI;
 
 };

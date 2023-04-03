@@ -38,8 +38,6 @@ public:
 
 	virtual void BeginPass(RHIRenderPassBeginDescriptor* descriptor) = 0;
 
-	virtual void SetPipeline(RHIPipelineStateObject* pso) = 0;
-
 	virtual void SetViewport(const Viewport& viewport) = 0;
 
 	virtual void SetScissor(const Scissor& scissor) = 0;
@@ -48,15 +46,13 @@ public:
 
 	virtual void SetDepthTestEnable(bool enable) = 0;
 
-	virtual void SetPolygonTopology(PrimitiveTopology primitive) = 0;
+	virtual void SetPolygonTopology(EPrimitiveTopology primitive) = 0;
 
 	virtual void ClearRenderTarget(bool isClearColor, bool isClearDepth, glm::vec4 clearColor, float clearDepth = 0.0f, unsigned int clearStencil = 1) = 0;
 
 	virtual void BindVertexBuffer(RHIBuffer* pBuffer) = 0;
 
 	virtual void BindIndexBuffer(RHIBuffer* pBuffer) = 0;
-
-	virtual void BindGroups(unsigned int groupCount, RHIGroup* pGroup, RHIPipelineResourceLayout* pPipelineResourceLayout, unsigned int offsetCount = 0, unsigned int* offsets = nullptr) = 0;
 
 	virtual void DrawVertexArray() = 0;
 

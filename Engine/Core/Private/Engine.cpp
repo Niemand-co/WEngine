@@ -91,8 +91,8 @@ namespace WEngine
 			if(name == "." || name == "..")
 				return;
 			WEngine::WString ResourceName ="assets/" + name;
-			if(WShaderLibrary::LoadShader(ResourceName))
-				return;
+			//if(WShaderLibrary::LoadShader(ResourceName))
+			//	return;
 			if(WMeshLibrary::LoadMesh(ResourceName))
 				return;
 		});

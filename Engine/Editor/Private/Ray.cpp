@@ -43,9 +43,9 @@ namespace WEngine
 
 	bool Ray::IsIntersectWithMesh(WStaticMesh* pMesh)
 	{
-		for (unsigned int i = 0; i < pMesh->m_indices.Size(); i += 3)
+		for (unsigned int i = 0; i < pMesh->Indices.Size(); i += 3)
 		{
-			if (IsIntersectWithTriangle(pMesh->m_vertices[pMesh->m_indices[i]].Position, pMesh->m_vertices[pMesh->m_indices[i + 1]].Position, pMesh->m_vertices[pMesh->m_indices[i + 2]].Position))
+			if (IsIntersectWithTriangle(pMesh->Vertices[pMesh->Indices[i]].Position, pMesh->Vertices[pMesh->Indices[i + 1]].Position, pMesh->Vertices[pMesh->Indices[i + 2]].Position))
 			{
 				return true;
 			}

@@ -1,6 +1,8 @@
 #pragma once
 #include "RHI/Public/RHIBuffer.h"
 
+class RHIBufferDescriptor;
+
 namespace Vulkan
 {
 
@@ -30,7 +32,7 @@ namespace Vulkan
 			uint32 Size = 0;
 			uint32 Offset = 0;
 			uint8 bRead : 1;
-			VulkanStagingBuffer* PendingBuffer = 0;
+			class VulkanStagingBuffer* PendingBuffer = 0;
 		};
 
 		VkBuffer Buffer;

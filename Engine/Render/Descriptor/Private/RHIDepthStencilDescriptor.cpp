@@ -7,8 +7,8 @@ RHIDepthStencilDescriptor::RHIDepthStencilDescriptor()
 	depthBoundsTest = false;
 	depthTestEnabled = false;
 	depthWriteEnabled = false;
-	stencilCompareOP = CompareOP::Never;
-	stencilFailedOP = StencilFailedOP::Keep;
-	passOP = StencilFailedOP::Keep;
-	depthFailedOP = StencilFailedOP::Keep;
+	stencilCompareOP = ECompareOP::Never;
+	stencilFailedOP = EStencilFailedOP::Keep;
+	passOP = EStencilFailedOP::Keep;
+	depthFailedOP = EStencilFailedOP::Keep;
 }

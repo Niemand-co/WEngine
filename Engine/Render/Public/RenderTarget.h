@@ -1,8 +1,5 @@
 #pragma once
-#include "Render/Public/Texture.h"
-
-class RHIRenderTarget;
-class RenderTexture;
+#include "Render/Public/RenderResource.h"
 
 class WRenderTarget : public RenderResource
 {

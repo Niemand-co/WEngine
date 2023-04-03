@@ -37,28 +37,28 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 
 		PipelineInfo.MultiSampleState = RenderState.MultiSampleState;
 
-		PipelineInfo.Shaders[EShaderStage::Vertex] = PassShader->GetVertexShaderRHI();
-		PipelineInfo.Shaders[EShaderStage::Geometry] = PassShader->GetPixelShaderRHI();
-		PipelineInfo.Shaders[EShaderStage::Pixel] = PassShader->GetVertexShaderRHI();
+		PipelineInfo.Shaders[(uint8)EShaderStage::Vertex] = PassShader->GetVertexShader();
+		PipelineInfo.Shaders[(uint8)EShaderStage::Geometry] = PassShader->GetPixelShader();
+		PipelineInfo.Shaders[(uint8)EShaderStage::Pixel] = PassShader->GetVertexShader();
 	}
 
 	WMeshDrawCommand DrawCommand;
 	if (PassShader->GetVertexShader())
 	{
-		ShaderBindingSlot& Slot = DrawCommand.GetShaderBinding(EShaderStage::Vertex);
-		PassShader->GetVertexShader()->GetParametersBinding(View, Material);
+		WMeshDrawShaderBindings& ShaderBindings = DrawCommand.GetShaderBinding((uint32)EShaderStage::Vertex);
+		PassShader->GetVertexShader()->GetParametersBinding(View, &Material, ShaderBindings);
 	}
 
 	if (PassShader->GetGeometryShader())
 	{
-		ShaderBindingSlot& Slot = DrawCommand.GetShaderBinding(EShaderStage::Geometry);
-		PassShader->GetGeometryShader()->GetParametersBinding(View, Material);
+		WMeshDrawShaderBindings& ShaderBindings = DrawCommand.GetShaderBinding((uint32)EShaderStage::Geometry);
+		PassShader->GetGeometryShader()->GetParametersBinding(View, &Material, ShaderBindings);
 	}
 
 	if (PassShader->GetPixelShader())
 	{
-		ShaderBindingSlot& Slot = DrawCommand.GetShaderBinding(EShaderStage::Pixel);
-		PassShader->GetPixelShader()->GetParametersBinding(View, Material);
+		WMeshDrawShaderBindings& ShaderBindings = DrawCommand.GetShaderBinding((uint32)EShaderStage::Pixel);
+		PassShader->GetPixelShader()->GetParametersBinding(View, &Material, ShaderBindings);
 	}
 
 	for (uint32 ElementIndex = 0; ElementIndex < MeshBatch.Elements.Size(); ++ElementIndex)
