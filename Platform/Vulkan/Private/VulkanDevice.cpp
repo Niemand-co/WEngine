@@ -63,7 +63,7 @@ namespace Vulkan
 		swapchainCreateInfo.clipped = VK_TRUE;
 		swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-		return new VulkanSwapchain(this, static_cast<VulkanInstance*>(RHIContext::GetContext()->GetInstance()), &swapchainCreateInfo, OutImages);
+		return new VulkanSwapchain(this, static_cast<VulkanInstance*>(GetDynamicRHI()->GetInstance()), &swapchainCreateInfo, OutImages);
 	}
 
 	WEngine::WArray<RHIFence*> VulkanDevice::CreateFence(unsigned int count)
@@ -703,7 +703,7 @@ namespace Vulkan
 
 	void VulkanDevice::SubmitCommandsAndFlushGPU()
 	{
-		VulkanCommandBufferManager *CmdBufferMgr = static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager();
+		VulkanCommandBufferManager *CmdBufferMgr = static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager();
 		if (CmdBufferMgr->HasPendingActiveCmdBuffer())
 		{
 			CmdBufferMgr->SubmitActiveCommandBuffer();
@@ -717,7 +717,7 @@ namespace Vulkan
 
 	void VulkanDevice::PrepareForCPURead()
 	{
-		VulkanCommandBufferManager *CmdBufferMgr = static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager();
+		VulkanCommandBufferManager *CmdBufferMgr = static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager();
 		VulkanCommandBuffer *ActiveCmdBuffer = CmdBufferMgr->GetActiveCommandBuffer();
 		if (ActiveCmdBuffer && ActiveCmdBuffer->HasBegun())
 		{
@@ -729,7 +729,7 @@ namespace Vulkan
 	void VulkanDevice::Wait()
 	{
 		vkDeviceWaitIdle(Device);
-		static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager()->RefreshFenceState();
+		static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager()->RefreshFenceState();
 	}
 
 	VkImageUsageFlags VulkanDevice::GetImageUsage(ETextureCreateFlags Flag)

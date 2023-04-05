@@ -58,6 +58,7 @@
 #include "Render/Public/RenderCore.h"
 #include "Render/Public/RenderResource.h"
 #include "RHI/Public/RHIResource.h"
+#include "RHI/Public/RHIContext.h"
 #include "Render/Public/RHICommandList.h"
 #include "RHI/Public/RHICore.h"
 #include "Utils/Public/ShaderCodeBlob.h"

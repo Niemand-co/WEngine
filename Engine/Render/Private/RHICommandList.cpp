@@ -32,32 +32,32 @@ RHIRenderCommandList::RHIRenderCommandList()
 
 void RHIRenderCommandList::BeginDrawingViewport(RHIViewport* Viewport)
 {
-    RHIContext::GetContext()->RHIBeginDrawingViewport(Viewport);
+    GetDynamicRHI()->RHIBeginDrawingViewport(Viewport);
 }
 
 void RHIRenderCommandList::EndDrawingViewport(RHIViewport* Viewport, bool bPresent)
 {
-    RHIContext::GetContext()->RHIEndDrawingViewport(Viewport, bPresent);
+    GetDynamicRHI()->RHIEndDrawingViewport(Viewport, bPresent);
 }
 
 WRenderPassRHIRef RHIRenderCommandList::BeginRenderPass(RHIRenderPassDescriptor* RenderPasDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor)
 {
-    return RHIContext::GetContext()->RHIBeginRenderPass(RenderPasDescriptor, FramebufferDescriptor);
+    return GetDynamicRHI()->RHIBeginRenderPass(RenderPasDescriptor, FramebufferDescriptor);
 }
 
 void RHIRenderCommandList::EndRenderPass()
 {
-    RHIContext::GetContext()->RHIEndRenderPass();
+    GetDynamicRHI()->RHIEndRenderPass();
 }
 
 void RHIRenderCommandList::BeginTransition(WEngine::WArray<RHIBarrierDescriptor>& Transitions)
 {
-    RHIContext::GetContext()->RHIBeginTransition(Transitions);
+    GetDynamicRHI()->RHIBeginTransition(Transitions);
 }
 
 void RHIRenderCommandList::SetGraphicsPipelineState(RHIGraphicsPipelineStateDescriptor* GraphicsPipelineState)
 {
-    RHIContext::GetContext()->RHISetGraphicsPipelineState(GraphicsPipelineState);
+    GetDynamicRHI()->RHISetGraphicsPipelineState(GraphicsPipelineState);
 }
 
 void RHIRenderCommandList::DrawIndexedPrimitive(uint32 indexCount, uint32 firstIndex, uint32 instanceCount)
@@ -67,7 +67,7 @@ void RHIRenderCommandList::DrawIndexedPrimitive(uint32 indexCount, uint32 firstI
         ALLOC_COMMAND(RHICommandDrawIndexedPrimitive)(indexCount, firstIndex, instanceCount);
         return;
     }
-    RHIContext::GetContext()->RHIDrawIndexedPrimitive(indexCount, firstIndex, instanceCount);
+    GetDynamicRHI()->RHIDrawIndexedPrimitive(indexCount, firstIndex, instanceCount);
 }
 
 void RHIRenderCommandList::SetViewport(float MinX, float MinY, float MaxX, float MaxY, float MinDepth, float MaxDepth)
@@ -77,97 +77,97 @@ void RHIRenderCommandList::SetViewport(float MinX, float MinY, float MaxX, float
         ALLOC_COMMAND(RHICommandSetViewport)(MinX, MaxX, MinY, MaxY, MinDepth, MaxDepth);
         return;
     }
-    RHIContext::GetContext()->RHISetViewport(MinX, MinY, MaxX - MinX, MaxY - MinY, MinDepth, MaxDepth);
+    GetDynamicRHI()->RHISetViewport(MinX, MinY, MaxX - MinX, MaxY - MinY, MinDepth, MaxDepth);
 }
 
 void RHIRenderCommandList::CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY)
 {
-    RHIContext::GetContext()->CopyImageToBackBuffer(SrcTexture, DstTexture, SrcSizeX, SrcSizeY, DstSizeX, DstSizeY);
+    GetDynamicRHI()->CopyImageToBackBuffer(SrcTexture, DstTexture, SrcSizeX, SrcSizeY, DstSizeX, DstSizeY);
 }
 
 WVertexBufferRHIRef RHIRenderCommandList::CreateVertexBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
 {
-    return RHIContext::GetContext()->CreateVertexBuffer(InContents, InStride, InCount, InUsage);
+    return GetDynamicRHI()->CreateVertexBuffer(InContents, InStride, InCount, InUsage);
 }
 
 WIndexBufferRHIRef RHIRenderCommandList::CreateIndexBuffer(uint8* InContents, uint32 InCount, EBufferUsageFlags InUsage)
 {
-    return RHIContext::GetContext()->CreateIndexBuffer(InContents, InCount, InUsage);
+    return GetDynamicRHI()->CreateIndexBuffer(InContents, InCount, InUsage);
 }
 
 WUniformBufferRHIRef RHIRenderCommandList::CreateUniformBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
 {
-    return RHIContext::GetContext()->CreateUniformBuffer(InContents, InStride, InCount, InUsage);
+    return GetDynamicRHI()->CreateUniformBuffer(InContents, InStride, InCount, InUsage);
 }
 
 WVertexShaderRHIRef RHIRenderCommandList::CreateVertexShader(ShaderCodeBlob& blob)
 {
-    return RHIContext::GetContext()->CreateVertexShader(blob);
+    return GetDynamicRHI()->CreateVertexShader(blob);
 }
 
 WPixelShaderRHIRef RHIRenderCommandList::CreatePixelShader(ShaderCodeBlob& blob)
 {
-    return RHIContext::GetContext()->CreatePixelShader(blob);
+    return GetDynamicRHI()->CreatePixelShader(blob);
 }
 
 WGeometryShaderRHIRef RHIRenderCommandList::CreateGeometryShader(ShaderCodeBlob& blob)
 {
-    return RHIContext::GetContext()->CreateGeometryShader(blob);
+    return GetDynamicRHI()->CreateGeometryShader(blob);
 }
 
 WComputeShaderRHIRef RHIRenderCommandList::CreateComputeShader(ShaderCodeBlob& blob)
 {
-    return RHIContext::GetContext()->CreateComputeShader(blob);
+    return GetDynamicRHI()->CreateComputeShader(blob);
 }
 
 WTexture2DRHIRef RHIRenderCommandList::CreateTexture2D(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, ClearValue InClearValue, ETextureCreateFlags InFlag, EAccess InitState)
 {
-    return RHIContext::GetContext()->CreateTexture2D(InWidth, InHeight, InFormat, InMipCount, InClearValue, InFlag, InitState);
+    return GetDynamicRHI()->CreateTexture2D(InWidth, InHeight, InFormat, InMipCount, InClearValue, InFlag, InitState);
 }
 
 WTexture2DArrayRHIRef RHIRenderCommandList::CreateTexture2DArray(uint32 InWith, uint32 InHeight, Format InFormat, uint32 InMipCount, uint32 InLayerCount, ClearValue InClearValue, ETextureCreateFlags InFlag, EAccess InitState)
 {
-    return RHIContext::GetContext()->CreateTexture2DArray(InWith, InHeight, InFormat, InMipCount, InLayerCount, InClearValue, InFlag, InitState);
+    return GetDynamicRHI()->CreateTexture2DArray(InWith, InHeight, InFormat, InMipCount, InLayerCount, InClearValue, InFlag, InitState);
 }
 
 WTexture3DRHIRef RHIRenderCommandList::CreateTexture3D(uint32 InWith, uint32 InHeight, uint32 InDepth, Format InFormat, uint32 InMipCount, ClearValue InClearValue, ETextureCreateFlags InFlag, EAccess InitState)
 {
-    return RHIContext::GetContext()->CreateTexture3D(InWith, InHeight, InDepth, InFormat, InMipCount, InClearValue, InFlag, InitState);
+    return GetDynamicRHI()->CreateTexture3D(InWith, InHeight, InDepth, InFormat, InMipCount, InClearValue, InFlag, InitState);
 }
 
 WTextureViewRHIRef RHIRenderCommandList::CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)
 {
-    return RHIContext::GetContext()->CreateTextureView(InMipIndex, InMipCount, InLayerIndex, InLayerCount, InPlaneIndex, InPlaneCount, InDimension, InFormat, InTexture);
+    return GetDynamicRHI()->CreateTextureView(InMipIndex, InMipCount, InLayerIndex, InLayerCount, InPlaneIndex, InPlaneCount, InDimension, InFormat, InTexture);
 }
 
 WViewportRHIRef RHIRenderCommandList::CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, Format InFormat)
 {
-    return RHIContext::GetContext()->CreateViewport(InWidth, InHeight, bInFullScreen, InFormat);
+    return GetDynamicRHI()->CreateViewport(InWidth, InHeight, bInFullScreen, InFormat);
 }
 
 WBlendStateRHIRef RHIRenderCommandList::CreateBlendState(const RHIBlendStateInitializer& Initializer)
 {
-    return RHIContext::GetContext()->CreateBlendState(Initializer);
+    return GetStaticRHI()->CreateBlendState(Initializer);
 }
 
 WDepthStencilStateRHIRef RHIRenderCommandList::CreateDepthStencilState(const RHIDepthStencilStateInitializer& Initializer)
 {
-    return RHIContext::GetContext()->CreateDepthStencilState(Initializer);
+    return GetStaticRHI()->CreateDepthStencilState(Initializer);
 }
 
 WRasterizationStateRHIRef RHIRenderCommandList::CreateRasterizationState(const RHIRasterizationStateInitializer& Initializer)
 {
-    return RHIContext::GetContext()->CreateRasterizationState(Initializer);
+    return GetStaticRHI()->CreateRasterizationState(Initializer);
 }
 
 WMultiSampleStateRHIRef RHIRenderCommandList::CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer)
 {
-    return RHIContext::GetContext()->CreateMultiSampleState(Initializer);
+    return GetStaticRHI()->CreateMultiSampleState(Initializer);
 }
 
 WVertexInputStateRHIRef RHIRenderCommandList::CreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements)
 {
-    return RHIContext::GetContext()->CreateVertexInputState(InElements);
+    return GetStaticRHI()->CreateVertexInputState(InElements);
 }
 
 RHIRenderCommandList* GetRenderCommandList()

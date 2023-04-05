@@ -25,10 +25,10 @@ namespace WEngine
 	{
 		GuiConfigure guiConfigure = {};
 		{
-			guiConfigure.pInstance = RHIContext::GetContext()->GetInstance();
-			guiConfigure.pGPU = RHIContext::GetContext()->GetGPU();
-			guiConfigure.pDevice = RHIContext::GetContext()->GetDevice();
-			guiConfigure.pQueue = RHIContext::GetContext()->GetQueue();
+			guiConfigure.pInstance = GetDynamicRHI()->GetInstance();
+			guiConfigure.pGPU = GetDynamicRHI()->GetGPU();
+			guiConfigure.pDevice = GetDynamicRHI()->GetDevice();
+			guiConfigure.pQueue = GetDynamicRHI()->GetQueue();
 			guiConfigure.imageCount = 3;
 		}
 

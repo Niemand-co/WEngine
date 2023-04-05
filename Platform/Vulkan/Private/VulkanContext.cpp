@@ -9,22 +9,22 @@
 namespace Vulkan
 {
 
-	VulkanContext::VulkanContext()
+	VulkanDynamicContext::VulkanDynamicContext()
 	{
 		pCommandBufferManager = new VulkanCommandBufferManager(static_cast<VulkanDevice*>(pDevice), static_cast<VulkanQueue*>(pQueue));
 	}
 
-	VulkanContext::~VulkanContext()
+	VulkanDynamicContext::~VulkanDynamicContext()
 	{
 	}
 
-	void VulkanContext::RHIBeginDrawingViewport(RHIViewport* Viewport)
+	void VulkanDynamicContext::RHIBeginDrawingViewport(RHIViewport* Viewport)
 	{
 		VulkanViewport *TrueViewport = dynamic_cast<VulkanViewport*>(Viewport);
 		RE_ASSERT(TrueViewport != nullptr, "Error RHI.");
 	}
 
-	void VulkanContext::RHIEndDrawingViewport(RHIViewport* Viewport, bool bPresent)
+	void VulkanDynamicContext::RHIEndDrawingViewport(RHIViewport* Viewport, bool bPresent)
 	{
 		if (bPresent)
 		{
@@ -33,7 +33,7 @@ namespace Vulkan
 		}
 	}
 
-	WRenderPassRHIRef VulkanContext::RHIBeginRenderPass(RHIRenderPassDescriptor* RenderPasDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor)
+	WRenderPassRHIRef VulkanDynamicContext::RHIBeginRenderPass(RHIRenderPassDescriptor* RenderPasDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor)
 	{
 		VulkanRenderPass *Pass = static_cast<VulkanRenderPass*>(pDevice->GetOrCreateRenderPass(RenderPasDescriptor));
 		VulkanFramebuffer *Framebuffer = static_cast<VulkanFramebuffer*>(pDevice->GetOrCreateFramebuffer(FramebufferDescriptor, Pass));
@@ -57,31 +57,31 @@ namespace Vulkan
 		return Pass;
 	}
 
-	void VulkanContext::RHIEndRenderPass()
+	void VulkanDynamicContext::RHIEndRenderPass()
 	{
 		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
 		vkCmdEndRenderPass(CmdBuffer->GetHandle());
 		CmdBuffer->State = VulkanCommandBuffer::ECmdState::IsInsideBegin;
 	}
 
-	void VulkanContext::RHISetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth)
+	void VulkanDynamicContext::RHISetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth)
 	{
 		VulkanCommandBuffer* CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
 		VkViewport Viewport = { X, Y, Width, Height, MinDepth, MaxDepth };
 		vkCmdSetViewport(CmdBuffer->GetHandle(), 0, 1, &Viewport);
 	}
 
-	void VulkanContext::RHISetScissor()
+	void VulkanDynamicContext::RHISetScissor()
 	{
 	}
 
-	void VulkanContext::RHIDrawIndexedPrimitive(uint32 indexCount, uint32 firstIndex, uint32 instanceCount)
+	void VulkanDynamicContext::RHIDrawIndexedPrimitive(uint32 indexCount, uint32 firstIndex, uint32 instanceCount)
 	{
 		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
 		vkCmdDrawIndexed(CmdBuffer->GetHandle(), indexCount, instanceCount, firstIndex, 0, 0);
 	}
 
-	void VulkanContext::RHIBeginTransition(WEngine::WArray<RHIBarrierDescriptor>& Transitions)
+	void VulkanDynamicContext::RHIBeginTransition(WEngine::WArray<RHIBarrierDescriptor>& Transitions)
 	{
 		VulkanPipelineBarrier PipelineBarrier;
 		for (RHIBarrierDescriptor& Transition : Transitions)
@@ -116,10 +116,10 @@ namespace Vulkan
 				PipelineBarrier.AddTransition(BufferBase->GetHandle(), Transition.Range, Transition.Offset, SrcAccess, DstAccess);
 			}
 		}
-		PipelineBarrier.Execute(static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager()->GetImmediateCommandBuffer());
+		PipelineBarrier.Execute(static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager()->GetImmediateCommandBuffer());
 	}
 
-	void VulkanContext::CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY)
+	void VulkanDynamicContext::CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY)
 	{
 		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetImmediateCommandBuffer();
 
@@ -188,33 +188,33 @@ namespace Vulkan
 		}
 	}
 
-	void VulkanContext::RHISetGraphicsPipelineState(RHIGraphicsPipelineStateDescriptor* descriptor)
+	void VulkanDynamicContext::RHISetGraphicsPipelineState(RHIGraphicsPipelineStateDescriptor* descriptor)
 	{
 		WPsoRHIRef Pipeline = pDevice->GetOrCreateGraphicsPipelineState(descriptor);
 		Pipeline->Bind(pCommandBufferManager->GetActiveCommandBuffer());
 	}
 
-	WBlendStateRHIRef VulkanContext::CreateBlendState(const RHIBlendStateInitializer& Initializer)
+	WBlendStateRHIRef VulkanStaticContext::CreateBlendState(const RHIBlendStateInitializer& Initializer)
 	{
 		return new VulkanBlendState(Initializer);
 	}
 
-	WDepthStencilStateRHIRef VulkanContext::CreateDepthStencilState(const RHIDepthStencilStateInitializer& Initializer)
+	WDepthStencilStateRHIRef VulkanStaticContext::CreateDepthStencilState(const RHIDepthStencilStateInitializer& Initializer)
 	{
 		return new VulkanDepthStencilState(Initializer);
 	}
 
-	WRasterizationStateRHIRef VulkanContext::CreateRasterizationState(const RHIRasterizationStateInitializer& Initializer)
+	WRasterizationStateRHIRef VulkanStaticContext::CreateRasterizationState(const RHIRasterizationStateInitializer& Initializer)
 	{
 		return new VulkanRasterizationState(Initializer);
 	}
 
-	WMultiSampleStateRHIRef VulkanContext::CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer)
+	WMultiSampleStateRHIRef VulkanStaticContext::CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer)
 	{
 		return new VulkanMultiSampleState(Initializer);
 	}
 
-	WVertexInputStateRHIRef VulkanContext::CreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements)
+	WVertexInputStateRHIRef VulkanStaticContext::CreateVertexInputState(const WEngine::WArray<VertexInputElement>& InElements)
 	{
 		uint32 VertexInputID = WEngine::MemCrc32(InElements.GetData(), sizeof(VertexInputElement) * InElements.Size());
 		VulkanVertexInputState* VertexInput = VulkanVertexInputStateManager::GetVertexInput(VertexInputID);

@@ -1,6 +1,6 @@
 #pragma once
 
-#define ENCODER_EXECUTE(command) RHIContext::GetContext()->command
+#define ENCODER_EXECUTE(command) GetDynamicRHI()->command
 
 struct RHICommandListBase;
 

@@ -125,7 +125,7 @@ namespace Vulkan
 		{
 			Barrier.AddTransition(OutImages[ImageIndex], Range, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 		}
-		Barrier.Execute(static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager()->GetImmediateCommandBuffer());
+		Barrier.Execute(static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager()->GetImmediateCommandBuffer());
 
 		RecreateInfo = *pInfo;
 

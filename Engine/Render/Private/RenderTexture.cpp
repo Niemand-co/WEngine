@@ -101,7 +101,7 @@
 //				barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
 //				barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
 //			}
-//			RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
+//			GetDynamicRHI()->ResourceBarrier(&barrierDescriptor);
 //
 //			m_textureView = m_texture->CreateTextureView(&m_textureViewDescriptor);
 //	}
@@ -137,7 +137,7 @@
 //			barrierDescriptor.srcStage = PIPELINE_STAGE_TOP_OF_PIPE;
 //			barrierDescriptor.dstStage = PIPELINE_STAGE_EARLY_FRAGMENT_TESTS;
 //		}
-//		RHIContext::GetContext()->ResourceBarrier(&barrierDescriptor);
+//		GetDynamicRHI()->ResourceBarrier(&barrierDescriptor);
 //
 //		m_textureView = m_texture->CreateTextureView(&m_textureViewDescriptor);
 //	}

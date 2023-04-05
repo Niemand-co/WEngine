@@ -48,14 +48,6 @@ public:
 
 	virtual WDynamicUniformBufferRHIRef CreateDynamicUniformBuffer(class RHIBufferDescriptor* descriptor) = 0;
 
-	virtual class RHIGroup* CreateResourceGroup(class RHIGroupDescriptor *descriptor) = 0;
-
-	virtual class RHIGroupLayout* CreateGroupLayout(class RHIGroupLayoutDescriptor *descriptor) = 0;
-
-	virtual class RHIPipelineResourceLayout* CreatePipelineResourceLayout(class RHIPipelineResourceLayoutDescriptor *descriptor) = 0;
-
-	virtual class RHIGroupPool* CreateGroupPool(class RHIGroupPoolDescriptor *descriptor) = 0;
-
 	virtual class RHIScissor* CreateScissor(class RHIScissorDescriptor *descriptor) = 0;
 
 	virtual WViewportRHIRef CreateViewport(class RHIViewportDescriptor* descriptor) = 0;

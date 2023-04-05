@@ -107,7 +107,7 @@ namespace Vulkan
 		friend class VulkanCommandBufferManager;
 		friend class VulkanCommandPool;
 		friend class VulkanQueue;
-		friend class VulkanContext;
+		friend class VulkanDynamicContext;
 
 	};
 

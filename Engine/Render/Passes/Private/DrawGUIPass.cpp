@@ -166,7 +166,7 @@
 //{
 //	for (int i = 0; i < 3; ++i)
 //	{
-//		WEngine::WArray<RHITextureView*> textureViews = { RHIContext::GetContext()->GetTextureView(i) };
+//		WEngine::WArray<RHITextureView*> textureViews = { GetDynamicRHI()->GetTextureView(i) };
 //		RHIRenderTargetDescriptor renderTargetDescriptor = {};
 //		{
 //			renderTargetDescriptor.bufferCount = 1;

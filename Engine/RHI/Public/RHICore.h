@@ -471,7 +471,7 @@ namespace WEngine
 		return VK_FORMAT_MAX_ENUM;
 	}
 
-	VkShaderStageFlags ToVulkan(EShaderStage Stage)
+	static VkShaderStageFlags ToVulkan(EShaderStage Stage)
 	{
 		switch (Stage)
 		{

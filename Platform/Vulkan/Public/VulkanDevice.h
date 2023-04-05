@@ -63,14 +63,6 @@ namespace Vulkan
 
 		virtual WDynamicUniformBufferRHIRef CreateDynamicUniformBuffer(RHIBufferDescriptor *descriptor) override;
 
-		virtual RHIGroup* CreateResourceGroup(RHIGroupDescriptor *descriptor) override;
-
-		virtual RHIGroupLayout* CreateGroupLayout(RHIGroupLayoutDescriptor *descriptor) override;
-
-		virtual RHIPipelineResourceLayout* CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor *descriptor) override;
-
-		virtual RHIGroupPool* CreateGroupPool(RHIGroupPoolDescriptor *descriptor) override;
-
 		virtual RHIScissor* CreateScissor(RHIScissorDescriptor *descriptor) override;
 
 		virtual WViewportRHIRef CreateViewport(RHIViewportDescriptor *descriptor) override;

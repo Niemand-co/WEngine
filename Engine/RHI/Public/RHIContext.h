@@ -1,46 +1,45 @@
 #pragma once
-#include "Render/Descriptor/Public/RHIDescriptorHeads.h"
-#include "RHI/Public/RHIInstance.h"
-#include "RHI/Public/RHIDevice.h"
+#include "RHI/Public/RHICore.h"
 
-class RHIDevice;
-class RHIGPU;
-class RHIQueue;
-class RHISwapchain;
-class RHISurface;
-class RHITexture;
-class RHITextureView;
-class RHICommandPool;
-class RHICommandBuffer;
-class RHIBuffer;
-class RHIGroup;
-class RHIGroupLayout;
-class RHIPipelineResourceLayout;
-class RHIPipelineStateObject;
-class RHISemaphore;
-class RHIFence;
-class RHIScissor;
-class RHIViewport;
-
-class RHIBufferDescriptor;
-class RHIScissorDescriptor;
-class RHIViewportDescriptor;
-class RHIGroupLayoutDescriptor;
-class RHIGroupDescriptor;
-class RHIUpdateResourceDescriptor;
-class RHIPipelineResourceLayoutDescriptor;
-class RHISubmitDescriptor;
-class RHIBarrierDescriptor;
+enum class EAccess : uint16;
 
 class RHIContext
 {
 public:
 
-	RHIContext();
+	RHIContext() = default;
 
 	virtual ~RHIContext() = default;
 
-	static void Init(RHIBackend backend);
+};
+
+class StaticRHIContext : public RHIContext
+{
+public:
+
+	StaticRHIContext() = default;
+
+	~StaticRHIContext() = default;
+
+	virtual WBlendStateRHIRef CreateBlendState(const RHIBlendStateInitializer& Initializer) = 0;
+
+	virtual WDepthStencilStateRHIRef CreateDepthStencilState(const RHIDepthStencilStateInitializer& Initializer) = 0;
+
+	virtual WRasterizationStateRHIRef CreateRasterizationState(const RHIRasterizationStateInitializer& Initializer) = 0;
+
+	virtual WMultiSampleStateRHIRef CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer) = 0;
+
+	virtual WVertexInputStateRHIRef CreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements) = 0;
+
+};
+
+class DynamicRHIContext : public RHIContext
+{
+public:
+
+	DynamicRHIContext();
+
+	virtual ~DynamicRHIContext();
 
 	WVertexBufferRHIRef CreateVertexBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage);
 
@@ -48,17 +47,13 @@ public:
 
 	WUniformBufferRHIRef CreateUniformBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage);
 
-	WDynamicUniformBufferRHIRef* CreateDynamicUniformBuffer(size_t stride, size_t count);
+	WVertexShaderRHIRef CreateVertexShader(class ShaderCodeBlob& blob);
 
-	RHIBuffer* CreateTextureBuffer(RHIBufferDescriptor *descriptor);
+	WPixelShaderRHIRef CreatePixelShader(class ShaderCodeBlob& blob);
 
-	WVertexShaderRHIRef CreateVertexShader(ShaderCodeBlob& blob);
+	WGeometryShaderRHIRef CreateGeometryShader(class ShaderCodeBlob& blob);
 
-	WPixelShaderRHIRef CreatePixelShader(ShaderCodeBlob& blob);
-
-	WGeometryShaderRHIRef CreateGeometryShader(ShaderCodeBlob& blob);
-
-	WComputeShaderRHIRef CreateComputeShader(ShaderCodeBlob& blob);
+	WComputeShaderRHIRef CreateComputeShader(class ShaderCodeBlob& blob);
 
 	WTexture2DRHIRef CreateTexture2D(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, ClearValue InClearValue, ETextureCreateFlags InFlag, EAccess InitState);
 
@@ -66,21 +61,13 @@ public:
 
 	WTexture3DRHIRef CreateTexture3D(uint32 InWidth, uint32 InHeight, uint32 InDepth, Format InFormat, uint32 InMipCount, ClearValue InClearValue, ETextureCreateFlags InFlag, EAccess InitState);
 
-	WTextureViewRHIRef CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture);
+	WTextureViewRHIRef CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, class RHITexture* InTexture);
 
-	virtual RHIScissor* CreateScissor(RHIScissorDescriptor *descriptor);
+	virtual void CopyBufferToImage(class RHITexture* pTexture, class RHIBuffer* pBuffer, unsigned int width, unsigned int height);
 
-	virtual void CopyBufferToImage(RHITexture *pTexture, RHIBuffer *pBuffer, unsigned int width, unsigned int height);
+	virtual void UpdateUniformResourceToGroup(class RHIUpdateResourceDescriptor* descriptor);
 
-	virtual RHIGroupLayout* CreateGroupLayout(RHIGroupLayoutDescriptor *descriptor);
-
-	virtual WEngine::WArray<RHIGroup*> CreateResourceGroup(RHIGroupDescriptor *descriptor);
-
-	virtual void UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor *descriptor);
-
-	virtual void UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor *descriptor);
-
-	virtual RHIPipelineResourceLayout* CreatePipelineResourceLayout(RHIPipelineResourceLayoutDescriptor *descriptor);
+	virtual void UpdateTextureResourceToGroup(class RHIUpdateResourceDescriptor* descriptor);
 
 	virtual WViewportRHIRef CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, Format InFormat);
 
@@ -100,55 +87,28 @@ public:
 
 	virtual void RHIBeginTransition(WEngine::WArray<class RHIBarrierDescriptor>& Transitions) = 0;
 
-	virtual void CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY) = 0;
+	virtual void CopyImageToBackBuffer(class RHITexture* SrcTexture, class RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY) = 0;
 
-	virtual void RHISetGraphicsPipelineState(class RHIGraphicsPipelineStateDescriptor *descriptor) = 0;
+	virtual void RHISetGraphicsPipelineState(class RHIGraphicsPipelineStateDescriptor* descriptor) = 0;
 
-	virtual WBlendStateRHIRef CreateBlendState(const RHIBlendStateInitializer& Initializer) = 0;
+	inline class RHIInstance* GetInstance() const { return pInstance; }
 
-	virtual WDepthStencilStateRHIRef CreateDepthStencilState(const RHIDepthStencilStateInitializer& Initializer) = 0;
+	class RHIGPU* GetGPU() const;
 
-	virtual WRasterizationStateRHIRef CreateRasterizationState(const RHIRasterizationStateInitializer& Initializer) = 0;
+	inline class RHIDevice* GetDevice() { return pDevice; }
 
-	virtual WMultiSampleStateRHIRef CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer) = 0;
-
-	virtual WVertexInputStateRHIRef CreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements) = 0;
-
-public:
-
-	static inline RHIContext* GetContext() { return g_pContext; }
-
-public:
-
-	inline RHIInstance* GetInstance() { return pInstance; }
-
-	inline RHIGPU* GetGPU() { return pInstance->GetGPU(0); }
-
-	inline RHIDevice* GetDevice() { return pDevice; }
-
-	inline RHIQueue* GetQueue() { return pQueue; }
-
-	template<typename T>
-	static T* CreateRenderPipeline();
+	inline class RHIQueue* GetQueue() { return pQueue; }
 
 protected:
 
-	RHIInstance* pInstance;
+	class RHIInstance* pInstance;
 
-	RHIDevice* pDevice;
+	class RHIDevice* pDevice;
 
-	RHIQueue *pQueue;
-
-private:
-
-	static RHIContext* g_pContext;
-
-	
+	class RHIQueue* pQueue;
 
 };
 
-template<typename T>
-inline T* RHIContext::CreateRenderPipeline()
-{
-	return new T(g_pContext);
-}
+StaticRHIContext* GetStaticRHI();
+
+DynamicRHIContext* GetDynamicRHI();

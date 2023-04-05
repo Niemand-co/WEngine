@@ -9,8 +9,7 @@
 #include "Platform/Vulkan/Public/VulkanView.h"
 #include "Platform/Vulkan/Public/VulkanContext.h"
 #include "Platform/Vulkan/Public/VulkanPipelineBarrier.h"
-#include "Render/Descriptor/Public/RHISwapchainDescriptor.h"
-#include "Render/Descriptor/Public/RHITextureViewDescriptor.h"
+#include "Render/Descriptor/Public/RHIDescriptorHeads.H"
 
 namespace Vulkan
 {
@@ -134,7 +133,7 @@ namespace Vulkan
 		}
 
 		CmdBuffer->EndScopePass();
-		VulkanCommandBufferManager *ImmediateCmdBufferMgr = static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager();
+		VulkanCommandBufferManager *ImmediateCmdBufferMgr = static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager();
 		if (!bFailedToAcquireImage)
 		{
 			TrueCmdBuffer->AddWaitingSemaphore(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, pAcquireImageSemaphore);
@@ -206,7 +205,7 @@ namespace Vulkan
 			}
 		}
 
-		LastFrameCmdBuffer = static_cast<VulkanQueue*>(RHIContext::GetContext()->GetQueue())->GetLastSubmittedCmdBuffer();
+		LastFrameCmdBuffer = static_cast<VulkanQueue*>(GetDynamicRHI()->GetQueue())->GetLastSubmittedCmdBuffer();
 	}
 
 	WTexture2DRHIRef VulkanViewport::GetRenderTarget() const
@@ -218,7 +217,7 @@ namespace Vulkan
 	{
 		RHISwapchainDescriptor SwapchainDescriptor = {};
 		{
-			SwapchainDescriptor.instance = RHIContext::GetContext()->GetInstance();
+			SwapchainDescriptor.instance = GetDynamicRHI()->GetInstance();
 			SwapchainDescriptor.count = 3;
 			SwapchainDescriptor.extent = Extent(Width, Height);
 			SwapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;

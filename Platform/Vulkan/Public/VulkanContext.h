@@ -4,19 +4,39 @@
 namespace Vulkan
 {
 
-	class VulkanContext : public RHIContext
+	class VulkanStaticContext : public StaticRHIContext
 	{
 	public:
 
-		VulkanContext();
+		VulkanStaticContext() = default;
 
-		virtual ~VulkanContext();
+		virtual ~VulkanStaticContext() = default;
+
+		virtual WBlendStateRHIRef CreateBlendState(const RHIBlendStateInitializer& Initializer) override;
+
+		virtual WDepthStencilStateRHIRef CreateDepthStencilState(const RHIDepthStencilStateInitializer& Initializer) override;
+
+		virtual WRasterizationStateRHIRef CreateRasterizationState(const RHIRasterizationStateInitializer& Initializer) override;
+
+		virtual WMultiSampleStateRHIRef CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer) override;
+
+		virtual WVertexInputStateRHIRef CreateVertexInputState(const WEngine::WArray<VertexInputElement>& InElements) override;
+
+	};
+
+	class VulkanDynamicContext : public DynamicRHIContext
+	{
+	public:
+
+		VulkanDynamicContext();
+
+		virtual ~VulkanDynamicContext();
 
 		class VulkanCommandBufferManager* GetCmdBufferManager() { return pCommandBufferManager; }
 
-		virtual void RHIBeginDrawingViewport(class RHIViewport* Viewport) override;
+		virtual void RHIBeginDrawingViewport(RHIViewport* Viewport) override;
 
-		virtual void RHIEndDrawingViewport(class RHIViewport* Viewport, bool bPresent) override;
+		virtual void RHIEndDrawingViewport(RHIViewport* Viewport, bool bPresent) override;
 
 		virtual WRenderPassRHIRef RHIBeginRenderPass(RHIRenderPassDescriptor* RenderPasDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor) override;
 
@@ -32,17 +52,7 @@ namespace Vulkan
 
 		virtual void CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY) override;
 
-		virtual void RHISetGraphicsPipelineState(class RHIGraphicsPipelineStateDescriptor* descriptor) override;
-
-		virtual WBlendStateRHIRef CreateBlendState(const RHIBlendStateInitializer& Initializer) override;
-
-		virtual WDepthStencilStateRHIRef CreateDepthStencilState(const RHIDepthStencilStateInitializer& Initializer) override;
-
-		virtual WRasterizationStateRHIRef CreateRasterizationState(const RHIRasterizationStateInitializer& Initializer) override;
-
-		virtual WMultiSampleStateRHIRef CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer) override;
-
-		virtual WVertexInputStateRHIRef CreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements) override;
+		virtual void RHISetGraphicsPipelineState(RHIGraphicsPipelineStateDescriptor* descriptor) override;
 
 	private:
 

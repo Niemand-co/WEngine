@@ -55,4 +55,6 @@ namespace Vulkan
 		VertexInputStateCreateInfo.pVertexAttributeDescriptions = VertexInputAttributes;
 	}
 
+	WEngine::WHashMap<uint32, VulkanVertexInputState*> VulkanVertexInputStateManager::VertexInputs = WEngine::WHashMap<uint32, VulkanVertexInputState*>();
+
 }

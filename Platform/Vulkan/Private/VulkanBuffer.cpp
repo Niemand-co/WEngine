@@ -55,7 +55,7 @@ namespace Vulkan
 		if (bRead)
 		{
 			pDevice->PrepareForCPURead();
-			VulkanCommandBuffer *CmdBuffer = static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager()->GetImmediateCommandBuffer();
+			VulkanCommandBuffer *CmdBuffer = static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager()->GetImmediateCommandBuffer();
 			
 			PendingLock.PendingBuffer = pDevice->GetStagingBufferManager()->AcquireBuffer(Size, VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_HOST_CACHED_BIT);
 
@@ -83,13 +83,13 @@ namespace Vulkan
 			}
 			vkCmdPipelineBarrier(CmdBuffer->GetHandle(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 1, &BarrierAfter, 0, nullptr, 0, nullptr);
 
-			static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager()->SubmitImmediateCommandBuffer();
+			static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager()->SubmitImmediateCommandBuffer();
 			pDevice->Wait();
 
 			PendingLock.PendingBuffer->Map(Size, Offset);
 			void *Data = PendingLock.PendingBuffer->GetMappedPointer();
 
-			static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager()->PrepareForNewActiveCmdBuffer();
+			static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager()->PrepareForNewActiveCmdBuffer();
 
 			return Data;
 		}
@@ -123,7 +123,7 @@ namespace Vulkan
 			StagingBuffer->UnMap();
 			pDevice->PrepareForCPURead();
 
-			VulkanCommandBufferManager *CmdBufferMgr = static_cast<VulkanContext*>(RHIContext::GetContext())->GetCmdBufferManager();
+			VulkanCommandBufferManager *CmdBufferMgr = static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager();
 			VulkanCommandBuffer *CmdBuffer = CmdBufferMgr->GetImmediateCommandBuffer();
 			RE_ASSERT(CmdBuffer->IsOutsideRenderPass(), "Cannot copy buffer inside render pass.");
 
