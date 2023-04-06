@@ -4,8 +4,6 @@
 #include "Render/Public/RenderDependencyGraphParameter.h"
 #include "RHI/Public/RHITexture.h"
 
-WEngine::Allocator<6>* WEngine::Allocator<6>::g_pInstance = new WRDGAllocator();
-
 inline EAccess GetValidWriteAccess(const EAccess& Access)
 {
 	return ((uint16)(Access & EAccess::Writable) != 0) ? (Access & ~EAccess::ReadOnly) : Access;
@@ -70,7 +68,7 @@ void WRDGBuilder::Compile()
 							}
 						}
 
-						TextureState[Index] = WRDGAllocator::GetAllocator()->AllocateObject<WRDGResourceState>();
+						TextureState[Index] = WRDGAllocator::Get()->AllocateObject<WRDGResourceState>();
 						memcpy(TextureState[Index], &PassNeedState.States[Index], sizeof(WRDGResourceState));
 						TextureState[Index]->FirstPass = TextureState[Index]->LastPass = Handle;
 					}
@@ -103,7 +101,7 @@ void WRDGBuilder::Compile()
 							Passes[Handle]->Producers.Push(Buffer->MergeState->LastPass);
 						}
 
-						Buffer->MergeState = WRDGAllocator::GetAllocator()->AllocateObject<WRDGResourceState>();
+						Buffer->MergeState = WRDGAllocator::Get()->AllocateObject<WRDGResourceState>();
 						memcpy(Buffer->MergeState, &PassNeedState.State, sizeof(WRDGResourceState));
 						Buffer->MergeState->FirstPass = Buffer->MergeState->LastPass = Handle;
 					}
@@ -137,7 +135,7 @@ void WRDGBuilder::Clear()
 	Passes.Clear();
 	Textures.Clear();
 	Buffers.Clear();
-	WRDGAllocator::GetAllocator()->Clear();
+	WRDGAllocator::Get()->Clear();
 }
 
 WRDGTexture* WRDGBuilder::CreateTexture(const WRDGTextureDesc& inDesc, const char* inName)
@@ -303,7 +301,7 @@ void WRDGBuilder::SetupPass(WRDGPass* Pass)
 	const WRDGPassHandle Handle = Pass->Handle;
 	EPipeline Pipeline = Pass->GetPipeline();
 
-	Parameters.EnumerateTextures(Pass->Flag, [&Pass, &Pipeline, &Handle](EUniformBaseType Type, WRDGTexture* Texture, EAccess Access)
+	Parameters.EnumerateTextures(Pass->Flag, [Pass, &Pipeline, &Handle](EUniformBaseType Type, WRDGTexture* Texture, EAccess Access)
 		{
 			auto& PassState = Pass->TextureStates[Texture];
 			PassState.ReferenceCount++;
@@ -322,7 +320,7 @@ void WRDGBuilder::SetupPass(WRDGPass* Pass)
 			Pass->bHasUAVResource |= WEngine::EnumHasFlags(Access, EAccess::UAV);
 		});
 
-	Parameters.EnumerateBuffers(Pass->Flag, [&Pass, &Pipeline, &Handle](EUniformBaseType Type, WRDGBuffer* Buffer, EAccess Access)
+	Parameters.EnumerateBuffers(Pass->Flag, [Pass, &Pipeline, &Handle](EUniformBaseType Type, WRDGBuffer* Buffer, EAccess Access)
 		{
 			auto& BufferState = Pass->BufferStates[Buffer];
 			BufferState.ReferenceCount++;

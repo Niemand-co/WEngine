@@ -2,7 +2,7 @@
 #include "Utils/Container/Public/WBitArray.h"
 #include "Utils/Allocator/Public/Allocator.h"
 
-class WRDGAllocator : public WEngine::Allocator<6>
+class WRDGAllocator
 {
 public:
 
@@ -19,14 +19,25 @@ public:
 	{
 		for (TrackedBase* Alloc : TrackedObjects)
 		{
-			Alloc->~TrackedBase();
+			delete Alloc;
 		}
 		TrackedObjects.Clear();
 	}
 
-	static WRDGAllocator* GetAllocator()
+	void* Allocate(size_t size)
 	{
-		return (WRDGAllocator*)Get();
+		return malloc(size);
+	}
+
+	void Deallocate(void* pData)
+	{
+		free(pData);
+	}
+
+	static WRDGAllocator* Get()
+	{
+		static WRDGAllocator* Allocator = new WRDGAllocator;
+		return Allocator;
 	}
 
 private:
@@ -144,7 +155,7 @@ public:
 	template<typename AllocObjectType, typename... Args>
 	AllocObjectType* Allocate(Args... args)
 	{
-		AllocObjectType* object = WRDGAllocator::GetAllocator()->AllocateObject<AllocObjectType>(args...);
+		AllocObjectType* object = WRDGAllocator::Get()->AllocateObject<AllocObjectType>(args...);
 		::new (object) AllocObjectType(args...);
 		Insert(static_cast<ObjectType*>(object));
 		return object;

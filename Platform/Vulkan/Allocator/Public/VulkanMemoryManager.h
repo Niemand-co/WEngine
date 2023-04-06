@@ -43,7 +43,7 @@ namespace Vulkan
 
 		void Tick();
 
-		void AllocateBuffer(VkBuffer& InOutBuffer, VulkanAllocation*& InOutAllocation, VkBufferUsageFlags& InUsageFlags, VkMemoryPropertyFlags& MemoryPropertyFlags);
+		void AllocateBuffer(VkBuffer& InOutBuffer, VulkanAllocation*& InOutAllocation, uint32 InSize, VkBufferUsageFlags& InUsageFlags, VkMemoryPropertyFlags& MemoryPropertyFlags);
 
 		void AllocateImage(VkImage& InOutImage, VkImageUsageFlags& InUsageFlags);
 

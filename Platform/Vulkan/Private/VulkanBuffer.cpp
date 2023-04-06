@@ -32,7 +32,7 @@ namespace Vulkan
 		VkMemoryPropertyFlags MemoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 		MemoryPropertyFlags |= bCPUAccess ? VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT : 0;
 
-		pDevice->GetMemoryManager()->AllocateBuffer(Buffer, Allocation, BufferUsageFlags, MemoryPropertyFlags);
+		pDevice->GetMemoryManager()->AllocateBuffer(Buffer, Allocation, pDescriptor->Stride * pDescriptor->Count, BufferUsageFlags, MemoryPropertyFlags);
 
 		void *Data = Lock(pDescriptor->Count * pDescriptor->Stride, 0);
 		memcpy(Data, pDescriptor->Data, pDescriptor->Count * pDescriptor->Stride);

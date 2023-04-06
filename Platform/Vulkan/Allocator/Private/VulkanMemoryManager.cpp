@@ -39,7 +39,7 @@ namespace Vulkan
 	void VulkanMemoryManager::Tick()
 	{
 		uint32 NumAllocationToFree = 0;
-		for (uint32 AllocationIndex = FreeAllocations.Size(); AllocationIndex >= 0; --AllocationIndex)
+		for (int32 AllocationIndex = FreeAllocations.Size(); AllocationIndex >= 0; --AllocationIndex)
 		{
 			FreeAllocations[AllocationIndex]->FramesAfterLastUsed++;
 			if (FreeAllocations[AllocationIndex]->FramesAfterLastUsed >= 30)
@@ -52,13 +52,14 @@ namespace Vulkan
 		}
 	}
 
-	void VulkanMemoryManager::AllocateBuffer(VkBuffer& InOutBuffer, VulkanAllocation*& InOutAllocation, VkBufferUsageFlags& InUsageFlags, VkMemoryPropertyFlags& MemoryPropertyFlags)
+	void VulkanMemoryManager::AllocateBuffer(VkBuffer& InOutBuffer, VulkanAllocation*& InOutAllocation, uint32 InSize, VkBufferUsageFlags& InUsageFlags, VkMemoryPropertyFlags& MemoryPropertyFlags)
 	{
 		VkBufferCreateInfo BufferCreateInfo = {};
 		{
 			BufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 			BufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 			BufferCreateInfo.usage = InUsageFlags;
+			BufferCreateInfo.size = InSize;
 		}
 
 		RE_ASSERT(vkCreateBuffer(pDevice->GetHandle(), &BufferCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &InOutBuffer) == VK_SUCCESS, "Failed to create buffer.");
@@ -84,7 +85,7 @@ namespace Vulkan
 			MemoryAllocateInfo.memoryTypeIndex = MemoryIndex;
 		}
 		VkDeviceMemory DeviceMemory;
-		vkAllocateMemory(pDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DeviceMemory);
+		RE_ASSERT(vkAllocateMemory(pDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DeviceMemory) == VK_SUCCESS, "Failed to allocate memory.");
 		
 		InOutAllocation = Alloc(DeviceMemory, Requirements.size);
 		InOutAllocation->BindBuffer(InOutBuffer);
@@ -160,7 +161,7 @@ namespace Vulkan
 		vkGetBufferMemoryRequirements(pDevice->GetHandle(), Buffer, &Requirements);
 
 		int32 MemoryIndex = -1;
-		for (uint32 MemoryTypeIndex = 0; MemoryTypeIndex < MemoryProperties.memoryHeapCount; ++MemoryTypeIndex)
+		for (uint32 MemoryTypeIndex = 0; MemoryTypeIndex < MemoryProperties.memoryTypeCount; ++MemoryTypeIndex)
 		{
 			if ((Requirements.memoryTypeBits & (0x01 << MemoryTypeIndex) != 0) && ((MemoryProperties.memoryTypes[MemoryTypeIndex].propertyFlags & MemoryPropertyFlags) == MemoryPropertyFlags))
 			{

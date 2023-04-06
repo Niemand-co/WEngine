@@ -1,10 +1,11 @@
 #pragma once
+#include "Render/Mesh/Public/Vertex.h"
 
 class RHIVertexInputState : public RHIResource
 {
 public:
 
-	RHIVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements)
+	RHIVertexInputState(const WEngine::WArray<VertexInputElement>& InElements)
 		: Elements(InElements)
 	{
 	}
@@ -13,6 +14,6 @@ public:
 
 protected:
 
-	WEngine::WArray<struct VertexInputElement> Elements;
+	WEngine::WArray<VertexInputElement> Elements;
 
 };

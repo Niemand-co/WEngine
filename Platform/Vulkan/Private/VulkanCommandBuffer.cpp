@@ -215,6 +215,7 @@ namespace Vulkan
 		if (ImmediateCmdBuffer)
 		{
 			SubmitImmediateCommandBuffer();
+			PrepareForNewActiveCmdBuffer();
 		}
 		return ActiveCmdBuffer;
 	}
@@ -286,10 +287,11 @@ namespace Vulkan
 			}
 			ImmediateDoneSemaphores.Clear();
 
-			WEngine::WArray<VkSemaphore> Semaphores(NumSignalSemaphore + 1);
+			WEngine::WArray<VkSemaphore> Semaphores;
+			Semaphores.Reserve(NumSignalSemaphore + 1);
 			for (uint32 SemaphoreIndex = 0; SemaphoreIndex < NumSignalSemaphore; ++SemaphoreIndex)
 			{
-				Semaphores[SemaphoreIndex] = pSemaphores[SemaphoreIndex].GetHandle();
+				Semaphores.Push(pSemaphores[SemaphoreIndex].GetHandle());
 			}
 			Semaphores.Push(pActiveSemaphore->GetHandle());
 			pActiveSemaphore = nullptr;

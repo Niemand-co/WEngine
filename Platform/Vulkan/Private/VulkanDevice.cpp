@@ -161,7 +161,7 @@ namespace Vulkan
 			ColorReferences[ColorIndex].layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		}
 		
-		VkAttachmentReference DepthStencilReference;
+		VkAttachmentReference DepthStencilReference = {};
 		if (descriptor->bHasDepthStencilAttachment)
 		{
 			Attachments[descriptor->ColorAttachmentCount].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
@@ -195,7 +195,7 @@ namespace Vulkan
 			subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 			subpass.colorAttachmentCount = ColorReferences.Size();
 			subpass.pColorAttachments = ColorReferences.GetData();
-			subpass.pDepthStencilAttachment = &DepthStencilReference;
+			subpass.pDepthStencilAttachment = descriptor->bHasDepthStencilAttachment ? &DepthStencilReference : nullptr;
 		}
 
 		VkRenderPassCreateInfo RenderPassCreateInfo = {};

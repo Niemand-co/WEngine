@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Scene/Components/Public/CameraComponent.h"
 #include "Scene/Components/Public/TransformComponent.h"
-#include "Render/Public/Scene.h"
 
 CameraComponent::CameraComponent(GameObject* pGameObject, const float& fov, const float& aspect, const float& nearPlane, const float& farPlane)
 	: m_fov(fov), m_aspect(aspect), m_nearPlane(nearPlane), m_farPlane(farPlane), m_pInfo(nullptr), Component(pGameObject)

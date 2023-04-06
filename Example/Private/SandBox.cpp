@@ -50,9 +50,12 @@ void GameScene::Tick(WEngine::TimeStep timeStep)
 	
 	WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, [this]()
 	{
+
 		Scene->UpdateLightInfosForScene();
 
 		Scene->UpdatePrimitiveInfosForScene();
+
+		Scene->UpdateCameraInfoForScene();
 
 		StartFrame();
 
@@ -72,12 +75,6 @@ SandBox::SandBox()
 	//GameObject *plane = m_scene->CreateGameObject("Plane");
 	//plane->AddComponent<MeshFilter>()->SetStaticMesh(StaticMesh::GetPlane());
 	//plane->AddComponent<MaterialComponent>();
-
-	//GameObject* go = m_scene->CreateGameObject("Cube");
-	//MeshFilter* filter = go->AddComponent<MeshFilter>();
-	//filter->SetStaticMesh(StaticMesh::GetCube());
-	//go->AddComponent<MaterialComponent>();
-	//plane->GetComponent<TransformComponent>()->SetScale(glm::vec3(50.0f, 50.0f, 50.0f));
 
 	WEngine::LayerStack::Get()->PushLayer(new GameScene("Game Scene"));
 }

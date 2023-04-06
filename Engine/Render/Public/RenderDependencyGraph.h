@@ -193,7 +193,7 @@ private:
 template<typename ParameterStructType>
 inline ParameterStructType* WRDGBuilder::AllocateParameterStruct()
 {
-	ParameterStructType* Parameter = WRDGAllocator::GetAllocator()->AllocateObject<ParameterStructType>();
+	ParameterStructType* Parameter = WRDGAllocator::Get()->AllocateObject<ParameterStructType>();
 	return Parameter;
 }
 
