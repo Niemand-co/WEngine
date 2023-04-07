@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Scene/Components/Public/CameraComponent.h"
 #include "Scene/Components/Public/TransformComponent.h"
+#include "Scene/Public/World.h"
+#include "Render/Public/Scene.h"
 
 CameraComponent::CameraComponent(GameObject* pGameObject, const float& fov, const float& aspect, const float& nearPlane, const float& farPlane)
 	: m_fov(fov), m_aspect(aspect), m_nearPlane(nearPlane), m_farPlane(farPlane), m_pInfo(nullptr), Component(pGameObject)
@@ -10,6 +12,8 @@ CameraComponent::CameraComponent(GameObject* pGameObject, const float& fov, cons
 	m_forward = glm::vec3(0.0f, 0.0f, -1.0f);
 
 	m_resolution = glm::vec2(1920.0f, 1080.0f);
+
+	GWorld::GetWorld()->Scene->AddCamera(this);
 }
 
 void CameraComponent::ShowInInspector()

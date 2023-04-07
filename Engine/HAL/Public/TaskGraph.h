@@ -7,6 +7,12 @@
 #define NUM_WORKING_THREAD 8
 #define ENQUEUE_RENDERER_COMMAND(LAMBDA) WEngine::WTaskGraph::Get()->EnqueTask(new WEngine::WLambdaTask(true, LAMBDA), WEngine::EThreadProperty::RenderThread)
 
+extern unsigned long GGameThreadId;
+
+extern unsigned long GRenderThreadId;
+
+extern unsigned long GRHIThreadId;
+
 bool IsRenderThread();
 
 bool IsOutOfRenderThread();

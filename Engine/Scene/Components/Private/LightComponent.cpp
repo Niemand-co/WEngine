@@ -2,16 +2,12 @@
 #include "Scene/Components/Public/LightComponent.h"
 #include "Scene/Public/GameObject.h"
 #include "Scene/Public/World.h"
-#include "RHI/Public/RHIHeads.h"
-#include "Render/Descriptor/Public/RHIDescriptorHeads.h"
-#include "Scene/Components/Public/CameraComponent.h"
-#include "Render/Public/CascadedShadowMap.h"
+#include "Render/Public/Scene.h"
 
 LightComponent::LightComponent(GameObject *pGameObject)
 	: Component(pGameObject), m_intensity(1.0f), m_color(glm::vec3(1.0f, 1.0f, 1.0f))
 {
-	GWorld::GetWorld()->AddLight(this);
-
+	GWorld::GetWorld()->Scene->AddLight(this);
 }
 
 void LightComponent::SetMainLight(bool isMainLight)

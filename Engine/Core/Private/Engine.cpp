@@ -37,7 +37,6 @@ namespace WEngine
 	void GEngine::Init()
 	{
 		//LayerStack::Get()->PushLayer(new GuiLayer("Gui"));
-		GWorld::CreateWorld();
 	}
 
 	void GEngine::Tick(const TimeStep& timeStep)
@@ -62,6 +61,7 @@ namespace WEngine
 
 	void REngine::Init()
 	{
+		GGameThreadId = GetCurrentThreadId();
 		StartRenderingThread();
 		ResourceLoading();
 		//LayerStack::Get()->PushLayer(new GuiLayer("Gui"));
@@ -102,6 +102,7 @@ namespace WEngine
 	{
 		m_pRenderingRunnable = new WRenderingThread();
 		m_pRenderingThread = WThread::Create(m_pRenderingRunnable, "Rendering_Thread");
+		GRenderThreadId = m_pRenderingThread->GetPID();
 		m_pRenderingRunnable->pMainThreadSyncEvent->Wait();
 	}
 

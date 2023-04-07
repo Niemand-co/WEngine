@@ -24,6 +24,8 @@ public:
 
 	virtual PrimitiveProxy* GetPrimitiveProxy() = 0;
 
+	virtual void ShowInInspector() override {}
+
 protected:
 
 	PrimitiveProxy *m_pProxy;

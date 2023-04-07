@@ -2,7 +2,23 @@
 #include "Utils/Container/Public/WBitArray.h"
 #include "Utils/Allocator/Public/Allocator.h"
 
-class WRDGAllocator
+class WRDGHead
+{
+public:
+
+	void* operator new(size_t size)
+	{
+		return NormalAllocator::Get()->Allocate(size);
+	}
+
+	void operator delete(void* pData)
+	{
+		NormalAllocator::Get()->Deallocate(pData);
+	}
+
+};
+
+class WRDGAllocator : public WRDGHead
 {
 public:
 
@@ -26,12 +42,12 @@ public:
 
 	void* Allocate(size_t size)
 	{
-		return malloc(size);
+		return NormalAllocator::Get()->Allocate(size);
 	}
 
 	void Deallocate(void* pData)
 	{
-		free(pData);
+		NormalAllocator::Get()->Deallocate(pData);
 	}
 
 	static WRDGAllocator* Get()
@@ -87,7 +103,7 @@ public:
 };
 
 template<typename InObjectType, typename IndexType>
-class WRDGHandle
+class WRDGHandle : public WRDGHead
 {
 public:
 
@@ -136,7 +152,7 @@ public:
 };
 
 template<typename HandleType>
-class WRDGHandleRegistry
+class WRDGHandleRegistry : public WRDGHead
 {
 public:
 

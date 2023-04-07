@@ -18,7 +18,6 @@ namespace WEngine
 		GameObject *CameraGo = new GameObject(name + "_Camera");
 		CameraGo->AddComponent<TransformComponent>();
 		Camera = CameraGo->AddComponent<CameraComponent>();
-		Scene->AddCamera(Camera.Get());
 	}
 
 	void Layer::StartFrame()

@@ -14,7 +14,7 @@ public:
 
 };
 
-class WRDGPass
+class WRDGPass : public WRDGHead
 {
 public:
 
@@ -114,7 +114,7 @@ private:
 
 };
 
-class WRDGBuilder
+class WRDGBuilder : public WRDGHead
 {
 public:
 

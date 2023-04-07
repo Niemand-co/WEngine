@@ -46,6 +46,8 @@ namespace WEngine
 		m_pRHIThread = WThread::Create(m_pRHIRunnable, "RHI Thread");
 		m_pRHIRunnable->m_pRenderingThreadSyncEvent->Wait();
 
+		GRHIThreadId = m_pRHIThread->GetPID();
+
 		WTaskGraph::Get()->ProcessUntilQuit(EThreadProperty::RenderThread);
 	}
 

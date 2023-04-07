@@ -31,10 +31,6 @@ public:
 
 	virtual ~SandBox();
 
-private:
-
-	GWorld *m_scene;
-
 };
 
 WEngine::Application* WEngine::CreateApplication()

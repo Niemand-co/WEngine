@@ -24,7 +24,7 @@ namespace WEngine
 		template<typename T, typename Y>
 		static bool CAS128(volatile T* Destination, Y HightValue, Y LowValue, T* CompareValue) {}
 
-		static unsigned long GetCurrentThreadId() {}
+		static unsigned long GetThreadId() {}
 
 		template<typename LAMBDA>
 		static void IterateFiles(const char* Path, LAMBDA lambda) {}

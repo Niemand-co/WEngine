@@ -13,7 +13,7 @@ namespace WEngine
 
 		static WEvent* CreateWEvent();
 
-		static unsigned long GetCurrentThreadId();
+		static unsigned long GetThreadId();
 
 		template<typename T>
 		static bool CAS(T* Destination, T NewValue, T CompareValue);

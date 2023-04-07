@@ -16,7 +16,7 @@ namespace WEngine
 		return new WEventWin();
 	}
 
-	unsigned long WindowsPlatformProcess::GetCurrentThreadId()
+	unsigned long WindowsPlatformProcess::GetThreadId()
 	{
 		return GetCurrentThreadId();
 	}

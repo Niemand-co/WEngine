@@ -22,7 +22,6 @@ ScriptableRenderPipeline::~ScriptableRenderPipeline()
 
 void ScriptableRenderPipeline::Init()
 {
-	m_pCameras = GWorld::GetWorld()->GetCameras();
 }
 
 void ScriptableRenderPipeline::Setup()

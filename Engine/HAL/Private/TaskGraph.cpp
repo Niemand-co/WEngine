@@ -152,22 +152,28 @@ namespace WEngine
 
 }
 
+unsigned long GGameThreadId = 0;
+
+unsigned long GRenderThreadId = 0;
+
+unsigned long GRHIThreadId = 0;
+
 bool IsRenderThread()
 {
-	return WEngine::PlatformProcess::GetCurrentThreadId() == WEngine::WTaskGraph::Get()->m_threads[(uint32)WEngine::EThreadProperty::RenderThread]->pThread->GetPID();
+	return WEngine::PlatformProcess::GetThreadId() == GRenderThreadId;
 }
 
 bool IsOutOfRenderThread()
 {
-	return WEngine::PlatformProcess::GetCurrentThreadId() != WEngine::WTaskGraph::Get()->m_threads[(uint32)WEngine::EThreadProperty::RenderThread]->pThread->GetPID();
+	return WEngine::PlatformProcess::GetThreadId() != GRenderThreadId;
 }
 
 bool IsRHIThread()
 {
-	return WEngine::PlatformProcess::GetCurrentThreadId() == WEngine::WTaskGraph::Get()->m_threads[(uint32)WEngine::EThreadProperty::RHIThread]->pThread->GetPID();
+	return WEngine::PlatformProcess::GetThreadId() == GRHIThreadId;
 }
 
 bool IsOutOfRHIThread()
 {
-	return WEngine::PlatformProcess::GetCurrentThreadId() != WEngine::WTaskGraph::Get()->m_threads[(uint32)WEngine::EThreadProperty::RHIThread]->pThread->GetPID();
+	return WEngine::PlatformProcess::GetThreadId() != GRHIThreadId;
 }
