@@ -34,14 +34,14 @@ glm::mat4x4 CameraComponent::GetProjectionMatrix()
 
 CameraInfo* CameraComponent::GetCameraInfo()
 {
-	if (m_bMarkedDirty)
+	if (bMarkedDirty)
 	{
 		if (m_pInfo == nullptr)
 		{
 			m_pInfo = (CameraInfo*)NormalAllocator::Get()->Allocate(sizeof(CameraInfo));
 		}
 		::new (m_pInfo) CameraInfo(this);
-		m_bMarkedDirty = false;
+		bMarkedDirty = false;
 	}
 
 	return m_pInfo;
@@ -76,7 +76,7 @@ void CameraComponent::Move(Direction dir, float dis)
 		break;
 	}
 
-	m_pGameObject->GetComponent<TransformComponent>()->Move(displacement);
+	pGameObject->GetComponent<TransformComponent>()->Move(displacement);
 }
 
 void CameraComponent::Rotate(RotateDirection dir, float dis)
@@ -100,7 +100,7 @@ void CameraComponent::Rotate(RotateDirection dir, float dis)
 
 void CameraComponent::UpdateViewMatrix()
 {
-	glm::vec3 position = m_pGameObject->GetComponent<TransformComponent>()->GetPosition();
+	glm::vec3 position = pGameObject->GetComponent<TransformComponent>()->GetPosition();
 	m_viewMatrix = glm::lookAt(position, position  + m_forward, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 

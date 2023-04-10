@@ -39,9 +39,9 @@ WSceneViewFamily::WSceneViewFamily(WViewport* InViewport, RScene* InScene)
 	  RenderTarget(InViewport)
 {
 	const WEngine::WArray<CameraInfo*>& Cameras = Scene->GetCameras();
-	Views.Resize(Cameras.Size());
+	Views.Reserve(Cameras.Size());
 	for (uint32 CameraIndex = 0; CameraIndex < Cameras.Size(); ++CameraIndex)
 	{
-		Views[CameraIndex] = new WSceneViewInfo(Cameras[CameraIndex]);
+		Views.Push(new WSceneViewInfo(Cameras[CameraIndex]));
 	}
 }

@@ -29,14 +29,14 @@ void LightComponent::ShowInInspector()
 
 LightInfo* LightComponent::GetLightInfo()
 {
-	if (m_bMarkedDirty)
+	if (bMarkedDirty)
 	{
 		if (m_pInfo == nullptr)
 		{
 			m_pInfo = (LightInfo*)NormalAllocator::Get()->Allocate(sizeof(LightInfo));
 		}
 		::new (m_pInfo) LightInfo(this);
-		m_bMarkedDirty = false;
+		bMarkedDirty = false;
 	}
 
 	return m_pInfo;

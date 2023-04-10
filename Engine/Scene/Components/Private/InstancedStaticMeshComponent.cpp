@@ -12,27 +12,27 @@ InstancedStaticMeshComponent::~InstancedStaticMeshComponent()
 
 PrimitiveProxy* InstancedStaticMeshComponent::GetPrimitiveProxy()
 {
-	if (!m_pMesh)
+	if (!pMesh)
 	{
 		return nullptr;
 	}
 
-	if (m_bMarkedDirty)
+	if (bMarkedDirty)
 	{
-		if (m_pProxy == nullptr)
+		if (Proxy == nullptr)
 		{
-			m_pProxy = (InstancedStaticMeshProxy*)NormalAllocator::Get()->Allocate(sizeof(InstancedStaticMeshProxy));
+			Proxy = (InstancedStaticMeshProxy*)NormalAllocator::Get()->Allocate(sizeof(InstancedStaticMeshProxy));
 		}
-		::new (m_pProxy) InstancedStaticMeshProxy(this);
-		m_bMarkedDirty = false;
+		::new (Proxy) InstancedStaticMeshProxy(this);
+		bMarkedDirty = false;
 	}
 
-	return m_pProxy;
+	return Proxy;
 }
 
 void InstancedStaticMeshComponent::AddInstance()
 {
 	m_instancedCount++;
-	TransformComponent *newTransform = GetCopy(m_pGameObject->GetComponent<TransformComponent>());
+	TransformComponent *newTransform = GetCopy(pGameObject->GetComponent<TransformComponent>());
 	m_transforms.Push(newTransform);
 }

@@ -23,7 +23,7 @@ void WStaticMeshVertexBuffer::Init(const WEngine::WArray<VertexComponent>& InVer
 		*DataPtr = WTangentData(InVertices[VertexIndex].Normal, InVertices[VertexIndex].Tangent);
 	}
 
-	TangentData->ResizeBuffer(InVertices.Size() * 8);
+	TexCoordsData->ResizeBuffer(InVertices.Size() * 8);
 	for (uint32 VertexIndex = 0; VertexIndex < InVertices.Size(); ++VertexIndex)
 	{
 		glm::vec2* DataPtr = (glm::vec2*)(TexCoordsData->GetData()) + VertexIndex;

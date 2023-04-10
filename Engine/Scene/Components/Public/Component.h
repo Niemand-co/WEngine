@@ -34,24 +34,24 @@ public:
 
 	//virtual void Tick(const WEngine::TimeStep& timeStep) = 0;
 
-	inline GameObject* GetOwner() { return m_pGameObject; } ;
+	inline GameObject* GetOwner() { return pGameObject; } ;
 
 	virtual void ShowInInspector() = 0;
 
-	void MarkDirty() { m_bMarkedDirty = true; }
+	void MarkDirty() { bMarkedDirty = true; }
 
 protected:
 
 	Component(GameObject *pGameObject)
-		: m_pGameObject(pGameObject), m_bMarkedDirty(true)
+		: pGameObject(pGameObject), bMarkedDirty(true)
 	{
 	};
 
 protected:
 
-	GameObject* m_pGameObject;
+	GameObject* pGameObject;
 
-	uint8 m_bMarkedDirty : 1;
+	uint8 bMarkedDirty : 1;
 
 };
 

@@ -7,6 +7,7 @@
 #include "Scene/Components/Public/CameraComponent.h"
 #include "Render/Public/Viewport.h"
 #include "Render/Renderer/Public/DeferredRenderer.h"
+#include "Scene/Public/World.h"
 
 namespace WEngine
 {
@@ -15,6 +16,7 @@ namespace WEngine
 		: DebugName(name)
 	{
 		Scene = new RScene();
+		GWorld::GetWorld()->Scene = Scene.Get();
 		GameObject *CameraGo = new GameObject(name + "_Camera");
 		CameraGo->AddComponent<TransformComponent>();
 		Camera = CameraGo->AddComponent<CameraComponent>();

@@ -3,13 +3,16 @@
 #include "Render/Mesh/Public/MeshBatch.h"
 #include "Render/Public/SceneView.h"
 #include "Scene/Public/SceneManagement.h"
+#include "Scene/Public/World.h"
 
 StaticMeshComponent::StaticMeshComponent(GameObject* pGameObject, WStaticMesh* pMesh)
-	: PrimitiveComponent(pGameObject), m_pMesh(pMesh)
+	: PrimitiveComponent(pGameObject), pMesh(pMesh)
 {
 	if (pMesh != nullptr)
 	{
-		RScene::GetActiveScene()->AddPrimitive(this);
+		Proxy = (StaticMeshProxy*)NormalAllocator::Get()->Allocate(sizeof(StaticMeshProxy));
+		::new (Proxy) StaticMeshProxy(this);
+		GWorld::GetWorld()->Scene->AddPrimitive(this);
 	}
 }
 
@@ -19,22 +22,18 @@ StaticMeshComponent::~StaticMeshComponent()
 
 PrimitiveProxy* StaticMeshComponent::GetPrimitiveProxy()
 {
-	if (!m_pMesh)
+	if (!pMesh)
 	{
 		return nullptr;
 	}
 
-	if (m_bMarkedDirty)
+	if (bMarkedDirty)
 	{
-		if (m_pProxy == nullptr)
-		{
-			m_pProxy = (StaticMeshProxy*)NormalAllocator::Get()->Allocate(sizeof(StaticMeshProxy));
-		}
-		::new (m_pProxy) StaticMeshProxy(this);
-		m_bMarkedDirty = false;
+		::new (Proxy) StaticMeshProxy(this);
+		bMarkedDirty = false;
 	}
 
-	return m_pProxy;
+	return Proxy;
 }
 
 void StaticMeshProxy::DrawStaticMesh(RHICommandListBase* CmdList)

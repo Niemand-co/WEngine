@@ -46,6 +46,7 @@ void WStaticMeshRenderData::Init(const WEngine::WArray<VertexComponent>& InVerti
 
 	for (uint32 LodIndex = 0; LodIndex < LodResources.Size(); ++LodIndex)
 	{
+		LodResources[LodIndex] = StaticMeshLodResource();
 		LodResources[LodIndex].VertexBuffer.Init(InVertices);
 		LodResources[LodIndex].IndexBuffer.Init(InIndices);
 		LodResources[LodIndex].NumIndices = InIndices.Size();
@@ -308,6 +309,7 @@ bool WMeshLibrary::ProcessNode(const aiNode* Node, const aiScene* ObjectScene, W
 	{
 		RE_ASSERT(ProcessNode(Node->mChildren[ChildIndex], ObjectScene, Mesh), "Failed to process object node.");
 	}
+	Mesh->InitRHIResource();
 	return true;
 }
 

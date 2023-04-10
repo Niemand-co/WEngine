@@ -9,9 +9,9 @@ public:
 
 	virtual ~WStaticMeshIndexData() = default;
 
-	virtual void ResizeBuffer(uint32 NumIndices) override { Data.Reserve(NumIndices); }
+	virtual void ResizeBuffer(uint32 NumIndices) override { Data.Resize(NumIndices); }
 
-	virtual void Empty() override { Data.Reserve(0); }
+	virtual void Empty() override { Data.Resize(0); }
 
 	virtual uint32 GetNum() const override { return Data.Size(); }
 

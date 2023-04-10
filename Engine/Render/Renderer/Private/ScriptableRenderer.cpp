@@ -9,10 +9,10 @@ SceneRenderer::SceneRenderer(const WSceneViewFamily* InViewFamily)
 	: ViewFamily(InViewFamily),
 	  Scene(InViewFamily->Scene)
 {
-	Views.Resize(ViewFamily->Views.Size());
+	Views.Reserve(ViewFamily->Views.Size());
 	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
 	{
-		Views[ViewIndex] = WViewInfo(*ViewFamily->Views[ViewIndex]);
+		Views.Push(WViewInfo(*ViewFamily->Views[ViewIndex]));
 		Views[ViewIndex].Family = WEngine::RemoveConst(ViewFamily);
 	}
 }

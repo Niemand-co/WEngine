@@ -9,9 +9,9 @@ public:
 
 	virtual ~WStaticMeshPositionData() = default;
 
-	virtual void ResizeBuffer(uint32 NumVertices) override { Data.Reserve(NumVertices); }
+	virtual void ResizeBuffer(uint32 NumVertices) override { Data.Resize(NumVertices); }
 
-	virtual void Empty() override { Data.Reserve(0); }
+	virtual void Empty() override { Data.Resize(0); }
 
 	virtual uint32 GetNum() const override { return Data.Size(); }
 

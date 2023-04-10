@@ -5,7 +5,6 @@ GameScene::GameScene(const WEngine::WString& name)
 	: Layer(name)
 {
 	Viewport = new WSceneViewport(1920, 1080, Format::B8G8R8A8_UNorm);
-	GWorld::GetWorld()->Scene = Scene.Get();
 }
 
 GameScene::~GameScene()
@@ -73,11 +72,12 @@ SandBox::SandBox()
 	//GameObject *pLight = m_scene->CreateGameObject("Main Light");
 	//pLight->AddComponent<LightComponent>();
 
-	GameObject *sphere = GWorld::GetWorld()->CreateGameObject("Sphere");
-	sphere->AddComponent<StaticMeshComponent>();
-	sphere->AddComponent<MaterialComponent>();
-
 	WEngine::LayerStack::Get()->PushLayer(new GameScene("Game Scene"));
+
+	GameObject *sphere = GWorld::GetWorld()->CreateGameObject("Sphere");
+	WStaticMesh *Mesh = WMeshLibrary::GetMesh("sphere");
+	sphere->AddComponent<StaticMeshComponent>(Mesh);
+	sphere->AddComponent<MaterialComponent>();
 }
 
 SandBox::~SandBox()

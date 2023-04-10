@@ -16,15 +16,17 @@ public:
 
 	virtual PrimitiveProxy* GetPrimitiveProxy() override;
 
-	WStaticMesh* GetStaticMesh() const { return m_pMesh; }
+	void SetStaticMesh(WStaticMesh *pInMesh) { pMesh = pInMesh; bMarkedDirty = true; }
 
-	uint8_t IsCastShadow() const { return m_bCastShadow; }
+	WStaticMesh* GetStaticMesh() const { return pMesh; }
+
+	uint8_t IsCastShadow() const { return bCastShadow; }
 
 protected:
 
-	WStaticMesh *m_pMesh;
+	WStaticMesh *pMesh;
 
-	uint8_t m_bCastShadow : 1;
+	uint8_t bCastShadow : 1;
 
 };
 
@@ -32,8 +34,8 @@ struct StaticMeshProxy : public PrimitiveProxy
 {
 	StaticMeshProxy(StaticMeshComponent *primitive)
 		: PrimitiveProxy(primitive),
-		  Mesh(primitive->m_pMesh),
-		  RenderData(primitive->m_pMesh->GetRenderData())
+		  Mesh(primitive->pMesh),
+		  RenderData(primitive->pMesh->GetRenderData())
 	{
 
 	}

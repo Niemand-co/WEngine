@@ -18,7 +18,7 @@ void WPositionVertexBuffer::Init(const WEngine::WArray<VertexComponent>& InVerti
 	PositionData->ResizeBuffer(NumVertices);
 	for (uint32 VertexIndex = 0; VertexIndex < NumVertices; ++VertexIndex)
 	{
-		glm::vec3 *DataPtr = (glm::vec3*)PositionData->GetData() + VertexIndex;
+		glm::vec3 *DataPtr = (glm::vec3*)(PositionData->GetData()) + VertexIndex;
 		*DataPtr = InVertices[VertexIndex].Position;
 	}
 }

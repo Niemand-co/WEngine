@@ -5,13 +5,12 @@
 
 PrimitiveComponent::PrimitiveComponent(GameObject* pGameObject)
     : Component(pGameObject),
-      m_bVisible(true),
-      m_bTranslucent(false),
-      m_bCastShadow(true),
-      m_bStatic(false),
-      m_pProxy(nullptr)
+      bVisible(true),
+      bTranslucent(false),
+      bCastShadow(true),
+      bStatic(false),
+      Proxy(nullptr)
 {
-    GWorld::GetWorld()->Scene->AddPrimitive(this);
 }
 
 PrimitiveComponent::~PrimitiveComponent()

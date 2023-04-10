@@ -28,25 +28,25 @@ public:
 
 protected:
 
-	PrimitiveProxy *m_pProxy;
+	PrimitiveProxy *Proxy;
 
-	uint8 m_bVisible : 1;
+	uint8 bVisible : 1;
 
-	uint8 m_bStatic : 1;
+	uint8 bStatic : 1;
 
-	uint8 m_bTranslucent : 1;
+	uint8 bTranslucent : 1;
 
-	uint8 m_bCastShadow : 1;
+	uint8 bCastShadow : 1;
 
 };
 
 struct PrimitiveProxy
 {
 	PrimitiveProxy(PrimitiveComponent* primitive)
-		: bVisible(primitive->m_bVisible),
-		  bStatic(primitive->m_bStatic),
-		  bTranslucent(primitive->m_bTranslucent),
-		  bCastShadow(primitive->m_bCastShadow),
+		: bVisible(primitive->bVisible),
+		  bStatic(primitive->bStatic),
+		  bTranslucent(primitive->bTranslucent),
+		  bCastShadow(primitive->bCastShadow),
 		  Info(nullptr)
 	{
 	}
@@ -94,11 +94,11 @@ protected:
 struct PrimitiveInfo
 {
 	PrimitiveInfo(PrimitiveComponent* primitive)
-		: Owner(primitive->m_pGameObject),
-		  Proxy(primitive->m_pProxy),
-		  bCastShadow(primitive->m_bCastShadow),
-		  bTranslucent(primitive->m_bTranslucent),
-		  bStatic(primitive->m_bStatic)
+		: Owner(primitive->pGameObject),
+		  Proxy(primitive->Proxy),
+		  bCastShadow(primitive->bCastShadow),
+		  bTranslucent(primitive->bTranslucent),
+		  bStatic(primitive->bStatic)
 	{
 		
 	}

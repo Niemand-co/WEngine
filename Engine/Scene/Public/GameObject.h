@@ -31,8 +31,8 @@ public:
 
 	bool HasChild() const;
 
-	template<typename T>
-	T* AddComponent();
+	template<typename T, typename ...Args>
+	T* AddComponent(Args... args);
 
 	template<typename T>
 	T* GetComponent();
@@ -55,10 +55,10 @@ private:
 
 };
 
-template<typename T>
-inline T* GameObject::AddComponent()
+template<typename T, typename ...Args>
+inline T* GameObject::AddComponent(Args... args)
 {
-	T* component = new T(this);
+	T* component = new T(this, args...);
 	m_components.Push(component);
 	return component;
 }

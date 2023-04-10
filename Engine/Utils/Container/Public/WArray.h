@@ -334,7 +334,10 @@ namespace WEngine
 			NormalAllocator::Get()->Deallocate(m_pData);
 			m_pData = newPtr;
 			m_capasity = size;
-			memset(m_pData + m_size, 0, sizeof(T) * (m_capasity - m_size));
+			for (uint32 Offset = m_size; Offset < m_capasity; ++Offset)
+			{
+				::new (m_pData + Offset) T();
+			}
 			m_size = size;
 		}
 		else
@@ -383,8 +386,6 @@ namespace WEngine
 	template<typename T>
 	inline T* WArray<T>::GetData() const
 	{
-		if(m_size == 0)
-			return nullptr;
 		return m_pData;
 	}
 
