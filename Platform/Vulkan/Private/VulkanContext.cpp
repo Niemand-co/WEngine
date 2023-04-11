@@ -39,6 +39,11 @@ namespace Vulkan
 		VulkanFramebuffer *Framebuffer = static_cast<VulkanFramebuffer*>(pDevice->GetOrCreateFramebuffer(FramebufferDescriptor, Pass));
 
 		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
+		if (!CmdBuffer)
+		{
+			pCommandBufferManager->PrepareForNewActiveCmdBuffer();
+			CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
+		}
 		WEngine::WArray<VkClearValue> ClearValues(FramebufferDescriptor->AttachmentCount);
 		ClearValues[0].color = { 1.0f, 0, 0, 0 };
 		VkRenderPassBeginInfo Info = {};

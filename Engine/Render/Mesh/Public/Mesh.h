@@ -127,7 +127,7 @@ private:
 
 };
 
-size_t MeshHash(WEngine::WGuid<WEngine::WString> key);
+size_t MeshHash(WEngine::WString key);
 
 class WMeshLibrary
 {
@@ -135,7 +135,7 @@ public:
 
 	static WStaticMesh* GetMesh(const WEngine::WString& Name)
 	{ 
-		return Meshes[WEngine::WGuid(Name)];
+		return Meshes[Name];
 	}
 
 	static bool LoadMesh(const WEngine::WString& Path);
@@ -146,6 +146,6 @@ public:
 
 private:
 
-	static WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WStaticMesh*, MeshHash> Meshes;
+	static WEngine::WHashMap<WEngine::WString, WStaticMesh*, MeshHash> Meshes;
 
 };

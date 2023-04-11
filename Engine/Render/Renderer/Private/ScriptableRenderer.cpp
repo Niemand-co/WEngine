@@ -10,7 +10,7 @@ SceneRenderer::SceneRenderer(const WSceneViewFamily* InViewFamily)
 	  Scene(InViewFamily->Scene)
 {
 	Views.Reserve(ViewFamily->Views.Size());
-	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
+	for (uint32 ViewIndex = 0; ViewIndex < ViewFamily->Views.Size(); ++ViewIndex)
 	{
 		Views.Push(WViewInfo(*ViewFamily->Views[ViewIndex]));
 		Views[ViewIndex].Family = WEngine::RemoveConst(ViewFamily);
@@ -52,16 +52,26 @@ void SceneRenderer::FrustumCulling(const WEngine::WArray<PrimitiveInfo*>& Primit
 	WEngine::WArray<glm::vec3> Frustum(8);
 	ViewInfo.ComputeFrustum(Frustum);
 
-	WEngine::WTaskGraph::Get()->ParallelFor(Primitives.Size(), [this, &ViewInfo, &Primitives, &Frustum](uint32 index)
-		{
-			PrimitiveInfo* info = Primitives[index];
-			const BoundingBox& box = info->Proxy->GetBoundingBox();
+	//WEngine::WTaskGraph::Get()->ParallelFor(Primitives.Size(), [this, &ViewInfo, &Primitives, &Frustum](uint32 index)
+	//	{
+	//		PrimitiveInfo* info = Primitives[index];
+	//		const BoundingBox& box = info->Proxy->GetBoundingBox();
 
-			if ((bUseBoxTest ? IsBoxInFrustum(Frustum, box.BoxMin, box.BoxMax) : true) && (bUseSphereTest ? IsSphereInFrustum(Frustum, glm::vec3(), 0.0f) : true))
-			{
-				ViewInfo.PrimitiveVisibilityMap[index] = true;
-			}
-		});
+	//		if ((bUseBoxTest ? IsBoxInFrustum(Frustum, box.BoxMin, box.BoxMax) : true) && (bUseSphereTest ? IsSphereInFrustum(Frustum, glm::vec3(), 0.0f) : true))
+	//		{
+	//			ViewInfo.PrimitiveVisibilityMap[index] = true;
+	//		}
+	//	});
+	for (uint32 index = 0; index < Primitives.Size(); ++index)
+	{
+		PrimitiveInfo* info = Primitives[index];
+		const BoundingBox& box = info->Proxy->GetBoundingBox();
+
+		if ((bUseBoxTest ? IsBoxInFrustum(Frustum, box.BoxMin, box.BoxMax) : true) && (bUseSphereTest ? IsSphereInFrustum(Frustum, glm::vec3(), 0.0f) : true))
+		{
+			ViewInfo.PrimitiveVisibilityMap[index] = true;
+		}
+	}
 }
 
 void SceneRenderer::OcclusionCulling(const WEngine::WArray<PrimitiveInfo*>& Primitives, WViewInfo& ViewInfo)

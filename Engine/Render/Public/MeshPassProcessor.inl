@@ -9,12 +9,15 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 {
 	RHIGraphicsPipelineStateDescriptor PipelineInfo = {};
 	{
-		for (uint32 BlendIndex = 0; BlendIndex < RenderState.RenderTargetCount; ++BlendIndex)
+		uint32 BlendIndex = 0;
+		for (; BlendIndex < MaxSimultaneousRenderTargets; ++BlendIndex)
 		{
+			if(RenderState.BlendStates[BlendIndex] == nullptr)
+				break;
 			PipelineInfo.BlendStates[BlendIndex] = RenderState.BlendStates[BlendIndex];
 		}
 
-		PipelineInfo.RenderTargetCount = RenderState.RenderTargetCount;
+		PipelineInfo.RenderTargetCount = BlendIndex;
 
 		PipelineInfo.DepthStencilState = RenderState.DepthStencilState;
 

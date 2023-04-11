@@ -35,7 +35,8 @@ public:
 	{
 		for (TrackedBase* Alloc : TrackedObjects)
 		{
-			delete Alloc;
+			Alloc->~TrackedBase();
+			Deallocate(Alloc);
 		}
 		TrackedObjects.Clear();
 	}

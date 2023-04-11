@@ -215,7 +215,6 @@ namespace Vulkan
 		if (ImmediateCmdBuffer)
 		{
 			SubmitImmediateCommandBuffer();
-			PrepareForNewActiveCmdBuffer();
 		}
 		return ActiveCmdBuffer;
 	}

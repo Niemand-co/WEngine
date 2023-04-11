@@ -54,8 +54,6 @@ private:
 
 	WUniformBufferRHIRef PassUniformBuffer = nullptr;
 
-	uint32 RenderTargetCount = 0;
-
 	friend class WMeshPassProcessor;
 
 };

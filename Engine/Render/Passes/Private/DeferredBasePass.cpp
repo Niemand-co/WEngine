@@ -16,8 +16,6 @@ void DeferredRenderer::RenderBasePass(WViewInfo& View)
 
 	DeferredBasePassParameters::GetStructMetaData()->GetLayout();
 
-	WDeferredBasePassVS *Shader = new WDeferredBasePassVS();
-
 	GraphBuilder->AddPass("BasePass", Parameters, [&View, this](RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
 	{
 		CmdList.SetViewport(View.ViewRect.Min.X, View.ViewRect.Min.Y, View.ViewRect.Max.X, View.ViewRect.Max.Y, 0.0f, 1.0f);
@@ -30,14 +28,16 @@ void DeferredRenderer::RenderBasePass(WViewInfo& View)
 		RenderState.SetMultiSampleState(TStaticMultiSampleStateRHI<>::GetRHI());
 
 		WDeferredBasePassMeshProcessor Processor(View.Family->Scene, &View, RenderState);
-		for (uint32 MeshIndex = 0; MeshIndex < Batches.Size(); ++MeshIndex)
+		const WEngine::WArray<WMeshBatch>& BatchElements = Collector.GetBatches();
+		for (uint32 MeshIndex = 0; MeshIndex < BatchElements.Size(); ++MeshIndex)
 		{
-			Processor.AddMeshBatch(*Batches[MeshIndex]);
+			Processor.AddMeshBatch(BatchElements[MeshIndex]);
 		}
 	});
 }
 
-WDeferredBasePassVS::WDeferredBasePassVS()
+WDeferredBasePassVS::WDeferredBasePassVS(WVertexShaderRHIRef InVertexShaderRHI)
+	: VertexShaderRHI(InVertexShaderRHI)
 {
 	UniformBuffer = new WUniformBuffer(&Parameters.GetStructMetaData()->GetLayout());
 }
@@ -52,7 +52,8 @@ void WDeferredBasePassVS::GetParametersBinding(const WViewInfo *View, const Mate
 	View->SetupViewParameters(Parameters.View);
 }
 
-WDeferredBasePassPS::WDeferredBasePassPS()
+WDeferredBasePassPS::WDeferredBasePassPS(WPixelShaderRHIRef InPixelShaderRHI)
+	: PixelShaderRHI(InPixelShaderRHI)
 {
 }
 
@@ -122,6 +123,6 @@ bool WDeferredBasePassMeshProcessor::ProcessForwardPlusShadingPath(const WMeshBa
 
 void GetBasePassShaders(WDeferredBasePassVS*& VertexShader, WDeferredBasePassPS*& PixelShader)
 {
-	VertexShader = new WDeferredBasePassVS();
-	PixelShader = new WDeferredBasePassPS();
+	VertexShader = new WDeferredBasePassVS((WVertexShaderRHIRef)WShaderLibrary::GetShader("DebugDrawVert"));
+	PixelShader = new WDeferredBasePassPS((WPixelShaderRHIRef)WShaderLibrary::GetShader("DebugDrawFrag"));
 }

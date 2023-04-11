@@ -53,7 +53,7 @@ struct WStaticMeshDataType
 
 	WVertexStreamComponent ColorComponent;
 	
-	WEngine::WArray<WVertexStreamComponent> TexCoordsComponent;
+	WVertexStreamComponent TexCoordsComponent[8];
 
 	uint32 NumTexCoords = 0;
 };

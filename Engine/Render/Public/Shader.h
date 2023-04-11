@@ -64,3 +64,31 @@ private:
 	WComputeShaderRHIRef Shader;
 
 };
+
+size_t ShaderHash(WEngine::WString Name);
+
+class WShaderLibrary
+{
+public:
+
+	static class RHIShader* GetShader(const WEngine::WString& Name)
+	{
+		if (Shaders.Find(Name))
+		{
+			return Shaders[Name];
+		}
+		return nullptr;
+	}
+
+	static void AddShader(const WEngine::WString& Name, RHIShader* Shader)
+	{
+		Shaders[Name] = Shader;
+	}
+
+	static bool LoadShader(const WEngine::WString& path);
+
+private:
+
+	static WEngine::WHashMap<WEngine::WString, RHIShader*, ShaderHash> Shaders;
+
+};

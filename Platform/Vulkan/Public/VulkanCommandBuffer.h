@@ -22,7 +22,7 @@ namespace Vulkan
 
 		const WEngine::WArray<class VulkanSemaphore*>& GetWaitingSemaphores() { return WaitingSemaphores; }
 
-		const WEngine::WArray<uint32> GetWaitingStageMasks() { return WaitingStageMasks; }
+		const WEngine::WArray<uint32>& GetWaitingStageMasks() { return WaitingStageMasks; }
 
 		class VulkanFence* GetFence() const { return pFence; }
 

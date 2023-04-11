@@ -270,12 +270,12 @@ WStaticMesh* WStaticMesh::GetSphere()
 //	return mesh;
 //}
 
-size_t MeshHash(WEngine::WGuid<WEngine::WString> key)
+size_t MeshHash(WEngine::WString key)
 {
-	return (size_t(key.A) << 32) | (size_t(key.B));
+	return WEngine::MemCrc32(key.Data(), key.Size());
 }
 
-WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WStaticMesh*, MeshHash> WMeshLibrary::Meshes = WEngine::WHashMap<WEngine::WGuid<WEngine::WString>, WStaticMesh*, MeshHash>();
+WEngine::WHashMap<WEngine::WString, WStaticMesh*, MeshHash> WMeshLibrary::Meshes = WEngine::WHashMap<WEngine::WString, WStaticMesh*, MeshHash>();
 
 bool WMeshLibrary::LoadMesh(const WEngine::WString& Path)
 {
@@ -294,6 +294,7 @@ bool WMeshLibrary::LoadMesh(const WEngine::WString& Path)
 
 		WStaticMesh *mesh = new WStaticMesh(MeshName);
 		ProcessNode(objectScene->mRootNode, objectScene, mesh);
+		mesh->InitRHIResource();
 		Meshes.Insert(MeshName, mesh);
 	}
 }
@@ -309,7 +310,6 @@ bool WMeshLibrary::ProcessNode(const aiNode* Node, const aiScene* ObjectScene, W
 	{
 		RE_ASSERT(ProcessNode(Node->mChildren[ChildIndex], ObjectScene, Mesh), "Failed to process object node.");
 	}
-	Mesh->InitRHIResource();
 	return true;
 }
 

@@ -12,7 +12,7 @@ namespace Vulkan
 		for (const VertexInputElement& Element : Elements)
 		{
 			VkVertexInputBindingDescription& Binding = VertexInputBindings[Element.StreamIndex];
-			if ((Element.AttribIndex & StreamIndexBitMask) != 0)
+			if (((1 << Element.StreamIndex) & StreamIndexBitMask) != 0)
 			{
 				RE_ASSERT(Binding.binding == Element.StreamIndex, "Vertex binding is occupied by multi elements.");
 				RE_ASSERT(Binding.inputRate == Element.bUseInstance ? VK_VERTEX_INPUT_RATE_INSTANCE : VK_VERTEX_INPUT_RATE_VERTEX, "Vertex binding is occupied by multi elements.");
@@ -38,9 +38,13 @@ namespace Vulkan
 			}
 		}
 
+		uint32 NumAttributes = 0;
 		for (const VertexInputElement& Element : Elements)
 		{
-			VkVertexInputAttributeDescription Attrib = VertexInputAttributes[Element.AttribIndex];
+			if(!(1 << Element.AttribIndex) || !BindingToStream.Find(Element.StreamIndex))
+				continue;
+
+			VkVertexInputAttributeDescription& Attrib = VertexInputAttributes[NumAttributes++];
 			Attrib.binding = BindingToStream[Element.StreamIndex];
 			Attrib.location = Element.AttribIndex;
 			Attrib.offset = Element.Offset;
@@ -51,7 +55,7 @@ namespace Vulkan
 		VertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 		VertexInputStateCreateInfo.vertexBindingDescriptionCount = Bindings.Size();
 		VertexInputStateCreateInfo.pVertexBindingDescriptions = Bindings.GetData();
-		VertexInputStateCreateInfo.vertexAttributeDescriptionCount = Elements.Size();
+		VertexInputStateCreateInfo.vertexAttributeDescriptionCount = NumAttributes;
 		VertexInputStateCreateInfo.pVertexAttributeDescriptions = VertexInputAttributes;
 	}
 

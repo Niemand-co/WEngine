@@ -9,7 +9,7 @@ class WDeferredBasePassVS : public WMaterialShader
 {
 public:
 
-	WDeferredBasePassVS();
+	WDeferredBasePassVS(WVertexShaderRHIRef InVertexShaderRHI);
 
 	virtual ~WDeferredBasePassVS();
 
@@ -35,7 +35,7 @@ class WDeferredBasePassPS : public WMaterialShader
 {
 public:
 
-	WDeferredBasePassPS();
+	WDeferredBasePassPS(WPixelShaderRHIRef InPixelShaderRHI);
 
 	virtual ~WDeferredBasePassPS();
 

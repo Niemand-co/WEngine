@@ -127,7 +127,7 @@ void WRDGBuilder::Execute()
 		ExecutePass(Passes[Handle]);
 	}
 
-	//Clear();
+	Clear();
 }
 
 void WRDGBuilder::Clear()
