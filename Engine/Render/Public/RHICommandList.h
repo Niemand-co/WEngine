@@ -67,6 +67,10 @@ public:
 
 	void SetGraphicsPipelineState(class RHIGraphicsPipelineStateDescriptor* GraphicsPipelineState);
 
+	void BindVertexBuffer();
+
+	void BindIndexBuffer();
+
 	void DrawIndexedPrimitive(uint32 indexCount, uint32 firstIndex, uint32 instanceCount);
 
 	void SetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth);

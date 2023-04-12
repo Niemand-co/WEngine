@@ -9,14 +9,14 @@
 void DeferredRenderer::RenderBasePass(WViewInfo& View)
 {
 	glm::vec2 ViewRect = View.ViewMatrices.Rect;
-	WRDGTexture* GBuffer0 = GraphBuilder->RegisterExternalTexture(View.Family->RenderTarget->GetHandle());
+	WRDGTexture* GBuffer0 = GetRDGBuilder()->RegisterExternalTexture(View.Family->RenderTarget->GetHandle());
 
-	DeferredBasePassParameters* Parameters = GraphBuilder->AllocateParameterStruct<DeferredBasePassParameters>();
+	DeferredBasePassParameters* Parameters = GetRDGBuilder()->AllocateParameterStruct<DeferredBasePassParameters>();
 	Parameters->RenderTarget.ColorTextures[0].Texture = GBuffer0;
 
 	DeferredBasePassParameters::GetStructMetaData()->GetLayout();
 
-	GraphBuilder->AddPass("BasePass", Parameters, [&View, this](RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
+	GetRDGBuilder()->AddPass("BasePass", Parameters, [&View, this](RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
 	{
 		CmdList.SetViewport(View.ViewRect.Min.X, View.ViewRect.Min.Y, View.ViewRect.Max.X, View.ViewRect.Max.Y, 0.0f, 1.0f);
 
@@ -28,11 +28,17 @@ void DeferredRenderer::RenderBasePass(WViewInfo& View)
 		RenderState.SetMultiSampleState(TStaticMultiSampleStateRHI<>::GetRHI());
 
 		WDeferredBasePassMeshProcessor Processor(View.Family->Scene, &View, RenderState);
+
+		WDynamicMeshPassDrawListContext DrawList;
+		Processor.SetDrawListContext(&DrawList);
+
 		const WEngine::WArray<WMeshBatch>& BatchElements = Collector.GetBatches();
 		for (uint32 MeshIndex = 0; MeshIndex < BatchElements.Size(); ++MeshIndex)
 		{
 			Processor.AddMeshBatch(BatchElements[MeshIndex]);
 		}
+
+		DrawList.FinalizeCommand(CmdList, RenderPass);
 	});
 }
 

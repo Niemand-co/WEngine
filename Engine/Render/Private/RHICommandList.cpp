@@ -87,6 +87,7 @@ void RHIRenderCommandList::CopyImageToBackBuffer(RHITexture* SrcTexture, RHIText
 
 WVertexBufferRHIRef RHIRenderCommandList::CreateVertexBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
 {
+    if(InCount == 0)return nullptr;
     return GetDynamicRHI()->CreateVertexBuffer(InContents, InStride, InCount, InUsage);
 }
 

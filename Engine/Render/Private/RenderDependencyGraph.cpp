@@ -120,7 +120,23 @@ void WRDGBuilder::Compile()
 
 void WRDGBuilder::Execute()
 {
+	Compile();
 
+	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
+	{
+		if (PassesToCull[Handle])
+			continue;
+
+		CollectResource(Handle);
+	}
+
+	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
+	{
+		if (PassesToCull[Handle])
+			continue;
+
+		CollectTrasition(Handle);
+	}
 
 	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
 	{
@@ -332,24 +348,6 @@ void WRDGBuilder::SetupPass(WRDGPass* Pass)
 
 			Pass->bHasUAVResource |= WEngine::EnumHasFlags(Access, EAccess::UAV);
 		});
-
-	Compile();
-
-	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
-	{
-		if (PassesToCull[Handle])
-			continue;
-
-		CollectResource(Handle);
-	}
-
-	for (WRDGPassHandle Handle = Passes.Begin(); Handle != Passes.End(); ++Handle)
-	{
-		if (PassesToCull[Handle])
-			continue;
-
-		CollectTrasition(Handle);
-	}
 }
 
 void WRDGBuilder::ExecutePass(WRDGPass* Pass)

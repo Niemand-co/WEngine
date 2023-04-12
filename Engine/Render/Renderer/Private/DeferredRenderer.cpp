@@ -11,10 +11,15 @@
 #include "Render/Descriptor/Public/RHIPipelineStateObjectDescriptor.h"
 #include "RHI/Public/RHIViewport.h"
 
+WRDGBuilder* GetRDGBuilder()
+{
+	static WRDGBuilder *Builder = new WRDGBuilder;
+	return Builder;
+}
+
 DeferredRenderer::DeferredRenderer(const WSceneViewFamily* InViewFamily)
 	: SceneRenderer(InViewFamily)
 {
-	GraphBuilder = new WRDGBuilder();
 }
 
 DeferredRenderer::~DeferredRenderer()
@@ -46,7 +51,7 @@ void DeferredRenderer::Render()
 		RenderPostEffect(View);
 
 	}
-	GraphBuilder->Execute();
+	GetRDGBuilder()->Execute();
 }
 
 void DeferredRenderer::InitView()

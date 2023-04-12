@@ -41,7 +41,7 @@ namespace WEngine
 	{
 	public:
 
-		WHashMap();
+		WHashMap() = default;
 
 		~WHashMap() = default;
 
@@ -88,16 +88,9 @@ namespace WEngine
 
 	private:
 
-		WArray<Entry<k, v>*> m_table;
+		Entry<k, v>* m_table[64] = {0};
 
 	};
-
-	template<typename k, typename v, size_t(*Hash)(k key)>
-	inline WHashMap<k, v, Hash>::WHashMap()
-		: m_table(WArray<Entry<k, v>*>(64, nullptr))
-	{
-		
-	}
 
 	template<typename k, typename v, size_t(*Hash)(k key)>
 	inline bool WHashMap<k, v, Hash>::Insert(const k& key, const v& val)

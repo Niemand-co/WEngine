@@ -70,6 +70,11 @@ public:
 
 	virtual ~WMeshPassProcessor() = default;
 
+	void SetDrawListContext(class WMeshPassDrawListContext* InDrawList)
+	{
+		DrawList = InDrawList;
+	}
+
 	template<typename PassShaderType>
 	void BuildMeshDrawCommand(
 	const WMeshBatch& MeshBatch,
@@ -83,6 +88,8 @@ protected:
 	const RScene *Scene;
 
 	const WViewInfo *View;
+
+	WMeshPassDrawListContext *DrawList;
 
 };
 
@@ -187,22 +194,78 @@ public:
 
 	WMeshDrawShaderBindings& GetShaderBinding(uint32 ShaderStage);
 
-	void SubmitDrawBegin(WRenderPassRHIRef RenderPass);
+	static bool SubmitDrawBegin(WMeshDrawCommand& Command, WRenderPassRHIRef RenderPass, RHIRenderCommandList& CmdList);
 
-	void SubmitDrawEnd();
+	static void SubmitDrawEnd(WMeshDrawCommand& Command, RHIRenderCommandList& CmdList);
+
+	static void SubmitDrawCommand(WMeshDrawCommand& Command, WRenderPassRHIRef RenderPass, RHIRenderCommandList& CmdList)
+	{
+		if (SubmitDrawBegin(Command, RenderPass, CmdList))
+		{
+			SubmitDrawEnd(Command, CmdList);
+		}
+	}
 
 private:
 
-	WIndexBufferRHIRef IndexBuffer;
+	WVertexBufferRHIRef VertexBuffer = nullptr;
 
-	uint32 FirstIndex;
+	WIndexBufferRHIRef IndexBuffer = nullptr;
 
-	uint32 NumPrimitives;
+	uint32 FirstIndex = 0;
 
-	uint32 NumInstances;
+	uint32 NumPrimitives = 0;
+
+	uint32 NumInstances = 0;
 
 	RHIGraphicsPipelineStateDescriptor PipelineDescriptor;
 
 	WMeshDrawShaderBindings ShaderBindings[MaxGraphicsPipelineShaderNum];
+
+};
+
+typedef WEngine::WArray<WMeshDrawCommand> WMeshCommandOneFrameArray;
+
+class WMeshPassDrawListContext
+{
+public:
+
+	virtual ~WMeshPassDrawListContext() = default;
+
+	virtual WMeshDrawCommand& AddCommand() = 0;
+
+	virtual void FinalizeCommand(RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass) = 0;
+
+};
+
+class WDynamicMeshPassDrawListContext : public WMeshPassDrawListContext
+{
+public:
+
+	WDynamicMeshPassDrawListContext() = default;
+
+	virtual ~WDynamicMeshPassDrawListContext() = default;
+
+	virtual WMeshDrawCommand& AddCommand() override;
+
+	virtual void FinalizeCommand(RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass) override;
+
+private:
+
+	WMeshCommandOneFrameArray MeshCommands;
+
+};
+
+class WCachedMeshPassDrawListContext : public WMeshPassDrawListContext
+{
+public:
+
+	WCachedMeshPassDrawListContext();
+
+	virtual ~WCachedMeshPassDrawListContext();
+
+	virtual WMeshDrawCommand& AddCommand() override;
+
+	virtual void FinalizeCommand(RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass) override;
 
 };

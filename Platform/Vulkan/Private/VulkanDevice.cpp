@@ -291,7 +291,7 @@ namespace Vulkan
 				DescriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 			}
 			WEngine::WArray<VkDescriptorSetLayoutBinding> LayoutBindings;
-			Bindings.EnumerateBindings([IsTextureResource, &DescriptorSetLayoutCreateInfo, &LayoutBindings, ShaderStage](const ShaderBindingSlot& Binding)
+			Bindings.EnumerateBindings([IsTextureResource, &DescriptorSetLayoutCreateInfo, &LayoutBindings, ShaderStage](const ShaderBindingSlot& Binding) -> void
 			{
 				DescriptorSetLayoutCreateInfo.bindingCount++;
 				if (IsTextureResource(Binding.Type))
@@ -304,13 +304,24 @@ namespace Vulkan
 				}
 			});
 
+			if (LayoutBindings.Size() == 0)
+			{
+				continue;
+			}
+
+			{
+				DescriptorSetLayoutCreateInfo.bindingCount = LayoutBindings.Size();
+				DescriptorSetLayoutCreateInfo.pBindings = LayoutBindings.GetData();
+			}
+
 			DescriptorSetLayout = new VulkanDescriptorSetLayout(this, &DescriptorSetLayoutCreateInfo);
 			DescriptorSetLayouts.Push(DescriptorSetLayout->GetHandle());
 			VulkanDescriptorSetLayoutManager::AddDescriptorLayout(LayoutID, DescriptorSetLayout);
 		}
 
 		uint32 PipelineLayoutID = WEngine::MemCrc32(HashCodes.GetData(), HashCodes.Size() * 4);
-		uint32 PipelineID = WEngine::MemCrc32(descriptor, sizeof(RHIGraphicsPipelineStateDescriptor), PipelineLayoutID);
+		descriptor->Finalize(PipelineLayoutID);
+		uint32 PipelineID = descriptor->GetHashCode();
 		VulkanGraphicsPipelineStateObject *Pipeline = VulkanPipelineStateManager::GetGraphicsPipelineState(PipelineID);
 		if (Pipeline)
 		{
@@ -337,7 +348,7 @@ namespace Vulkan
 				ShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 				ShaderStageCreateInfo.pName = "GSMain";
 				ShaderStageCreateInfo.stage = VK_SHADER_STAGE_GEOMETRY_BIT;
-				ShaderStageCreateInfo.module = static_cast<VulkanGeometryShader*>(descriptor->Shaders[(uint8)EShaderStage::Vertex]->GetGeometryShader())->GetShaderModule();
+				ShaderStageCreateInfo.module = static_cast<VulkanGeometryShader*>(descriptor->Shaders[(uint8)EShaderStage::Geometry]->GetGeometryShader())->GetShaderModule();
 			}
 			ShaderStageCreateInfos.Push(ShaderStageCreateInfo);
 		}
@@ -348,7 +359,7 @@ namespace Vulkan
 				ShaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 				ShaderStageCreateInfo.pName = "PSMain";
 				ShaderStageCreateInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-				ShaderStageCreateInfo.module = static_cast<VulkanPixelShader*>(descriptor->Shaders[(uint8)EShaderStage::Vertex]->GetPixelShader())->GetShaderModule();
+				ShaderStageCreateInfo.module = static_cast<VulkanPixelShader*>(descriptor->Shaders[(uint8)EShaderStage::Pixel]->GetPixelShader())->GetShaderModule();
 			}
 			ShaderStageCreateInfos.Push(ShaderStageCreateInfo);
 		}

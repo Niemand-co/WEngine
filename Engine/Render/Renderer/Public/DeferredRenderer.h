@@ -2,6 +2,8 @@
 #include "Render/Renderer/Public/ScriptableRenderer.h"
 #include "Render/Public/CascadedShadowMap.h"
 
+class WRDGBuilder* GetRDGBuilder();
+
 class DeferredRenderer : public SceneRenderer
 {
 public:

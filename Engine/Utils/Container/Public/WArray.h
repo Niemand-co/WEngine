@@ -32,6 +32,8 @@ namespace WEngine
 
 		void PushForward(const T& var);
 
+		T& AddInitialized();
+
 		T Pop();
 
 		void Append(const WArray<T>& other);
@@ -279,6 +281,30 @@ namespace WEngine
 
 		*m_pData = var;
 		m_size++;
+	}
+
+	template<typename T>
+	inline T& WArray<T>::AddInitialized()
+	{
+		if (m_capasity == 0)
+		{
+			m_capasity = 1;
+			m_pData = (T*)NormalAllocator::Get()->Allocate(sizeof(T));
+			memset(m_pData, 0, sizeof(T));
+		}
+		else if (m_size == m_capasity)
+		{
+			T* newPtr = (T*)NormalAllocator::Get()->Allocate(2 * m_capasity * sizeof(T));
+			memcpy(newPtr, m_pData, sizeof(T) * m_size);
+			NormalAllocator::Get()->Deallocate(m_pData);
+			m_pData = newPtr;
+			m_capasity *= 2;
+			memset(m_pData + m_size, 0, sizeof(T) * (m_capasity - m_size));
+		}
+
+		::new (m_pData + m_size) T();
+		m_size++;
+		return *(m_pData + m_size - 1);
 	}
 
 	template<typename T>

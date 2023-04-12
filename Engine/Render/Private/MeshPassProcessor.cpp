@@ -23,6 +23,7 @@ void WMeshDrawCommand::SetParameters(const WMeshBatch& MeshBatch, uint32 MeshBat
 {
 	const WMeshBatchElement& Element = MeshBatch.Elements[MeshBatchElementIndex];
 
+	VertexBuffer = MeshBatch.VertexFactory
 	IndexBuffer = Element.IndexBuffer ? Element.IndexBuffer->GetRHI() : nullptr;
 	FirstIndex = Element.FirstIndex;
 	NumPrimitives = Element.NumPrimitives; 
@@ -39,15 +40,30 @@ WMeshDrawShaderBindings& WMeshDrawCommand::GetShaderBinding(uint32 ShaderStage)
 	return ShaderBindings[ShaderStage];
 }
 
-void WMeshDrawCommand::SubmitDrawBegin(WRenderPassRHIRef RenderPass)
+bool WMeshDrawCommand::SubmitDrawBegin(WMeshDrawCommand& Command, WRenderPassRHIRef RenderPass, RHIRenderCommandList& CmdList)
 {
-	PipelineDescriptor.RenderPass = RenderPass;
-	PipelineDescriptor.ShaderBindings = ShaderBindings;
+	Command.PipelineDescriptor.RenderPass = RenderPass;
+	Command.PipelineDescriptor.ShaderBindings = Command.ShaderBindings;
 
-	GetRenderCommandList()->SetGraphicsPipelineState(&PipelineDescriptor);
+	CmdList.SetGraphicsPipelineState(&Command.PipelineDescriptor);
+
+	return true;
 }
 
-void WMeshDrawCommand::SubmitDrawEnd()
+void WMeshDrawCommand::SubmitDrawEnd(WMeshDrawCommand& Command, RHIRenderCommandList& CmdList)
 {
-	GetRenderCommandList()->DrawIndexedPrimitive(NumPrimitives * 3, FirstIndex, NumInstances);
+	CmdList.DrawIndexedPrimitive(Command.NumPrimitives * 3, Command.FirstIndex, Command.NumInstances);
+}
+
+WMeshDrawCommand& WDynamicMeshPassDrawListContext::AddCommand()
+{
+	return MeshCommands.AddInitialized();
+}
+
+void WDynamicMeshPassDrawListContext::FinalizeCommand(RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
+{
+	for (WMeshDrawCommand& Command : MeshCommands)
+	{
+		WMeshDrawCommand::SubmitDrawCommand(Command, RenderPass, CmdList);
+	}
 }
