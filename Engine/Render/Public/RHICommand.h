@@ -43,6 +43,42 @@ struct RHICommandEndRenderPass final : public RHICommand<RHICommandEndRenderPass
 	void Execute(RHICommandListBase *CmdList);
 };
 
+struct RHICommandBindVertexBuffer final : public RHICommand<RHICommandBindVertexBuffer>
+{
+	WVertexFactory* VertexFactory;
+
+	RHICommandBindVertexBuffer(WVertexFactory* InVertexFactory)
+		: VertexFactory(InVertexFactory)
+	{
+	}
+
+	void Execute(RHICommandListBase *CmdList);
+};
+
+struct RHICommandSetStreamResource final : public RHICommand<RHICommandSetStreamResource>
+{
+	VertexInputStream Stream;
+
+	RHICommandSetStreamResource(const VertexInputStream& InStream)
+		: Stream(InStream)
+	{
+	}
+
+	void Execute(RHICommandListBase *CmdList);
+};
+
+struct RHICommandBindIndexBuffer final : public RHICommand<RHICommandBindIndexBuffer>
+{
+	WIndexBufferRHIRef IndexBuffer;
+
+	RHICommandBindIndexBuffer(WIndexBufferRHIRef InIndexBuffer)
+		: IndexBuffer(InIndexBuffer)
+	{
+	}
+
+	void Execute(RHICommandListBase *CmdList);
+};
+
 struct RHICommandDrawIndexedPrimitive final : public RHICommand<RHICommandDrawIndexedPrimitive>
 {
 	unsigned int indexCount;
@@ -52,7 +88,6 @@ struct RHICommandDrawIndexedPrimitive final : public RHICommand<RHICommandDrawIn
 	RHICommandDrawIndexedPrimitive(unsigned int inIndexCount, unsigned int inFirstIndex, unsigned int inInstanceCount)
 		: indexCount(inIndexCount), firstIndex(inFirstIndex), instanceCount(inInstanceCount)
 	{
-
 	}
 
 	void Execute(RHICommandListBase *CmdList);
@@ -70,7 +105,6 @@ struct RHICommandSetViewport final : public RHICommand<RHICommandSetViewport>
 	RHICommandSetViewport(float minX, float maxX, float minY, float maxY, float minZ, float maxZ)
 		: MinX(minX), MaxX(maxX), MinY(minY), MaxY(maxY), MinZ(minZ), MaxZ(maxZ)
 	{
-
 	}
 
 	void Execute(RHICommandListBase *CmdList);
@@ -78,15 +112,14 @@ struct RHICommandSetViewport final : public RHICommand<RHICommandSetViewport>
 
 struct RHICommandSetScissor final : public RHICommand<RHICommandSetScissor>
 {
-	unsigned int MinX;
-	unsigned int MinY;
-	unsigned int MaxX;
-	unsigned int MaxY;
+	int32 OffsetX;
+	int32 OffsetY;
+	uint32 Width;
+	uint32 Height;
 
-	RHICommandSetScissor(unsigned int minX, unsigned int maxX, unsigned int minY, unsigned int maxY)
-		: MinX(minX), MaxX(maxX), MinY(minY), MaxY(maxY)
+	RHICommandSetScissor(int32 InOffsetX, int32 InOffsetY, uint32 InWidth, uint32 InHeight)
+		: OffsetX(InOffsetX), OffsetY(InOffsetY), Width(InWidth), Height(InHeight)
 	{
-
 	}
 
 	void Execute(RHICommandListBase* CmdList);

@@ -25,7 +25,7 @@ void WColorVertexBuffer::Init(const WEngine::WArray<struct VertexComponent>& InV
 
 void WColorVertexBuffer::InitRHIResource()
 {
-	Buffer = GetRenderCommandList()->CreateVertexBuffer(ColorData->GetData(), ColorData->GetStride(), ColorData->GetNum(), EBufferUsageFlags::BF_VertexBuffer);
+	Buffer = GetRenderCommandList()->CreateVertexBuffer(ColorData->GetData(), ColorData->GetStride(), ColorData->GetNum(), EBufferUsageFlags::BF_VertexBuffer | EBufferUsageFlags::BF_TransferDst);
 }
 
 void WColorVertexBuffer::UpdateRHIResource()

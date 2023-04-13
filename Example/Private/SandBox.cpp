@@ -75,7 +75,7 @@ SandBox::SandBox()
 	WEngine::LayerStack::Get()->PushLayer(new GameScene("Game Scene"));
 
 	GameObject *sphere = GWorld::GetWorld()->CreateGameObject("Sphere");
-	WStaticMesh *Mesh = WMeshLibrary::GetMesh("triangle");
+	WStaticMesh *Mesh = WMeshLibrary::GetMesh("sphere");
 	sphere->AddComponent<StaticMeshComponent>(Mesh);
 	sphere->AddComponent<MaterialComponent>();
 }

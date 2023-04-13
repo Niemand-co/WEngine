@@ -20,7 +20,7 @@ namespace Vulkan
 
 		virtual WMultiSampleStateRHIRef CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer) override;
 
-		virtual WVertexInputStateRHIRef CreateVertexInputState(const WEngine::WArray<VertexInputElement>& InElements) override;
+		virtual WVertexInputStateRHIRef GetOrCreateVertexInputState(const WEngine::WArray<VertexInputElement>& InElements) override;
 
 	};
 
@@ -44,7 +44,13 @@ namespace Vulkan
 
 		virtual void RHISetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth) override;
 
-		virtual void RHISetScissor() override;
+		virtual void RHISetScissor(int32 OffsetX, int32 OffsetY, uint32 Width, uint32 Height) override;
+
+		virtual void RHIBindVertexBuffer(WVertexFactory* InVertexFactory) override;
+
+		virtual void RHISetStreamResource(const VertexInputStream& InStream) override;
+
+		virtual void RHIBindIndexBuffer(WIndexBufferRHIRef InIndexBuffer) override;
 
 		virtual void RHIDrawIndexedPrimitive(uint32 indexCount, uint32 firstIndex, uint32 instanceCount) override;
 

@@ -1,20 +1,6 @@
 #pragma once
 #include "Render/Descriptor/Public/RHIVertexInputDescriptor.h"
 
-struct VertexBindingDescription
-{
-	unsigned int slot;
-	size_t stride;
-};
-
-struct VertexAttributeDescription
-{
-	unsigned int slot;
-	unsigned int location;
-	unsigned int offset;
-	Format format;
-};
-
 struct VertexComponent
 {
 	glm::vec3 Position = glm::vec3();
@@ -73,6 +59,8 @@ public:
 	virtual void UpdateRHIResource() override;
 
 	virtual WVertexInputStateRHIRef GetVertexInput(EVertexInputType Type) = 0;
+
+	virtual void GetStreams(EVertexInputType VertexInputType, VertexInputStream& OutVertexStream) = 0;
 	
 };
 
@@ -84,6 +72,12 @@ public:
 
 	virtual ~WLocalVertexFactory() = default;
 
+	virtual void InitRHIResource() override;
+
+	virtual void ReleaseRHIResource() override;
+
+	virtual void UpdateRHIResource() override;
+
 	void SetData(const WStaticMeshDataType& InData) { Data = InData; }
 
 	const WStaticMeshDataType& GetData() const { return Data; }
@@ -92,9 +86,17 @@ public:
 
 	virtual WVertexInputStateRHIRef GetVertexInput(EVertexInputType Type) override;
 
+	virtual void GetStreams(EVertexInputType VertexInputType, VertexInputStream& OutVertexStream) override;
+
 private:
 
 	WStaticMeshDataType Data;
+
+	WVertexInputStateRHIRef PositionDeclaration;
+
+	WVertexInputStateRHIRef PositionAndNormalDeclaration;
+
+	WVertexInputStateRHIRef DefaultDeclaration;
 
 };
 

@@ -190,7 +190,7 @@ public:
 	WMeshDrawCommand& operator=(WMeshDrawCommand&& Other) = default;
 	WMeshDrawCommand& operator=(const WMeshDrawCommand& Other) = default;
 
-	void SetParameters(const WMeshBatch& MeshBatch, uint32 MeshBatchElementIndex, const WMeshPassProcessorShaderBase *Shaders, const class RHIGraphicsPipelineStateDescriptor& InPipelineDescriptor);
+	void SetParameters(const WMeshBatch& MeshBatch, uint32 MeshBatchElementIndex, VertexInputStream& Stream, const WMeshPassProcessorShaderBase *Shaders, const class RHIGraphicsPipelineStateDescriptor& InPipelineDescriptor);
 
 	WMeshDrawShaderBindings& GetShaderBinding(uint32 ShaderStage);
 
@@ -208,7 +208,7 @@ public:
 
 private:
 
-	WVertexBufferRHIRef VertexBuffer = nullptr;
+	VertexInputStream VertexStream;
 
 	WIndexBufferRHIRef IndexBuffer = nullptr;
 

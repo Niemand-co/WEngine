@@ -53,9 +53,9 @@ public:
 
 	void ComputeVisibility();
 
-	void FrustumCulling(const WEngine::WArray<class PrimitiveInfo*>& Primitives, WViewInfo& ViewInfo);
+	void FrustumCulling(const WEngine::WArray<struct PrimitiveInfo*>& Primitives, WViewInfo& ViewInfo);
 
-	void OcclusionCulling(const WEngine::WArray<class PrimitiveInfo*>& Primitives, WViewInfo& ViewInfo);
+	void OcclusionCulling(const WEngine::WArray<struct PrimitiveInfo*>& Primitives, WViewInfo& ViewInfo);
 
 	void GatherDynamicMeshElements(const WEngine::WArray<WViewInfo>& Views, const WSceneViewFamily* InFamily);
 

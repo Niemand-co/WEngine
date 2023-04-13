@@ -20,7 +20,7 @@ void WStaticMeshIndexBuffer::Init(const WEngine::WArray<uint32>& InIndices)
 
 void WStaticMeshIndexBuffer::InitRHIResource()
 {
-	Buffer = GetRenderCommandList()->CreateIndexBuffer(IndexData->GetData(), IndexData->GetNum(), EBufferUsageFlags::BF_IndexBuffer);
+	Buffer = GetRenderCommandList()->CreateIndexBuffer(IndexData->GetData(), IndexData->GetNum(), EBufferUsageFlags::BF_IndexBuffer | EBufferUsageFlags::BF_TransferDst);
 }
 
 void WStaticMeshIndexBuffer::UpdateRHIResource()

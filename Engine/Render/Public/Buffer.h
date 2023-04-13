@@ -18,6 +18,8 @@ public:
 
 	WVertexBufferRHIRef& GetRHI() { return Buffer; }
 
+	const WVertexBufferRHIRef& GetRHI() const { return Buffer; }
+
 	virtual void ReleaseRHIResource() override
 	{
 		Buffer = nullptr;

@@ -60,6 +60,36 @@ void RHIRenderCommandList::SetGraphicsPipelineState(RHIGraphicsPipelineStateDesc
     GetDynamicRHI()->RHISetGraphicsPipelineState(GraphicsPipelineState);
 }
 
+void RHIRenderCommandList::BindVertexBuffer(WVertexFactory* InVertexFactory)
+{
+    if (IsOutOfRenderThread() && IsOutOfRHIThread())
+    {
+        ALLOC_COMMAND(RHICommandBindVertexBuffer)(InVertexFactory);
+        return;
+    }
+    GetDynamicRHI()->RHIBindVertexBuffer(InVertexFactory);
+}
+
+void RHIRenderCommandList::SetStreamResource(const VertexInputStream& Stream)
+{
+    if (IsOutOfRenderThread() && IsOutOfRHIThread())
+    {
+        ALLOC_COMMAND(RHICommandSetStreamResource)(Stream);
+        return;
+    }
+    GetDynamicRHI()->RHISetStreamResource(Stream);
+}
+
+void RHIRenderCommandList::BindIndexBuffer(WIndexBufferRHIRef IndexBuffer)
+{
+    if (IsOutOfRenderThread() && IsOutOfRHIThread())
+    {
+        ALLOC_COMMAND(RHICommandBindIndexBuffer)(IndexBuffer);
+        return;
+    }
+    GetDynamicRHI()->RHIBindIndexBuffer(IndexBuffer);
+}
+
 void RHIRenderCommandList::DrawIndexedPrimitive(uint32 indexCount, uint32 firstIndex, uint32 instanceCount)
 {
     if (IsOutOfRenderThread() && IsOutOfRHIThread())
@@ -78,6 +108,16 @@ void RHIRenderCommandList::SetViewport(float MinX, float MinY, float MaxX, float
         return;
     }
     GetDynamicRHI()->RHISetViewport(MinX, MinY, MaxX - MinX, MaxY - MinY, MinDepth, MaxDepth);
+}
+
+void RHIRenderCommandList::SetScissor(int32 OffsetX, int32 OffsetY, uint32 Width, uint32 Height)
+{
+    if (IsOutOfRenderThread() && IsOutOfRHIThread())
+    {
+        ALLOC_COMMAND(RHICommandSetScissor)(OffsetX, OffsetY, Width, Height);
+        return;
+    }
+    GetDynamicRHI()->RHISetScissor(OffsetX, OffsetY, Width, Height);
 }
 
 void RHIRenderCommandList::CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY)
@@ -166,9 +206,9 @@ WMultiSampleStateRHIRef RHIRenderCommandList::CreateMultiSampleState(const RHIMu
     return GetStaticRHI()->CreateMultiSampleState(Initializer);
 }
 
-WVertexInputStateRHIRef RHIRenderCommandList::CreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements)
+WVertexInputStateRHIRef RHIRenderCommandList::GetOrCreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements)
 {
-    return GetStaticRHI()->CreateVertexInputState(InElements);
+    return GetStaticRHI()->GetOrCreateVertexInputState(InElements);
 }
 
 RHIRenderCommandList* GetRenderCommandList()

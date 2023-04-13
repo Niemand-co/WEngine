@@ -395,6 +395,17 @@ namespace Vulkan
 		}
 		vkCreatePipelineLayout(Device, &PipelineCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &PipelineLayout);
 
+		VkViewport viewport = {0, 0, 1920, 1080, 0.0f, 1.0f};
+		VkRect2D scissor = {0, 0, 1920, 1080};
+		VkPipelineViewportStateCreateInfo PipelineViewportStateCreateInfo = {};
+		{
+			PipelineViewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+			PipelineViewportStateCreateInfo.viewportCount = 1;
+			PipelineViewportStateCreateInfo.pViewports = &viewport;
+			PipelineViewportStateCreateInfo.scissorCount = 1;
+			PipelineViewportStateCreateInfo.pScissors = &scissor;
+		}
+
 		VkGraphicsPipelineCreateInfo GraphicsPipelineCreateInfo = {};
 		{
 			GraphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -402,7 +413,7 @@ namespace Vulkan
 			GraphicsPipelineCreateInfo.pStages = ShaderStageCreateInfos.GetData();
 			GraphicsPipelineCreateInfo.pVertexInputState = &static_cast<VulkanVertexInputState*>(descriptor->VertexInputState)->VertexInputStateCreateInfo;
 			GraphicsPipelineCreateInfo.pInputAssemblyState = &static_cast<VulkanRasterizationState*>(descriptor->RasterizationState)->InputAssemblyStateCreateInfo;
-			GraphicsPipelineCreateInfo.pViewportState = nullptr;
+			GraphicsPipelineCreateInfo.pViewportState = &PipelineViewportStateCreateInfo;
 			GraphicsPipelineCreateInfo.pRasterizationState = &static_cast<VulkanRasterizationState*>(descriptor->RasterizationState)->RasterizationStateCreateInfo;
 			GraphicsPipelineCreateInfo.pMultisampleState = &static_cast<VulkanMultiSampleState*>(descriptor->MultiSampleState)->MultiSampleStateCreateInfo;
 			GraphicsPipelineCreateInfo.pDepthStencilState = &static_cast<VulkanDepthStencilState*>(descriptor->DepthStencilState)->DepthStencilStateCreateInfo;

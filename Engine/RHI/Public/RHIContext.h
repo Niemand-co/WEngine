@@ -29,7 +29,7 @@ public:
 
 	virtual WMultiSampleStateRHIRef CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer) = 0;
 
-	virtual WVertexInputStateRHIRef CreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements) = 0;
+	virtual WVertexInputStateRHIRef GetOrCreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements) = 0;
 
 };
 
@@ -81,7 +81,13 @@ public:
 
 	virtual void RHISetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth) = 0;
 
-	virtual void RHISetScissor() = 0;
+	virtual void RHISetScissor(int32 OffsetX, int32 OffsetY, uint32 Width, uint32 Height) = 0;
+
+	virtual void RHIBindVertexBuffer(class WVertexFactory* InVertexFactory) = 0;
+
+	virtual void RHISetStreamResource(const VertexInputStream& InStream) = 0;
+
+	virtual void RHIBindIndexBuffer(WIndexBufferRHIRef InIndexBuffer) = 0;
 
 	virtual void RHIDrawIndexedPrimitive(uint32 indexCount, uint32 firstIndex, uint32 instanceCount) = 0;
 

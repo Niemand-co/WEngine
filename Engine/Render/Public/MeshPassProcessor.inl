@@ -7,6 +7,8 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 											  const MaterialProxy& Material,
 											  EPassFeature Feature)
 {
+	VertexInputStream VertexStream;
+
 	RHIGraphicsPipelineStateDescriptor PipelineInfo = {};
 	{
 		uint32 BlendIndex = 0;
@@ -27,12 +29,15 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 		{
 		case EPassFeature::Default:
 			PipelineInfo.VertexInputState = MeshBatch.VertexFactory->GetVertexInput(EVertexInputType::Default);
+			MeshBatch.VertexFactory->GetStreams(EVertexInputType::Default, VertexStream);
 			break;
 		case EPassFeature::PositionOnly:
 			PipelineInfo.VertexInputState = MeshBatch.VertexFactory->GetVertexInput(EVertexInputType::PositionOnly);
+			MeshBatch.VertexFactory->GetStreams(EVertexInputType::PositionOnly, VertexStream);
 			break;
 		case EPassFeature::PositionAndNormal:
 			PipelineInfo.VertexInputState = MeshBatch.VertexFactory->GetVertexInput(EVertexInputType::PositionAndNormal);
+			MeshBatch.VertexFactory->GetStreams(EVertexInputType::PositionAndNormal, VertexStream);
 			break;
 		default:
 			RE_ASSERT(false, "Error pass feature.");
@@ -66,7 +71,7 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 			PassShader->GetPixelShader()->GetParametersBinding(View, &Material, ShaderBindings);
 		}
 
-		DrawCommand.SetParameters(MeshBatch, ElementIndex, PassShader, PipelineInfo);
+		DrawCommand.SetParameters(MeshBatch, ElementIndex, VertexStream, PassShader, PipelineInfo);
 	}
 
 }

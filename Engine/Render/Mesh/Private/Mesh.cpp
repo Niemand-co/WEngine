@@ -25,6 +25,7 @@ void StaticMeshFactories::InitResource(const StaticMeshLodResource& LodResource)
 		LodResource.VertexBuffer.MeshBuffer.BindMeshVertexBuffer(Data);
 
 		VertexFactory.SetData(Data);
+		VertexFactory.InitRHIResource();
 	}
 
 	{
@@ -34,6 +35,7 @@ void StaticMeshFactories::InitResource(const StaticMeshLodResource& LodResource)
 		LodResource.VertexBuffer.ColorBuffer.BindColorVertexBuffer(Data);
 
 		VertexFactoryWithColor.SetData(Data);
+		VertexFactoryWithColor.InitRHIResource();
 	}
 
 }

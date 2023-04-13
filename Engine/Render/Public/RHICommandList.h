@@ -67,13 +67,17 @@ public:
 
 	void SetGraphicsPipelineState(class RHIGraphicsPipelineStateDescriptor* GraphicsPipelineState);
 
-	void BindVertexBuffer();
+	void BindVertexBuffer(class WVertexFactory* InVertexFactory);
 
-	void BindIndexBuffer();
+	void SetStreamResource(const VertexInputStream& Stream);
+
+	void BindIndexBuffer(WIndexBufferRHIRef IndexBuffer);
 
 	void DrawIndexedPrimitive(uint32 indexCount, uint32 firstIndex, uint32 instanceCount);
 
 	void SetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth);
+
+	void SetScissor(int32 OffsetX, int32 OffsetY, uint32 Width, uint32 Height);
 
 	void CopyImageToBackBuffer(class RHITexture *SrcTexture, class RHITexture *DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY);
 
@@ -109,7 +113,7 @@ public:
 
 	WMultiSampleStateRHIRef CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer);
 
-	WVertexInputStateRHIRef CreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements);
+	WVertexInputStateRHIRef GetOrCreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements);
 
 public:
 

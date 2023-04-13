@@ -633,3 +633,12 @@ typedef class RHIDepthStencilState* WDepthStencilStateRHIRef;
 typedef class RHIRasterizationState* WRasterizationStateRHIRef;
 typedef class RHIMultiSampleState* WMultiSampleStateRHIRef;
 typedef class RHIVertexInputState* WVertexInputStateRHIRef;
+
+struct VertexInputStreamElement
+{
+	uint32 StreamIndex;
+	WVertexBufferRHIRef VertexBuffer;
+	uint32 Offset;
+};
+
+typedef WEngine::WArray<VertexInputStreamElement> VertexInputStream;

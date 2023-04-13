@@ -45,6 +45,7 @@ enum class EBufferUsageFlags : uint32
 	BF_Dynamic         = 0x00000800,
 	BF_CPUAccessable   = 0x00001000,
 };
+ENUM_CLASS_FLAGS(EBufferUsageFlags)
 
 enum class EImageUsageFlags : uint32
 {

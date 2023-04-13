@@ -16,6 +16,21 @@ void RHICommandEndRenderPass::Execute(RHICommandListBase* CmdList)
 	ENCODER_EXECUTE(RHIEndRenderPass)();
 }
 
+void RHICommandBindVertexBuffer::Execute(RHICommandListBase* CmdList)
+{
+	ENCODER_EXECUTE(RHIBindVertexBuffer)(VertexFactory);
+}
+
+void RHICommandSetStreamResource::Execute(RHICommandListBase* CmdList)
+{
+	ENCODER_EXECUTE(RHISetStreamResource)(Stream);
+}
+
+void RHICommandBindIndexBuffer::Execute(RHICommandListBase* CmdList)
+{
+	ENCODER_EXECUTE(RHIBindIndexBuffer)(IndexBuffer);
+}
+
 void RHICommandDrawIndexedPrimitive::Execute(RHICommandListBase* CmdList)
 {
 	ENCODER_EXECUTE(RHIDrawIndexedPrimitive)(indexCount, firstIndex, instanceCount);
@@ -28,4 +43,5 @@ void RHICommandSetViewport::Execute(RHICommandListBase* CmdList)
 
 void RHICommandSetScissor::Execute(RHICommandListBase* CmdList)
 {
+	ENCODER_EXECUTE(RHISetScissor)(OffsetX, OffsetY, Width, Height);
 }
