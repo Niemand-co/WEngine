@@ -534,9 +534,9 @@ private:\
 
 #define END_SHADER_PARAMETERS_STRUCT_INTERNAL\
 	LastFuncPtrIdentity;\
-		static WEngine::WArray<WParameterMember> GetMembers()\
+		static WEngine::WArray<WParameterMember>& GetMembers()\
 		{\
-			WEngine::WArray<WParameterMember> Members;\
+			static WEngine::WArray<WParameterMember> Members;\
 			FuncPtr(*LastPtr)(LastFuncPtrIdentity, WEngine::WArray<WParameterMember>&);\
 			LastPtr = AppendMember;\
 			FuncPtr ptr = (FuncPtr)LastPtr;\

@@ -1,5 +1,6 @@
 #pragma once
 #include "Utils/Public/Tools.h"
+#include "Utils/Allocator/Public/Allocator.h"
 #include <initializer_list>
 
 namespace WEngine
@@ -94,6 +95,16 @@ namespace WEngine
 				m_pData[i] = array[i];
 			}
 			return *this;
+		}
+
+		void* operator new(size_t size)
+		{
+			return NormalAllocator::Get()->Allocate(size);
+		}
+
+		void operator delete(void* pData)
+		{
+			NormalAllocator::Get()->Deallocate(pData);
 		}
 
 	private:

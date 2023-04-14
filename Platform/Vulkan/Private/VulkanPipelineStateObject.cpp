@@ -13,7 +13,7 @@ namespace Vulkan
 	VulkanGraphicsPipelineStateObject::VulkanGraphicsPipelineStateObject(VulkanDevice *pInDevice, VkGraphicsPipelineCreateInfo *pInfo)
 		: pDevice(pInDevice)
 	{
-		vkCreateGraphicsPipelines(pDevice->GetHandle(), VK_NULL_HANDLE, 1, pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Pipeline);
+		RE_ASSERT(vkCreateGraphicsPipelines(pDevice->GetHandle(), VK_NULL_HANDLE, 1, pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Pipeline) == VK_SUCCESS, "Failed to create pipeline");
 	}
 
 	VulkanGraphicsPipelineStateObject::~VulkanGraphicsPipelineStateObject()

@@ -53,8 +53,6 @@ public:
 
 	virtual ~RHIRenderCommandList() = default;
 
-	RHIGraphicsEncoder* GetEncoder() const { return m_pEncoder; }
-
 	void BeginDrawingViewport(RHIViewport *Viewport);
 
 	void EndDrawingViewport(RHIViewport *Viewport, bool bPresent);
@@ -115,18 +113,6 @@ public:
 
 	WVertexInputStateRHIRef GetOrCreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements);
 
-public:
-
-	static RHIRenderCommandList* Get() { if(g_instance == nullptr)g_instance = new RHIRenderCommandList(); return g_instance; }
-
-private:
-
-	static RHIRenderCommandList* g_instance;
-
-protected:
-
-	class RHIGraphicsEncoder *m_pEncoder;
-
 };
 
 class RHIComputeCommandList : public RHICommandListBase
@@ -136,12 +122,6 @@ public:
 	RHIComputeCommandList();
 
 	virtual ~RHIComputeCommandList() = default;
-
-	class RHIComputeEncoder* GetEncoder() const { return m_pEncoder; }
-
-protected:
-
-	RHIComputeEncoder *m_pEncoder;
 
 };
 

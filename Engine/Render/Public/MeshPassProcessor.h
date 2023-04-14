@@ -194,15 +194,15 @@ public:
 
 	WMeshDrawShaderBindings& GetShaderBinding(uint32 ShaderStage);
 
-	static bool SubmitDrawBegin(WMeshDrawCommand& Command, WRenderPassRHIRef RenderPass, RHIRenderCommandList& CmdList);
+	bool SubmitDrawBegin(WRenderPassRHIRef RenderPass, RHIRenderCommandList& CmdList);
 
-	static void SubmitDrawEnd(WMeshDrawCommand& Command, RHIRenderCommandList& CmdList);
+	void SubmitDrawEnd(RHIRenderCommandList& CmdList);
 
 	static void SubmitDrawCommand(WMeshDrawCommand& Command, WRenderPassRHIRef RenderPass, RHIRenderCommandList& CmdList)
 	{
-		if (SubmitDrawBegin(Command, RenderPass, CmdList))
+		if (Command.SubmitDrawBegin(RenderPass, CmdList))
 		{
-			SubmitDrawEnd(Command, CmdList);
+			Command.SubmitDrawEnd(CmdList);
 		}
 	}
 
@@ -250,7 +250,7 @@ public:
 
 	virtual void FinalizeCommand(RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass) override;
 
-private:
+public:
 
 	WMeshCommandOneFrameArray MeshCommands;
 

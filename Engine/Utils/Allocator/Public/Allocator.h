@@ -70,6 +70,7 @@ namespace WEngine
 	template<uint32 NumBlock>
 	void* Allocator<NumBlock>::Allocate(size_t size)
 	{
+		return malloc(size);
 		WScopeLock Lock(&Section);
 		if (size <= 0)
 		{
@@ -104,6 +105,8 @@ namespace WEngine
 	template<uint32 NumBlock>
 	void Allocator<NumBlock>::Deallocate(void* pBlock)
 	{
+		free(pBlock);
+		return;
 		WScopeLock Lock(&Section);
 		if (pBlock == nullptr)
 			return;
@@ -122,6 +125,7 @@ namespace WEngine
 	template<uint32 NumBlock>
 	void* Allocator<NumBlock>::Reallocate(void* pBlock, size_t newSize)
 	{
+		return realloc(pBlock, newSize);
 		BYTE index = *((BYTE*)pBlock - 1);
 		if (index == 0)
 		{

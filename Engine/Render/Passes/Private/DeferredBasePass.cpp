@@ -14,12 +14,8 @@ void DeferredRenderer::RenderBasePass(WViewInfo& View)
 	DeferredBasePassParameters* Parameters = GetRDGBuilder()->AllocateParameterStruct<DeferredBasePassParameters>();
 	Parameters->RenderTarget.ColorTextures[0].Texture = GBuffer0;
 
-	DeferredBasePassParameters::GetStructMetaData()->GetLayout();
-
 	GetRDGBuilder()->AddPass("BasePass", Parameters, [&View, this](RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
 	{
-		CmdList.SetViewport(View.ViewRect.Min.X, View.ViewRect.Min.Y, View.ViewRect.Max.X, View.ViewRect.Max.Y, 0.0f, 1.0f);
-		CmdList.SetScissor(0, 0, View.ViewRect.Max.X - View.ViewRect.Min.X, View.ViewRect.Max.Y - View.ViewRect.Min.Y);
 
 		WMeshPassProcessorRenderState RenderState;
 
@@ -39,14 +35,15 @@ void DeferredRenderer::RenderBasePass(WViewInfo& View)
 			Processor.AddMeshBatch(BatchElements[MeshIndex]);
 		}
 		DrawList.FinalizeCommand(CmdList, RenderPass);
-
+		//CmdList.SetViewport(View.ViewRect.Min.X, View.ViewRect.Min.Y, View.ViewRect.Max.X, View.ViewRect.Max.Y, 0.0f, 1.0f);
+		//CmdList.SetScissor(0, 0, View.ViewRect.Max.X - View.ViewRect.Min.X, View.ViewRect.Max.Y - View.ViewRect.Min.Y);
 	});
 }
 
 WDeferredBasePassVS::WDeferredBasePassVS(WVertexShaderRHIRef InVertexShaderRHI)
 	: VertexShaderRHI(InVertexShaderRHI)
 {
-	UniformBuffer = new WUniformBuffer(&Parameters.GetStructMetaData()->GetLayout());
+	//UniformBuffer = new WUniformBuffer(&Parameters.GetStructMetaData()->GetLayout());
 }
 
 WDeferredBasePassVS::~WDeferredBasePassVS()

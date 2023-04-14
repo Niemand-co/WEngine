@@ -32,7 +32,10 @@ void WMeshDrawCommand::SetParameters(const WMeshBatch& MeshBatch, uint32 MeshBat
 
 	PipelineDescriptor = InPipelineDescriptor;
 
-	ShaderBindings->Initialize(Shaders);
+	for (uint32 ShaderStage = 0; ShaderStage < MaxGraphicsPipelineShaderNum; ++ShaderStage)
+	{
+		ShaderBindings[ShaderStage].Initialize(Shaders);
+	}
 }
 
 WMeshDrawShaderBindings& WMeshDrawCommand::GetShaderBinding(uint32 ShaderStage)
@@ -41,22 +44,25 @@ WMeshDrawShaderBindings& WMeshDrawCommand::GetShaderBinding(uint32 ShaderStage)
 	return ShaderBindings[ShaderStage];
 }
 
-bool WMeshDrawCommand::SubmitDrawBegin(WMeshDrawCommand& Command, WRenderPassRHIRef RenderPass, RHIRenderCommandList& CmdList)
+bool WMeshDrawCommand::SubmitDrawBegin(WRenderPassRHIRef RenderPass, RHIRenderCommandList& CmdList)
 {
-	Command.PipelineDescriptor.RenderPass = RenderPass;
-	Command.PipelineDescriptor.ShaderBindings = Command.ShaderBindings;
+	PipelineDescriptor.RenderPass = RenderPass;
+	PipelineDescriptor.ShaderBindings = ShaderBindings;
 
-	CmdList.SetGraphicsPipelineState(&Command.PipelineDescriptor);
+	CmdList.SetViewport(0, 0, 1920, 1080, 0.0f, 1.0f);
+	CmdList.SetScissor(0, 0, 1920, 1080);
+	//CmdList.SetGraphicsPipelineState(&PipelineDescriptor);
 
-	CmdList.SetStreamResource(Command.VertexStream);
+	//CmdList.SetStreamResource(VertexStream);
 
 	return true;
 }
 
-void WMeshDrawCommand::SubmitDrawEnd(WMeshDrawCommand& Command, RHIRenderCommandList& CmdList)
+void WMeshDrawCommand::SubmitDrawEnd(RHIRenderCommandList& CmdList)
 {
-	CmdList.BindIndexBuffer(Command.IndexBuffer);
-	CmdList.DrawIndexedPrimitive(Command.NumPrimitives * 3, Command.FirstIndex, Command.NumInstances);
+	//CmdList.BindIndexBuffer(IndexBuffer);
+	//CmdList.DrawIndexedPrimitive(NumPrimitives * 3, FirstIndex, NumInstances);
+
 }
 
 WMeshDrawCommand& WDynamicMeshPassDrawListContext::AddCommand()

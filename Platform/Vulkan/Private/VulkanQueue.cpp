@@ -42,19 +42,19 @@ namespace Vulkan
 	{
 		VkCommandBuffer CommandBuffer = CmdBuffer->GetHandle();
 
-		WEngine::WArray<VkSemaphore> WaitingSemaphores;
-		WaitingSemaphores.Reserve(CmdBuffer->GetWaitingSemaphores().Size());
+		WEngine::WArray<VkSemaphore> *WaitingSemaphores = new WEngine::WArray<VkSemaphore>();
+		WaitingSemaphores->Reserve(CmdBuffer->GetWaitingSemaphores().Size());
 		for (const VulkanSemaphore* Semaphore : CmdBuffer->GetWaitingSemaphores())
 		{
-			WaitingSemaphores.Push(Semaphore->GetHandle());
+			WaitingSemaphores->Push(Semaphore->GetHandle());
 		}
 		VkSubmitInfo Info = {};
 		{
 			Info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 			Info.commandBufferCount = 1;
 			Info.pCommandBuffers = &CommandBuffer;
-			Info.waitSemaphoreCount = WaitingSemaphores.Size();
-			Info.pWaitSemaphores = WaitingSemaphores.GetData();
+			Info.waitSemaphoreCount = WaitingSemaphores->Size();
+			Info.pWaitSemaphores = WaitingSemaphores->GetData();
 			Info.pWaitDstStageMask = CmdBuffer->GetWaitingStageMasks().GetData();
 			Info.signalSemaphoreCount = NumSignalSemaphore;
 			Info.pSignalSemaphores = pSignalSemaphores;
@@ -66,6 +66,7 @@ namespace Vulkan
 		CmdBuffer->WaitingStageMasks.Clear();
 		CmdBuffer->SubmittedWaitingSemaphores = CmdBuffer->WaitingSemaphores;
 		CmdBuffer->WaitingSemaphores.Clear();
+		delete WaitingSemaphores;
 	}
 
 }

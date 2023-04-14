@@ -6,8 +6,6 @@
 
 #define ALLOC_COMMAND(...) ::new (AllocCommand<__VA_ARGS__>()) __VA_ARGS__
 
-RHIRenderCommandList* RHIRenderCommandList::g_instance = nullptr;
-
 void RHICommandListBase::Execute()
 {
     while (*CommandLink != nullptr)
