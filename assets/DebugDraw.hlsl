@@ -1,6 +1,7 @@
 struct VSInput
 {
 	float3 Position : POSITION;
+	// int index : SV_VertexID;
 };
 
 struct VSOutput
@@ -13,7 +14,7 @@ struct SceneData
 	float4x4 VP;
 };
 
-cbuffer sceneData : register(b0) { SceneData sceneData; }
+//cbuffer sceneData : register(b0) { SceneData sceneData; }
 
 VSOutput VSMain(VSInput input)
 {

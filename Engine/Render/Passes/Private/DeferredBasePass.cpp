@@ -16,10 +16,11 @@ void DeferredRenderer::RenderBasePass(WViewInfo& View)
 
 	GetRDGBuilder()->AddPass("BasePass", Parameters, [&View, this](RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
 	{
-
+		CmdList.SetViewport(View.ViewRect.Min.X, View.ViewRect.Min.Y, View.ViewRect.Max.X, View.ViewRect.Max.Y, 0.0f, 1.0f);
+		CmdList.SetScissor(0, 0, View.ViewRect.Max.X - View.ViewRect.Min.X, View.ViewRect.Max.Y - View.ViewRect.Min.Y);
 		WMeshPassProcessorRenderState RenderState;
 
-		RenderState.SetBlendState(0, TStaticBlendStateRHI<false>::GetRHI());
+		RenderState.SetBlendState(0, TStaticBlendStateRHI<true, EBlendOP::BlendAdd, EBlendFactor::FactorSrcAlpha, EBlendFactor::FactorOneMinusSrcAlpha>::GetRHI());
 		RenderState.SetDepthStencilState(TStaticDepthStencilStateRHI<false, false>::GetRHI());
 		RenderState.SetRasterizationState(TStaticRasterizationStateRHI<ECullMode::None>::GetRHI());
 		RenderState.SetMultiSampleState(TStaticMultiSampleStateRHI<>::GetRHI());
@@ -35,8 +36,6 @@ void DeferredRenderer::RenderBasePass(WViewInfo& View)
 			Processor.AddMeshBatch(BatchElements[MeshIndex]);
 		}
 		DrawList.FinalizeCommand(CmdList, RenderPass);
-		//CmdList.SetViewport(View.ViewRect.Min.X, View.ViewRect.Min.Y, View.ViewRect.Max.X, View.ViewRect.Max.Y, 0.0f, 1.0f);
-		//CmdList.SetScissor(0, 0, View.ViewRect.Max.X - View.ViewRect.Min.X, View.ViewRect.Max.Y - View.ViewRect.Min.Y);
 	});
 }
 

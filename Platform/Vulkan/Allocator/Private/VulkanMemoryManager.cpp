@@ -67,22 +67,21 @@ namespace Vulkan
 		VkMemoryRequirements Requirements;
 		vkGetBufferMemoryRequirements(pDevice->GetHandle(), InOutBuffer, &Requirements);
 
-		int32 MemoryIndex = -1;
-		for (uint32 MemoryTypeIndex = 0; MemoryTypeIndex < MemoryProperties.memoryHeapCount; ++MemoryTypeIndex)
+		int32 MemoryTypeIndex = 0;
+		for (; MemoryTypeIndex < MemoryProperties.memoryHeapCount; ++MemoryTypeIndex)
 		{
 			if ((Requirements.memoryTypeBits & (0x01 << MemoryTypeIndex) != 0) && ((MemoryProperties.memoryTypes[MemoryTypeIndex].propertyFlags & MemoryPropertyFlags) == MemoryPropertyFlags))
 			{
-				MemoryIndex = MemoryProperties.memoryTypes[MemoryTypeIndex].heapIndex;
 				break;
 			}
 		}
-		RE_ASSERT(MemoryIndex >= 0, "No support memory heap.");
+		RE_ASSERT(MemoryTypeIndex < MemoryProperties.memoryTypeCount, "No support memory heap.");
 
 		VkMemoryAllocateInfo MemoryAllocateInfo = {};
 		{
 			MemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 			MemoryAllocateInfo.allocationSize = Requirements.size;
-			MemoryAllocateInfo.memoryTypeIndex = MemoryIndex;
+			MemoryAllocateInfo.memoryTypeIndex = MemoryTypeIndex;
 		}
 		VkDeviceMemory DeviceMemory;
 		RE_ASSERT(vkAllocateMemory(pDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DeviceMemory) == VK_SUCCESS, "Failed to allocate memory.");
@@ -160,21 +159,20 @@ namespace Vulkan
 		VkMemoryRequirements Requirements;
 		vkGetBufferMemoryRequirements(pDevice->GetHandle(), Buffer, &Requirements);
 
-		int32 MemoryIndex = -1;
-		for (uint32 MemoryTypeIndex = 0; MemoryTypeIndex < MemoryProperties.memoryTypeCount; ++MemoryTypeIndex)
+		int32 MemoryTypeIndex = 0;
+		for (; MemoryTypeIndex < MemoryProperties.memoryTypeCount; ++MemoryTypeIndex)
 		{
 			if ((Requirements.memoryTypeBits & (0x01 << MemoryTypeIndex) != 0) && ((MemoryProperties.memoryTypes[MemoryTypeIndex].propertyFlags & MemoryPropertyFlags) == MemoryPropertyFlags))
 			{
-				MemoryIndex = MemoryProperties.memoryTypes[MemoryTypeIndex].heapIndex;
 				break;
 			}
 		}
-		RE_ASSERT(MemoryIndex >= 0, "No support memory heap.");
+		RE_ASSERT(MemoryTypeIndex < MemoryProperties.memoryTypeCount, "No support memory heap.");
 
 		VkMemoryAllocateInfo MemoryAllocateInfo = {};
 		{
 			MemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-			MemoryAllocateInfo.memoryTypeIndex = MemoryIndex;
+			MemoryAllocateInfo.memoryTypeIndex = MemoryTypeIndex;
 			MemoryAllocateInfo.allocationSize = Requirements.size;
 		}
 

@@ -206,7 +206,7 @@ public:
 		}
 	}
 
-private:
+public:
 
 	VertexInputStream VertexStream;
 

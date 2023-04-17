@@ -123,6 +123,7 @@ namespace Vulkan
 	{
 		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
 		vkCmdDrawIndexed(CmdBuffer->GetHandle(), indexCount, instanceCount, firstIndex, 0, 0);
+		//vkCmdDraw(CmdBuffer->GetHandle(), 3, 1, 0, 0);
 	}
 
 	void VulkanDynamicContext::RHIBeginTransition(WEngine::WArray<RHIBarrierDescriptor>& Transitions)

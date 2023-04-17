@@ -49,20 +49,17 @@ bool WMeshDrawCommand::SubmitDrawBegin(WRenderPassRHIRef RenderPass, RHIRenderCo
 	PipelineDescriptor.RenderPass = RenderPass;
 	PipelineDescriptor.ShaderBindings = ShaderBindings;
 
-	CmdList.SetViewport(0, 0, 1920, 1080, 0.0f, 1.0f);
-	CmdList.SetScissor(0, 0, 1920, 1080);
-	//CmdList.SetGraphicsPipelineState(&PipelineDescriptor);
+	CmdList.SetGraphicsPipelineState(&PipelineDescriptor);
 
-	//CmdList.SetStreamResource(VertexStream);
+	CmdList.SetStreamResource(VertexStream);
 
 	return true;
 }
 
 void WMeshDrawCommand::SubmitDrawEnd(RHIRenderCommandList& CmdList)
 {
-	//CmdList.BindIndexBuffer(IndexBuffer);
-	//CmdList.DrawIndexedPrimitive(NumPrimitives * 3, FirstIndex, NumInstances);
-
+	CmdList.BindIndexBuffer(IndexBuffer);
+	CmdList.DrawIndexedPrimitive(NumPrimitives * 3, FirstIndex, NumInstances);
 }
 
 WMeshDrawCommand& WDynamicMeshPassDrawListContext::AddCommand()

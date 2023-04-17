@@ -374,7 +374,8 @@ namespace Vulkan
 			ColorBlendStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 			ColorBlendStateCreateInfo.attachmentCount = ColorBlendAttachments.Size();
 			ColorBlendStateCreateInfo.pAttachments = ColorBlendAttachments.GetData();
-			ColorBlendStateCreateInfo.logicOpEnable = false;
+			ColorBlendStateCreateInfo.logicOpEnable = VK_FALSE;
+			ColorBlendStateCreateInfo.logicOp = VK_LOGIC_OP_COPY;
 		}
 
 		VkDynamicState dynamicStates[3] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_LINE_WIDTH };

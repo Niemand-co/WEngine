@@ -110,6 +110,9 @@ namespace Vulkan
 		}
 
 		VkPhysicalDeviceFeatures deviceFeatures = {};
+		{
+			deviceFeatures.geometryShader = true;
+		}
 
 		VkDeviceCreateInfo DeviceCreateInfo = {};
 		WEngine::WArray<const char*> extensionNames = { "VK_KHR_swapchain" };
