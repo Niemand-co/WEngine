@@ -49,6 +49,8 @@ public:
 
 	virtual ~SceneRenderer() = default;
 
+	void InitView();
+
 	void PrepareViewForRendering();
 
 	void ComputeVisibility();

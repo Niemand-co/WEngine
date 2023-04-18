@@ -14,8 +14,6 @@ public:
 
 	virtual void Render() override;
 
-	void InitView();
-
 	void RenderPrePass(WViewInfo &View);
 
 	void RenderBasePass(WViewInfo& View);

@@ -60,6 +60,8 @@ namespace Vulkan
 
 		virtual void RHISetGraphicsPipelineState(RHIGraphicsPipelineStateDescriptor* descriptor) override;
 
+		virtual void UpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void* Contents) override;
+
 	private:
 
 		VulkanCommandBufferManager *pCommandBufferManager;

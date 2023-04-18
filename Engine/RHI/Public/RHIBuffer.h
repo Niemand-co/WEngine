@@ -16,6 +16,8 @@ public:
 
 	virtual void* GetBufferRHIBase() = 0;
 
+	uint32 GetSize() const { return Num * Stride; }
+
 protected:
 
 	uint32 Num;

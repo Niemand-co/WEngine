@@ -209,6 +209,11 @@ WVertexInputStateRHIRef RHIRenderCommandList::GetOrCreateVertexInputState(const 
     return GetStaticRHI()->GetOrCreateVertexInputState(InElements);
 }
 
+void RHIRenderCommandList::UpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void* Contents)
+{
+    GetDynamicRHI()->UpdateUniformBuffer(UniformBuffer, Contents);
+}
+
 RHIRenderCommandList* GetRenderCommandList()
 {
     static RHIRenderCommandList* list = new RHIRenderCommandList;

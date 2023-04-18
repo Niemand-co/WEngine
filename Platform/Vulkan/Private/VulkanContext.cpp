@@ -1,7 +1,5 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanHeads.h"
-#include "Platform/Vulkan/Encoder/Public/VulkanGraphicsEncoder.h"
-#include "Platform/Vulkan/Encoder/Public/VulkanComputeEncoder.h"
 #include "Render/Descriptor/Public/RHIBarrierDescriptor.h"
 #include "Render/Descriptor/Public/RHIFramebufferDescriptor.h"
 #include "Render/Mesh/Public/Vertex.h"
@@ -237,6 +235,21 @@ namespace Vulkan
 	{
 		WPsoRHIRef Pipeline = pDevice->GetOrCreateGraphicsPipelineState(descriptor);
 		Pipeline->Bind(pCommandBufferManager->GetActiveCommandBuffer());
+	}
+
+	void VulkanDynamicContext::UpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void* Contents)
+	{
+		VulkanCommandBuffer *ActiveCmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
+		if (ActiveCmdBuffer && ActiveCmdBuffer->HasBegun())
+		{
+			pCommandBufferManager->SubmitActiveCommandBuffer();
+			pCommandBufferManager->WaitForCommandBuffer(ActiveCmdBuffer);
+		}
+
+		VulkanUniformBuffer* RealBuffer = static_cast<VulkanUniformBuffer*>(UniformBuffer);
+		void *Data = RealBuffer->Lock(UniformBuffer->GetSize(), 0);
+		memcpy(Data, Contents, UniformBuffer->GetSize());
+		RealBuffer->Unlock();
 	}
 
 	WBlendStateRHIRef VulkanStaticContext::CreateBlendState(const RHIBlendStateInitializer& Initializer)

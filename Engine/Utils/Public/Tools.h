@@ -202,6 +202,18 @@ namespace WEngine
 		return (T)(((uint64)Val + Alignment - 1) & ~(Alignment - 1));
 	}
 
+	template<typename T>
+	static constexpr T Min(T a, T b)
+	{
+		return a < b ? a : b;
+	}
+
+	template<typename T>
+	static constexpr T Max(T a, T b)
+	{
+		return a > b ? a : b;
+	}
+
 }
 
 #define ENUM_CLASS_FLAGS(Enum) \

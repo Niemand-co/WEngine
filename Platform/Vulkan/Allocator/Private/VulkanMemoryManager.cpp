@@ -7,14 +7,21 @@
 namespace Vulkan
 {
 
-	VulkanAllocation::VulkanAllocation(VulkanDevice* pInDevice, VkDeviceMemory& InMempry, uint32 InSize)
-		: pDevice(pInDevice), Memory(InMempry), FramesAfterLastUsed(0), Size(InSize)
+	VulkanAllocation::VulkanAllocation(VulkanDevice* pInDevice, VkDeviceMemory& InMemory, uint32 InSize)
+		: pDevice(pInDevice), Memory(InMemory), FramesAfterLastUsed(0), Size(InSize)
 	{
 	}
 
 	VulkanAllocation::~VulkanAllocation()
 	{
 		vkFreeMemory(pDevice->GetHandle(), Memory, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+	}
+
+	void VulkanAllocation::Init(VulkanDevice* pInDevice, VkDeviceMemory& InMemory, uint32 InSize)
+	{
+		pDevice = pInDevice;
+		Memory = InMemory;
+		Size = InSize;
 	}
 
 	void VulkanAllocation::BindBuffer(VkBuffer& InBuffer)
@@ -36,7 +43,7 @@ namespace Vulkan
 	{
 	}
 
-	void VulkanMemoryManager::Tick()
+	void VulkanMemoryManager::ProcessPendingUBFrees()
 	{
 		uint32 NumAllocationToFree = 0;
 		for (int32 AllocationIndex = FreeAllocations.Size(); AllocationIndex >= 0; --AllocationIndex)
@@ -95,6 +102,11 @@ namespace Vulkan
 	{
 	}
 
+	void VulkanMemoryManager::AllocateUniformBuffer(VulkanAllocation& OutAllocation, uint32 Size, const void* Contents)
+	{
+		if(!AllocateBufferPooled(OutAllocation, Size, 0, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, ));
+	}
+
 	void VulkanMemoryManager::DeallocateBuffer(VkBuffer& InBuffer, VulkanAllocation*& InAllocation)
 	{
 		FreeAllocations.Push(InAllocation);
@@ -115,6 +127,31 @@ namespace Vulkan
 		}
 
 		return new VulkanAllocation(pDevice, Memory, InSize);
+	}
+
+	bool VulkanMemoryManager::AllocateBufferPooled(VulkanAllocation& OutAllocation, uint32 Size, uint32 MinAlignment, VkBufferUsageFlags UsageFlags, VkMemoryPropertyFlags MemortPropertyFlags)
+	{
+		uint32 Alignment = WEngine::Max(MinAlignment, 0u);
+
+		int32 PoolSize = (int32)GetPoolSize(Size, Alignment);
+		if (PoolSize != (int32)EPoolSizes::SizeCount)
+		{
+			Size = PoolSizes[PoolSize];
+		}
+
+		WEngine::WScopeLock ScopeLock(&UsedBufferSection);
+
+		for (int32 Index = 0; Index < UsedBufferAllocations[PoolSize].Size(); ++Index)
+		{
+			VulkanSubresourceAllocation *SubresourceAllocation = UsedBufferAllocations[PoolSize][Index];
+			if ((SubresourceAllocation->BufferUsageFlags & UsageFlags) == UsageFlags &&
+				(SubresourceAllocation->MemoryPropertyFlags & MemortPropertyFlags) == MemortPropertyFlags)
+			{
+
+			}
+		}
+
+		return false;
 	}
 
 	VulkanStagingBufferManager::VulkanStagingBufferManager(VulkanDevice *pInDevice)
@@ -203,6 +240,20 @@ namespace Vulkan
 		}
 
 		return new VulkanAllocation(pDevice, Memory, InSize);
+	}
+
+	VulkanSubresourceAllocation::VulkanSubresourceAllocation(EVulkanAllocationType InType, class VulkanMemoryManager* InOwner, uint32 InUsedSize, uint32 InBufferId, VkBufferUsageFlags InUsageFlags, VkMemoryPropertyFlags InMemoryPropertyFlags)
+		: Type(InType),
+		  Owner(InOwner),
+		  UsedSize(InUsedSize),
+		  BufferId(InBufferId),
+		  BufferUsageFlags(InUsageFlags),
+		  MemoryPropertyFlags(InMemoryPropertyFlags)
+	{
+	}
+
+	VulkanSubresourceAllocation::~VulkanSubresourceAllocation()
+	{
 	}
 
 }

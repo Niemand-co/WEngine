@@ -179,8 +179,10 @@ namespace Vulkan
 	}
 
 	VulkanUniformBuffer::VulkanUniformBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor)
-		: RHIUniformBuffer(pDescriptor->Count, pDescriptor->Stride, pDescriptor->Usage), VulkanBufferBase(pInDevice, pDescriptor)
+		: RHIUniformBuffer(pDescriptor->Count, pDescriptor->Stride, pDescriptor->Usage),
+		  pDevice(pInDevice)
 	{
+		pDevice->GetMemoryManager()->AllocUniformBuffer();
 	}
 
 	VulkanUniformBuffer::~VulkanUniformBuffer()
@@ -188,7 +190,8 @@ namespace Vulkan
 	}
 
 	VulkanDynamicUniformBuffer::VulkanDynamicUniformBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor)
-		: RHIDynamicUniformBuffer(pDescriptor->Count, pDescriptor->Stride, pDescriptor->Usage), VulkanBufferBase(pInDevice, pDescriptor)
+		: RHIDynamicUniformBuffer(pDescriptor->Count, pDescriptor->Stride, pDescriptor->Usage),
+		  pDevice(pInDevice)
 	{
 	}
 

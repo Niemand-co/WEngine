@@ -54,16 +54,6 @@ void DeferredRenderer::Render()
 	GetRDGBuilder()->Execute();
 }
 
-void DeferredRenderer::InitView()
-{
-	ComputeVisibility();
-	
-	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
-	{
-		Views[ViewIndex].InitRHIResources();
-	}
-}
-
 void DeferredRenderer::RenderPrePass(WViewInfo& View)
 {
 

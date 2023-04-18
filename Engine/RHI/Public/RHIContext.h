@@ -65,6 +65,8 @@ public:
 
 	virtual void CopyBufferToImage(class RHITexture* pTexture, class RHIBuffer* pBuffer, unsigned int width, unsigned int height);
 
+	virtual void UpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void *Contents) = 0;
+
 	virtual void UpdateUniformResourceToGroup(class RHIUpdateResourceDescriptor* descriptor);
 
 	virtual void UpdateTextureResourceToGroup(class RHIUpdateResourceDescriptor* descriptor);

@@ -17,6 +17,7 @@ namespace Vulkan
 	VulkanCommandBuffer::~VulkanCommandBuffer()
 	{
 		vkFreeCommandBuffers(pDevice->GetHandle(), pCommandPool->GetHandle(), 1, &CommandBuffer);
+		delete pFence;
 	}
 
 	void VulkanCommandBuffer::BeginScopePass(const WEngine::WString& passName)

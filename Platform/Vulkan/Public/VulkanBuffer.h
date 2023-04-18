@@ -93,7 +93,7 @@ namespace Vulkan
 
 	};
 
-	class VulkanUniformBuffer : public RHIUniformBuffer, public VulkanBufferBase
+	class VulkanUniformBuffer : public RHIUniformBuffer
 	{
 	public:
 
@@ -101,15 +101,15 @@ namespace Vulkan
 
 		virtual ~VulkanUniformBuffer();
 
-		virtual void* GetBufferRHIBase() override
-		{
-			VulkanBufferBase* Base = static_cast<VulkanBufferBase*>(this);
-			return  Base;
-		}
+		virtual void* GetBufferRHIBase() { return this; }
+
+	private:
+
+		VulkanDevice *pDevice;
 
 	};
 
-	class VulkanDynamicUniformBuffer : public RHIDynamicUniformBuffer, public VulkanBufferBase
+	class VulkanDynamicUniformBuffer : public RHIDynamicUniformBuffer
 	{
 	public:
 
@@ -117,11 +117,11 @@ namespace Vulkan
 
 		virtual ~VulkanDynamicUniformBuffer();
 
-		virtual void* GetBufferRHIBase() override
-		{
-			VulkanBufferBase* Base = static_cast<VulkanBufferBase*>(this);
-			return  Base;
-		}
+		virtual void* GetBufferRHIBase() { return this; }
+
+	private:
+
+		VulkanDevice *pDevice;
 
 	};
 

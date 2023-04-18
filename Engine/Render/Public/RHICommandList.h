@@ -113,6 +113,8 @@ public:
 
 	WVertexInputStateRHIRef GetOrCreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements);
 
+	void UpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void *Contents);
+
 };
 
 class RHIComputeCommandList : public RHICommandListBase

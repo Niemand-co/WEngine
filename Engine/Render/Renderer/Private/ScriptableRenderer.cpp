@@ -28,6 +28,16 @@ void SceneRenderer::PrepareViewForRendering()
 	}
 }
 
+void SceneRenderer::InitView()
+{
+	ComputeVisibility();
+
+	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
+	{
+		Views[ViewIndex].InitRHIResources();
+	}
+}
+
 void SceneRenderer::ComputeVisibility()
 {
 	for (uint32 ViewIndex = 0; ViewIndex < Views.Size(); ++ViewIndex)
@@ -127,7 +137,7 @@ void WViewInfo::SetupViewParameters(SceneViewUniformBufferParameters& Parameters
 
 void WViewInfo::CreateUniformBuffer(SceneViewUniformBufferParameters& Parameters)
 {
-	//ViewUniformBuffer = SceneViewUniformBufferParameters::CreateUniformBuffer((uint8*)&Parameters, sizeof(Parameters), 1, EBufferUsageFlags::BF_UniformBuffer);
+	ViewUniformBuffer = SceneViewUniformBufferParameters::CreateUniformBuffer((uint8*)&Parameters, sizeof(Parameters), 1, EBufferUsageFlags::BF_UniformBuffer);
 }
 
 void WViewInfo::InitRHIResources()
