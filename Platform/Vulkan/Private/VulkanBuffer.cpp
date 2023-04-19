@@ -199,8 +199,12 @@ namespace Vulkan
 	{
 	}
 
-	VulkanStagingBuffer::VulkanStagingBuffer(VulkanDevice* pInDevice, VkBuffer& InBuffer, VulkanAllocation* InAllocation)
-		: pDevice(pInDevice), Buffer(InBuffer), Allocation(InAllocation)
+	VulkanStagingBuffer::VulkanStagingBuffer(VulkanDevice* pInDevice)
+		: pDevice(pInDevice),
+		  Buffer(VK_NULL_HANDLE),
+		  MemoryPropertyFlags(VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
+		  Size(0),
+		  MappedPointer(nullptr)
 	{
 	}
 

@@ -114,4 +114,10 @@ enum class EImageUsageFlags : uint32
 #define IMAGE_ASPECT_DEPTH      0x00000002
 #define IMAGE_ASPECT_STENCIL    0x00000004
 
+template<typename FlagBits>
+bool VkEnumHasFlags(VkFlags Flags, FlagBits Bits)
+{
+	return (Flags & Bits) == Bits;
+}
+
 #endif

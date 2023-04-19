@@ -19,6 +19,8 @@ namespace Vulkan
 
 		pMemoryManager = new VulkanMemoryManager(this);
 		pStagingBufferManager = new VulkanStagingBufferManager(this);
+
+		vkGetPhysicalDeviceProperties(*pGPU->GetHandle(), &GPUProps);
 	}
 
 	VulkanDevice::~VulkanDevice()

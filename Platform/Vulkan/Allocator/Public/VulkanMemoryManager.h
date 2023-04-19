@@ -5,9 +5,25 @@ namespace Vulkan
 	
 	enum class EVulkanAllocationType : uint8
 	{
+		EAT_Empty,
 		EAT_PooledBuffer,
 		EAT_Buffer,
 		EAT_Image,
+	};
+
+	enum class EVulkanAllocationMetaType : uint8
+	{
+		EAMT_Unknown,
+		EAMT_UniformBuffer,
+		EAMT_MultiBuffer,
+		EAMT_RingBuffer,
+		EAMT_FrameTempBuffer,
+		EAMT_ImageRenderTarget,
+		EAMT_ImageOther,
+		EAMT_BufferUAV,
+		EAMT_BufferStaging,
+		EAMT_BufferOther,
+		EAMT_Size,
 	};
 	
 	class VulkanAllocation : public RHIResource
@@ -16,56 +32,134 @@ namespace Vulkan
 
 		VulkanAllocation() = default;
 
-		VulkanAllocation(class VulkanDevice *pInDevice, VkDeviceMemory& InMemory, uint32 INSize);
+		virtual ~VulkanAllocation() = default;
 
-		virtual ~VulkanAllocation();
+		void Init(EVulkanAllocationType InType, EVulkanAllocationMetaType InMetaType, uint32 InSize, uint32 InOffset, uint32 InAllocatorIndex, uint32 InAllocationIndex);
 
-		void Init(class VulkanDevice* pInDevice, VkDeviceMemory& InMemory, uint32 InSize);
+		bool HasAllocation() const { return  Type != EVulkanAllocationType::EAT_Empty; }
 
-		void BindBuffer(VkBuffer& InBuffer);
+		void* GetMappedPointer(class VulkanDevice *pDevice);
 
-		VkDeviceMemory GetMemoryHandle() const { return Memory; }
+		void FlushMappedMemory(class VulkanDevice *pDevice);
+
+		void InvalidateMappedMemory(class VulkanDevice *pDevice);
 
 		uint32 GetSize() const { return Size; }
 
 	private:
 
-		VulkanDevice *pDevice = nullptr;
-
-		VkDeviceMemory Memory;
-
 		uint32 Size = 0;
 
-		uint32 FramesAfterLastUsed = 0;
+		uint32 Offset = 0;
 
-		friend class VulkanSubresourceAllocation;
+		uint16 AllocatorIndex = 0;
+
+		uint32 AllocationIndex = 0;
+
+		EVulkanAllocationMetaType MetaType = EVulkanAllocationMetaType::EAMT_Unknown;
+
+		EVulkanAllocationType Type;
+
+		friend class VulkanSubresourceAllocator;
 		friend class VulkanMemoryManager;
 		friend class VulkanStagingBufferManager;
 	};
 
-	class VulkanSubresourceAllocation : public RHIResource
+	class VulkanDeviceMemoryAllocation : public RHIResource
 	{
 	public:
 
-		VulkanSubresourceAllocation(EVulkanAllocationType InType, class VulkanMemoryManager *InOwner, uint32 InUsedSize, uint32 InBufferId, VkBufferUsageFlags InUsageFlags, VkMemoryPropertyFlags InMemoryPropertyFlags);
+		VulkanDeviceMemoryAllocation() = default;
 
-		virtual ~VulkanSubresourceAllocation();
+		virtual ~VulkanDeviceMemoryAllocation() = default;
+
+		void* Map(uint32 MappingSize, uint32 MappingOffset);
+
+		void Unmap();
+
+		void FlushMappedMemory(VkDeviceSize FlushSize, VkDeviceSize FlushOffset);
+
+		void InvalidateMappedMemory(VkDeviceSize InvalidateSize, VkDeviceSize InvalidateOffset);
+
+		bool CanBeMapped() const { return bCanBeMapped; }
+
+		bool IsCoherent() const { return bIsCoherent; }
+
+		bool IsCached() const { return bIsCached; }
+
+		uint32 GetSize() const { return Size; }
+
+		void* GetMappedPointer() const { return MappedPointer; }
+
+		VkDeviceMemory GetHandle() const { return Memory; }
+
+	private:
+
+		uint32 Size = 0;
+
+		VkDevice Device = VK_NULL_HANDLE;
+
+		VkDeviceMemory Memory = VK_NULL_HANDLE;
+
+		void *MappedPointer = nullptr;
+
+		uint32 MemoryTypeIndex = 0;
+
+		uint8 bCanBeMapped : 1 = false;
+
+		uint8 bIsCached : 1 = false;
+
+		uint8 bIsCoherent : 1 = false;
+
+		friend class VulkanMemoryManager;
+
+	};
+
+	class VulkanSubresourceAllocator : public RHIResource
+	{
+	public:
+
+		VulkanSubresourceAllocator(EVulkanAllocationType InType, class VulkanMemoryManager *InOwner, VulkanDeviceMemoryAllocation *InDeviceMemoryAllocation, uint32 InBufferSize, uint32 InAlignment, VkBufferUsageFlags InUsageFlags, VkMemoryPropertyFlags InMemoryPropertyFlags);
+
+		virtual ~VulkanSubresourceAllocator();
+
+		bool TryAllocate(VulkanAllocation &OutAllocation, uint32 InSize, uint32 InAlignment, EVulkanAllocationMetaType InMetaType);
+
+		void* GetMappedPointer() const { return DeviceMemoryAllocation->GetMappedPointer(); }
+
+		void FlushMappedMemory(VkDeviceSize Offset, VkDeviceSize Size) { DeviceMemoryAllocation->FlushMappedMemory(Size, Offset); }
+
+		void InvalidateMappedMemory(VkDeviceSize Offset, VkDeviceSize Size) { DeviceMemoryAllocation->InvalidateMappedMemory(Size, Offset); }
 
 	private:
 
 		EVulkanAllocationType Type;
 
+		uint16 AllocatorIndex;
+
 		VulkanMemoryManager *Owner;
 
-		VulkanAllocation *Allocation;
+		VulkanDeviceMemoryAllocation *DeviceMemoryAllocation;
+
+		uint32 BufferSize;
+
+		uint32 Alignment;
 
 		uint32 UsedSize;
-
-		uint32 BufferId;
 
 		VkBufferUsageFlags BufferUsageFlags;
 
 		VkMemoryPropertyFlags MemoryPropertyFlags;
+
+		WCriticalSection Section;
+
+		struct WRange
+		{
+			uint32 Size;
+			uint32 Offset;
+		};
+		WEngine::WArray<WRange> FreeList;
+		uint32 NumAllocations = 0;
 
 		friend class VulkanMemoryManager;
 
@@ -88,13 +182,22 @@ namespace Vulkan
 
 		void ProcessPendingUBFrees();
 
-		void AllocateBuffer(VkBuffer& InOutBuffer, VulkanAllocation*& InOutAllocation, uint32 InSize, VkBufferUsageFlags& InUsageFlags, VkMemoryPropertyFlags& MemoryPropertyFlags);
-
 		void AllocateImage(VkImage& InOutImage, VkImageUsageFlags& InUsageFlags);
 
 		void AllocateUniformBuffer(VulkanAllocation &OutAllocation, uint32 Size, const void *Contents);
 
+		void FreeUniformBuffer(VulkanAllocation &InAllocation);
+
 		void DeallocateBuffer(VkBuffer& InBuffer, VulkanAllocation*& InAllocation);
+
+		void RegisterSubresourceAllocator(VulkanSubresourceAllocator *Allocator);
+
+		void UnregisterSubresourceAllocator(VulkanSubresourceAllocator *Allocator);
+
+		VulkanSubresourceAllocator* GetSubresourceAllocator(uint16 AllocatorIndex)
+		{
+			return AllBufferAllocators[AllocatorIndex];
+		}
 
 	private:
 
@@ -124,9 +227,23 @@ namespace Vulkan
 			8192,
 		};
 
-		VulkanAllocation* Alloc(VkDeviceMemory& Memory, uint32 InSize);
+		static constexpr uint32 BufferSizes[(int32)EPoolSizes::SizeCount + 1] =
+		{
+			64 * 1024,
+			64 * 1024,
+			128 * 1024,
+			128 * 1024,
+			256 * 1024,
+			256 * 1024,
+			512 * 1024,
+			512 * 1024,
+			1024 * 1024,
+			1024 * 1024,
+		};
 
-		bool AllocateBufferPooled(VulkanAllocation &OutAllocation, uint32 Size, uint32 MinAlignment, VkBufferUsageFlags UsageFlags, VkMemoryPropertyFlags MemortPropertyFlags);
+		VulkanDeviceMemoryAllocation* Alloc(uint32 MemoryTypeIndex, uint32 Size);
+
+		bool AllocateBufferPooled(VulkanAllocation &OutAllocation, uint32 Size, uint32 MinAlignment, VkBufferUsageFlags UsageFlags, VkMemoryPropertyFlags MemoryPropertyFlags, EVulkanAllocationMetaType MetaType);
 
 		EPoolSizes GetPoolSize(uint32 Size, uint32 Alignment)
 		{
@@ -152,9 +269,15 @@ namespace Vulkan
 
 		WEngine::WArray<VulkanAllocation*> FreeAllocations;
 
-		WEngine::WArray<VulkanSubresourceAllocation*> UsedBufferAllocations[(int32)EPoolSizes::SizeCount + 1];
+		WEngine::WArray<VulkanSubresourceAllocator*> UsedBufferAllocators[(int32)EPoolSizes::SizeCount + 1];
 
-		WEngine::WArray<VulkanSubresourceAllocation*> FreeBufferAllocations[(int32)EPoolSizes::SizeCount + 1];
+		WEngine::WArray<VulkanSubresourceAllocator*> FreeBufferAllocators[(int32)EPoolSizes::SizeCount + 1];
+
+		WEngine::WArray<VulkanSubresourceAllocator*> AllBufferAllocators;
+
+		PTRINT AllBufferAllocationsFreeListHead;
+
+		WRWLock AllBufferAllocatorsLock;
 
 		WCriticalSection UsedBufferSection;
 
@@ -172,13 +295,9 @@ namespace Vulkan
 
 		void Tick();
 
-		class VulkanStagingBuffer* AcquireBuffer(uint32 Size, VkBufferUsageFlags UsageFlags, VkMemoryPropertyFlags MemoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		class VulkanStagingBuffer* AcquireBuffer(uint32 InSize, VkBufferUsageFlags InUsageFlags, VkMemoryPropertyFlags InMemoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 		void ReleaseBuffer(VulkanStagingBuffer *StagingBuffer);
-
-	private:
-
-		VulkanAllocation* Alloc(VkDeviceMemory& Memory, uint32 InSize);
 
 	private:
 
@@ -186,9 +305,15 @@ namespace Vulkan
 
 		VkPhysicalDeviceMemoryProperties MemoryProperties;
 
-		WEngine::WArray<VulkanAllocation*> UsedAllocations;
+		struct FreeEntry
+		{
+			VulkanStagingBuffer *StagingBuffer;
+			uint32 NumFrames;
+		};
 
-		WEngine::WArray<VulkanAllocation*> FreeAllocations;
+		WEngine::WArray<VulkanStagingBuffer*> UsedStagingBuffers;
+
+		WEngine::WArray<FreeEntry> FreeStagingBuffers;
 
 	};
 

@@ -85,6 +85,8 @@ namespace Vulkan
 
 		VulkanGPU* GetGPU() const { return pGPU; }
 
+		VkPhysicalDeviceLimits GetLimits() const { return GPUProps.limits; }
+
 		VkDevice GetHandle() const { return Device; }
 
 		class VulkanMemoryManager* GetMemoryManager() const { return pMemoryManager; }
@@ -104,6 +106,8 @@ namespace Vulkan
 		VulkanStagingBufferManager *pStagingBufferManager;
 
 		WEngine::WArray<QueueStack> m_queues;
+
+		VkPhysicalDeviceProperties GPUProps;
 
 		VulkanGPU *pGPU;
 

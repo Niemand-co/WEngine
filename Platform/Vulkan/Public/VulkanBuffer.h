@@ -141,7 +141,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanStagingBuffer(class VulkanDevice* pInDevice, VkBuffer& InBuffer, class VulkanAllocation* InAllocation);
+		VulkanStagingBuffer(class VulkanDevice* pInDevice);
 
 		virtual ~VulkanStagingBuffer();
 
@@ -151,6 +151,8 @@ namespace Vulkan
 
 		void* GetMappedPointer() const { return MappedPointer; }
 
+		uint32 GetSize() const { return Size; }
+
 		VkBuffer GetHandle() const { return Buffer; }
 
 	private:
@@ -159,7 +161,9 @@ namespace Vulkan
 
 		VkBuffer Buffer;
 
-		VulkanAllocation *Allocation;
+		uint32 Size;
+
+		VkMemoryPropertyFlags MemoryPropertyFlags;
 
 		void *MappedPointer;
 

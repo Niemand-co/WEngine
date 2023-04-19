@@ -23,12 +23,12 @@ void Logger::Success(const WEngine::WString& exp)
 
 void Logger::Error(const WEngine::WString& exp)
 {
-	std::cout<<"\033[31m"<<GetTime()<<"Error:"<<exp<<"\033[37m"<<std::endl;
+	std::cout << "\033[31m" << GetTime() << "Error:" << exp << '(' << __FILE__ << ':' << __LINE__ << ')' << "\033[37m" << std::endl;
 }
 
 void Logger::Error(const char* exp)
 {
-	std::cout << "\033[31m" << GetTime() << "Error:" << exp << "\033[37m" << std::endl;
+	std::cout << "\033[31m" << GetTime() << "Error:" << exp << '(' << __FILE__ << ':' << __LINE__ << ')' << "\033[37m" << std::endl;
 }
 
 void Logger::AssertFail(bool judge, const WEngine::WString& exp)

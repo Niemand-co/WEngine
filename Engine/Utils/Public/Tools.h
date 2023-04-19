@@ -203,6 +203,12 @@ namespace WEngine
 	}
 
 	template<typename T>
+	FORCEINLINE constexpr T AlignArbitrary(T Val, uint64 Alignment)
+	{
+		return (T)((((uint64)Val + Alignment - 1) / Alignment) * Alignment);
+	}
+
+	template<typename T>
 	static constexpr T Min(T a, T b)
 	{
 		return a < b ? a : b;
@@ -213,6 +219,23 @@ namespace WEngine
 	{
 		return a > b ? a : b;
 	}
+
+	template<typename BIT32, typename BIT64, size_t pointerLenth>
+	struct SelectIntPointerType
+	{
+	};
+
+	template<typename BIT32, typename BIT64>
+	struct SelectIntPointerType<BIT32, BIT64, 4>
+	{
+		typedef BIT32 TPointerType;
+	};
+
+	template<typename BIT32, typename BIT64>
+	struct SelectIntPointerType<BIT32, BIT64, 8>
+	{
+		typedef BIT64 TPointerType;
+	};
 
 }
 

@@ -78,6 +78,7 @@
 #include "Utils/Container/Public/WBitArray.h"
 #include "Utils/Public/NamingSystem.h"
 #include "HAL/Public/TaskGraph.h"
+#include "HAL/Public/WRWScopeLock.h"
 #include "Render/Public/RenderDependencyGraphDefinitions.h"
 #include "RHI/Public/RHIStaticState.h"
 

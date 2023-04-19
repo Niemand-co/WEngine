@@ -42,6 +42,7 @@ namespace WEngine
 	void GEngine::Tick(const TimeStep& timeStep)
 	{
 		Input::Poll();
+		GFrameGameThread++;
 	}
 
 	REngine* REngine::g_instance = nullptr;
@@ -71,11 +72,13 @@ namespace WEngine
 	{
 		GEngine::Get()->Tick(timeStep);
 
+		GFrameRenderThread++;
 		const WArray<Layer*>& layers = LayerStack::Get()->GetLayers();
 		for (int32 LayerIndex = layers.Size() - 1; LayerIndex >= 0; LayerIndex--)
 		{
 			layers[LayerIndex]->Tick(timeStep);
 		}
+
 		FrameSync::Sync();
 	}
 

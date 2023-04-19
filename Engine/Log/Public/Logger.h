@@ -29,6 +29,8 @@ private:
 	}
 };
 
+#define LOCATION __FILE__":"__LINE__
+
 template<typename T>
 void Logger::Log(T exp)
 {
