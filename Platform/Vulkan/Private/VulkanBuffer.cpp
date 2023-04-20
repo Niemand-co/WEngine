@@ -182,7 +182,7 @@ namespace Vulkan
 		: RHIUniformBuffer(pDescriptor->Count, pDescriptor->Stride, pDescriptor->Usage),
 		  pDevice(pInDevice)
 	{
-		pDevice->GetMemoryManager()->AllocUniformBuffer();
+		pDevice->GetMemoryManager()->AllocateUniformBuffer();
 	}
 
 	VulkanUniformBuffer::~VulkanUniformBuffer()

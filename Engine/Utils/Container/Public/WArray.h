@@ -41,7 +41,11 @@ namespace WEngine
 
 		T* Find(const T& Val);
 
+		uint32 FindIndex(const T& Val);
+
 		void RemoveAndSwap(size_t index);
+
+		bool RemoveSingleSwap(const T& Val);
 
 		//template<typename... Args>
 		//void Push(Args... args);
@@ -354,11 +358,36 @@ namespace WEngine
 	}
 
 	template<typename T>
+	inline uint32 WArray<T>::FindIndex(const T& Val)
+	{
+		for (uint32 Index = 0; Index < m_size; ++Index)
+		{
+			if (Val == m_pData[Index])
+				break;
+		}
+		return Index;
+	}
+
+	template<typename T>
 	inline void WArray<T>::RemoveAndSwap(size_t index)
 	{
 		(m_pData + index)->~T();
 		--m_size;
 		memcpy(m_pData + index, m_pData + m_size, sizeof(T));
+	}
+
+	template<typename T>
+	inline bool WArray<T>::RemoveSingleSwap(const T& Val)
+	{
+		uint32 Index = FindIndex(Val);
+		if (Index == m_size)
+		{
+			return false;
+		}
+
+		RemoveAndSwap(Index);
+
+		return true;
 	}
 
 	template<typename T>

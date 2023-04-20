@@ -25,6 +25,24 @@ namespace Vulkan
 		EAMT_BufferOther,
 		EAMT_Size,
 	};
+
+	enum
+	{
+		GPU_ONLY_HEAP_PAGE_SIZE = 128 * 1024 * 1024,
+		STAGING_HEAP_PAGE_SIZE = 32 * 1024 * 1024,
+	};
+
+	struct VulkanPageSizeBucket
+	{
+		uint64 AllocationMax;
+		uint32 PageSize;
+		enum
+		{
+			BUCKET_MASK_IMAGE = 0x1,
+			BUCKET_MASK_BUFFER = 0x2,
+		};
+		uint32 BucketMask;
+	};
 	
 	class VulkanAllocation : public RHIResource
 	{
@@ -119,17 +137,21 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanSubresourceAllocator(EVulkanAllocationType InType, class VulkanMemoryManager *InOwner, VulkanDeviceMemoryAllocation *InDeviceMemoryAllocation, uint32 InBufferSize, uint32 InAlignment, VkBufferUsageFlags InUsageFlags, VkMemoryPropertyFlags InMemoryPropertyFlags);
+		VulkanSubresourceAllocator(EVulkanAllocationType InType, class VulkanMemoryManager *InOwner, VulkanDeviceMemoryAllocation *InDeviceMemoryAllocation, uint32 InBufferSize, uint32 InAlignment, VkBufferUsageFlags InUsageFlags, VkMemoryPropertyFlags InMemoryPropertyFlags, uint32 InPoolSizeIndex);
 
 		virtual ~VulkanSubresourceAllocator();
 
 		bool TryAllocate(VulkanAllocation &OutAllocation, uint32 InSize, uint32 InAlignment, EVulkanAllocationMetaType InMetaType);
+
+		void Free(VulkanAllocation &Allocation);
 
 		void* GetMappedPointer() const { return DeviceMemoryAllocation->GetMappedPointer(); }
 
 		void FlushMappedMemory(VkDeviceSize Offset, VkDeviceSize Size) { DeviceMemoryAllocation->FlushMappedMemory(Size, Offset); }
 
 		void InvalidateMappedMemory(VkDeviceSize Offset, VkDeviceSize Size) { DeviceMemoryAllocation->InvalidateMappedMemory(Size, Offset); }
+
+		bool JoinFreeBlocks();
 
 	private:
 
@@ -146,6 +168,10 @@ namespace Vulkan
 		uint32 Alignment;
 
 		uint32 UsedSize;
+
+		uint32 PoolSizeIndex;
+
+		uint32 Frame;
 
 		VkBufferUsageFlags BufferUsageFlags;
 
@@ -165,8 +191,33 @@ namespace Vulkan
 
 	};
 
-	class VulkanPendingFree : public RHIResource
+	class VulkanResourceHeap : public RHIResource
 	{
+	public:
+
+		VulkanResourceHeap(class VulkanMemoryManager *InOwner, uint32 InMemoryTypeIndex);
+
+		virtual ~VulkanResourceHeap();
+
+		void TryAllocate();
+
+		void FreePage();
+
+		void ReleasePage();
+
+	private:
+
+		uint32 GetPageSizeBucket(VulkanPageSizeBucket &Bucket, uint8 Type, uint32 AllocationSize);
+
+	private:
+
+		VulkanMemoryManager *Owner;
+
+		uint32 MemoryTypeIndex;
+
+		WEngine::WArray<VulkanSubresourceAllocator*> Pages;
+
+		WCriticalSection PageCS;
 
 	};
 
@@ -179,20 +230,22 @@ namespace Vulkan
 		virtual ~VulkanMemoryManager();
 
 		void Init();
-
 		void ProcessPendingUBFrees();
 
-		void AllocateImage(VkImage& InOutImage, VkImageUsageFlags& InUsageFlags);
+		void FreeVulkanAllocation(VulkanAllocation &Allocation);
+		void FreeVulkanAllocationPooledBuffer(VulkanAllocation& Allocation);
+		void FreeVulkanAllocationBuffer(VulkanAllocation& Allocation);
+		void FreeVulkanAllocationImage(VulkanAllocation& Allocation);
 
 		void AllocateUniformBuffer(VulkanAllocation &OutAllocation, uint32 Size, const void *Contents);
-
 		void FreeUniformBuffer(VulkanAllocation &InAllocation);
 
-		void DeallocateBuffer(VkBuffer& InBuffer, VulkanAllocation*& InAllocation);
-
 		void RegisterSubresourceAllocator(VulkanSubresourceAllocator *Allocator);
-
 		void UnregisterSubresourceAllocator(VulkanSubresourceAllocator *Allocator);
+		bool ReleaseSubresourceAllocator(VulkanSubresourceAllocator *Allocator);
+
+		bool AllocateBufferPooled(VulkanAllocation &OutAllocation, uint32 Size, uint32 MinAlignment, VkBufferUsageFlags UsageFlags, VkMemoryPropertyFlags MemoryPropertyFlags, EVulkanAllocationMetaType MetaType);
+		bool AllocateBufferMemory(VulkanAllocation &OutAllocation, const VkMemoryRequirements& MemoryRequirements, VkMemoryPropertyFlags MemoryPropertyFlags, EVulkanAllocationMetaType MetaType);
 
 		VulkanSubresourceAllocator* GetSubresourceAllocator(uint16 AllocatorIndex)
 		{
@@ -243,7 +296,7 @@ namespace Vulkan
 
 		VulkanDeviceMemoryAllocation* Alloc(uint32 MemoryTypeIndex, uint32 Size);
 
-		bool AllocateBufferPooled(VulkanAllocation &OutAllocation, uint32 Size, uint32 MinAlignment, VkBufferUsageFlags UsageFlags, VkMemoryPropertyFlags MemoryPropertyFlags, EVulkanAllocationMetaType MetaType);
+		void GetMemoryPropertyTypeIndex(uint32 MemoryPropertyBits, VkMemoryPropertyFlags MemoryPropertyFlags, uint32& OutTypeIndex);
 
 		EPoolSizes GetPoolSize(uint32 Size, uint32 Alignment)
 		{
@@ -265,10 +318,6 @@ namespace Vulkan
 
 		VkPhysicalDeviceMemoryProperties MemoryProperties;
 
-		WEngine::WArray<VulkanAllocation*> UsedAllocations;
-
-		WEngine::WArray<VulkanAllocation*> FreeAllocations;
-
 		WEngine::WArray<VulkanSubresourceAllocator*> UsedBufferAllocators[(int32)EPoolSizes::SizeCount + 1];
 
 		WEngine::WArray<VulkanSubresourceAllocator*> FreeBufferAllocators[(int32)EPoolSizes::SizeCount + 1];
@@ -279,9 +328,20 @@ namespace Vulkan
 
 		WRWLock AllBufferAllocatorsLock;
 
-		WCriticalSection UsedBufferSection;
+		WCriticalSection UsedFreeBufferSection;
 
-		WCriticalSection FreeBufferSection;
+		struct UBPendingFree
+		{
+			VulkanAllocation Allocation;
+			uint64 Frame = 0;
+		};
+
+		struct
+		{
+			WCriticalSection CS;
+			WEngine::WArray<UBPendingFree> PendingFree;
+			uint32 Peak = 0;
+		} UBAllocations;
 
 	};
 

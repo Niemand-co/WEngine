@@ -208,6 +208,11 @@ namespace WEngine
 		return (T)((((uint64)Val + Alignment - 1) / Alignment) * Alignment);
 	}
 
+	static FORCEINLINE void* Memzero(void* Dst, size_t Size)
+	{
+		return memset(Dst, 0, Size);
+	}
+
 	template<typename T>
 	static constexpr T Min(T a, T b)
 	{
