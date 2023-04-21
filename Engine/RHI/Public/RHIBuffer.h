@@ -41,21 +41,6 @@ public:
 
 };
 
-
-class RHIDynamicVertexBuffer : public RHIVertexBuffer
-{
-public:
-
-	RHIDynamicVertexBuffer(uint32 InNum, uint32 InStride, EBufferUsageFlags InUsage)
-		: RHIVertexBuffer(InNum, InStride, InUsage)
-	{
-	}
-
-	virtual ~RHIDynamicVertexBuffer() = default;
-
-};
-
-
 class RHIIndexBuffer : public RHIBuffer
 {
 public:
@@ -70,30 +55,15 @@ public:
 };
 
 
-class RHIUniformBuffer : public RHIBuffer
+class RHIUniformBuffer : public RHIResource
 {
 public:
 
-	RHIUniformBuffer(uint32 InNum, uint32 InStride, EBufferUsageFlags InUsage)
-		: RHIBuffer(InNum, InStride, InUsage)
+	RHIUniformBuffer(const class ShaderParametersLayout* InLayout)
 	{
 	}
 
 	virtual ~RHIUniformBuffer() = default;
-
-};
-
-
-class RHIDynamicUniformBuffer : public RHIUniformBuffer
-{
-public:
-
-	RHIDynamicUniformBuffer(uint32 InNum, uint32 InStride, EBufferUsageFlags InUsage)
-		: RHIUniformBuffer(InNum, InStride, InUsage)
-	{
-	}
-
-	virtual ~RHIDynamicUniformBuffer() = default;
 
 };
 

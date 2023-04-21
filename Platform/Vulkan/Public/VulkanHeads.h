@@ -1,4 +1,5 @@
 #include "Platform/Vulkan/Public/VulkanBuffer.h"
+#include "Platform/Vulkan/Public/VulkanUniformBuffer.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 #include "Platform/Vulkan/Public/VulkanCommandPool.h"
 #include "Platform/Vulkan/Public/VulkanContext.h"

@@ -62,6 +62,8 @@ namespace Vulkan
 
 		void InvalidateMappedMemory(class VulkanDevice *pDevice);
 
+		void BindBuffer(VulkanDevice* Device, VkBuffer Buffer);
+
 		uint32 GetSize() const { return Size; }
 
 	private:
@@ -139,6 +141,8 @@ namespace Vulkan
 
 		VulkanSubresourceAllocator(EVulkanAllocationType InType, class VulkanMemoryManager *InOwner, VulkanDeviceMemoryAllocation *InDeviceMemoryAllocation, uint32 InBufferSize, uint32 InAlignment, VkBufferUsageFlags InUsageFlags, VkMemoryPropertyFlags InMemoryPropertyFlags, uint32 InPoolSizeIndex);
 
+		VulkanSubresourceAllocator(EVulkanAllocationType InType, class VulkanMemoryManager *InOwner, VulkanDeviceMemoryAllocation *InDeviceMemoryAllocation, uint32 InMemoryTypeIndex, uint32 InBucketId);
+
 		virtual ~VulkanSubresourceAllocator();
 
 		bool TryAllocate(VulkanAllocation &OutAllocation, uint32 InSize, uint32 InAlignment, EVulkanAllocationMetaType InMetaType);
@@ -146,6 +150,8 @@ namespace Vulkan
 		void Free(VulkanAllocation &Allocation);
 
 		void* GetMappedPointer() const { return DeviceMemoryAllocation->GetMappedPointer(); }
+
+		VulkanDeviceMemoryAllocation* GetMemoryHandle() const { return DeviceMemoryAllocation; }
 
 		void FlushMappedMemory(VkDeviceSize Offset, VkDeviceSize Size) { DeviceMemoryAllocation->FlushMappedMemory(Size, Offset); }
 
@@ -171,6 +177,10 @@ namespace Vulkan
 
 		uint32 PoolSizeIndex;
 
+		uint32 BucketId;
+
+		uint32 MemoryTypeIndex;
+
 		uint32 Frame;
 
 		VkBufferUsageFlags BufferUsageFlags;
@@ -183,11 +193,36 @@ namespace Vulkan
 		{
 			uint32 Size;
 			uint32 Offset;
+
+			static void AddAndMerge(WEngine::WArray<WRange>& List, WRange& Range)
+			{
+				for (WRange& R : List)
+				{
+					if (R.Offset + R.Size == Range.Offset)
+					{
+						R.Size += Range.Size;
+						return;
+					}
+				}
+				List.Push(Range);
+			}
 		};
 		WEngine::WArray<WRange> FreeList;
 		uint32 NumAllocations = 0;
 
+		struct VulkanAllocationInternal
+		{
+			uint32 AllocationSize = 0;
+			uint32 AllocationOffset = 0;
+			uint32 Alignment = 0;
+			int32 PreFree = -1;
+		};
+		WEngine::WArray<VulkanAllocationInternal> Internals;
+
+		int32 AllocationFreeListHead;
+
 		friend class VulkanMemoryManager;
+		friend class VulkanResourceHeap;
 
 	};
 
@@ -199,11 +234,11 @@ namespace Vulkan
 
 		virtual ~VulkanResourceHeap();
 
-		void TryAllocate();
+		bool TryAllocate(VulkanAllocation& OutAllocation, uint8 Type, uint32 Size, uint32 Alignment, EVulkanAllocationMetaType MetaType, bool bMapAllocation);
 
-		void FreePage();
+		void FreePage(VulkanSubresourceAllocator *Allocator);
 
-		void ReleasePage();
+		void ReleasePage(VulkanSubresourceAllocator *Allocator);
 
 	private:
 
@@ -215,9 +250,13 @@ namespace Vulkan
 
 		uint32 MemoryTypeIndex;
 
-		WEngine::WArray<VulkanSubresourceAllocator*> Pages;
+		WEngine::WArray<VulkanPageSizeBucket> Buckets;
+
+		WEngine::WArray<VulkanSubresourceAllocator*> Pages[5];
 
 		WCriticalSection PageCS;
+
+		friend class VulkanMemoryManager;
 
 	};
 
@@ -251,8 +290,6 @@ namespace Vulkan
 		{
 			return AllBufferAllocators[AllocatorIndex];
 		}
-
-	private:
 
 		enum class EPoolSizes : uint16
 		{
@@ -296,7 +333,9 @@ namespace Vulkan
 
 		VulkanDeviceMemoryAllocation* Alloc(uint32 MemoryTypeIndex, uint32 Size);
 
-		void GetMemoryPropertyTypeIndex(uint32 MemoryPropertyBits, VkMemoryPropertyFlags MemoryPropertyFlags, uint32& OutTypeIndex);
+		void Free(VulkanDeviceMemoryAllocation* Allocation);
+
+		bool GetMemoryPropertyTypeIndex(uint32 MemoryPropertyBits, VkMemoryPropertyFlags MemoryPropertyFlags, uint32& OutTypeIndex);
 
 		EPoolSizes GetPoolSize(uint32 Size, uint32 Alignment)
 		{
@@ -328,6 +367,8 @@ namespace Vulkan
 
 		WRWLock AllBufferAllocatorsLock;
 
+		WCriticalSection DeviceMemoryCS;
+
 		WCriticalSection UsedFreeBufferSection;
 
 		struct UBPendingFree
@@ -342,6 +383,8 @@ namespace Vulkan
 			WEngine::WArray<UBPendingFree> PendingFree;
 			uint32 Peak = 0;
 		} UBAllocations;
+
+		WEngine::WArray<VulkanResourceHeap*> ResourceTypeHeaps;
 
 	};
 
@@ -368,12 +411,14 @@ namespace Vulkan
 		struct FreeEntry
 		{
 			VulkanStagingBuffer *StagingBuffer;
-			uint32 NumFrames;
+			uint32 Frame;
 		};
 
 		WEngine::WArray<VulkanStagingBuffer*> UsedStagingBuffers;
 
 		WEngine::WArray<FreeEntry> FreeStagingBuffers;
+
+		WCriticalSection StagingBufferCS;
 
 	};
 

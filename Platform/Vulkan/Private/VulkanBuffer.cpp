@@ -32,7 +32,7 @@ namespace Vulkan
 		VkMemoryPropertyFlags MemoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 		MemoryPropertyFlags |= bCPUAccess ? VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT : 0;
 
-		pDevice->GetMemoryManager()->AllocateBuffer(Buffer, Allocation, pDescriptor->Stride * pDescriptor->Count, BufferUsageFlags, MemoryPropertyFlags);
+		pDevice->GetMemoryManager()->AllocateBufferPooled(Allocation, pDescriptor->Stride * pDescriptor->Count, 0, BufferUsageFlags, MemoryPropertyFlags, EVulkanAllocationMetaType::EAMT_BufferOther);
 
 		void *Data = Lock(pDescriptor->Count * pDescriptor->Stride, 0);
 		memcpy(Data, pDescriptor->Data, pDescriptor->Count * pDescriptor->Stride);
@@ -41,7 +41,7 @@ namespace Vulkan
 
 	VulkanBufferBase::~VulkanBufferBase()
 	{
-		pDevice->GetMemoryManager()->DeallocateBuffer(Buffer, Allocation);
+		pDevice->GetMemoryManager()->FreeVulkanAllocation(Allocation);
 	}
 
 	void* VulkanBufferBase::Lock(uint32 Size, uint32 Offset, bool bRead)
@@ -86,7 +86,6 @@ namespace Vulkan
 			static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager()->SubmitImmediateCommandBuffer();
 			pDevice->Wait();
 
-			PendingLock.PendingBuffer->Map(Size, Offset);
 			void *Data = PendingLock.PendingBuffer->GetMappedPointer();
 
 			static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager()->PrepareForNewActiveCmdBuffer();
@@ -96,7 +95,6 @@ namespace Vulkan
 		else
 		{
 			PendingLock.PendingBuffer = pDevice->GetStagingBufferManager()->AcquireBuffer(Size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-			PendingLock.PendingBuffer->Map(Size, Offset);
 			void *Data = PendingLock.PendingBuffer->GetMappedPointer();
 			return Data;
 		}
@@ -115,12 +113,10 @@ namespace Vulkan
 
 		if (bRead)
 		{
-			StagingBuffer->UnMap();
 			pDevice->GetStagingBufferManager()->ReleaseBuffer(StagingBuffer);
 		}
 		else
 		{
-			StagingBuffer->UnMap();
 			pDevice->PrepareForCPURead();
 
 			VulkanCommandBufferManager *CmdBufferMgr = static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager();
@@ -160,15 +156,6 @@ namespace Vulkan
 	{
 	}
 
-	VulkanDynamicVertexBuffer::VulkanDynamicVertexBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor)
-		: RHIDynamicVertexBuffer(pDescriptor->Count, pDescriptor->Stride, pDescriptor->Usage), VulkanBufferBase(pInDevice, pDescriptor)
-	{
-	}
-
-	VulkanDynamicVertexBuffer::~VulkanDynamicVertexBuffer()
-	{
-	}
-
 	VulkanIndexBuffer::VulkanIndexBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor)
 		: RHIIndexBuffer(pDescriptor->Count, pDescriptor->Stride, pDescriptor->Usage), VulkanBufferBase(pInDevice, pDescriptor)
 	{
@@ -178,49 +165,17 @@ namespace Vulkan
 	{
 	}
 
-	VulkanUniformBuffer::VulkanUniformBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor)
-		: RHIUniformBuffer(pDescriptor->Count, pDescriptor->Stride, pDescriptor->Usage),
-		  pDevice(pInDevice)
-	{
-		pDevice->GetMemoryManager()->AllocateUniformBuffer();
-	}
-
-	VulkanUniformBuffer::~VulkanUniformBuffer()
-	{
-	}
-
-	VulkanDynamicUniformBuffer::VulkanDynamicUniformBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor)
-		: RHIDynamicUniformBuffer(pDescriptor->Count, pDescriptor->Stride, pDescriptor->Usage),
-		  pDevice(pInDevice)
-	{
-	}
-
-	VulkanDynamicUniformBuffer::~VulkanDynamicUniformBuffer()
-	{
-	}
-
 	VulkanStagingBuffer::VulkanStagingBuffer(VulkanDevice* pInDevice)
 		: pDevice(pInDevice),
 		  Buffer(VK_NULL_HANDLE),
 		  MemoryPropertyFlags(VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
-		  Size(0),
-		  MappedPointer(nullptr)
+		  Size(0)
 	{
 	}
 
 	VulkanStagingBuffer::~VulkanStagingBuffer()
 	{
-		vkDestroyBuffer(pDevice->GetHandle(), Buffer, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
-	}
-
-	void VulkanStagingBuffer::Map(uint32 Size, uint32 Offset)
-	{
-		vkMapMemory(pDevice->GetHandle(), Allocation->GetMemoryHandle(), Offset, Size, 0, &MappedPointer);
-	}
-
-	void VulkanStagingBuffer::UnMap()
-	{
-		vkUnmapMemory(pDevice->GetHandle(), Allocation->GetMemoryHandle());
+		pDevice->GetMemoryManager()->FreeVulkanAllocation(Allocation);
 	}
 
 }

@@ -605,10 +605,8 @@ struct RHIMultiSampleStateInitializer
 };
 
 typedef class RHIVertexBuffer* WVertexBufferRHIRef;
-typedef class RHIDynamicVertexBuffer* WDynamicVertexBufferRHIRef;
 typedef class RHIIndexBuffer* WIndexBufferRHIRef;
 typedef class RHIUniformBuffer* WUniformBufferRHIRef;
-typedef class RHIDynamicUniformBuffer* WDynamicUniformBufferRHIRef;
 typedef class RHITextureBuffer* WTextureBufferRHIRef;
 
 typedef class RHIVertexShader* WVertexShaderRHIRef;

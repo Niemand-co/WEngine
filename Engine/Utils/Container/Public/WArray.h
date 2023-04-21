@@ -35,6 +35,8 @@ namespace WEngine
 
 		T& AddInitialized();
 
+		void AddZero(uint32 Count);
+
 		T Pop();
 
 		void Append(const WArray<T>& other);
@@ -323,6 +325,13 @@ namespace WEngine
 	}
 
 	template<typename T>
+	inline void WArray<T>::AddZero(uint32 Count)
+	{
+		Resize(m_size + Count);
+		WEngine::Memzero(m_pData + m_size, sizeof(T) * Count);
+	}
+
+	template<typename T>
 	inline T WArray<T>::Pop()
 	{
 		--m_size;
@@ -363,9 +372,11 @@ namespace WEngine
 		for (uint32 Index = 0; Index < m_size; ++Index)
 		{
 			if (Val == m_pData[Index])
-				break;
+			{
+				return Index;
+			}
 		}
-		return Index;
+		return m_size;
 	}
 
 	template<typename T>

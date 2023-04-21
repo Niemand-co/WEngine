@@ -83,7 +83,7 @@ public:
 
 	WIndexBufferRHIRef CreateIndexBuffer(uint8* InContents, uint32 InCount, EBufferUsageFlags InUsage);
 
-	WUniformBufferRHIRef CreateUniformBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage);
+	WUniformBufferRHIRef CreateUniformBuffer(uint8* InContents, const class ShaderParametersLayout * InLayout, EBufferUsageFlags InUsage);
 
 	WVertexShaderRHIRef CreateVertexShader(ShaderCodeBlob& blob);
 

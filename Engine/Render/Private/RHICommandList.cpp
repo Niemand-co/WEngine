@@ -134,9 +134,9 @@ WIndexBufferRHIRef RHIRenderCommandList::CreateIndexBuffer(uint8* InContents, ui
     return GetDynamicRHI()->CreateIndexBuffer(InContents, InCount, InUsage);
 }
 
-WUniformBufferRHIRef RHIRenderCommandList::CreateUniformBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
+WUniformBufferRHIRef RHIRenderCommandList::CreateUniformBuffer(uint8* InContents, const ShaderParametersLayout * InLayout, EBufferUsageFlags InUsage)
 {
-    return GetDynamicRHI()->CreateUniformBuffer(InContents, InStride, InCount, InUsage);
+    return GetDynamicRHI()->CreateUniformBuffer(InContents, InLayout, InUsage);
 }
 
 WVertexShaderRHIRef RHIRenderCommandList::CreateVertexShader(ShaderCodeBlob& blob)

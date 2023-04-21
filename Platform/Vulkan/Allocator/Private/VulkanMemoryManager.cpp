@@ -36,6 +36,16 @@ namespace Vulkan
 		Allocator->InvalidateMappedMemory(Offset, Size);
 	}
 
+	void VulkanAllocation::BindBuffer(VulkanDevice *Device, VkBuffer Buffer)
+	{
+		VkDeviceMemory DeviceMemory;
+		{
+			VulkanSubresourceAllocator *Allocator = Device->GetMemoryManager()->GetSubresourceAllocator(AllocatorIndex);
+			DeviceMemory = Allocator->GetMemoryHandle()->GetHandle();
+		}
+		RE_ASSERT(vkBindBufferMemory(Device->GetHandle(), Buffer, DeviceMemory, Offset) == VK_SUCCESS, "Failed to bind buffer with memory.");
+	}
+
 	void* VulkanDeviceMemoryAllocation::Map(uint32 MappingSize, uint32 MappingOffset)
 	{
 		if (!MappedPointer)
@@ -91,9 +101,29 @@ namespace Vulkan
 		  Frame(0),
 		  BufferUsageFlags(InUsageFlags),
 		  MemoryPropertyFlags(InMemoryPropertyFlags),
-		  PoolSizeIndex(InPoolSizeIndex)
+		  PoolSizeIndex(InPoolSizeIndex),
+		  AllocationFreeListHead(-1)
 	{
-		WRange FullRange(DeviceMemoryAllocation->GetSize(), 0);
+		WRange FullRange(BufferSize, 0);
+		FreeList.Push(FullRange);
+	}
+
+	VulkanSubresourceAllocator::VulkanSubresourceAllocator(EVulkanAllocationType InType, VulkanMemoryManager* InOwner, VulkanDeviceMemoryAllocation* InDeviceMemoryAllocation, uint32 InMemoryTypeIndex, uint32 InBucketId)
+		: Type(InType),
+		  Owner(InOwner),
+		  DeviceMemoryAllocation(InDeviceMemoryAllocation),
+		  BufferSize(InDeviceMemoryAllocation->GetSize()),
+		  Alignment(0),
+		  UsedSize(0),
+		  Frame(0),
+		  BufferUsageFlags(0),
+		  MemoryPropertyFlags(0),
+		  PoolSizeIndex(0x7fffffff),
+		  BucketId(InBucketId),
+		  MemoryTypeIndex(InMemoryTypeIndex),
+		  AllocationFreeListHead(-1)
+	{
+		WRange FullRange(BufferSize, 0);
 		FreeList.Push(FullRange);
 	}
 
@@ -125,7 +155,24 @@ namespace Vulkan
 					FreeList.RemoveAndSwap(Index);
 				}
 
-				OutAllocation.Init(Type, InMetaType, InSize, AlignedOffset, AllocatorIndex, NumAllocations);
+				if (AllocationFreeListHead)
+				{
+					OutAllocation.Init(Type, InMetaType, InSize, AlignedOffset, AllocatorIndex, NumAllocations);
+					VulkanAllocationInternal& Data = Internals.AddInitialized();
+					Data.Alignment = InAlignment;
+					Data.AllocationSize = AllocateSize;
+					Data.AllocationOffset = AllocatedOffset;
+				}
+				else
+				{
+					OutAllocation.Init(Type, InMetaType, InSize, AlignedOffset, AllocatorIndex, AllocationFreeListHead);
+					VulkanAllocationInternal& Data = Internals[AllocationFreeListHead];
+					AllocationFreeListHead = Data.PreFree;
+					Data.Alignment = InAlignment;
+					Data.AllocationSize = AllocateSize;
+					Data.AllocationOffset = AllocatedOffset;
+					Data.PreFree = -1;
+				}
 				UsedSize += AllocateSize;
 				NumAllocations++;
 			}
@@ -137,7 +184,34 @@ namespace Vulkan
 
 	void VulkanSubresourceAllocator::Free(VulkanAllocation& Allocation)
 	{
-		
+		bool bCanFree = false;
+		{
+			WEngine::WScopeLock Lock(&Section);
+			VulkanAllocationInternal& Data = Internals[Allocation.AllocationIndex];
+			uint32 AllocationOffset = Data.AllocationOffset;
+			uint32 AllocationSize = Data.AllocationSize;
+			WRange Range = {};
+			{
+				Range.Size = AllocationSize;
+				Range.Offset = AllocationOffset;
+			}
+
+			Data.PreFree = AllocationFreeListHead;
+			AllocationFreeListHead = Allocation.AllocationIndex;
+
+			WRange::AddAndMerge(FreeList, Range);
+			UsedSize -= AllocationSize;
+			NumAllocations--;
+			if (JoinFreeBlocks())
+			{
+				bCanFree = true;
+			}
+		}
+
+		if (bCanFree)
+		{
+			Owner->ReleaseSubresourceAllocator(this);
+		}
 	}
 
 	bool VulkanSubresourceAllocator::JoinFreeBlocks()
@@ -162,24 +236,83 @@ namespace Vulkan
 	{
 	}
 
-	void VulkanResourceHeap::TryAllocate()
+	bool VulkanResourceHeap::TryAllocate(VulkanAllocation& OutAllocation, uint8 Type, uint32 Size, uint32 Alignment, EVulkanAllocationMetaType MetaType, bool bMapAllocation)
 	{
 		WEngine::WScopeLock Lock(&PageCS);
+		VulkanPageSizeBucket Bucket;
+		uint32 BucketId = GetPageSizeBucket(Bucket, Type, Size);
+		WEngine::WArray<VulkanSubresourceAllocator*>& UsedPages = Pages[BucketId];
 
+		for (uint32 Index = 0; Index < UsedPages.Size(); ++Index)
+		{
+			VulkanSubresourceAllocator* Page = UsedPages[Index];
+			if (Page->TryAllocate(OutAllocation, Size, Alignment, MetaType))
+			{
+				return true;
+			}
+		}
 
+		uint32 AllocationSize = WEngine::Max(Size, Bucket.PageSize);
+
+		VulkanDeviceMemoryAllocation *DeviceMemoryAllocation = Owner->Alloc(MemoryTypeIndex, AllocationSize);
+		if (!DeviceMemoryAllocation && AllocationSize != Size)
+		{
+			DeviceMemoryAllocation = Owner->Alloc(MemoryTypeIndex, Size);
+			if (!DeviceMemoryAllocation)
+			{
+				return false;
+			}
+		}
+
+		if (bMapAllocation)
+		{
+			DeviceMemoryAllocation->Map(AllocationSize, 0);
+		}
+		VulkanSubresourceAllocator *NewPage = new VulkanSubresourceAllocator(Type == 0x1 ? EVulkanAllocationType::EAT_Buffer : EVulkanAllocationType::EAT_Image, Owner, DeviceMemoryAllocation, MemoryTypeIndex, BucketId);
+		Owner->RegisterSubresourceAllocator(NewPage);
+		UsedPages.Push(NewPage);
+		
+		if (NewPage->TryAllocate(OutAllocation, Size, Alignment, MetaType))
+		{
+			return true;
+		}
+
+		return false;
 	}
 
-	void VulkanResourceHeap::FreePage()
+	void VulkanResourceHeap::FreePage(VulkanSubresourceAllocator *Allocator)
 	{
+		RE_ASSERT(Allocator->JoinFreeBlocks(), "Cannot free an allocator still hold allocation(s).");
+		Allocator->Frame = GFrameRenderThread;
+
+		uint32 BucketId = Allocator->BucketId;
+		uint32 Index = Pages[BucketId].FindIndex(Allocator);
+		Pages[BucketId].RemoveAndSwap(Index);
+
+		ReleasePage(Allocator);
 	}
 
-	void VulkanResourceHeap::ReleasePage()
+	void VulkanResourceHeap::ReleasePage(VulkanSubresourceAllocator* Allocator)
 	{
+		Owner->UnregisterSubresourceAllocator(Allocator);
+		VulkanDeviceMemoryAllocation *DeviceMemoryAllocation = Allocator->DeviceMemoryAllocation;
+		Allocator->DeviceMemoryAllocation = nullptr;
+		Owner->Free(Allocator->DeviceMemoryAllocation);
+		delete Allocator;
 	}
 
 	uint32 VulkanResourceHeap::GetPageSizeBucket(VulkanPageSizeBucket& OutBucket, uint8 Type, uint32 AllocationSize)
 	{
-		return uint32();
+		for (uint32 BucketIndex = 0; BucketIndex < Buckets.Size(); ++BucketIndex)
+		{
+			VulkanPageSizeBucket& Bucket = Buckets[BucketIndex];
+			if ((Bucket.BucketMask & Type) == Type && AllocationSize <= Bucket.AllocationMax)
+			{
+				OutBucket = Bucket;
+				return BucketIndex;
+			}
+		}
+		return 0xffffffff;
 	}
 
 	VulkanMemoryManager::VulkanMemoryManager(VulkanDevice* pInDevice)
@@ -195,6 +328,60 @@ namespace Vulkan
 
 	void VulkanMemoryManager::Init()
 	{
+		const uint32 MemoryPropertyBits = (1 << MemoryProperties.memoryTypeCount) - 1;
+		ResourceTypeHeaps.AddZero(MemoryProperties.memoryTypeCount);
+
+		{
+			uint32 TypeIndex = 0;
+			GetMemoryPropertyTypeIndex(MemoryPropertyBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, TypeIndex);
+			ResourceTypeHeaps[TypeIndex] = new VulkanResourceHeap(this, TypeIndex);
+
+			WEngine::WArray<VulkanPageSizeBucket>& Buckets = ResourceTypeHeaps[TypeIndex]->Buckets;
+			Buckets.Push({ STAGING_HEAP_PAGE_SIZE, STAGING_HEAP_PAGE_SIZE, VulkanPageSizeBucket::BUCKET_MASK_IMAGE | VulkanPageSizeBucket::BUCKET_MASK_BUFFER });
+		}
+
+		{
+			uint32 TypeIndex = 0;
+			{
+				if (GetMemoryPropertyTypeIndex(MemoryPropertyBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT, TypeIndex))
+				{
+				}
+				else if (GetMemoryPropertyTypeIndex(MemoryPropertyBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, TypeIndex))
+				{
+				}
+			}
+			ResourceTypeHeaps[TypeIndex] = new VulkanResourceHeap(this, TypeIndex);
+
+			WEngine::WArray<VulkanPageSizeBucket>& Buckets = ResourceTypeHeaps[TypeIndex]->Buckets;
+			Buckets.Push({ STAGING_HEAP_PAGE_SIZE, STAGING_HEAP_PAGE_SIZE, VulkanPageSizeBucket::BUCKET_MASK_IMAGE | VulkanPageSizeBucket::BUCKET_MASK_BUFFER });
+		}
+
+		{
+			uint32 TypeIndex = 0;
+			RE_ASSERT(GetMemoryPropertyTypeIndex(MemoryPropertyBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, TypeIndex), "The device does not support GPU memory.");
+
+			for (; TypeIndex < MemoryProperties.memoryTypeCount; ++TypeIndex)
+			{
+				const uint32 HeapIndex = MemoryProperties.memoryTypes[TypeIndex].heapIndex;
+				const VkDeviceSize HeapSize = MemoryProperties.memoryHeaps[HeapIndex].size;
+
+				if (!ResourceTypeHeaps[TypeIndex])
+				{
+					ResourceTypeHeaps[TypeIndex] = new VulkanResourceHeap(this, TypeIndex);
+
+					WEngine::WArray<VulkanPageSizeBucket>& Buckets = ResourceTypeHeaps[TypeIndex]->Buckets;
+					uint32 SmallAllocationThreshold = 2llu << 20llu;
+					uint32 LargeAllocationThreshold = 64llu << 20llu;
+					VkDeviceSize SmallPageSize = 8llu << 20llu;
+					VkDeviceSize LargePageSize = WEngine::Min<VkDeviceSize>(HeapSize / 8, GPU_ONLY_HEAP_PAGE_SIZE);
+
+					Buckets.Push({ SmallAllocationThreshold, (uint32)SmallPageSize, VulkanPageSizeBucket::BUCKET_MASK_BUFFER });
+					Buckets.Push({ LargeAllocationThreshold, (uint32)LargePageSize, VulkanPageSizeBucket::BUCKET_MASK_BUFFER });
+					Buckets.Push({ SmallAllocationThreshold, (uint32)SmallPageSize, VulkanPageSizeBucket::BUCKET_MASK_IMAGE });
+					Buckets.Push({ LargeAllocationThreshold, (uint32)LargePageSize, VulkanPageSizeBucket::BUCKET_MASK_IMAGE });
+				}
+			}
+		}
 	}
 
 	void VulkanMemoryManager::ProcessPendingUBFrees()
@@ -315,7 +502,8 @@ namespace Vulkan
 			}
 			else
 			{
-				
+				VulkanResourceHeap *Heap = ResourceTypeHeaps[Allocator->MemoryTypeIndex];
+				Heap->FreePage(Allocator);
 			}
 
 			return true;
@@ -325,6 +513,7 @@ namespace Vulkan
 
 	VulkanDeviceMemoryAllocation* VulkanMemoryManager::Alloc(uint32 MemoryTypeIndex, uint32 Size)
 	{
+		WEngine::WScopeLock Lock(&DeviceMemoryCS);
 		VkMemoryAllocateInfo MemoryAllocateInfo = {};
 		{
 			MemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -346,17 +535,25 @@ namespace Vulkan
 		return Allocation;
 	}
 
-	void VulkanMemoryManager::GetMemoryPropertyTypeIndex(uint32 MemoryPropertyBits, VkMemoryPropertyFlags MemoryPropertyFlags, uint32& OutTypeIndex)
+	bool VulkanMemoryManager::GetMemoryPropertyTypeIndex(uint32 MemoryPropertyBits, VkMemoryPropertyFlags MemoryPropertyFlags, uint32& OutTypeIndex)
 	{
 		for (int32 MemoryTypeIndex = 0; MemoryTypeIndex < MemoryProperties.memoryHeapCount; ++MemoryTypeIndex)
 		{
 			if ((MemoryPropertyBits & (0x01 << MemoryTypeIndex) != 0) && ((MemoryProperties.memoryTypes[MemoryTypeIndex].propertyFlags & MemoryPropertyFlags) == MemoryPropertyFlags))
 			{
 				OutTypeIndex = MemoryTypeIndex;
-				return;
+				return true;
 			}
 		}
-		RE_ASSERT(false, "No support memory heap.");
+		return false;
+	}
+
+	void VulkanMemoryManager::Free(VulkanDeviceMemoryAllocation* Allocation)
+	{
+		WEngine::WScopeLock Lock(&DeviceMemoryCS);
+		vkFreeMemory(pDevice->GetHandle(), Allocation->Memory, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+
+		delete Allocation;
 	}
 
 	bool VulkanMemoryManager::AllocateBufferPooled(VulkanAllocation& OutAllocation, uint32 Size, uint32 MinAlignment, VkBufferUsageFlags UsageFlags, VkMemoryPropertyFlags MemoryPropertyFlags, EVulkanAllocationMetaType MetaType)
@@ -424,7 +621,7 @@ namespace Vulkan
 			DeviceMemoryAllocation->Map(BufferSize, 0);
 		}
 
-		VulkanSubresourceAllocator *NewSubresourceAllocator = new VulkanSubresourceAllocator(EVulkanAllocationType::EAT_PooledBuffer, this, DeviceMemoryAllocation, BufferSize, MemoryRequirements.alignment, UsageFlags, MemoryPropertyFlags);
+		VulkanSubresourceAllocator *NewSubresourceAllocator = new VulkanSubresourceAllocator(EVulkanAllocationType::EAT_PooledBuffer, this, DeviceMemoryAllocation, BufferSize, MemoryRequirements.alignment, UsageFlags, MemoryPropertyFlags, PoolSize);
 
 		RegisterSubresourceAllocator(NewSubresourceAllocator);
 		UsedBufferAllocators[PoolSize].Push(NewSubresourceAllocator);
@@ -441,10 +638,13 @@ namespace Vulkan
 	{
 		uint32 MemoryTypeIndex = 0;
 		GetMemoryPropertyTypeIndex(MemoryRequirements.memoryTypeBits, MemoryPropertyFlags, MemoryTypeIndex);
+		bool bShouldMap = VkEnumHasFlags(MemoryPropertyFlags, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
-		VulkanDeviceMemoryAllocation *DeviceMemoryAllocation = Alloc(MemoryTypeIndex, MemoryRequirements.size);
+		if (ResourceTypeHeaps[MemoryTypeIndex]->TryAllocate(OutAllocation, 0x1, MemoryRequirements.size, MemoryRequirements.alignment, MetaType, bShouldMap))
+		{
+			return true;
+		}
 
-		VulkanSubresourceAllocator *SubresourceAllocator = new VulkanSubresourceAllocator(EVulkanAllocationType::EAT_Buffer, this, DeviceMemoryAllocation, MemoryRequirements.size, MemoryRequirements.alignment, )
 		return false;
 	}
 
@@ -464,6 +664,12 @@ namespace Vulkan
 
 	VulkanStagingBuffer* VulkanStagingBufferManager::AcquireBuffer(uint32 InSize, VkBufferUsageFlags InUsageFlags, VkMemoryPropertyFlags InMemoryPropertyFlags)
 	{
+		if (InMemoryPropertyFlags == VK_MEMORY_PROPERTY_HOST_CACHED_BIT)
+		{
+			uint64 NonCoherentAtomSize = (uint64)pDevice->GetLimits().nonCoherentAtomSize;
+			InSize = WEngine::AlignArbitrary(InSize, NonCoherentAtomSize);
+		}
+
 		for (uint32 Index = 0; Index < FreeStagingBuffers.Size(); ++Index)
 		{
 			FreeEntry& Entry = FreeStagingBuffers[Index];
@@ -476,6 +682,8 @@ namespace Vulkan
 			}
 		}
 
+		VulkanStagingBuffer *StagingBuffer = new VulkanStagingBuffer(pDevice);
+
 		VkBufferCreateInfo BufferCreateInfo = {};
 		{
 			BufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -483,12 +691,10 @@ namespace Vulkan
 			BufferCreateInfo.size = InSize;
 			BufferCreateInfo.usage = InUsageFlags;
 		}
-
-		VkBuffer Buffer;
-		RE_ASSERT(vkCreateBuffer(pDevice->GetHandle(), &BufferCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Buffer) == VK_SUCCESS, "Failed to create buffer.");
+		RE_ASSERT(vkCreateBuffer(pDevice->GetHandle(), &BufferCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &StagingBuffer->Buffer) == VK_SUCCESS, "Failed to create buffer.");
 
 		VkMemoryRequirements MemoryRequirements;
-		vkGetBufferMemoryRequirements(pDevice->GetHandle(), Buffer, &MemoryRequirements);
+		vkGetBufferMemoryRequirements(pDevice->GetHandle(), StagingBuffer->Buffer, &MemoryRequirements);
 		MemoryRequirements.alignment = WEngine::Max((VkDeviceSize)16, MemoryRequirements.alignment);
 		if (InMemoryPropertyFlags == VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)
 		{
@@ -496,33 +702,19 @@ namespace Vulkan
 			MemoryRequirements.alignment = WEngine::AlignArbitrary(MemoryRequirements.alignment, NonCoherentAtomSize);
 		}
 
-		int32 MemoryTypeIndex = 0;
-		for (; MemoryTypeIndex < MemoryProperties.memoryTypeCount; ++MemoryTypeIndex)
+		RE_ASSERT(pDevice->GetMemoryManager()->AllocateBufferMemory(StagingBuffer->Allocation, MemoryRequirements, InMemoryPropertyFlags | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, EVulkanAllocationMetaType::EAMT_BufferStaging), "Failed to create staging buffer allocation.");
+		StagingBuffer->Size = InSize;
+		StagingBuffer->Allocation.BindBuffer(pDevice, StagingBuffer->Buffer);
+
 		{
-			if ((MemoryRequirements.memoryTypeBits & (0x01 << MemoryTypeIndex) != 0) && ((MemoryProperties.memoryTypes[MemoryTypeIndex].propertyFlags & InMemoryPropertyFlags) == InMemoryPropertyFlags))
-			{
-				break;
-			}
+			WEngine::WScopeLock Lock(&StagingBufferCS);
+			UsedStagingBuffers.Push(StagingBuffer);
 		}
-		RE_ASSERT(MemoryTypeIndex < MemoryProperties.memoryTypeCount, "No support memory heap.");
-
-		VkMemoryAllocateInfo MemoryAllocateInfo = {};
-		{
-			MemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-			MemoryAllocateInfo.memoryTypeIndex = MemoryTypeIndex;
-			MemoryAllocateInfo.allocationSize = MemoryRequirements.size;
-		}
-
-		VkDeviceMemory Memory;
-		vkAllocateMemory(pDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Memory);
-
-		VulkanAllocation *Allocation = Alloc(Memory, MemoryRequirements.size);
-		return new VulkanStagingBuffer(pDevice, Buffer, Allocation);
 	}
 
 	void VulkanStagingBufferManager::ReleaseBuffer(VulkanStagingBuffer* StagingBuffer)
 	{
-		FreeAllocations.Push(StagingBuffer->Allocation);
+		FreeStagingBuffers.Push({ StagingBuffer, GFrameRenderThread });
 		delete StagingBuffer;
 	}
 

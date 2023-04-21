@@ -64,16 +64,9 @@ WIndexBufferRHIRef DynamicRHIContext::CreateIndexBuffer(uint8* InContents, uint3
 	return pDevice->CreateIndexBuffer(&descriptor);
 }
 
-WUniformBufferRHIRef DynamicRHIContext::CreateUniformBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
+WUniformBufferRHIRef DynamicRHIContext::CreateUniformBuffer(uint8* InContents, const ShaderParametersLayout* InLayout, EBufferUsageFlags InUsage)
 {
-	RHIBufferDescriptor descriptor = {};
-	{
-		descriptor.Count = InCount;
-		descriptor.Stride = InStride;
-		descriptor.Usage = InUsage;
-		descriptor.Data = InContents;
-	}
-	return pDevice->CreateUniformBuffer(&descriptor);
+	return pDevice->CreateUniformBuffer(InContents, InLayout, InUsage);
 }
 
 WVertexShaderRHIRef DynamicRHIContext::CreateVertexShader(ShaderCodeBlob& blob)

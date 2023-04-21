@@ -40,13 +40,9 @@ public:
 
 	virtual WVertexBufferRHIRef CreateVertexBuffer(class RHIBufferDescriptor* descriptor) = 0;
 
-	virtual WDynamicVertexBufferRHIRef CreateDynamicVertexBuffer(class RHIBufferDescriptor* descriptor) = 0;
-
 	virtual WIndexBufferRHIRef CreateIndexBuffer(class RHIBufferDescriptor* descriptor) = 0;
 
-	virtual WUniformBufferRHIRef CreateUniformBuffer(class RHIBufferDescriptor* descriptor) = 0;
-
-	virtual WDynamicUniformBufferRHIRef CreateDynamicUniformBuffer(class RHIBufferDescriptor* descriptor) = 0;
+	virtual WUniformBufferRHIRef CreateUniformBuffer(uint8 *InContents, const class ShaderParametersLayout* InLayout, EBufferUsageFlags InUsage) = 0;
 
 	virtual class RHIScissor* CreateScissor(class RHIScissorDescriptor *descriptor) = 0;
 

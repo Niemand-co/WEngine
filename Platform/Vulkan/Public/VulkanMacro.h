@@ -36,14 +36,15 @@ enum class EBufferUsageFlags : uint32
 	BF_UniformTexel    = 0x00000004,
 	BF_StorageTexel    = 0x00000008,
 	BF_UniformBuffer   = 0x00000010,
-	BF_StorageBuffer   = 0x00000020,
-	BF_IndexBuffer     = 0x00000040,
-	BF_VertexBuffer    = 0x00000080,
-	BF_IndirectBuffer  = 0x00000100,
-	BF_SRV             = 0x00000200,
-	BF_UAV             = 0x00000400,
-	BF_Dynamic         = 0x00000800,
-	BF_CPUAccessable   = 0x00001000,
+	BF_SingleFrame     = 0x00000020,
+	BF_StorageBuffer   = 0x00000040,
+	BF_IndexBuffer     = 0x00000080,
+	BF_VertexBuffer    = 0x00000100,
+	BF_IndirectBuffer  = 0x00000200,
+	BF_SRV             = 0x00000400,
+	BF_UAV             = 0x00000800,
+	BF_Dynamic         = 0x00001000,
+	BF_CPUAccessable   = 0x00002000,
 };
 ENUM_CLASS_FLAGS(EBufferUsageFlags)
 

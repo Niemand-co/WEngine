@@ -225,23 +225,6 @@ namespace WEngine
 		return a > b ? a : b;
 	}
 
-	template<typename BIT32, typename BIT64, size_t pointerLenth>
-	struct SelectIntPointerType
-	{
-	};
-
-	template<typename BIT32, typename BIT64>
-	struct SelectIntPointerType<BIT32, BIT64, 4>
-	{
-		typedef BIT32 TPointerType;
-	};
-
-	template<typename BIT32, typename BIT64>
-	struct SelectIntPointerType<BIT32, BIT64, 8>
-	{
-		typedef BIT64 TPointerType;
-	};
-
 }
 
 #define ENUM_CLASS_FLAGS(Enum) \

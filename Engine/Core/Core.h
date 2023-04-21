@@ -1,5 +1,4 @@
 #pragma once
-#include "Utils/Public/Tools.h"
 
 #define EVENT_CLASS_TYPE(type) static EventType GetStaticType() {return EventType::##type;}\
 				virtual EventType GetEventType() const override {return GetStaticType();}\
@@ -38,5 +37,22 @@ typedef long long int64;
 uint32 GFrameGameThread = 1;
 uint32 GFrameRenderThread = 1;
 
-typedef WEngine::SelectIntPointerType<uint32, uint64, sizeof(void*)>::TPointerType UPTRINT;
-typedef WEngine::SelectIntPointerType<int32, int64, sizeof(void*)>::TPointerType PTRINT;
+template<typename BIT32, typename BIT64, size_t pointerLenth>
+struct SelectIntPointerType
+{
+};
+
+template<typename BIT32, typename BIT64>
+struct SelectIntPointerType<BIT32, BIT64, 4>
+{
+	typedef BIT32 TPointerType;
+};
+
+template<typename BIT32, typename BIT64>
+struct SelectIntPointerType<BIT32, BIT64, 8>
+{
+	typedef BIT64 TPointerType;
+};
+
+typedef SelectIntPointerType<uint32, uint64, sizeof(void*)>::TPointerType UPTRINT;
+typedef SelectIntPointerType<int32, int64, sizeof(void*)>::TPointerType PTRINT;

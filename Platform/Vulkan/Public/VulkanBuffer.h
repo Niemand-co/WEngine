@@ -1,5 +1,6 @@
 #pragma once
 #include "RHI/Public/RHIBuffer.h"
+#include "Platform/Vulkan/Allocator/Public/VulkanMemoryManager.h"
 
 class RHIBufferDescriptor;
 
@@ -39,7 +40,7 @@ namespace Vulkan
 
 		VulkanDevice *pDevice;
 
-		class VulkanAllocation *Allocation;
+		VulkanAllocation Allocation;
 
 		PendingEntry PendingLock;
 
@@ -61,22 +62,6 @@ namespace Vulkan
 
 	};
 
-	class VulkanDynamicVertexBuffer : public RHIDynamicVertexBuffer, public VulkanBufferBase
-	{
-	public:
-
-		VulkanDynamicVertexBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor);
-
-		virtual ~VulkanDynamicVertexBuffer();
-
-		virtual void* GetBufferRHIBase() override
-		{
-			VulkanBufferBase* Base = static_cast<VulkanBufferBase*>(this);
-			return  Base;
-		}
-
-	};
-
 	class VulkanIndexBuffer : public RHIIndexBuffer, public VulkanBufferBase
 	{
 	public:
@@ -90,38 +75,6 @@ namespace Vulkan
 			VulkanBufferBase* Base = static_cast<VulkanBufferBase*>(this);
 			return  Base;
 		}
-
-	};
-
-	class VulkanUniformBuffer : public RHIUniformBuffer
-	{
-	public:
-
-		VulkanUniformBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor);
-
-		virtual ~VulkanUniformBuffer();
-
-		virtual void* GetBufferRHIBase() { return this; }
-
-	private:
-
-		VulkanDevice *pDevice;
-
-	};
-
-	class VulkanDynamicUniformBuffer : public RHIDynamicUniformBuffer
-	{
-	public:
-
-		VulkanDynamicUniformBuffer(VulkanDevice* pInDevice, RHIBufferDescriptor* pDescriptor);
-
-		virtual ~VulkanDynamicUniformBuffer();
-
-		virtual void* GetBufferRHIBase() { return this; }
-
-	private:
-
-		VulkanDevice *pDevice;
 
 	};
 
@@ -145,11 +98,11 @@ namespace Vulkan
 
 		virtual ~VulkanStagingBuffer();
 
-		void Map(uint32 Size, uint32 Offset);
+		void* GetMappedPointer() { return Allocation.GetMappedPointer(pDevice); }
 
-		void UnMap();
+		void FlushMappedMemory() { Allocation.FlushMappedMemory(pDevice); }
 
-		void* GetMappedPointer() const { return MappedPointer; }
+		void InvalidateMappedMemory() { Allocation.InvalidateMappedMemory(pDevice); }
 
 		uint32 GetSize() const { return Size; }
 
@@ -161,11 +114,11 @@ namespace Vulkan
 
 		VkBuffer Buffer;
 
+		VulkanAllocation Allocation;
+
 		uint32 Size;
 
 		VkMemoryPropertyFlags MemoryPropertyFlags;
-
-		void *MappedPointer;
 
 		friend class VulkanStagingBufferManager;
 

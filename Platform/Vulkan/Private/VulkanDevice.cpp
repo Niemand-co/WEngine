@@ -581,24 +581,14 @@ namespace Vulkan
 		return new VulkanVertexBuffer(this, descriptor);
 	}
 
-	WDynamicVertexBufferRHIRef VulkanDevice::CreateDynamicVertexBuffer(RHIBufferDescriptor* descriptor)
-	{
-		return new VulkanDynamicVertexBuffer(this, descriptor);
-	}
-
 	WIndexBufferRHIRef VulkanDevice::CreateIndexBuffer(RHIBufferDescriptor* descriptor)
 	{
 		return new VulkanIndexBuffer(this, descriptor);
 	}
 
-	WUniformBufferRHIRef VulkanDevice::CreateUniformBuffer(RHIBufferDescriptor* descriptor)
+	WUniformBufferRHIRef VulkanDevice::CreateUniformBuffer(uint8* InContents, const ShaderParametersLayout* InLayout, EBufferUsageFlags InUsage)
 	{
-		return new VulkanUniformBuffer(this, descriptor);
-	}
-
-	WDynamicUniformBufferRHIRef VulkanDevice::CreateDynamicUniformBuffer(RHIBufferDescriptor* descriptor)
-	{
-		return new VulkanDynamicUniformBuffer(this, descriptor);
+		return new VulkanUniformBuffer(this, InContents, InLayout, InUsage);
 	}
 
 	RHIScissor* VulkanDevice::CreateScissor(RHIScissorDescriptor* descriptor)
