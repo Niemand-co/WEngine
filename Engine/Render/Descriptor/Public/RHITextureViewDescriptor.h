@@ -10,7 +10,7 @@ public:
 
 public:
 
-	Format format = Format::A16R16G16B16_SFloat;
+	EFormat Format = EFormat::A16R16G16B16_SFloat;
 
 	uint32 mipCount = 1;
 
@@ -24,6 +24,6 @@ public:
 
 	uint32 planeCount = 0;
 
-	Dimension dimension = Dimension::Texture2D;
+	EDimension Dimension = EDimension::Texture2D;
 
 };

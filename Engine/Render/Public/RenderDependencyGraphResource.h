@@ -13,7 +13,7 @@ inline void InitResource(WEngine::WArray<ElementType>& ResourceArray, uint32 Num
 	}
 }
 
-class WRDGResource
+class WRDGResource : public RHIResource
 {
 public:
 
@@ -21,15 +21,7 @@ public:
 
 	bool IsExternal() const { return bExternal; }
 
-	void* operator new(size_t size)
-	{
-		return WRDGAllocator::Get()->Allocate(size);
-	}
-
-	void operator delete(void* pData)
-	{
-		WRDGAllocator::Get()->Deallocate(pData);
-	}
+	virtual RHIResource* GetRHI() const = 0;
 
 protected:
 
@@ -137,7 +129,7 @@ public:
 
 	WRDGTextureSubresourceRange GetSubresourceRange() { return WRDGTextureSubresourceRange(Layout); }
 
-	class RHITexture* GetRHI() const { return RHI; }
+	virtual RHIResource* GetRHI() const override { return RHI; }
 
 private:
 
@@ -179,6 +171,8 @@ protected:
 
 	WRDGView();
 
+	virtual RHIResource* GetRHI() const override { return nullptr; }
+
 private:
 
 	WRDGViewHandle Handle;
@@ -194,6 +188,8 @@ public:
 		if(!bExternal)
 			RHI->~RHIBuffer();
 	}
+
+	virtual RHIResource* GetRHI() const override { return RHI; }
 
 private:
 
@@ -255,11 +251,11 @@ public:
 		Desc.baseMipLevel = inMipLevel;
 	}
 
-	static WRDGTextureSRVDesc GetWithPixelFormat(WRDGTexture* inTexture, Format PixelFormat)
+	static WRDGTextureSRVDesc GetWithPixelFormat(WRDGTexture* inTexture, EFormat PixelFormat)
 	{
 		WRDGTextureSRVDesc Desc;
 		Desc.Texture = inTexture;
-		Desc.format = PixelFormat;
+		Desc.Format = PixelFormat;
 	}
 
 public:

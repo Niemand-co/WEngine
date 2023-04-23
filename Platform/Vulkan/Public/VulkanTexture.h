@@ -1,6 +1,6 @@
 #pragma once
 #include "RHI/Public/RHITexture.h"
-#include "Platform/Vulkan/Public/VulkanSurface.h"
+#include "Platform/Vulkan/Allocator/Public/VulkanMemoryManager.h"
 
 namespace Vulkan
 {
@@ -26,77 +26,35 @@ namespace Vulkan
 
 	};
 
-	class VulkanTextureBase
+	class VulkanTexture : public RHITexture
 	{
 	public:
 
-		VulkanTextureBase(class VulkanDevice* pInDevice, VkImageCreateInfo* pInfo, VkImageViewType ViewType, ETextureCreateFlags Flags, EAccess InitState);
+		VulkanTexture(class VulkanDevice* pInDevice, const RHITextureDesc& InDesc);
 
-		virtual ~VulkanTextureBase();
+		virtual ~VulkanTexture();
 
-		const VulkanSurface& GetSurface() const { return Surface; }
+		VkImage GetHandle() const { return Image; }
 
-		VkImage GetHandle() const { return Surface.GetImage(); }
+		VkImageUsageFlags GetImageUsage(ETextureCreateFlags Flag);
 
-		static VulkanTextureBase* Cast(RHITexture* Texture)
-		{
-			return (VulkanTextureBase*)(Texture->GetTextureRHIBase());
-		}
+		VkImageViewType GetViewType(EDimension Dimension);
+
+		VkImageAspectFlags GetAspect(EFormat Format);
+
+		static void CopyBufferToImage(VkBuffer SrcBuffer, VkImage DstImage, uint32 DstSizeX, uint32 DstSizeY, uint32 DstSizeZ, uint32 DstLayerCount, VkImageAspectFlags Aspect);
 
 	protected:
 
 		VulkanDevice *pDevice;
 
-		VulkanSurface Surface;
+		VkImage Image;
+		VkMemoryRequirements MemoryRequirements;
+		VulkanAllocation Allocation;
 
-	};
+		VulkanTextureView DefaultView;
 
-	class VulkanTexture2D : public RHITexture2D, public VulkanTextureBase
-	{
-	public:
-
-		VulkanTexture2D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, Format InPixelFormat, ETextureCreateFlags Flags, EAccess InitState, ClearValue InClearValue, uint32 InSampleCount);
-
-		virtual ~VulkanTexture2D();
-
-		virtual void* GetTextureRHIBase() override
-		{
-			VulkanTextureBase *Base = static_cast<VulkanTextureBase*>(this);
-			return Base;
-		}
-
-	};
-
-	class VulkanTexture2DArray : public RHITexture2DArray, public VulkanTextureBase
-	{
-	public:
-
-		VulkanTexture2DArray(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, Format InPixelFormat, ETextureCreateFlags Flags, EAccess InitState, ClearValue InClearValue, uint32 InSampleCount);
-
-		virtual ~VulkanTexture2DArray();
-
-		virtual void* GetTextureRHIBase() override
-		{
-			VulkanTextureBase* Base = static_cast<VulkanTextureBase*>(this);
-			return Base;
-		}
-
-	};
-
-	class VulkanTexture3D : public RHITexture3D, public VulkanTextureBase
-	{
-	public:
-
-		VulkanTexture3D(VulkanDevice *pInDevice, VkImageCreateInfo *pInfo, Format InPixelFormat, ETextureCreateFlags Flags, EAccess InitState, ClearValue InClearValue, uint32 InSampleCount);
-
-		virtual ~VulkanTexture3D();
-
-		virtual void* GetTextureRHIBase() override
-		{
-			VulkanTextureBase* Base = static_cast<VulkanTextureBase*>(this);
-			return Base;
-		}
-
+		
 	};
 
 }

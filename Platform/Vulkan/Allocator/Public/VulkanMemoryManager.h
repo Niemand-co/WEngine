@@ -44,7 +44,7 @@ namespace Vulkan
 		uint32 BucketMask;
 	};
 	
-	class VulkanAllocation : public RHIResource
+	class VulkanAllocation
 	{
 	public:
 
@@ -63,6 +63,8 @@ namespace Vulkan
 		void InvalidateMappedMemory(class VulkanDevice *pDevice);
 
 		void BindBuffer(VulkanDevice* Device, VkBuffer Buffer);
+
+		void BindImage(VulkanDevice *Device, VkImage Image);
 
 		uint32 GetSize() const { return Size; }
 
@@ -85,7 +87,7 @@ namespace Vulkan
 		friend class VulkanStagingBufferManager;
 	};
 
-	class VulkanDeviceMemoryAllocation : public RHIResource
+	class VulkanDeviceMemoryAllocation : public VulkanResource
 	{
 	public:
 
@@ -135,7 +137,7 @@ namespace Vulkan
 
 	};
 
-	class VulkanSubresourceAllocator : public RHIResource
+	class VulkanSubresourceAllocator : public VulkanResource
 	{
 	public:
 
@@ -226,7 +228,7 @@ namespace Vulkan
 
 	};
 
-	class VulkanResourceHeap : public RHIResource
+	class VulkanResourceHeap : public VulkanResource
 	{
 	public:
 
@@ -285,6 +287,7 @@ namespace Vulkan
 
 		bool AllocateBufferPooled(VulkanAllocation &OutAllocation, uint32 Size, uint32 MinAlignment, VkBufferUsageFlags UsageFlags, VkMemoryPropertyFlags MemoryPropertyFlags, EVulkanAllocationMetaType MetaType);
 		bool AllocateBufferMemory(VulkanAllocation &OutAllocation, const VkMemoryRequirements& MemoryRequirements, VkMemoryPropertyFlags MemoryPropertyFlags, EVulkanAllocationMetaType MetaType);
+		bool AllocateImageMemory(VulkanAllocation &OutAllocation, const VkMemoryRequirements& MemoryRequirements, VkMemoryPropertyFlags MemoryPropertyFlags, EVulkanAllocationMetaType MetaType);
 
 		VulkanSubresourceAllocator* GetSubresourceAllocator(uint16 AllocatorIndex)
 		{
@@ -388,7 +391,7 @@ namespace Vulkan
 
 	};
 
-	class VulkanStagingBufferManager : public RHIResource
+	class VulkanStagingBufferManager : public VulkanResource
 	{
 	public:
 

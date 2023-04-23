@@ -35,7 +35,7 @@ template<typename T>
 void Logger::Log(T exp)
 {
 	if(exp != (T)NULL)
-		std::cout << "\033[35m" << GetTime() << "Logging:" << exp << "\033[37m" << std::endl;
+		std::cout << "\033[35m" << GetTime() << "Logging:" << exp << '(' << __FILE__ << ':' << __LINE__ << ')' << "\033[37m" << std::endl;
 }
 
 #define RE_LOG(expression) Logger::Log(expression);

@@ -138,10 +138,10 @@ namespace Vulkan
 
 			if (Transition.Type == RHIBarrierDescriptor::EType::Texture)
 			{
-				VulkanTextureBase *TextureBase = VulkanTextureBase::Cast(Transition.Texture);
+				VulkanTexture *Texture = static_cast<VulkanTexture*>(Transition.Texture);
 				VkImageSubresourceRange Range = {};
 				{
-					Range.aspectMask = TextureBase->GetSurface().GetImageAspect();
+					Range.aspectMask = Texture->GetAspect(Texture->GetFormat());
 					Range.baseArrayLayer = Transition.ArrayLayer;
 					Range.layerCount = 1;
 					Range.baseMipLevel = Transition.MipLevel;
@@ -149,9 +149,9 @@ namespace Vulkan
 				}
 
 				if(SrcLayout == DstLayout)
-					PipelineBarrier.AddTransition(TextureBase->GetHandle(), Range, SrcAccess, DstAccess, SrcLayout);
+					PipelineBarrier.AddTransition(Texture->GetHandle(), Range, SrcAccess, DstAccess, SrcLayout);
 				else
-					PipelineBarrier.AddTransition(TextureBase->GetHandle(), Range, SrcAccess, DstAccess, SrcLayout, DstLayout);
+					PipelineBarrier.AddTransition(Texture->GetHandle(), Range, SrcAccess, DstAccess, SrcLayout, DstLayout);
 			}
 			else if (Transition.Type == RHIBarrierDescriptor::EType::Buffer)
 			{
@@ -166,8 +166,8 @@ namespace Vulkan
 	{
 		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetImmediateCommandBuffer();
 
-		VkImage SrcImage = VulkanTextureBase::Cast(SrcTexture)->GetHandle();
-		VkImage DstImage = VulkanTextureBase::Cast(DstTexture)->GetHandle();
+		VkImage SrcImage = static_cast<VulkanTexture*>(SrcTexture)->GetHandle();
+		VkImage DstImage = static_cast<VulkanTexture*>(DstTexture)->GetHandle();
 		VkImageLayout SrcLayout = VulkanTextureLayoutManager::FindLayout(SrcImage);
 		VkImageLayout DstLayout = VulkanTextureLayoutManager::FindLayout(DstImage);
 
@@ -245,11 +245,6 @@ namespace Vulkan
 			pCommandBufferManager->SubmitActiveCommandBuffer();
 			pCommandBufferManager->WaitForCommandBuffer(ActiveCmdBuffer);
 		}
-
-		VulkanUniformBuffer* RealBuffer = static_cast<VulkanUniformBuffer*>(UniformBuffer);
-		void *Data = RealBuffer->Lock(UniformBuffer->GetSize(), 0);
-		memcpy(Data, Contents, UniformBuffer->GetSize());
-		RealBuffer->Unlock();
 	}
 
 	WBlendStateRHIRef VulkanStaticContext::CreateBlendState(const RHIBlendStateInitializer& Initializer)

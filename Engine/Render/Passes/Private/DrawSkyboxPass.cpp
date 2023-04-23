@@ -18,8 +18,8 @@
 //{
 //	RHIAttachmentDescriptor attachmentDescriptors[] =
 //	{
-//		{ Format::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::ColorBuffer, AttachmentLayout::ColorBuffer },
-//		{ Format::D16_Unorm, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::DepthBuffer, AttachmentLayout::DepthBuffer }
+//		{ EFormat::A16R16G16B16_SFloat, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::ColorBuffer, AttachmentLayout::ColorBuffer },
+//		{ EFormat::D16_Unorm, 1, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLoadOP::Load, AttachmentStoreOP::Store, AttachmentLayout::DepthBuffer, AttachmentLayout::DepthBuffer }
 //	};
 //
 //	SubPassAttachment colorAttachments[] = { { 0, AttachmentLayout::ColorBuffer } };
@@ -195,7 +195,7 @@
 //
 //	RHITextureDescriptor textureDescriptor = {};
 //	{
-//		textureDescriptor.format = Format::A8R8G8B8_SNorm;
+//		textureDescriptor.format = EFormat::A8R8G8B8_SNorm;
 //		textureDescriptor.width = 256;
 //		textureDescriptor.height = 256;
 //		textureDescriptor.layout = AttachmentLayout::Undefined;
@@ -215,12 +215,12 @@
 //
 //	RHITextureViewDescriptor uvd = {};
 //	{
-//		uvd.format = Format::A8R8G8B8_SNorm;
+//		uvd.format = EFormat::A8R8G8B8_SNorm;
 //		uvd.arrayLayerCount = 1;
 //		uvd.baseArrayLayer = 0;
 //		uvd.mipCount = 1;
 //		uvd.baseMipLevel = 0;
-//		uvd.dimension = Dimension::Texture2D;
+//		uvd.dimension = EDimension::Texture2D;
 //		uvd.imageAspect = IMAGE_ASPECT_COLOR;
 //	}
 //

@@ -6,6 +6,11 @@
 #include "Render/Public/RenderDependencyGraph.h"
 #include "Scene/Components/Public/MaterialComponent.h"
 
+BEGIN_SHADER_PARAMETERS_STRUCT(DeferredBasePassParameters)
+	SHADER_PARAMETER_TEXTURE(WBuffer, sa)
+	RENDER_TARGET_SLOTS()
+END_SHADER_PARAMETERS_STRUCT
+
 void DeferredRenderer::RenderBasePass(WViewInfo& View)
 {
 	glm::vec2 ViewRect = View.ViewMatrices.Rect;

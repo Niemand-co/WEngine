@@ -179,17 +179,17 @@ WRDGTexture* WRDGBuilder::RegisterExternalTexture(RHITexture* ExternalTexture)
 	uint32 Depth = ExternalTexture->GetDepth();
 	switch (ExternalTexture->GetDimension())
 	{
-	case Dimension::Texture2D:
+	case EDimension::Texture2D:
 		Desc = WRDGTextureDesc::GetTexture2DDesc(ExternalTexture->GetFormat(), { Width, Height, Depth }, ExternalTexture->GetClearValue(), MipCount, SampleCount, ExternalTexture->GetFlags());
 		break;
-	case Dimension::Texture2DARRAY:
+	case EDimension::Texture2DArray:
 		Desc = WRDGTextureDesc::GetTexture2DArrayDesc(ExternalTexture->GetFormat(), {Width, Height, Depth}, ExternalTexture->GetClearValue(), MipCount, SampleCount, ExternalTexture->GetLayerCount(), ExternalTexture->GetFlags());
 		break;
-	case Dimension::Texture3D:
+	case EDimension::Texture3D:
 		Desc = WRDGTextureDesc::GetTexture3DDesc(ExternalTexture->GetFormat(), { Width, Height, Depth }, ExternalTexture->GetClearValue(), MipCount, SampleCount, ExternalTexture->GetFlags());
 		break;
-	case Dimension::TextureCUBE:
-	case Dimension::TextureCUBEARRAY:
+	case EDimension::TextureCube:
+	case EDimension::TextureCubeArray:
 		break;
 	}
 	WRDGTexture* Texture = Textures.Allocate<WRDGTexture>(Desc, "<External>");
@@ -482,16 +482,16 @@ void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHan
 	{
 		if (Texture->Desc.IsTextureArray())
 		{
-			Texture->RHI = GetRenderCommandList()->CreateTexture2DArray(Texture->Desc.extent.width, Texture->Desc.extent.height, Texture->Desc.format, Texture->Desc.mipCount, Texture->Desc.layerCount, Texture->Desc.clearValue, Flag);
+			Texture->RHI = GetRenderCommandList()->CreateTexture(RHITextureDesc::CreateTexture2D(Texture->Desc.Format, Texture->Desc.ClearValue, Texture->Desc.Extent, Texture->Desc.mipCount, Texture->Desc.sampleCount, Flag));
 		}
 		else
 		{
-			Texture->RHI = GetRenderCommandList()->CreateTexture2D(Texture->Desc.extent.width, Texture->Desc.extent.height, Texture->Desc.format, Texture->Desc.mipCount, Texture->Desc.clearValue, Flag);
+			Texture->RHI = GetRenderCommandList()->CreateTexture(RHITextureDesc::CreateTexture2DArray(Texture->Desc.Format, Texture->Desc.ClearValue, Texture->Desc.Extent, Texture->Desc.layerCount, Texture->Desc.mipCount, Texture->Desc.sampleCount, Flag));
 		}
 	}
 	else
 	{
-		Texture->RHI = GetRenderCommandList()->CreateTexture3D(Texture->Desc.extent.width, Texture->Desc.extent.height, Texture->Desc.extent.depth, Texture->Desc.format, Texture->Desc.mipCount, Texture->Desc.clearValue, Flag);
+		Texture->RHI = GetRenderCommandList()->CreateTexture(RHITextureDesc::CreateTexture3D(Texture->Desc.Format, Texture->Desc.ClearValue, Texture->Desc.Extent, Texture->Desc.mipCount, Texture->Desc.sampleCount, Flag));
 	}
 
 	Texture->FirstPass = PassHandle;
@@ -510,7 +510,7 @@ void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHan
 
 	BeginResourceRHI(Type, PassHandle, SRV->Desc.Texture);
 
-	SRV->RHI = GetRenderCommandList()->CreateTextureView(SRV->Desc.baseMipLevel, SRV->Desc.mipCount, SRV->Desc.baseArrayLayer, SRV->Desc.arrayLayerCount, SRV->Desc.planeIndex, SRV->Desc.planeCount, SRV->Desc.dimension, SRV->Desc.format, SRV->Desc.Texture->RHI);
+	SRV->RHI = GetRenderCommandList()->CreateTextureView(SRV->Desc.baseMipLevel, SRV->Desc.mipCount, SRV->Desc.baseArrayLayer, SRV->Desc.arrayLayerCount, SRV->Desc.planeIndex, SRV->Desc.planeCount, SRV->Desc.Dimension, SRV->Desc.Format, SRV->Desc.Texture->RHI);
 
 	SRV->FirstPass = PassHandle;
 }
@@ -524,7 +524,7 @@ void WRDGBuilder::BeginResourceRHI(EUniformBaseType Type, WRDGPassHandle PassHan
 
 	BeginResourceRHI(Type, PassHandle, UAV->Desc.Texture);
 
-	UAV->RHI = GetRenderCommandList()->CreateTextureView(UAV->Desc.baseMipLevel, UAV->Desc.mipCount, UAV->Desc.baseArrayLayer, UAV->Desc.arrayLayerCount, UAV->Desc.planeIndex, UAV->Desc.planeCount, UAV->Desc.dimension, UAV->Desc.format, UAV->Desc.Texture->RHI);
+	UAV->RHI = GetRenderCommandList()->CreateTextureView(UAV->Desc.baseMipLevel, UAV->Desc.mipCount, UAV->Desc.baseArrayLayer, UAV->Desc.arrayLayerCount, UAV->Desc.planeIndex, UAV->Desc.planeCount, UAV->Desc.Dimension, UAV->Desc.Format, UAV->Desc.Texture->RHI);
 
 	UAV->FirstPass = PassHandle;
 }

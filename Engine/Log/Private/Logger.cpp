@@ -3,22 +3,22 @@
 
 void Logger::Warn(const WEngine::WString& exp)
 {
-	std::cout<<"\033[33m"<<GetTime()<<"Warning:"<<exp<<"\033[37m"<<std::endl;
+	std::cout << "\033[33m" << GetTime() << "Warning:" << exp << '(' << __FILE__ << ':' << __LINE__ << ')' << "\033[37m" << std::endl;
 }
 
 void Logger::Debugger(const WEngine::WString& exp)
 {
-	std::cout<<"\033[35m"<<GetTime()<<"Debug:"<<exp<<"\033[37m"<<std::endl;
+	std::cout << "\033[35m" << GetTime() << "Debug:" << exp << '(' << __FILE__ << ':' << __LINE__ << ')' << "\033[37m" << std::endl;
 }
 
 void Logger::Loading(const WEngine::WString& exp)
 {
-	std::cout<<"\033[37m"<<GetTime()<<exp<<"\033[37m"<<std::endl;
+	std::cout << "\033[37m" << GetTime() << exp << '(' << __FILE__ << ':' << __LINE__ << ')' << "\033[37m" << std::endl;
 }
 
 void Logger::Success(const WEngine::WString& exp)
 {
-	std::cout<<"\033[32m"<<GetTime()<<exp<<"\033[37m"<<std::endl;
+	std::cout << "\033[32m" << GetTime() << exp << '(' << __FILE__ << ':' << __LINE__ << ')' << "\033[37m" << std::endl;
 }
 
 void Logger::Error(const WEngine::WString& exp)

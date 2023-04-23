@@ -121,4 +121,56 @@ bool VkEnumHasFlags(VkFlags Flags, FlagBits Bits)
 	return (Flags & Bits) == Bits;
 }
 
+const VkComponentMapping ComponentMappingRGBA = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_A };
+const VkComponentMapping ComponentMappingRGB1 = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_ONE };
+const VkComponentMapping ComponentMappingRG01 = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_ZERO, VK_COMPONENT_SWIZZLE_ONE };
+const VkComponentMapping ComponentMappingR001 = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_ZERO, VK_COMPONENT_SWIZZLE_ZERO, VK_COMPONENT_SWIZZLE_ONE };
+const VkComponentMapping ComponentMappingRIII = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
+const VkComponentMapping ComponentMapping000R = { VK_COMPONENT_SWIZZLE_ZERO, VK_COMPONENT_SWIZZLE_ZERO, VK_COMPONENT_SWIZZLE_ZERO, VK_COMPONENT_SWIZZLE_R };
+const VkComponentMapping ComponentMappingR000 = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_ZERO, VK_COMPONENT_SWIZZLE_ZERO, VK_COMPONENT_SWIZZLE_ZERO };
+const VkComponentMapping ComponentMappingRR01 = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_ZERO, VK_COMPONENT_SWIZZLE_ONE };
+
+template<EFormat PixelFormat>
+struct FormatComponentMapping
+{
+	static const VkComponentMapping ComponentMapping = ComponentMappingRGBA;
+};
+
+template<>
+struct FormatComponentMapping<EFormat::R8_SInt> { static const VkComponentMapping ComponentMapping = ComponentMappingR001; };
+template<>
+struct FormatComponentMapping<EFormat::R8_SNorm> { static const VkComponentMapping ComponentMapping = ComponentMappingR001; };
+template<>
+struct FormatComponentMapping<EFormat::R8_UInt> { static const VkComponentMapping ComponentMapping = ComponentMappingR001; };
+template<>
+struct FormatComponentMapping<EFormat::R8_UNorm> { static const VkComponentMapping ComponentMapping = ComponentMappingR001; };
+template<>
+struct FormatComponentMapping<EFormat::R16_UInt> { static const VkComponentMapping ComponentMapping = ComponentMappingR001; };
+template<>
+struct FormatComponentMapping<EFormat::R16_SInt> { static const VkComponentMapping ComponentMapping = ComponentMappingR001; };
+template<>
+struct FormatComponentMapping<EFormat::R16_SFloat> { static const VkComponentMapping ComponentMapping = ComponentMappingR001; };
+template<>
+struct FormatComponentMapping<EFormat::R32_UInt> { static const VkComponentMapping ComponentMapping = ComponentMappingR001; };
+template<>
+struct FormatComponentMapping<EFormat::R32_SInt> { static const VkComponentMapping ComponentMapping = ComponentMappingR001; };
+template<>
+struct FormatComponentMapping<EFormat::R32_SFloat> { static const VkComponentMapping ComponentMapping = ComponentMappingR001; };
+template<>
+struct FormatComponentMapping<EFormat::D16_Unorm> { static const VkComponentMapping ComponentMapping = ComponentMappingRIII; };
+template<>
+struct FormatComponentMapping<EFormat::D32_SFloat> { static const VkComponentMapping ComponentMapping = ComponentMappingR000; };
+template<>
+struct FormatComponentMapping<EFormat::D16_UNORM_S8_UINT> { static const VkComponentMapping ComponentMapping = ComponentMappingR000; };
+template<>
+struct FormatComponentMapping<EFormat::D24_UNORM_S8_UINT> { static const VkComponentMapping ComponentMapping = ComponentMappingR000; };
+template<>
+struct FormatComponentMapping<EFormat::D32_SFLOAT_S8_UINT> { static const VkComponentMapping ComponentMapping = ComponentMappingR000; };
+template<>
+struct FormatComponentMapping<EFormat::R16G16_UInt> { static const VkComponentMapping ComponentMapping = ComponentMappingRG01; };
+template<>
+struct FormatComponentMapping<EFormat::R16G16_SInt> { static const VkComponentMapping ComponentMapping = ComponentMappingRG01; };
+template<>
+struct FormatComponentMapping<EFormat::R16G16_SFloat> { static const VkComponentMapping ComponentMapping = ComponentMappingRG01; };
+
 #endif

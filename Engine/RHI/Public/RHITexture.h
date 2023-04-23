@@ -1,160 +1,126 @@
 #pragma once
 
-class RHITextureViewDescriptor;
-class RHITextureView;
-class RHIDevice;
-class RHIContext;
+struct RHITextureDesc
+{
+public:
 
-class RHITexture : public RHIResource
+	static RHITextureDesc CreateTexture2D(EFormat InFormat, FClearValue InClearValue, FExtent InExtent, uint8 InNumMips, uint8 InNumSamples, ETextureCreateFlags InFlags)
+	{
+		return RHITextureDesc(InFormat, EDimension::Texture2D, InClearValue, InExtent, 1, InNumMips, InNumSamples, InFlags);
+	}
+
+	static RHITextureDesc CreateTexture2DArray(EFormat InFormat, FClearValue InClearValue, FExtent InExtent, uint16 InArraySize, uint8 InNumMips, uint8 InNumSamples, ETextureCreateFlags InFlags)
+	{
+		return RHITextureDesc(InFormat, EDimension::Texture2DArray, InClearValue, InExtent, InArraySize, InNumMips, InNumSamples, InFlags);
+	}
+
+	static RHITextureDesc CreateTexture3D(EFormat InFormat, FClearValue InClearValue, FExtent InExtent, uint8 InNumMips, uint8 InNumSamples, ETextureCreateFlags InFlags)
+	{
+		return RHITextureDesc(InFormat, EDimension::Texture3D, InClearValue, InExtent, 1, InNumMips, InNumSamples, InFlags);
+	}
+
+	static RHITextureDesc CreateTextureCube(EFormat InFormat, FClearValue InClearValue, FExtent InExtent, uint8 InNumMips, uint8 InNumSamples, ETextureCreateFlags InFlags)
+	{
+		return RHITextureDesc(InFormat, EDimension::TextureCube, InClearValue, InExtent, 1, InNumMips, InNumSamples, InFlags);
+	}
+
+	static RHITextureDesc CreateTextureCubeArray(EFormat InFormat, FClearValue InClearValue, FExtent InExtent, uint16 InArraySize, uint8 InNumMips, uint8 InNumSamples, ETextureCreateFlags InFlags)
+	{
+		return RHITextureDesc(InFormat, EDimension::TextureCubeArray, InClearValue, InExtent, InArraySize, InNumMips, InNumSamples, InFlags);
+	}
+
+	RHITextureDesc(EFormat InFormat, EDimension InDimension, FClearValue InClearValue, FExtent InExtent, uint16 InArraySize, uint8 InNumMips, uint8 InNumSamples, ETextureCreateFlags InFlags)
+		: Format(InFormat),
+		  Dimension(InDimension),
+		  ClearValue(InClearValue),
+		  Extent(InExtent),
+		  ArraySize(InArraySize),
+		  NumMips(InNumMips),
+		  NumSamples(InNumSamples),
+		  Flags(InFlags),
+		  BulkData(nullptr),
+		  BulkDataSize(0)
+	{
+	}
+
+public:
+
+	EFormat Format;
+
+	EDimension Dimension;
+
+	FClearValue ClearValue;
+
+	FExtent Extent;
+
+	uint16 ArraySize;
+
+	uint8 NumMips;
+
+	uint8 NumSamples;
+
+	EAccess InitialState = EAccess::Unknown;
+
+	ETextureCreateFlags Flags = ETextureCreateFlags::TextureCreate_None;
+
+	void *BulkData;
+
+	uint32 BulkDataSize;
+
+};
+
+class RHITexture : public RHIViewableResource
 {
 public:
 
 	virtual ~RHITexture() = default;
 
-	uint32 GetMipCount() const { return MipCount; }
+	uint32 GetMipCount() const { return Desc.NumMips; }
 
-	virtual uint32 GetWidth() const = 0;
+	virtual uint32 GetWidth() const { return Desc.Extent.width; }
 
-	virtual uint32 GetHeight() const = 0;
+	virtual uint32 GetHeight() const { return Desc.Extent.height; }
 
-	virtual uint32 GetDepth() const = 0;
+	virtual uint32 GetDepth() const { return Desc.Extent.depth; }
 
-	virtual uint32 GetLayerCount() const = 0;
+	virtual uint32 GetLayerCount() const { return Desc.ArraySize; }
 
-	Format GetFormat() const { return PixelFormat; }
+	EFormat GetFormat() const { return Desc.Format; }
 
-	ClearValue GetClearValue() const { return clearValue; }
+	FClearValue GetClearValue() const { return Desc.ClearValue; }
 
-	virtual Dimension GetDimension() const = 0;
+	virtual EDimension GetDimension() const { return Desc.Dimension; }
 
-	uint32 GetSampleCount() const { return SampleCount; }
+	uint32 GetSampleCount() const { return Desc.NumSamples; }
 
-	ETextureCreateFlags GetFlags() const { return Flags; }
+	ETextureCreateFlags GetFlags() const { return Desc.Flags; }
 
 	bool IsStencilFormat() const
 	{
-		return PixelFormat == Format::D16_UNORM_S8_UINT || PixelFormat == Format::D24_UNORM_S8_UINT || PixelFormat == Format::D32_SFLOAT_S8_UINT;
+		return Desc.Format == EFormat::D16_UNORM_S8_UINT || Desc.Format == EFormat::D24_UNORM_S8_UINT || Desc.Format == EFormat::D32_SFLOAT_S8_UINT;
 	}
 
 	bool IsDepthFormat() const
 	{
-		return PixelFormat == Format::D16_Unorm ||
-			   PixelFormat == Format::D16_UNORM_S8_UINT ||
-			   PixelFormat == Format::D24_UNORM_S8_UINT ||
-			   PixelFormat == Format::D32_SFloat ||
-			   PixelFormat == Format::D32_SFLOAT_S8_UINT;
+		return Desc.Format == EFormat::D16_Unorm ||
+			   Desc.Format == EFormat::D16_UNORM_S8_UINT ||
+			   Desc.Format == EFormat::D24_UNORM_S8_UINT ||
+			   Desc.Format == EFormat::D32_SFloat ||
+			   Desc.Format == EFormat::D32_SFLOAT_S8_UINT;
 	}
 
 	virtual void* GetTextureRHIBase() { return nullptr; }
 
 protected:
 
-	RHITexture(Format InPixelFormat, uint32 inMipCount, ClearValue InClearValue, uint32 InSampleCount, ETextureCreateFlags InFlags)
-		: PixelFormat(InPixelFormat),
-		  MipCount(inMipCount),
-		  clearValue(InClearValue),
-		  SampleCount(InSampleCount),
-		  Flags(InFlags)
+	RHITexture(RHITextureDesc InDesc)
+		: RHIViewableResource(ERHIResourceType::RRT_Texture, InDesc.InitialState),
+		  Desc(InDesc)
 	{
 	}
 
 protected:
 
-	uint32 MipCount;
-
-	ClearValue clearValue;
-
-	Format PixelFormat;
-
-	uint32 SampleCount;
-
-	ETextureCreateFlags Flags;
-
-};
-
-class RHITexture2D : public RHITexture
-{
-public:
-
-	virtual ~RHITexture2D() = default;
-
-	virtual uint32 GetWidth() const override { return Width; }
-
-	virtual uint32 GetHeight() const override { return Height; }
-
-	virtual uint32 GetDepth() const override { return 1; }
-
-	virtual uint32 GetLayerCount() const override { return 1; }
-
-	virtual Dimension GetDimension() const override { return Dimension::Texture2D; }
-
-protected:
-
-	RHITexture2D(Format InPixelFormat, uint32 inWidth, uint32 inHeight, uint32 inMipCount, ClearValue InClearValue, uint32 SampleCount, ETextureCreateFlags Flags)
-		: Width(inWidth), Height(inHeight), RHITexture(InPixelFormat, inMipCount, InClearValue, SampleCount, Flags)
-	{
-	}
-
-protected:
-
-	uint32 Width;
-
-	uint32 Height;
-
-};
-
-class RHITexture2DArray : public RHITexture2D
-{
-public:
-
-	virtual ~RHITexture2DArray() = default;
-
-	virtual uint32 GetLayerCount() const override { return LayerCount; }
-
-	virtual Dimension GetDimension() const override { return Dimension::Texture2DARRAY; }
-
-protected:
-
-	RHITexture2DArray(Format InPixelFormat, uint32 inWidth, uint32 inHeight, uint32 inMipCount, uint32 inLayerCount, ClearValue InClearValue, uint32 SampleCount, ETextureCreateFlags Flags)
-		: RHITexture2D(InPixelFormat, inWidth, inHeight, inMipCount, InClearValue, SampleCount, Flags), LayerCount(inLayerCount)
-	{
-	}
-
-protected:
-
-	uint32 LayerCount;
-
-};
-
-class RHITexture3D : public RHITexture
-{
-public:
-
-	virtual ~RHITexture3D() = default;
-
-	virtual uint32 GetWidth() const override { return Width; }
-
-	virtual uint32 GetHeight() const override { return Height; }
-
-	virtual uint32 GetDepth() const override { return Depth; }
-
-	virtual uint32 GetLayerCount() const override { return 1; }
-
-	virtual Dimension GetDimension() const override { return Dimension::Texture3D; }
-
-protected:
-
-	RHITexture3D(Format InPixelFormat, uint32 inWidth, uint32 inHeight, uint32 inDepth, uint32 inMipCount, ClearValue InClearValue, uint32 SampleCount, ETextureCreateFlags Flags)
-		: Width(inWidth), Height(inHeight), Depth(inDepth), RHITexture(InPixelFormat, inMipCount, InClearValue, SampleCount, Flags)
-	{
-	}
-
-protected:
-
-	uint32 Width;
-
-	uint32 Height;
-
-	uint32 Depth;
+	RHITextureDesc Desc;
 
 };

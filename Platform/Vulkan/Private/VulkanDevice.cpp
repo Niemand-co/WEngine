@@ -228,14 +228,13 @@ namespace Vulkan
 		WEngine::WArray<VkImageView> ImageViews(descriptor->AttachmentCount);
 		for (uint32 Index = 0; Index < ImageViews.Size(); ++Index)
 		{
-			VulkanTextureBase *TextureBase = VulkanTextureBase::Cast(descriptor->Attachments[Index]);
-			const VulkanSurface& Surface = TextureBase->GetSurface();
+			VulkanTexture *TextureRHI = VulkanTextureBase::Cast(descriptor->Attachments[Index]);
 
 			VkImageViewCreateInfo ImageViewCreateInfo = {};
 			{
 				ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-				ImageViewCreateInfo.image = Surface.Image;
-				ImageViewCreateInfo.format = Surface.format;
+				ImageViewCreateInfo.image = TextureRHI->Image;
+				ImageViewCreateInfo.format = TextureRHI->Format;
 				ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
 				ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;
 				ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_B;
@@ -435,61 +434,9 @@ namespace Vulkan
 		return Pipeline;
 	}
 
-	WTexture2DRHIRef VulkanDevice::CreateTexture2D(RHITextureDescriptor* descriptor)
+	WTextureRHIRef VulkanDevice::CreateTexture(const RHITextureDesc& InDesc)
 	{
-		VkImageCreateInfo ImageCreateInfo = {};
-		ImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		ImageCreateInfo.extent = { descriptor->width, descriptor->height, 1 };
-		ImageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
-		ImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-		ImageCreateInfo.arrayLayers = 1;
-		ImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		ImageCreateInfo.mipLevels = descriptor->mipCount;
-		ImageCreateInfo.samples = WEngine::ToVulkan(descriptor->sampleCount);
-		ImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-		ImageCreateInfo.usage = GetImageUsage(descriptor->Flag);
-
-		ImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		return new VulkanTexture2D(this, &ImageCreateInfo, descriptor->format, descriptor->Flag, descriptor->initialState, descriptor->clearValue, descriptor->sampleCount);
-	}
-
-	WTexture2DArrayRHIRef VulkanDevice::CreateTexture2DArray(RHITextureDescriptor* descriptor)
-	{
-		VkImageCreateInfo imageCreateInfo = {};
-		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		imageCreateInfo.extent = { descriptor->width, descriptor->height, 1 };
-		imageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
-		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-		imageCreateInfo.arrayLayers = descriptor->layerCount;
-		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		imageCreateInfo.mipLevels = descriptor->mipCount;
-		imageCreateInfo.samples = WEngine::ToVulkan(descriptor->sampleCount);
-		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-		imageCreateInfo.usage = GetImageUsage(descriptor->Flag);
-
-		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		return new VulkanTexture2DArray(this, &imageCreateInfo, descriptor->format, descriptor->Flag, descriptor->initialState, descriptor->clearValue, descriptor->sampleCount);
-	}
-
-	WTexture3DRHIRef VulkanDevice::CreateTexture3D(RHITextureDescriptor* descriptor)
-	{
-		VkImageCreateInfo imageCreateInfo = {};
-		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		imageCreateInfo.extent = { descriptor->width, descriptor->height, descriptor->depth };
-		imageCreateInfo.format = WEngine::ToVulkan(descriptor->format);
-		imageCreateInfo.imageType = VK_IMAGE_TYPE_3D;
-		imageCreateInfo.arrayLayers = 1;
-		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		imageCreateInfo.mipLevels = descriptor->mipCount;
-		imageCreateInfo.samples = WEngine::ToVulkan(descriptor->sampleCount);
-		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-		imageCreateInfo.usage = GetImageUsage(descriptor->Flag);
-
-		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		return new VulkanTexture3D(this, &imageCreateInfo, descriptor->format, descriptor->Flag, descriptor->initialState, descriptor->clearValue, descriptor->sampleCount);
+		return new VulkanTexture(this, InDesc);
 	}
 
 	WTextureViewRHIRef VulkanDevice::CreateTextureView(RHITextureViewDescriptor* descriptor, RHITexture* InTexture)
@@ -498,14 +445,14 @@ namespace Vulkan
 		{
 			ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 
-			if(descriptor->dimension == Dimension::Texture2D)
-				ImageViewCreateInfo.image = static_cast<VulkanTexture2D*>(InTexture)->GetHandle();
-			else if(descriptor->dimension == Dimension::Texture2DARRAY)
-				ImageViewCreateInfo.image = static_cast<VulkanTexture2DArray*>(InTexture)->GetHandle();
-			else if(descriptor->dimension == Dimension::Texture3D)
-				ImageViewCreateInfo.image = static_cast<VulkanTexture3D*>(InTexture)->GetHandle();
+			if(descriptor->Dimension == EDimension::Texture2D)
+				ImageViewCreateInfo.image = static_cast<VulkanTexture*>(InTexture)->GetHandle();
+			else if(descriptor->Dimension == EDimension::Texture2DArray)
+				ImageViewCreateInfo.image = static_cast<VulkanTexture*>(InTexture)->GetHandle();
+			else if(descriptor->Dimension == EDimension::Texture3D)
+				ImageViewCreateInfo.image = static_cast<VulkanTexture*>(InTexture)->GetHandle();
 
-			ImageViewCreateInfo.format = WEngine::ToVulkan(descriptor->format);
+			ImageViewCreateInfo.format = WEngine::ToVulkan(descriptor->Format);
 			ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
 			ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;
 			ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_B;
@@ -528,8 +475,8 @@ namespace Vulkan
 		{
 			ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 			ImageViewCreateInfo.image = InImage;
-			ImageViewCreateInfo.format = WEngine::ToVulkan(descriptor->format);
-			ImageViewCreateInfo.viewType = WEngine::ToVulkan(descriptor->dimension);
+			ImageViewCreateInfo.format = WEngine::ToVulkan(descriptor->Format);
+			ImageViewCreateInfo.viewType = WEngine::ToVulkan(descriptor->Dimension);
 			ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
 			ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;
 			ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_B;
@@ -745,44 +692,6 @@ namespace Vulkan
 	{
 		vkDeviceWaitIdle(Device);
 		static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager()->RefreshFenceState();
-	}
-
-	VkImageUsageFlags VulkanDevice::GetImageUsage(ETextureCreateFlags Flag)
-	{
-		VkImageUsageFlags Usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-		if ((Flag & ETextureCreateFlags::TextureCreate_Presentable) != ETextureCreateFlags::TextureCreate_None)
-		{
-			Usage |= VK_IMAGE_USAGE_STORAGE_BIT;
-		}
-		else if ((Flag & ETextureCreateFlags::TextureCreate_RenderTarget) != ETextureCreateFlags::TextureCreate_None)
-		{
-			if ((Flag & ETextureCreateFlags::TextureCreate_InputAttachmentReadable) != ETextureCreateFlags::TextureCreate_None)
-			{
-				Usage |= (VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
-			}
-			else
-			{
-				Usage |= (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
-			}
-		}
-		else if ((Flag & ETextureCreateFlags::TextureCreate_DepthStencil) != ETextureCreateFlags::TextureCreate_None)
-		{
-			if ((Flag & ETextureCreateFlags::TextureCreate_InputAttachmentReadable) != ETextureCreateFlags::TextureCreate_None)
-			{
-				Usage |= (VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT | VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
-			}
-			else
-			{
-				Usage |= (VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
-			}
-		}
-
-		if ((Flag & ETextureCreateFlags::TextureCreate_UAV) != ETextureCreateFlags::TextureCreate_None)
-		{
-			Usage |= VK_IMAGE_USAGE_STORAGE_BIT;
-		}
-
-		return Usage;
 	}
 
 }

@@ -16,7 +16,7 @@ enum class EVertexInputType : uint8
 	PositionAndColor,
 };
 
-enum class Format
+enum class EFormat : uint16
 {
 	R8_SInt = 0,
 	R8_UInt,
@@ -82,7 +82,7 @@ enum class PresentMode
 	Mailbox,
 };
 
-struct Extent
+struct FExtent
 {
 	uint32 width = 0;
 	uint32 height = 0;
@@ -100,15 +100,15 @@ struct IntRect
 	IntCorner Max;
 };
 
-enum class Dimension
+enum class EDimension
 {
 	Texture1D = 0,
 	Texture2D,
 	Texture3D,
-	TextureCUBE,
-	Texture1DARRAY,
-	Texture2DARRAY,
-	TextureCUBEARRAY,
+	TextureCube,
+	Texture1DArray,
+	Texture2DArray,
+	TextureCubeArray,
 };
 
 struct QueueProperty
@@ -160,7 +160,7 @@ struct QueueStack
 
 struct ImageSupport
 {
-	Format format;
+	EFormat format;
 	ColorSpace colorSpace;
 };
 

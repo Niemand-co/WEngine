@@ -558,13 +558,13 @@ private:\
 	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_SAMPLER, PARAMETER_TYPE, PARAMETER_NAME, = nullptr)
 
 #define SHADER_PARAMETER_TEXTURE(PARAMETER_TYPE, PARAMETER_NAME)\
-	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_TEXTURE, PARAMETER_TYPE, PARAMETER_NAME, = nullptr)
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_TEXTURE, RHITexture*, PARAMETER_NAME, = nullptr)
 
 #define SHADER_PARAMETER_SRV(PARAMETER_TYPE, PARAMETER_NAME)\
 	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RDG_TEXTURE_SRV, PARAMETER_TYPE, PARAMETER_NAME, = nullptr)
 
 #define SHADER_PARAMETER_UAV(PARAMETER_TYPE, PARAMETER_NAME)\
-	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RDG_TEXTURE_UAV, PARAMETER_TYPE, PARAMETER_NAME, = nullptr)
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RDG_TEXTURE_UAV, RHIUnordererResourceView*, PARAMETER_NAME, = nullptr)
 
 #define SHADER_PARAMETER_RDG_TEXTURE(PARAMETER_TYPE, PARAMETER_NAME)\
 	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RDG_TEXTURE, PARAMETER_TYPE, PARAMETER_NAME, = nullptr)
@@ -572,6 +572,39 @@ private:\
 #define SHADER_PARAMETER_STRUCT(PARAMETER_TYPE, PARAMETER_NAME)\
 	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_STRUCT, PARAMETER_TYPE, PARAMETER_NAME, )
 
-BEGIN_SHADER_PARAMETERS_STRUCT(DeferredBasePassParameters)
-	RENDER_TARGET_SLOTS()
-END_SHADER_PARAMETERS_STRUCT
+bool IsShaderParameterIgnoredByRHI(EUniformBaseType Type)
+{
+	return Type == EUniformBaseType::UB_RTV    ||
+		   Type == EUniformBaseType::UB_STRUCT ;
+}
+
+bool IsRDGResource(EUniformBaseType Type)
+{
+	return Type == EUniformBaseType::UB_RDG_BUFFER         ||
+		   Type == EUniformBaseType::UB_RDG_BUFFER_SRV     ||
+		   Type == EUniformBaseType::UB_RDG_BUFFER_UAV     ||
+		   Type == EUniformBaseType::UB_RDG_TEXTURE        ||
+		   Type == EUniformBaseType::UB_RDG_TEXTURE_SRV    ||
+		   Type == EUniformBaseType::UB_RDG_TEXTURE_UAV    ||
+		   Type == EUniformBaseType::UB_RDG_TEXTURE_ACCESS ;
+}
+
+RHIResource* GetShaderParameterRHI(const void* Contents, uint16 MemOffset, EUniformBaseType MemType)
+{
+	if (IsShaderParameterIgnoredByRHI(MemType))
+	{
+		return nullptr;
+	}
+
+	const uint8* MemPtr = (uint8*)Contents + MemOffset;
+
+	if (IsRDGResource(MemType))
+	{
+		const WRDGResource* RDGPtr = *reinterpret_cast<const WRDGResource* const*>(MemPtr);
+		return RDGPtr ? RDGPtr->GetRHI() : nullptr;
+	}
+	else
+	{
+		return *reinterpret_cast<RHIResource* const*>(MemPtr);
+	}
+}

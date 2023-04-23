@@ -2,105 +2,105 @@
 
 namespace WEngine
 {
-	static VkFormat ToVulkan(Format format)
+	static VkFormat ToVulkan(EFormat format)
 	{
 		switch (format)
 		{
-		case Format::R8_SInt:
+		case EFormat::R8_SInt:
 			return VK_FORMAT_R8_SINT;
-		case Format::R8_UInt:
+		case EFormat::R8_UInt:
 			return VK_FORMAT_R8_UINT;
-		case Format::R8_UNorm:
+		case EFormat::R8_UNorm:
 			return VK_FORMAT_R8_UNORM;
-		case Format::R8_SNorm:
+		case EFormat::R8_SNorm:
 			return VK_FORMAT_R8_SNORM;
-		case Format::R8G8_SFloat:
+		case EFormat::R8G8_SFloat:
 			return VK_FORMAT_R8G8_SINT;
-		case Format::R8G8_SInt:
+		case EFormat::R8G8_SInt:
 			return VK_FORMAT_R8G8_SINT;
-		case Format::R8G8_UInt:
+		case EFormat::R8G8_UInt:
 			return VK_FORMAT_R8G8_UINT;
-		case Format::R8G8_UNorm:
+		case EFormat::R8G8_UNorm:
 			return VK_FORMAT_R8G8_UNORM;
-		case Format::R8G8_SNorm:
+		case EFormat::R8G8_SNorm:
 			return VK_FORMAT_R8G8_SNORM;
-		case Format::R8G8B8_SInt:
+		case EFormat::R8G8B8_SInt:
 			return VK_FORMAT_R8G8B8_SINT;
-		case Format::R8G8B8_UInt:
+		case EFormat::R8G8B8_UInt:
 			return VK_FORMAT_R8G8B8_UINT;
-		case Format::R8G8B8_UNorm:
+		case EFormat::R8G8B8_UNorm:
 			return VK_FORMAT_R8G8B8_UNORM;
-		case Format::R8G8B8_SNorm:
+		case EFormat::R8G8B8_SNorm:
 			return VK_FORMAT_R8G8B8_SNORM;
-		case Format::A8R8G8B8_SInt:
+		case EFormat::A8R8G8B8_SInt:
 			return VK_FORMAT_R8G8B8_SINT;
-		case Format::A8R8G8B8_UInt:
+		case EFormat::A8R8G8B8_UInt:
 			return VK_FORMAT_R8G8B8A8_UINT;
-		case Format::A8R8G8B8_UNorm:
+		case EFormat::A8R8G8B8_UNorm:
 			return VK_FORMAT_R8G8B8A8_UNORM;
-		case Format::A8R8G8B8_SNorm:
+		case EFormat::A8R8G8B8_SNorm:
 			return VK_FORMAT_R8G8B8A8_SNORM;
-		case Format::R16_SFloat:
+		case EFormat::R16_SFloat:
 			return VK_FORMAT_R16_SFLOAT;
-		case Format::R16_SInt:
+		case EFormat::R16_SInt:
 			return VK_FORMAT_R16_SINT;
-		case Format::R16_UInt:
+		case EFormat::R16_UInt:
 			return VK_FORMAT_R16_UINT;
-		case Format::R16G16_SFloat:
+		case EFormat::R16G16_SFloat:
 			return VK_FORMAT_R16G16_SFLOAT;
-		case Format::R16G16_SInt:
+		case EFormat::R16G16_SInt:
 			return VK_FORMAT_R16G16_SINT;
-		case Format::R16G16_UInt:
+		case EFormat::R16G16_UInt:
 			return VK_FORMAT_R16G16_UINT;
-		case Format::R16G16B16_SFloat:
+		case EFormat::R16G16B16_SFloat:
 			return VK_FORMAT_R16G16B16_SFLOAT;
-		case Format::R16G16B16_SInt:
+		case EFormat::R16G16B16_SInt:
 			return VK_FORMAT_R16G16B16_SINT;
-		case Format::R16G16B16_UInt:
+		case EFormat::R16G16B16_UInt:
 			return VK_FORMAT_R16G16B16_UINT;
-		case Format::A16R16G16B16_SFloat:
+		case EFormat::A16R16G16B16_SFloat:
 			return VK_FORMAT_R16G16B16A16_SFLOAT;
-		case Format::A16R16G16B16_SInt:
+		case EFormat::A16R16G16B16_SInt:
 			return VK_FORMAT_R16G16B16A16_SINT;
-		case Format::A16R16G16B16_UInt:
+		case EFormat::A16R16G16B16_UInt:
 			return VK_FORMAT_R16G16B16A16_UINT;
-		case Format::R32_SFloat:
+		case EFormat::R32_SFloat:
 			return VK_FORMAT_R32_SFLOAT;
-		case Format::R32_SInt:
+		case EFormat::R32_SInt:
 			return VK_FORMAT_R32_SINT;
-		case Format::R32_UInt:
+		case EFormat::R32_UInt:
 			return VK_FORMAT_R32_UINT;
-		case Format::R32G32_SFloat:
+		case EFormat::R32G32_SFloat:
 			return VK_FORMAT_R32G32_SFLOAT;
-		case Format::R32G32_SInt:
+		case EFormat::R32G32_SInt:
 			return VK_FORMAT_R32G32_SINT;
-		case Format::R32G32_UInt:
+		case EFormat::R32G32_UInt:
 			return VK_FORMAT_R32G32_UINT;
-		case Format::R32G32B32_SFloat:
+		case EFormat::R32G32B32_SFloat:
 			return VK_FORMAT_R32G32B32_SFLOAT;
-		case Format::R32G32B32_SInt:
+		case EFormat::R32G32B32_SInt:
 			return VK_FORMAT_R32G32B32_SINT;
-		case Format::R32G32B32_UInt:
+		case EFormat::R32G32B32_UInt:
 			return VK_FORMAT_R32G32B32_UINT;
-		case Format::A32R32G32B32_SFloat:
+		case EFormat::A32R32G32B32_SFloat:
 			return VK_FORMAT_R32G32B32A32_SFLOAT;
-		case Format::A32R32G32B32_SInt:
+		case EFormat::A32R32G32B32_SInt:
 			return VK_FORMAT_R32G32B32A32_SINT;
-		case Format::A32R32G32B32_UInt:
+		case EFormat::A32R32G32B32_UInt:
 			return VK_FORMAT_R32G32B32A32_UINT;
-		case Format::D32_SFloat:
+		case EFormat::D32_SFloat:
 			return VK_FORMAT_D32_SFLOAT;
-		case Format::D16_Unorm:
+		case EFormat::D16_Unorm:
 			return VK_FORMAT_D16_UNORM;
-		case Format::S8_UINT:
+		case EFormat::S8_UINT:
 			return VK_FORMAT_S8_UINT;
-		case Format::B8G8R8A8_UNorm:
+		case EFormat::B8G8R8A8_UNorm:
 			return VK_FORMAT_B8G8R8A8_UNORM;
-		case Format::D16_UNORM_S8_UINT:
+		case EFormat::D16_UNORM_S8_UINT:
 			return VK_FORMAT_D16_UNORM_S8_UINT;
-		case Format::D24_UNORM_S8_UINT:
+		case EFormat::D24_UNORM_S8_UINT:
 			return VK_FORMAT_D24_UNORM_S8_UINT;
-		case Format::D32_SFLOAT_S8_UINT:
+		case EFormat::D32_SFLOAT_S8_UINT:
 			return VK_FORMAT_D32_SFLOAT_S8_UINT;
 		default:
 			RE_ASSERT(false, "Error Type Format.");
@@ -138,23 +138,23 @@ namespace WEngine
 		return VK_PRESENT_MODE_MAX_ENUM_KHR;
 	}
 
-	static VkImageViewType ToVulkan(Dimension dimension)
+	static VkImageViewType ToVulkan(EDimension Dimension)
 	{
-		switch (dimension)
+		switch (Dimension)
 		{
-		case Dimension::Texture1D:
+		case EDimension::Texture1D:
 			return VK_IMAGE_VIEW_TYPE_1D;
-		case Dimension::Texture2D:
+		case EDimension::Texture2D:
 			return VK_IMAGE_VIEW_TYPE_2D;
-		case Dimension::Texture3D:
+		case EDimension::Texture3D:
 			return VK_IMAGE_VIEW_TYPE_3D;
-		case Dimension::TextureCUBE:
+		case EDimension::TextureCUBE:
 			return VK_IMAGE_VIEW_TYPE_CUBE;
-		case Dimension::Texture1DARRAY:
+		case EDimension::Texture1DARRAY:
 			return VK_IMAGE_VIEW_TYPE_1D_ARRAY;
-		case Dimension::Texture2DARRAY:
+		case EDimension::Texture2DARRAY:
 			return VK_IMAGE_VIEW_TYPE_2D_ARRAY;
-		case Dimension::TextureCUBEARRAY:
+		case EDimension::TextureCUBEARRAY:
 			return VK_IMAGE_VIEW_TYPE_CUBE_ARRAY;
 		default:
 			RE_ASSERT(false, "Error Type View Type.");
@@ -498,7 +498,7 @@ enum class EState : int32
 	Healthy = None,
 };
 
-struct ClearValue
+struct FClearValue
 {
 	union
 	{
@@ -539,18 +539,20 @@ enum
 
 enum class ETextureCreateFlags : uint32
 {
-	TextureCreate_None                    = 0,
-	TextureCreate_Presentable             = 1 << 0,
-	TextureCreate_RenderTarget            = 1 << 1,
-	TextureCreate_DepthStencil            = 1 << 2,
-	TextureCreate_SRV                     = 1 << 3,
-	TextureCreate_UAV                     = 1 << 4,
-	TextureCreate_NoTiling                = 1 << 5,
-	TextureCreate_CPUWritable             = 1 << 6,
-	TextureCreate_CPUReadable             = 1 << 7,
-	TextureCreate_Transient               = 1 << 8,
-	TextureCreate_InputAttachmentReadable = 1 << 9,
-	TextureCreate_Memoryless              = 1 << 10,
+	TextureCreate_None                      = 0,
+	TextureCreate_Presentable               = 1 << 0,
+	TextureCreate_RenderTarget              = 1 << 1,
+	TextureCreate_DepthStencil              = 1 << 2,
+	TextureCreate_SRV                       = 1 << 3,
+	TextureCreate_UAV                       = 1 << 4,
+	TextureCreate_NoTiling                  = 1 << 5,
+	TextureCreate_CPUWritable               = 1 << 6,
+	TextureCreate_CPUReadable               = 1 << 7,
+	TextureCreate_Transient                 = 1 << 8,
+	TextureCreate_InputAttachmentReadable   = 1 << 9,
+	TextureCreate_Memoryless                = 1 << 10,
+	TextureCreate_ResolveTarget             = 1 << 11,
+	TextureCreate_DepthStencilResolveTarget = 1 << 12,
 };
 ENUM_CLASS_FLAGS(ETextureCreateFlags)
 
@@ -614,9 +616,7 @@ typedef class RHIPixelShader* WPixelShaderRHIRef;
 typedef class RHIGeometryShader* WGeometryShaderRHIRef;
 typedef class RHIComputeShader* WComputeShaderRHIRef;
 
-typedef class RHITexture2D* WTexture2DRHIRef;
-typedef class RHITexture2DArray* WTexture2DArrayRHIRef;
-typedef class RHITexture3D* WTexture3DRHIRef;
+typedef class RHITexture* WTextureRHIRef;
 
 typedef class RHITextureView* WTextureViewRHIRef;
 

@@ -10,17 +10,22 @@ public:
 
 	static constexpr uint32 kAllResource = WEngine::NumericLimits<uint32>::Max();
 
-	RHISubresource() = default;
+	RHISubresource()
+		: RHIResource(ERHIResourceType::RRT_Subresource)
+	{
+	}
 
 	RHISubresource(uint32 inMipLevel, uint32 inArrayLayer, uint32 inPlaneSlice)
-		: MipLevel(inMipLevel),
+		: RHIResource(ERHIResourceType::RRT_Subresource),
+		  MipLevel(inMipLevel),
 		  ArrayLayer(inArrayLayer),
   		  PlaneSlice(inPlaneSlice)
 	{
 	}
 
 	RHISubresource(uint32 inOffset, uint32 inRange)
-		: Offset(inOffset),
+		: RHIResource(ERHIResourceType::RRT_Subresource),
+		  Offset(inOffset),
 		  Range(inRange)
 	{
 	}
@@ -112,7 +117,10 @@ class RHIBarrierBatch : public RHIResource
 {
 public:
 
-	RHIBarrierBatch() = default;
+	RHIBarrierBatch()
+		: RHIResource(ERHIResourceType::RRT_Barrier)
+	{
+	}
 
 	virtual ~RHIBarrierBatch() = default;
 

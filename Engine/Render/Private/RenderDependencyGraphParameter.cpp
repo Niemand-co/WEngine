@@ -31,7 +31,7 @@ void WShaderParameterMetaData::InitializeLayout()
 																		Type == EUniformBaseType::UB_RDG_TEXTURE_UAV ;};
 
 	auto IsRDGBufferResource = [](EUniformBaseType Type)->bool { return Type == EUniformBaseType::UB_RDG_BUFFER_SRV  ||
-																		 Type == EUniformBaseType::UB_RDG_BUFFER_SRV ;};
+																		Type == EUniformBaseType::UB_RDG_BUFFER_SRV ;};
 
 	for (int32 Index = Members.Size() - 1; Index >= 0; --Index)
 	{

@@ -28,11 +28,7 @@ public:
 
 	virtual WPsoRHIRef GetOrCreateGraphicsPipelineState(class RHIGraphicsPipelineStateDescriptor *descriptor) = 0;
 
-	virtual WTexture2DRHIRef CreateTexture2D(class RHITextureDescriptor* descriptor) = 0;
-
-	virtual WTexture2DArrayRHIRef CreateTexture2DArray(class RHITextureDescriptor* descriptor) = 0;
-
-	virtual WTexture3DRHIRef CreateTexture3D(class RHITextureDescriptor* descriptor) = 0;
+	virtual WTextureRHIRef CreateTexture(const class RHITextureDesc& InDesc) = 0;
 
 	virtual WTextureViewRHIRef CreateTextureView(class RHITextureViewDescriptor* descriptor, class RHITexture* InTexture) = 0;;
 

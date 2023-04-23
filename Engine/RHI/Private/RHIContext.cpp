@@ -113,65 +113,21 @@ WComputeShaderRHIRef DynamicRHIContext::CreateComputeShader(ShaderCodeBlob& blob
 	return pDevice->CreateComputeShader(&descriptor);
 }
 
-WTexture2DRHIRef DynamicRHIContext::CreateTexture2D(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, ClearValue InClearValue, ETextureCreateFlags InFlag, EAccess InitState)
+WTextureRHIRef DynamicRHIContext::CreateTexture(const RHITextureDesc& InDesc)
 {
-	RHITextureDescriptor descriptor = {};
-	{
-		descriptor.width = InWidth;
-		descriptor.height = InHeight;
-		descriptor.format = InFormat;
-		descriptor.layerCount = 1;
-		descriptor.mipCount = InMipCount;
-		descriptor.Flag = InFlag;
-		descriptor.initialState = InitState;
-		descriptor.clearValue = InClearValue;
-	}
-	return pDevice->CreateTexture2D(&descriptor);
+	return pDevice->CreateTexture(InDesc);
 }
 
-WTexture2DArrayRHIRef DynamicRHIContext::CreateTexture2DArray(uint32 InWidth, uint32 InHeight, Format InFormat, uint32 InMipCount, uint32 InLayerCount, ClearValue InClearValue, ETextureCreateFlags InFlag, EAccess InitState)
-{
-	RHITextureDescriptor descriptor = {};
-	{
-		descriptor.width = InWidth;
-		descriptor.height = InHeight;
-		descriptor.format = InFormat;
-		descriptor.layerCount = InLayerCount;
-		descriptor.mipCount = InMipCount;
-		descriptor.Flag = InFlag;
-		descriptor.initialState = InitState;
-		descriptor.clearValue = InClearValue;
-	}
-	return pDevice->CreateTexture2DArray(&descriptor);
-}
-
-WTexture3DRHIRef DynamicRHIContext::CreateTexture3D(uint32 InWidth, uint32 InHeight, uint32 InDepth, Format InFormat, uint32 InMipCount, ClearValue InClearValue, ETextureCreateFlags InFlag, EAccess InitState)
-{
-	RHITextureDescriptor descriptor = {};
-	{
-		descriptor.width = InWidth;
-		descriptor.height = InHeight;
-		descriptor.depth = InDepth;
-		descriptor.format = InFormat;
-		descriptor.layerCount = 1;
-		descriptor.mipCount = InMipCount;
-		descriptor.Flag = InFlag;
-		descriptor.initialState = InitState;
-		descriptor.clearValue = InClearValue;
-	}
-	return pDevice->CreateTexture3D(&descriptor);
-}
-
-WTextureViewRHIRef DynamicRHIContext::CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, Dimension InDimension, Format InFormat, RHITexture* InTexture)
+WTextureViewRHIRef DynamicRHIContext::CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, EDimension InDimension, EFormat InFormat, RHITexture* InTexture)
 {
 	RHITextureViewDescriptor descriptor = {};
 	{
-		descriptor.format = InFormat;
+		descriptor.Format = InFormat;
 		descriptor.baseMipLevel = InMipIndex;
 		descriptor.mipCount = InMipCount;
 		descriptor.baseArrayLayer = InLayerIndex;
 		descriptor.arrayLayerCount = InLayerCount;
-		descriptor.dimension = InDimension;
+		descriptor.Dimension = InDimension;
 	}
 	return pDevice->CreateTextureView(&descriptor, InTexture);
 }
@@ -191,7 +147,7 @@ void DynamicRHIContext::UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor
 	pDevice->UpdateTextureResourceToGroup(descriptor);
 }
 
-WViewportRHIRef DynamicRHIContext::CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, Format InFormat)
+WViewportRHIRef DynamicRHIContext::CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, EFormat InFormat)
 {
 	RHIViewportDescriptor descriptor = {};
 	{

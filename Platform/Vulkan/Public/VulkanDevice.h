@@ -41,11 +41,7 @@ namespace Vulkan
 
 		virtual WPsoRHIRef GetOrCreateGraphicsPipelineState(RHIGraphicsPipelineStateDescriptor *descriptor) override;
 
-		virtual WTexture2DRHIRef CreateTexture2D(RHITextureDescriptor* descriptor) override;
-
-		virtual WTexture2DArrayRHIRef CreateTexture2DArray(RHITextureDescriptor* descriptor) override;
-
-		virtual WTexture3DRHIRef CreateTexture3D(RHITextureDescriptor* descriptor) override;
+		virtual WTextureRHIRef CreateTexture(const RHITextureDesc& InDesc) override;
 
 		virtual WTextureViewRHIRef CreateTextureView(RHITextureViewDescriptor* descriptor, RHITexture* InTexture) override;
 

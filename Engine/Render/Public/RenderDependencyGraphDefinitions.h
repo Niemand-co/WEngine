@@ -333,32 +333,32 @@ struct WRDGTextureDesc
 
 	WRDGTextureDesc() = default;
 
-	WRDGTextureDesc(Format inFormat, Extent inExtent, EDimension inDimension, ClearValue inClearValue, uint8 inMipCount, uint8 inSampleCount, uint32 inLayerCount, ETextureCreateFlags InFlags)
-		: format(inFormat), extent(inExtent), dimension(inDimension), clearValue(inClearValue), mipCount(inMipCount), sampleCount(inSampleCount), layerCount(inLayerCount), Flags(InFlags)
+	WRDGTextureDesc(EFormat inFormat, FExtent inExtent, EDimension inDimension, FClearValue inClearValue, uint8 inMipCount, uint8 inSampleCount, uint32 inLayerCount, ETextureCreateFlags InFlags)
+		: Format(inFormat), Extent(inExtent), dimension(inDimension), ClearValue(inClearValue), mipCount(inMipCount), sampleCount(inSampleCount), layerCount(inLayerCount), Flags(InFlags)
 	{
 	}
 
-	static WRDGTextureDesc GetTexture2DDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
+	static WRDGTextureDesc GetTexture2DDesc(EFormat inFormat, FExtent inExtent, FClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
 	{
 		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture2D, inClearValue, inMipCount, inSampleCount, 1, InFlags);
 	}
 
-	static WRDGTextureDesc GetTexture2DArrayDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, uint32 inLayerCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
+	static WRDGTextureDesc GetTexture2DArrayDesc(EFormat inFormat, FExtent inExtent, FClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, uint32 inLayerCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
 	{
 		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture2DArray, inClearValue, inMipCount, inSampleCount, inLayerCount, InFlags);
 	}
 
-	static WRDGTextureDesc GetTexture3DDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
+	static WRDGTextureDesc GetTexture3DDesc(EFormat inFormat, FExtent inExtent, FClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
 	{
 		return WRDGTextureDesc(inFormat, inExtent, EDimension::Texture3D, inClearValue, inMipCount, inSampleCount, 1, InFlags);
 	}
 
-	static WRDGTextureDesc GetTextureCubeDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
+	static WRDGTextureDesc GetTextureCubeDesc(EFormat inFormat, FExtent inExtent, FClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
 	{
 		return WRDGTextureDesc(inFormat, inExtent, EDimension::TextureCube, inClearValue, inMipCount, inSampleCount, 1, InFlags);
 	}
 
-	static WRDGTextureDesc GetTextureCubeArrayDesc(Format inFormat, Extent inExtent, ClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, uint32 inLayerCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
+	static WRDGTextureDesc GetTextureCubeArrayDesc(EFormat inFormat, FExtent inExtent, FClearValue inClearValue, uint8 inMipCount = 1, uint8 inSampleCount = 1, uint32 inLayerCount = 1, ETextureCreateFlags InFlags = ETextureCreateFlags::TextureCreate_None)
 	{
 		return WRDGTextureDesc(inFormat, inExtent, EDimension::TextureCubeArray, inClearValue, inMipCount, inSampleCount, inLayerCount, InFlags);
 	}
@@ -380,16 +380,16 @@ struct WRDGTextureDesc
 
 	bool IsStencilFormat() const
 	{
-		return format == Format::D16_UNORM_S8_UINT || format == Format::D24_UNORM_S8_UINT || format == Format::D32_SFLOAT_S8_UINT;
+		return Format == EFormat::D16_UNORM_S8_UINT || Format == EFormat::D24_UNORM_S8_UINT || Format == EFormat::D32_SFLOAT_S8_UINT;
 	}
 
 	bool IsDepthFormat() const
 	{
-		return format == Format::D16_Unorm ||
-			   format == Format::D16_UNORM_S8_UINT ||
-			   format == Format::D24_UNORM_S8_UINT ||
-			   format == Format::D32_SFloat ||
-			   format == Format::D32_SFLOAT_S8_UINT;
+		return Format == EFormat::D16_Unorm ||
+			   Format == EFormat::D16_UNORM_S8_UINT ||
+			   Format == EFormat::D24_UNORM_S8_UINT ||
+			   Format == EFormat::D32_SFloat ||
+			   Format == EFormat::D32_SFLOAT_S8_UINT;
 	}
 
 	WRDGTerxtureSubresourceLayout GetSubresourceLayout() const
@@ -397,10 +397,10 @@ struct WRDGTextureDesc
 		return WRDGTerxtureSubresourceLayout(mipCount, layerCount * (IsTextureCube() ? 6 : 1), IsStencilFormat() ? 2 : 1);
 	}
 
-	Format format = Format::A16R16G16B16_SFloat;
-	Extent extent;
+	EFormat Format = EFormat::A16R16G16B16_SFloat;
+	FExtent Extent;
 	EDimension dimension = EDimension::Texture2D;
-	ClearValue clearValue;
+	FClearValue ClearValue;
 	uint8 mipCount = 1;
 	uint8 sampleCount = 1;
 	uint32 layerCount = 1;

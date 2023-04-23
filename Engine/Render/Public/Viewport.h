@@ -6,7 +6,7 @@ class WViewport : public WRenderTarget
 {
 public:
 
-	WViewport(uint32 InWidth, uint32 InHeight, Format InFormat)
+	WViewport(uint32 InWidth, uint32 InHeight, EFormat InFormat)
 		: WRenderTarget(InWidth, InHeight, InFormat),
 		  Width(InWidth),
 		  Height(InHeight),
@@ -39,7 +39,7 @@ protected:
 
 	uint32 Height;
 
-	Format PixelFormat;
+	EFormat PixelFormat;
 
 	uint32 AcquiredImageIndex = 0;
 
@@ -53,7 +53,7 @@ class WEditorViewport : public WViewport
 {
 public:
 
-	WEditorViewport(uint32 width, uint32 height, Format format);
+	WEditorViewport(uint32 width, uint32 height, EFormat format);
 
 	virtual ~WEditorViewport();
 
@@ -73,7 +73,7 @@ class WSceneViewport : public WViewport
 {
 public:
 
-	WSceneViewport(uint32 width, uint32 height, Format format);
+	WSceneViewport(uint32 width, uint32 height, EFormat format);
 
 	virtual ~WSceneViewport();
 

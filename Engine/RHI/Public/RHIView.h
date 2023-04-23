@@ -4,7 +4,18 @@ class RHIView : public RHIResource
 {
 public:
 
+	RHIView(ERHIResourceType InType, class RHIViewableResource* InParentResource)
+		: RHIResource(InType),
+		  ParentResource(InParentResource)
+	{
+	}
+
+
 	virtual ~RHIView() = default;
+
+protected:
+
+	RHIViewableResource *ParentResource;
 
 };
 

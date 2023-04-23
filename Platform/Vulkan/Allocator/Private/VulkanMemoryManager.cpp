@@ -46,6 +46,16 @@ namespace Vulkan
 		RE_ASSERT(vkBindBufferMemory(Device->GetHandle(), Buffer, DeviceMemory, Offset) == VK_SUCCESS, "Failed to bind buffer with memory.");
 	}
 
+	void VulkanAllocation::BindImage(VulkanDevice* Device, VkImage Image)
+	{
+		VkDeviceMemory DeviceMemory;
+		{
+			VulkanSubresourceAllocator* Allocator = Device->GetMemoryManager()->GetSubresourceAllocator(AllocatorIndex);
+			DeviceMemory = Allocator->GetMemoryHandle()->GetHandle();
+		}
+		RE_ASSERT(vkBindImageMemory(Device->GetHandle(), Image, DeviceMemory, Offset) == VK_SUCCESS, "Failed to bind image with memory.");
+	}
+
 	void* VulkanDeviceMemoryAllocation::Map(uint32 MappingSize, uint32 MappingOffset)
 	{
 		if (!MappedPointer)
@@ -316,7 +326,8 @@ namespace Vulkan
 	}
 
 	VulkanMemoryManager::VulkanMemoryManager(VulkanDevice* pInDevice)
-		: pDevice(pInDevice),
+		: RHIResource(ERHIResourceType::RRT_Allocator),
+		  pDevice(pInDevice),
 		  AllBufferAllocationsFreeListHead(-1)
 	{
 		vkGetPhysicalDeviceMemoryProperties(*pDevice->GetGPU()->GetHandle(), &MemoryProperties);
@@ -641,6 +652,29 @@ namespace Vulkan
 		bool bShouldMap = VkEnumHasFlags(MemoryPropertyFlags, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
 		if (ResourceTypeHeaps[MemoryTypeIndex]->TryAllocate(OutAllocation, 0x1, MemoryRequirements.size, MemoryRequirements.alignment, MetaType, bShouldMap))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	bool VulkanMemoryManager::AllocateImageMemory(VulkanAllocation& OutAllocation, const VkMemoryRequirements& MemoryRequirements, VkMemoryPropertyFlags MemoryPropertyFlags, EVulkanAllocationMetaType MetaType)
+	{
+		uint32 TypeIndex = 0;
+		if (!GetMemoryPropertyTypeIndex(MemoryRequirements.memoryTypeBits, MemoryPropertyFlags, TypeIndex))
+		{
+			bool bRetrySuccess = false;
+			if (VkEnumHasFlags(MemoryPropertyFlags, VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT))
+			{
+				MemoryPropertyFlags &= ~VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT;
+				bRetrySuccess = GetMemoryPropertyTypeIndex(MemoryRequirements.memoryTypeBits, MemoryPropertyFlags, TypeIndex);
+			}
+			RE_ASSERT(bRetrySuccess, "Cannot find memory heap match the memory type.");
+		}
+
+		bool bShouldMap = VkEnumHasFlags(MemoryPropertyFlags, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		if (ResourceTypeHeaps[TypeIndex]->TryAllocate(OutAllocation, 0x2, MemoryRequirements.size, MemoryRequirements.alignment, MetaType, bShouldMap))
 		{
 			return true;
 		}

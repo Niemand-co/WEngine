@@ -235,8 +235,8 @@ namespace Vulkan
 
 		RHITextureViewDescriptor TextureViewDescriptor = {};
 		{
-			TextureViewDescriptor.format = PixelFormat;
-			TextureViewDescriptor.dimension = Dimension::Texture2D;
+			TextureViewDescriptor.Format = PixelFormat;
+			TextureViewDescriptor.Dimension = EDimension::Texture2D;
 			TextureViewDescriptor.baseMipLevel = 0;
 			TextureViewDescriptor.mipCount = 1;
 			TextureViewDescriptor.baseArrayLayer = 0;

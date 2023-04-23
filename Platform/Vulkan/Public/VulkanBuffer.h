@@ -90,7 +90,7 @@ namespace Vulkan
 
 	};
 
-	class VulkanStagingBuffer : public RHIResource
+	class VulkanStagingBuffer : public RHIBuffer
 	{
 	public:
 

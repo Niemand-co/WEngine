@@ -8,7 +8,7 @@ class RHIBuffer : public RHIResource
 public:
 
 	RHIBuffer(uint32 InNum, uint32 InStride, EBufferUsageFlags InUsage)
-		: Num(InNum), Stride(InStride), Usage(InUsage)
+		: RHIResource(ERHIResourceType::RRT_Buffer), Num(InNum), Stride(InStride), Usage(InUsage)
 	{
 	}
 
@@ -60,6 +60,7 @@ class RHIUniformBuffer : public RHIResource
 public:
 
 	RHIUniformBuffer(const class ShaderParametersLayout* InLayout)
+		: RHIResource(ERHIResourceType::RRT_Buffer)
 	{
 	}
 

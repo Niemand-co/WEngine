@@ -21,7 +21,7 @@ class WTexture2D : public WTexture
 {
 public:
 
-	WTexture2D(uint32 inWidth, uint32 inHeight, Format inFormat)
+	WTexture2D(uint32 inWidth, uint32 inHeight, EFormat inFormat)
 		: Width(inWidth), Height(inHeight), format(inFormat)
 	{
 	}
@@ -34,7 +34,7 @@ protected:
 
 	uint32 Height;
 
-	Format format;
+	EFormat format;
 
 	WTexture2DRHIRef Texture;
 
@@ -44,7 +44,7 @@ class WTextureWithSRV : public WTexture2D
 {
 public:
 
-	WTextureWithSRV(uint32 inWidth, uint32 inHeight, Format inFormat);
+	WTextureWithSRV(uint32 inWidth, uint32 inHeight, EFormat inFormat);
 
 	virtual ~WTextureWithSRV() = default;
 
