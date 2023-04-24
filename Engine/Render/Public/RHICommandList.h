@@ -63,7 +63,7 @@ public:
 
 	void BeginTransition(WEngine::WArray<class RHIBarrierDescriptor>& Transitions);
 
-	void SetGraphicsPipelineState(class RHIGraphicsPipelineStateDescriptor* GraphicsPipelineState);
+	void SetGraphicsPipelineState(class RHIGraphicsPipelineStateInitializer& GraphicsPipelineState);
 
 	void BindVertexBuffer(class WVertexFactory* InVertexFactory);
 

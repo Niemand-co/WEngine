@@ -108,6 +108,12 @@ namespace Vulkan
 
 		VkBuffer GetHandle() const { return Buffer; }
 
+		virtual void* GetBufferRHIBase() override
+		{
+			VulkanStagingBuffer* Base = static_cast<VulkanStagingBuffer*>(this);
+			return  Base;
+		}
+
 	private:
 
 		VulkanDevice *pDevice;

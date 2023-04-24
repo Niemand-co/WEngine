@@ -7,6 +7,11 @@ class RHIGroupPool : public RHIResource
 {
 public:
 
+	RHIGroupPool()
+		: RHIResource(ERHIResourceType::RRT_None)
+	{
+	}
+
 	virtual ~RHIGroupPool() = default;
 
 protected:

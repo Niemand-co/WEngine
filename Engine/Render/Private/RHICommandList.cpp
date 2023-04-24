@@ -53,7 +53,7 @@ void RHIRenderCommandList::BeginTransition(WEngine::WArray<RHIBarrierDescriptor>
     GetDynamicRHI()->RHIBeginTransition(Transitions);
 }
 
-void RHIRenderCommandList::SetGraphicsPipelineState(RHIGraphicsPipelineStateDescriptor* GraphicsPipelineState)
+void RHIRenderCommandList::SetGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& GraphicsPipelineState)
 {
     GetDynamicRHI()->RHISetGraphicsPipelineState(GraphicsPipelineState);
 }

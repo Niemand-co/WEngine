@@ -228,22 +228,22 @@ namespace Vulkan
 		WEngine::WArray<VkImageView> ImageViews(descriptor->AttachmentCount);
 		for (uint32 Index = 0; Index < ImageViews.Size(); ++Index)
 		{
-			VulkanTexture *TextureRHI = VulkanTextureBase::Cast(descriptor->Attachments[Index]);
+			VulkanTexture *TextureRHI = static_cast<VulkanTexture*>(descriptor->Attachments[Index]);
 
 			VkImageViewCreateInfo ImageViewCreateInfo = {};
 			{
 				ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-				ImageViewCreateInfo.image = TextureRHI->Image;
-				ImageViewCreateInfo.format = TextureRHI->Format;
+				ImageViewCreateInfo.image = TextureRHI->GetHandle();
+				ImageViewCreateInfo.format = WEngine::ToVulkan(TextureRHI->GetDesc().Format);
 				ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
 				ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;
 				ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_B;
 				ImageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_A;
-				ImageViewCreateInfo.viewType = Surface.ViewType;
-				ImageViewCreateInfo.subresourceRange.aspectMask = Surface.Aspect;
-				ImageViewCreateInfo.subresourceRange.layerCount = Surface.NumArray;
+				ImageViewCreateInfo.viewType = TextureRHI->GetViewType(TextureRHI->GetDesc().Dimension);
+				ImageViewCreateInfo.subresourceRange.aspectMask = TextureRHI->GetAspect(TextureRHI->GetDesc().Format);
+				ImageViewCreateInfo.subresourceRange.layerCount = TextureRHI->GetDesc().ArraySize;
 				ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-				ImageViewCreateInfo.subresourceRange.levelCount = Surface.NumMip;
+				ImageViewCreateInfo.subresourceRange.levelCount = TextureRHI->GetDesc().NumMips;
 				ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
 			}
 			vkCreateImageView(Device, &ImageViewCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &ImageViews[Index]);

@@ -67,3 +67,72 @@ private:
 	EAccess Access;
 
 };
+
+struct RHIBlendStateInitializer
+{
+	bool bEnableBlend = true;
+	EBlendOP ColorBlendOp = EBlendOP::BlendAdd;
+	EBlendFactor ColorSrcFactor = EBlendFactor::FactorOne;
+	EBlendFactor ColorDstFactor = EBlendFactor::FactorZero;
+	EBlendOP AlphaBlendOp = EBlendOP::BlendAdd;
+	EBlendFactor AlphaSrcFactor = EBlendFactor::FactorOne;
+	EBlendFactor AlphaDstFactor = EBlendFactor::FactorZero;
+};
+
+struct RHIDepthStencilStateInitializer
+{
+	bool bEnableDepthTest = true;
+	bool bEnableDepthWrite = true;
+	ECompareOP DepthCompareOp = ECompareOP::NotEqual;
+	bool bEnableFrontStencil = false;
+	ECompareOP FrontStencilCompareOp = ECompareOP::Always;
+	EStencilFailedOP FrontStencilFailedOp = EStencilFailedOP::Keep;
+	EStencilFailedOP FrontDepthFailedOp = EStencilFailedOP::Keep;
+	EStencilFailedOP FrontStencilPassOp = EStencilFailedOP::Replace;
+	bool bEnableBackStencil = false;
+	ECompareOP BackStencilCompareOp = ECompareOP::Always;
+	EStencilFailedOP BackStencilFailedOp = EStencilFailedOP::Keep;
+	EStencilFailedOP BackDepthFailedOp = EStencilFailedOP::Keep;
+	EStencilFailedOP BackStencilPassOp = EStencilFailedOP::Replace;
+	uint8 StencilReadMask = 0xFF;
+	uint8 StencilWriteMask = 0xFF;
+};
+
+struct RHIRasterizationStateInitializer
+{
+	ECullMode CullMode = ECullMode::None;
+	EPolygonMode PolygonMode = EPolygonMode::Triangle;
+	EPrimitiveTopology PrimitiveTopology = EPrimitiveTopology::TriangleList;
+	bool bEnableDepthClamp = false;
+	bool bEnableDiscard = false;
+	bool bClockWise = false;
+};
+
+struct RHIMultiSampleStateInitializer
+{
+	bool bEnableSampleShading = false;
+	uint32 SampleCount = 1;
+	uint32 SampleMask = 0x00;
+	float MinSampleShading = 0.f;
+	bool bEnableAlphaToCoverage = false;
+	bool bEnableAlphaToOne = false;
+};
+
+struct RHIGraphicsPipelineStateInitializer
+{
+public:
+
+	RHIGraphicsPipelineStateInitializer()
+		:
+	{
+	}
+
+public:
+
+	RHIBlendState *BlendState;
+	RHIDepthStencilState *DepthStencilState;
+	RHIRasterizationState *RasterizationState;
+	RHIMultiSampleState *MultiSampleState;
+
+	EPrimitiveTopology PrimitiveType;
+};

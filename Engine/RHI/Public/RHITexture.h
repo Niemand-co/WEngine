@@ -75,25 +75,7 @@ public:
 
 	virtual ~RHITexture() = default;
 
-	uint32 GetMipCount() const { return Desc.NumMips; }
-
-	virtual uint32 GetWidth() const { return Desc.Extent.width; }
-
-	virtual uint32 GetHeight() const { return Desc.Extent.height; }
-
-	virtual uint32 GetDepth() const { return Desc.Extent.depth; }
-
-	virtual uint32 GetLayerCount() const { return Desc.ArraySize; }
-
-	EFormat GetFormat() const { return Desc.Format; }
-
-	FClearValue GetClearValue() const { return Desc.ClearValue; }
-
-	virtual EDimension GetDimension() const { return Desc.Dimension; }
-
-	uint32 GetSampleCount() const { return Desc.NumSamples; }
-
-	ETextureCreateFlags GetFlags() const { return Desc.Flags; }
+	inline const RHITextureDesc& GetDesc() const { return Desc; }
 
 	bool IsStencilFormat() const
 	{

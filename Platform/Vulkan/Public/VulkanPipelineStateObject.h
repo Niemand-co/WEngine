@@ -18,7 +18,9 @@ namespace Vulkan
 
 	private:
 
-		VulkanDevice *pDevice;
+		class VulkanDevice *pDevice;
+		class VulkanRenderPass *RenderPass;
+		class VulkanLayout *Layout;
 
 		VkPipeline Pipeline;
 
@@ -66,6 +68,28 @@ namespace Vulkan
 		static WEngine::WHashMap<uint32, VulkanGraphicsPipelineStateObject*> GraphicsPipelines;
 
 		static WEngine::WHashMap<uint32, VulkanComputePipelineStateObject*> ComputePipelines;
+
+	};
+
+	class VulkanCommonPipelineDescriptorState : public VulkanResource
+	{
+	public:
+
+		VulkanCommonPipelineDescriptorState();
+
+		virtual ~VulkanCommonPipelineDescriptorState();
+
+
+
+	};
+
+	class VulkanGraphicsPipelineDescriptorState : public VulkanCommonPipelineDescriptorState
+	{
+
+	};
+
+	class VulkanComputePipelineDescriptorState : public VulkanCommonPipelineDescriptorState
+	{
 
 	};
 

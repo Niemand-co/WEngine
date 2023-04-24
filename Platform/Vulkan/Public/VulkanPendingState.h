@@ -3,14 +3,6 @@
 namespace Vulkan
 {
 
-	class VulkanGraphicsPipelineDescriptorState : public VulkanResource
-	{
-	public:
-
-		
-
-	};
-
 	class VulkanPendingGfxState : public VulkanResource
 	{
 	public:
@@ -27,6 +19,10 @@ namespace Vulkan
 
 		void SetGfxPipeline(class VulkanGraphicsPipelineStateObject* InGfxPipeline, bool bForceReset);
 
+		void PrepareForDraw(class VulkanCommandBuffer *CmdBuffer);
+
+		void Bind(class VulkanCommandBuffer *CmdBuffer);
+
 	protected:
 
 		WEngine::WArray<VkViewport> Viewports;
@@ -34,8 +30,8 @@ namespace Vulkan
 
 		float WireLineWidth = 1.0f;
 
-		VulkanGraphicsPipelineStateObject *CurrentPipelineState;
-
+		class VulkanGraphicsPipelineStateObject* CurrentPipelineState;
+		class VulkanGraphicsPipelineDescriptorState *CurrentState;
 	};
 
 	class VulkanPendingComputeState : public VulkanResource

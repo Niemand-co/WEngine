@@ -3,7 +3,7 @@
 namespace Vulkan
 {
 	
-	class VulkanLayout : public RHIResource
+	class VulkanLayout : public VulkanResource
 	{
 	public:
 

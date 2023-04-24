@@ -326,8 +326,7 @@ namespace Vulkan
 	}
 
 	VulkanMemoryManager::VulkanMemoryManager(VulkanDevice* pInDevice)
-		: RHIResource(ERHIResourceType::RRT_Allocator),
-		  pDevice(pInDevice),
+		: pDevice(pInDevice),
 		  AllBufferAllocationsFreeListHead(-1)
 	{
 		vkGetPhysicalDeviceMemoryProperties(*pDevice->GetGPU()->GetHandle(), &MemoryProperties);
@@ -340,7 +339,7 @@ namespace Vulkan
 	void VulkanMemoryManager::Init()
 	{
 		const uint32 MemoryPropertyBits = (1 << MemoryProperties.memoryTypeCount) - 1;
-		ResourceTypeHeaps.AddZero(MemoryProperties.memoryTypeCount);
+		ResourceTypeHeaps.AddZerod(MemoryProperties.memoryTypeCount);
 
 		{
 			uint32 TypeIndex = 0;

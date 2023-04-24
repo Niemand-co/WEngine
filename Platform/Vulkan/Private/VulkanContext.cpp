@@ -141,7 +141,7 @@ namespace Vulkan
 				VulkanTexture *Texture = static_cast<VulkanTexture*>(Transition.Texture);
 				VkImageSubresourceRange Range = {};
 				{
-					Range.aspectMask = Texture->GetAspect(Texture->GetFormat());
+					Range.aspectMask = Texture->GetAspect(Texture->GetDesc().Format);
 					Range.baseArrayLayer = Transition.ArrayLayer;
 					Range.layerCount = 1;
 					Range.baseMipLevel = Transition.MipLevel;
@@ -231,9 +231,9 @@ namespace Vulkan
 		}
 	}
 
-	void VulkanDynamicContext::RHISetGraphicsPipelineState(RHIGraphicsPipelineStateDescriptor* descriptor)
+	void VulkanDynamicContext::RHISetGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& Initializer)
 	{
-		WPsoRHIRef Pipeline = pDevice->GetOrCreateGraphicsPipelineState(descriptor);
+		WPsoRHIRef Pipeline = Vulkan
 		Pipeline->Bind(pCommandBufferManager->GetActiveCommandBuffer());
 	}
 

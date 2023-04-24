@@ -262,7 +262,7 @@ namespace Vulkan
 
 	};
 
-	class VulkanMemoryManager : public RHIResource
+	class VulkanMemoryManager : public VulkanResource
 	{
 	public:
 

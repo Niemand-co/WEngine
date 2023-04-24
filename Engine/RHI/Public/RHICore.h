@@ -148,13 +148,13 @@ namespace WEngine
 			return VK_IMAGE_VIEW_TYPE_2D;
 		case EDimension::Texture3D:
 			return VK_IMAGE_VIEW_TYPE_3D;
-		case EDimension::TextureCUBE:
+		case EDimension::TextureCube:
 			return VK_IMAGE_VIEW_TYPE_CUBE;
-		case EDimension::Texture1DARRAY:
+		case EDimension::Texture1DArray:
 			return VK_IMAGE_VIEW_TYPE_1D_ARRAY;
-		case EDimension::Texture2DARRAY:
+		case EDimension::Texture2DArray:
 			return VK_IMAGE_VIEW_TYPE_2D_ARRAY;
-		case EDimension::TextureCUBEARRAY:
+		case EDimension::TextureCubeArray:
 			return VK_IMAGE_VIEW_TYPE_CUBE_ARRAY;
 		default:
 			RE_ASSERT(false, "Error Type View Type.");
@@ -571,56 +571,6 @@ enum EShaderFrequency : uint8
 	SF_NumFrequencies   = 9,
 
 	SF_NumGraphicsFrequencies = 4,
-};
-
-struct RHIBlendStateInitializer
-{
-	bool bEnableBlend = true;
-	EBlendOP ColorBlendOp = EBlendOP::BlendAdd;
-	EBlendFactor ColorSrcFactor = EBlendFactor::FactorOne;
-	EBlendFactor ColorDstFactor = EBlendFactor::FactorZero;
-	EBlendOP AlphaBlendOp = EBlendOP::BlendAdd;
-	EBlendFactor AlphaSrcFactor = EBlendFactor::FactorOne;
-	EBlendFactor AlphaDstFactor = EBlendFactor::FactorZero;
-};
-
-struct RHIDepthStencilStateInitializer
-{
-	bool bEnableDepthTest = true;
-	bool bEnableDepthWrite = true;
-	ECompareOP DepthCompareOp = ECompareOP::NotEqual;
-	bool bEnableFrontStencil = false;
-	ECompareOP FrontStencilCompareOp = ECompareOP::Always;
-	EStencilFailedOP FrontStencilFailedOp = EStencilFailedOP::Keep;
-	EStencilFailedOP FrontDepthFailedOp = EStencilFailedOP::Keep;
-	EStencilFailedOP FrontStencilPassOp = EStencilFailedOP::Replace;
-	bool bEnableBackStencil = false;
-	ECompareOP BackStencilCompareOp = ECompareOP::Always;
-	EStencilFailedOP BackStencilFailedOp = EStencilFailedOP::Keep;
-	EStencilFailedOP BackDepthFailedOp = EStencilFailedOP::Keep;
-	EStencilFailedOP BackStencilPassOp = EStencilFailedOP::Replace;
-	uint8 StencilReadMask = 0xFF;
-	uint8 StencilWriteMask = 0xFF;
-};
-
-struct RHIRasterizationStateInitializer
-{
-	ECullMode CullMode = ECullMode::None;
-	EPolygonMode PolygonMode = EPolygonMode::Triangle;
-	EPrimitiveTopology PrimitiveTopology = EPrimitiveTopology::TriangleList;
-	bool bEnableDepthClamp = false;
-	bool bEnableDiscard = false;
-	bool bClockWise = false;
-};
-
-struct RHIMultiSampleStateInitializer
-{
-	bool bEnableSampleShading = false;
-	uint32 SampleCount = 1;
-	uint32 SampleMask = 0x00;
-	float MinSampleShading = 0.f;
-	bool bEnableAlphaToCoverage = false;
-	bool bEnableAlphaToOne = false;
 };
 
 typedef class RHIVertexBuffer* WVertexBufferRHIRef;
