@@ -10,9 +10,9 @@ class RenderTexture : public RenderResource
 {
 public:
 
-	RenderTexture(unsigned int width, unsigned int height, Format format);
+	RenderTexture(unsigned int width, unsigned int height, EFormat format);
 
-	RenderTexture(unsigned int width, unsigned int height, Format format, unsigned int mipLevel, unsigned int layerCount);
+	RenderTexture(unsigned int width, unsigned int height, EFormat format, unsigned int mipLevel, unsigned int layerCount);
 
 	virtual ~RenderTexture() = default;
 
@@ -66,9 +66,9 @@ class UAVTexture : public RenderTexture
 {
 public:
 
-	UAVTexture(unsigned int width, unsigned int height, Format format);
+	UAVTexture(unsigned int width, unsigned int height, EFormat format);
 
-	UAVTexture(unsigned int width, unsigned int height, Format format, unsigned int mipLevel, unsigned int layerCount);
+	UAVTexture(unsigned int width, unsigned int height, EFormat format, unsigned int mipLevel, unsigned int layerCount);
 
 
 
@@ -78,9 +78,9 @@ class SRVTexture : public RenderTexture
 {
 public:
 
-	SRVTexture(unsigned int width, unsigned int height, Format format);
+	SRVTexture(unsigned int width, unsigned int height, EFormat format);
 
-	SRVTexture(unsigned int width, unsigned int height, Format format, unsigned int mipLevel, unsigned int layerCount);
+	SRVTexture(unsigned int width, unsigned int height, EFormat format, unsigned int mipLevel, unsigned int layerCount);
 
 };
 
@@ -90,6 +90,6 @@ public:
 
 	ShadowMap2D(unsigned int width, unsigned int height);
 
-	ShadowMap2D(unsigned int width, unsigned int height, Format format);
+	ShadowMap2D(unsigned int width, unsigned int height, EFormat format);
 
 };

@@ -11,6 +11,6 @@ SlateRenderer::~SlateRenderer()
 {
 }
 
-void SlateRenderer::Render()
+void SlateRenderer::Render(WRDGBuilder& GraphBuilder)
 {
 }

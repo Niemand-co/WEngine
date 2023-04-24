@@ -4,6 +4,7 @@
 #include "Platform/Vulkan/Public/VulkanBuffer.h"
 #include "Platform/Vulkan/Public/VulkanCommandBuffer.h"
 #include "Platform/Vulkan/Public/VulkanContext.h"
+#include "Platform/Vulkan/Public/VulkanPipelineBarrier.h"
 
 namespace Vulkan
 {
@@ -88,12 +89,13 @@ namespace Vulkan
 		void *Data = StagingBuffer->GetMappedPointer();
 		memcpy(Data, InDesc.BulkData, InDesc.BulkDataSize);
 
-		CopyBufferToImage(StagingBuffer->GetHandle(), Image, InDesc.Extent.width, InDesc.Extent.height, InDesc.Extent.depth, (ViewType == VK_IMAGE_VIEW_TYPE_CUBE || ViewType == VK_IMAGE_VIEW_TYPE_CUBE_ARRAY) ? InDesc.ArraySize * 6 : InDesc.ArraySize, Aspect);
+		CopyBufferToImage(StagingBuffer, this, InDesc.Extent.width, InDesc.Extent.height, InDesc.Extent.depth, (ViewType == VK_IMAGE_VIEW_TYPE_CUBE || ViewType == VK_IMAGE_VIEW_TYPE_CUBE_ARRAY) ? InDesc.ArraySize * 6 : InDesc.ArraySize, Aspect);
 	}
 
 	VulkanTexture::~VulkanTexture()
 	{
-
+		DefaultView.Destroy(pDevice);
+		pDevice->GetMemoryManager()->FreeVulkanAllocationImage(Allocation);
 	}
 
 	VkImageUsageFlags VulkanTexture::GetImageUsage(ETextureCreateFlags Flag)
@@ -176,8 +178,11 @@ namespace Vulkan
 		}
 	}
 
-	void VulkanTexture::CopyBufferToImage(VkBuffer SrcBuffer, VkImage DstImage, uint32 DstSizeX, uint32 DstSizeY, uint32 DstSizeZ, uint32 DstLayerCount, VkImageAspectFlags Aspect)
+	void VulkanTexture::CopyBufferToImage(VulkanStagingBuffer *StagingBuffer, VulkanTexture *Texture, uint32 DstSizeX, uint32 DstSizeY, uint32 DstSizeZ, uint32 DstLayerCount, VkImageAspectFlags Aspect)
 	{
+		VkBuffer SrcBuffer = StagingBuffer->GetHandle();
+		VkImage DstImage = Texture->GetHandle();
+
 		VkBufferImageCopy Region = {};
 		{
 			Region.bufferOffset = 0;
@@ -196,7 +201,21 @@ namespace Vulkan
 
 		VulkanCommandBuffer *CmdBuffer = static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager()->GetImmediateCommandBuffer();
 
+		{
+			VulkanPipelineBarrier Barrier;
+			Barrier.AddTransition(DstImage, Aspect, 0, 0, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+			Barrier.Execute(CmdBuffer);
+		}
 		
+		vkCmdCopyBufferToImage(CmdBuffer->GetHandle(), SrcBuffer, DstImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region);
+
+		{
+			VulkanPipelineBarrier Barrier;
+			Barrier.AddTransition(DstImage, Aspect, 0, 0, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_UNDEFINED);
+			Barrier.Execute(CmdBuffer);
+		}
+
+		Texture->pDevice->GetStagingBufferManager()->ReleaseBuffer(StagingBuffer);
 	}
 
 }

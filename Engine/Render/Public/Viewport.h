@@ -29,7 +29,7 @@ public:
 
 	virtual void UpdateRHIResource() override;
 
-	virtual WTexture2DRHIRef GetHandle() const override { return ViewportRHI->GetRenderTarget(); }
+	virtual WTextureRHIRef GetHandle() const override { return ViewportRHI->GetRenderTarget(); }
 
 	WViewportRHIRef GetRHI() const { return ViewportRHI; }
 
@@ -44,8 +44,6 @@ protected:
 	uint32 AcquiredImageIndex = 0;
 
 	WViewportRHIRef ViewportRHI;
-
-	WTexture2DRHIRef DepthStencil;
 
 };
 

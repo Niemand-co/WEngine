@@ -225,6 +225,17 @@ namespace WEngine
 		return a > b ? a : b;
 	}
 
+	template<typename ElementType>
+	FORCEINLINE void DestructItems(ElementType* Data, uint32 Num)
+	{
+		whlie(Num)
+		{
+			Data->~ElementType();
+			++Data;
+			--Count;
+		}
+	}
+
 }
 
 #define ENUM_CLASS_FLAGS(Enum) \

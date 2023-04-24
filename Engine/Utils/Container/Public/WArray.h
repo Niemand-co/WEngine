@@ -35,7 +35,7 @@ namespace WEngine
 
 		T& AddInitialized();
 
-		void AddZero(uint32 Count);
+		void AddZerod(uint32 Count);
 
 		T Pop();
 
@@ -45,9 +45,15 @@ namespace WEngine
 
 		uint32 FindIndex(const T& Val);
 
-		void RemoveAndSwap(size_t index);
+		void RemoveAt(uint32 Index, uint32 Num = 1, bool bShrink = true);
+
+		void RemoveAndSwap(uint32 Index, uint32 Num = 1, bool bShrink = true);
 
 		bool RemoveSingleSwap(const T& Val);
+
+		void SetNumZeroed(uint32 NewNum, bool bShrink = true);
+
+		void Shrink();
 
 		//template<typename... Args>
 		//void Push(Args... args);
@@ -74,31 +80,31 @@ namespace WEngine
 
 		T& operator[](size_t index)
 		{
-			RE_ASSERT(index < m_size, "Out of Index.");
-			return *((T*)m_pData + index);
+			RE_ASSERT(index < ArrayNum, "Out of Index.");
+			return *((T*)Data + index);
 		}
 
 		const T& operator[](size_t index) const
 		{
-			RE_ASSERT(index < m_size, "Out of Index.");
-			return *((T*)m_pData + index);
+			RE_ASSERT(index < ArrayNum, "Out of Index.");
+			return *((T*)Data + index);
 		}
 
 		WArray<T>& operator=(const WArray<T>& array)
 		{
-			for (size_t i = 0; i < m_size; ++i)
+			for (size_t i = 0; i < ArrayNum; ++i)
 			{
-				if(m_pData + i != nullptr)
-					(m_pData + i)->~T();
+				if(Data + i != nullptr)
+					(Data + i)->~T();
 			}
-			m_size = array.m_size;
-			m_capasity = array.m_capasity;
-			NormalAllocator::Get()->Deallocate(m_pData);
-			m_pData = (T*)NormalAllocator::Get()->Allocate(sizeof(T) * m_capasity);
-			memset(m_pData, 0, sizeof(T) * m_capasity);
-			for (uint32 i = 0; i < m_size; ++i)
+			ArrayNum = array.ArrayNum;
+			Capacity = array.Capacity;
+			NormalAllocator::Get()->Deallocate(Data);
+			Data = (T*)NormalAllocator::Get()->Allocate(sizeof(T) * Capacity);
+			memset(Data, 0, sizeof(T) * Capacity);
+			for (uint32 i = 0; i < ArrayNum; ++i)
 			{
-				m_pData[i] = array[i];
+				Data[i] = array[i];
 			}
 			return *this;
 		}
@@ -115,244 +121,244 @@ namespace WEngine
 
 	private:
 
-		size_t m_size;
+		size_t ArrayNum;
 
-		size_t m_capasity;
+		size_t Capacity;
 
-		T *m_pData = nullptr;
+		T *Data = nullptr;
 
 	};
 
 	template<typename T>
 	inline WArray<T>::WArray()
 	{
-		m_size = 0;
-		m_capasity = 0;
-		m_pData = nullptr;
+		ArrayNum = 0;
+		Capacity = 0;
+		Data = nullptr;
 	}
 
 	template<typename T>
 	inline WArray<T>::WArray(size_t size)
 	{
-		m_size = size;
-		m_capasity = size;
-		m_pData = (T*)NormalAllocator::Get()->Allocate(size * sizeof(T));
+		ArrayNum = size;
+		Capacity = size;
+		Data = (T*)NormalAllocator::Get()->Allocate(size * sizeof(T));
 		for (size_t i = 0; i < size; ++i)
 		{
-			::new (m_pData + i) T();
+			::new (Data + i) T();
 		}
 	}
 
 	template<typename T>
 	inline WArray<T>::WArray(size_t size, const T& var)
 	{
-		m_size = size;
-		m_capasity = size;
+		ArrayNum = size;
+		Capacity = size;
 		if (size > 0)
 		{
-			m_pData = (T*)NormalAllocator::Get()->Allocate(size * sizeof(var));
+			Data = (T*)NormalAllocator::Get()->Allocate(size * sizeof(var));
 		}
 		for (size_t i = 0; i < size; ++i)
 		{
-			memcpy(m_pData + i, &var, sizeof(var));
+			memcpy(Data + i, &var, sizeof(var));
 		}
 	}
 
 	template<typename T>
 	inline WArray<T>::WArray(const std::initializer_list<T>& list)
 	{
-		m_capasity = m_size = list.size();
-		m_pData = (T*)NormalAllocator::Get()->Allocate(m_size * sizeof(T));
-		memcpy(m_pData, list.begin(), m_size * sizeof(T));
+		Capacity = ArrayNum = list.size();
+		Data = (T*)NormalAllocator::Get()->Allocate(ArrayNum * sizeof(T));
+		memcpy(Data, list.begin(), ArrayNum * sizeof(T));
 	}
 
 	template<typename T>
 	inline WArray<T>::WArray(T* begin, T* end)
 	{
-		m_capasity = m_size = size_t(end - begin);
-		m_pData = (T*)NormalAllocator::Get()->Allocate(sizeof(T) * m_capasity);
-		memcpy(m_pData, begin, sizeof(T) * m_capasity);
+		Capacity = ArrayNum = size_t(end - begin);
+		Data = (T*)NormalAllocator::Get()->Allocate(sizeof(T) * Capacity);
+		memcpy(Data, begin, sizeof(T) * Capacity);
 	}
 
 	template<typename T>
 	inline WArray<T>::WArray(const WArray& array)
 	{
-		m_size = array.m_size;
-		m_capasity = array.m_capasity;
-		m_pData = (T*)NormalAllocator::Get()->Allocate(sizeof(T) * m_capasity);
-		memcpy(m_pData, array.m_pData, sizeof(T) * m_size);
+		ArrayNum = array.ArrayNum;
+		Capacity = array.Capacity;
+		Data = (T*)NormalAllocator::Get()->Allocate(sizeof(T) * Capacity);
+		memcpy(Data, array.Data, sizeof(T) * ArrayNum);
 	}
 
 	template<typename T>
 	inline WArray<T>::~WArray()
 	{
-		for (size_t i = 0; i < m_size; ++i)
+		for (size_t i = 0; i < ArrayNum; ++i)
 		{
-			if(m_pData + i != nullptr)
-				(m_pData + i)->~T();
+			if(Data + i != nullptr)
+				(Data + i)->~T();
 		}
-		NormalAllocator::Get()->Deallocate(m_pData);
+		NormalAllocator::Get()->Deallocate(Data);
 	}
 
 	template<typename T>
 	inline void WArray<T>::Push(T& var)
 	{
-		if (m_capasity == 0)
+		if (Capacity == 0)
 		{
-			m_capasity = 1;
-			m_pData = (T*)NormalAllocator::Get()->Allocate(sizeof(T));
-			memset(m_pData, 0, sizeof(T));
+			Capacity = 1;
+			Data = (T*)NormalAllocator::Get()->Allocate(sizeof(T));
+			memset(Data, 0, sizeof(T));
 		}
-		else if (m_size == m_capasity)
+		else if (ArrayNum == Capacity)
 		{
-			T* newPtr = (T*)NormalAllocator::Get()->Allocate(2 * m_capasity * sizeof(T));
-			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			NormalAllocator::Get()->Deallocate(m_pData);
-			m_pData = newPtr;
-			m_capasity *= 2;
-			memset(m_pData + m_size, 0, sizeof(T) * (m_capasity - m_size));
+			T* newPtr = (T*)NormalAllocator::Get()->Allocate(2 * Capacity * sizeof(T));
+			memcpy(newPtr, Data, sizeof(T) * ArrayNum);
+			NormalAllocator::Get()->Deallocate(Data);
+			Data = newPtr;
+			Capacity *= 2;
+			memset(Data + ArrayNum, 0, sizeof(T) * (Capacity - ArrayNum));
 		}
 
-		*(m_pData + m_size) = var;
-		m_size++;
+		*(Data + ArrayNum) = var;
+		ArrayNum++;
 	}
 
 	template<typename T>
 	inline void WArray<T>::Push(const T& var)
 	{
-		if (m_capasity == 0)
+		if (Capacity == 0)
 		{
-			m_capasity = 1;
-			m_pData = (T*)NormalAllocator::Get()->Allocate(sizeof(T));
-			memset(m_pData, 0, sizeof(T));
+			Capacity = 1;
+			Data = (T*)NormalAllocator::Get()->Allocate(sizeof(T));
+			memset(Data, 0, sizeof(T));
 		}
-		else if (m_size == m_capasity)
+		else if (ArrayNum == Capacity)
 		{
-			T* newPtr = (T*)NormalAllocator::Get()->Allocate(2 * m_capasity * sizeof(T));
-			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			NormalAllocator::Get()->Deallocate(m_pData);
-			m_pData = newPtr;
-			m_capasity *= 2;
-			memset(m_pData + m_size, 0, sizeof(T) * (m_capasity - m_size));
+			T* newPtr = (T*)NormalAllocator::Get()->Allocate(2 * Capacity * sizeof(T));
+			memcpy(newPtr, Data, sizeof(T) * ArrayNum);
+			NormalAllocator::Get()->Deallocate(Data);
+			Data = newPtr;
+			Capacity *= 2;
+			memset(Data + ArrayNum, 0, sizeof(T) * (Capacity - ArrayNum));
 		}
 		
-		*(m_pData + m_size) = var;
-		m_size++;
+		*(Data + ArrayNum) = var;
+		ArrayNum++;
 	}
 
 	template<typename T>
 	inline void WArray<T>::PushForward(T& var)
 	{
-		if (m_capasity == 0)
+		if (Capacity == 0)
 		{
-			m_capasity = 1;
-			m_pData = (T*)NormalAllocator::Get()->Allocate(sizeof(T));
-			memset(m_pData, 0, sizeof(T));
+			Capacity = 1;
+			Data = (T*)NormalAllocator::Get()->Allocate(sizeof(T));
+			memset(Data, 0, sizeof(T));
 		}
-		else if (m_size == m_capasity)
+		else if (ArrayNum == Capacity)
 		{
-			T* newPtr = (T*)NormalAllocator::Get()->Allocate(2 * m_capasity * sizeof(T));
-			memcpy(newPtr + 1, m_pData, sizeof(T) * m_size);
-			NormalAllocator::Get()->Deallocate(m_pData);
-			m_pData = newPtr;
-			m_capasity *= 2;
-			memset(m_pData, 0, sizeof(T));
+			T* newPtr = (T*)NormalAllocator::Get()->Allocate(2 * Capacity * sizeof(T));
+			memcpy(newPtr + 1, Data, sizeof(T) * ArrayNum);
+			NormalAllocator::Get()->Deallocate(Data);
+			Data = newPtr;
+			Capacity *= 2;
+			memset(Data, 0, sizeof(T));
 		}
 		else
 		{
-			for (size_t index = m_size - 1; index > 0; --index)
+			for (size_t index = ArrayNum - 1; index > 0; --index)
 			{
-				(m_pData)[index] = (m_pData)[index - 1];
+				(Data)[index] = (Data)[index - 1];
 			}
 		}
 
-		*m_pData = var;
-		m_size++;
+		*Data = var;
+		ArrayNum++;
 	}
 
 	template<typename T>
 	inline void WArray<T>::PushForward(const T& var)
 	{
-		if (m_capasity == 0)
+		if (Capacity == 0)
 		{
-			m_capasity = 1;
-			m_pData = (T*)NormalAllocator::Get()->Allocate(sizeof(T));
-			memset(m_pData, 0, sizeof(T));
+			Capacity = 1;
+			Data = (T*)NormalAllocator::Get()->Allocate(sizeof(T));
+			memset(Data, 0, sizeof(T));
 		}
-		else if (m_size == m_capasity)
+		else if (ArrayNum == Capacity)
 		{
-			T* newPtr = (T*)NormalAllocator::Get()->Allocate(2 * m_capasity * sizeof(T));
-			memcpy(newPtr + 1, m_pData, sizeof(T) * m_size);
-			NormalAllocator::Get()->Deallocate(m_pData);
-			m_pData = newPtr;
-			m_capasity *= 2;
-			memset(m_pData, 0, sizeof(T));
+			T* newPtr = (T*)NormalAllocator::Get()->Allocate(2 * Capacity * sizeof(T));
+			memcpy(newPtr + 1, Data, sizeof(T) * ArrayNum);
+			NormalAllocator::Get()->Deallocate(Data);
+			Data = newPtr;
+			Capacity *= 2;
+			memset(Data, 0, sizeof(T));
 		}
 		else
 		{
-			for (size_t index = m_size - 1; index > 0; --index)
+			for (size_t index = ArrayNum - 1; index > 0; --index)
 			{
-				(m_pData)[index] = (m_pData)[index - 1];
+				(Data)[index] = (Data)[index - 1];
 			}
 		}
 
-		*m_pData = var;
-		m_size++;
+		*Data = var;
+		ArrayNum++;
 	}
 
 	template<typename T>
 	inline T& WArray<T>::AddInitialized()
 	{
-		if (m_capasity == 0)
+		if (Capacity == 0)
 		{
-			m_capasity = 1;
-			m_pData = (T*)NormalAllocator::Get()->Allocate(sizeof(T));
-			memset(m_pData, 0, sizeof(T));
+			Capacity = 1;
+			Data = (T*)NormalAllocator::Get()->Allocate(sizeof(T));
+			memset(Data, 0, sizeof(T));
 		}
-		else if (m_size == m_capasity)
+		else if (ArrayNum == Capacity)
 		{
-			T* newPtr = (T*)NormalAllocator::Get()->Allocate(2 * m_capasity * sizeof(T));
-			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			NormalAllocator::Get()->Deallocate(m_pData);
-			m_pData = newPtr;
-			m_capasity *= 2;
-			memset(m_pData + m_size, 0, sizeof(T) * (m_capasity - m_size));
+			T* newPtr = (T*)NormalAllocator::Get()->Allocate(2 * Capacity * sizeof(T));
+			memcpy(newPtr, Data, sizeof(T) * ArrayNum);
+			NormalAllocator::Get()->Deallocate(Data);
+			Data = newPtr;
+			Capacity *= 2;
+			memset(Data + ArrayNum, 0, sizeof(T) * (Capacity - ArrayNum));
 		}
 
-		::new (m_pData + m_size) T();
-		m_size++;
-		return *(m_pData + m_size - 1);
+		::new (Data + ArrayNum) T();
+		ArrayNum++;
+		return *(Data + ArrayNum - 1);
 	}
 
 	template<typename T>
-	inline void WArray<T>::AddZero(uint32 Count)
+	inline void WArray<T>::AddZerod(uint32 Count)
 	{
-		Resize(m_size + Count);
-		WEngine::Memzero(m_pData + m_size, sizeof(T) * Count);
+		Resize(ArrayNum + Count);
+		WEngine::Memzero(Data + ArrayNum, sizeof(T) * Count);
 	}
 
 	template<typename T>
 	inline T WArray<T>::Pop()
 	{
-		--m_size;
-		T Result = RemoveTemp(*(m_pData + m_size));
-		(m_pData + m_size)->~T();
+		--ArrayNum;
+		T Result = RemoveTemp(*(Data + ArrayNum));
+		(Data + ArrayNum)->~T();
 		return Result;
 	}
 
 	template<typename T>
 	inline void WArray<T>::Append(const WArray<T>& other)
 	{
-		if (m_size + other.Size() > m_capasity)
+		if (ArrayNum + other.Size() > Capacity)
 		{
-			T* newPtr = (T*)NormalAllocator::Get()->Allocate((m_size + other.m_size) * sizeof(T));
-			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			NormalAllocator::Get()->Deallocate(m_pData);
-			m_pData = newPtr;
-			m_capasity = m_size + other.m_size;
+			T* newPtr = (T*)NormalAllocator::Get()->Allocate((ArrayNum + other.ArrayNum) * sizeof(T));
+			memcpy(newPtr, Data, sizeof(T) * ArrayNum);
+			NormalAllocator::Get()->Deallocate(Data);
+			Data = newPtr;
+			Capacity = ArrayNum + other.ArrayNum;
 		}
-		memcpy(m_pData + m_size, other.m_pData, other.m_size * sizeof(T));
-		m_size += other.m_size;
+		memcpy(Data + ArrayNum, other.Data, other.ArrayNum * sizeof(T));
+		ArrayNum += other.ArrayNum;
 	}
 
 	template<typename T>
@@ -369,29 +375,65 @@ namespace WEngine
 	template<typename T>
 	inline uint32 WArray<T>::FindIndex(const T& Val)
 	{
-		for (uint32 Index = 0; Index < m_size; ++Index)
+		for (uint32 Index = 0; Index < ArrayNum; ++Index)
 		{
-			if (Val == m_pData[Index])
+			if (Val == Data[Index])
 			{
 				return Index;
 			}
 		}
-		return m_size;
+		return ArrayNum;
 	}
 
 	template<typename T>
-	inline void WArray<T>::RemoveAndSwap(size_t index)
+	inline void WArray<T>::RemoveAt(uint32 Index, uint32 Num /* = 1 */, bool bShrink /* = false */)
 	{
-		(m_pData + index)->~T();
-		--m_size;
-		memcpy(m_pData + index, m_pData + m_size, sizeof(T));
+		if (Num)
+		{
+			DestructItems(GetData() + Index, Num);
+
+			uint32 NumToMove = ArrayNum - Index - Num;
+			if (NumToMove)
+			{
+				memcpy(Data + Index, Data + Index + Num, NumToMove * sizeof(T));
+			}
+			ArrayNum -= Num;
+
+			if (bShrink)
+			{
+				Shrink();
+			}
+		}
+	}
+
+	template<typename T>
+	inline void WArray<T>::RemoveAndSwap(uint32 Index, uint32 Num /* = 1 */, bool bShrink /* = false */)
+	{
+		if (Num)
+		{
+			DestructItems(GetData() + Index, Num);
+
+			uint32 NumHoles = Num;
+			uint32 NumAfterHoles = ArrayNum - Index - Num;
+			uint32 NumToMove = WEngine::Min(NumHoles, NumAfterHolse);
+			if (NumToMove)
+			{
+				memcpy(Data + Index, Data + (ArrayNum - NumToMove), NumToMove * sizeof(T));
+			}
+			ArrayNum -= Num;
+
+			if (bShrink)
+			{
+				Shrink();
+			}
+		}
 	}
 
 	template<typename T>
 	inline bool WArray<T>::RemoveSingleSwap(const T& Val)
 	{
 		uint32 Index = FindIndex(Val);
-		if (Index == m_size)
+		if (Index == ArrayNum)
 		{
 			return false;
 		}
@@ -402,109 +444,139 @@ namespace WEngine
 	}
 
 	template<typename T>
+	inline void WArray<T>::SetNumZeroed(uint32 NewNum, bool bShrink /* = true */)
+	{
+		if (NewNum > ArrayNum)
+		{
+			AddZerod(NewNum - ArrayNum);
+		}
+		else if (NewNum < 0)
+		{
+			RE_ERROR("Undefined process.");
+		}
+		else if (NewNum < ArrayNum)
+		{
+			RemoveAt(NewNum, ArrayNum - NewNum, bShrink);
+		}
+	}
+
+	template<typename T>
+	inline void WArray<T>::Shrink()
+	{
+		if (Capacity > ArrayNum)
+		{
+			T* NewPtr = (T*)NormalAllocator::Get()->Allocate(ArrayNum * sizeof(T));
+			memcpy(NewPtr, Data, ArrayNum * sizoef(T));
+			NormalAllocator::Get()->Deallocate(Data);
+			Data = NewPtr;
+			Capacity = ArrayNum;
+		}
+	}
+
+	template<typename T>
 	inline void WArray<T>::Resize(size_t size)
 	{
-		if (size > m_capasity)
+		if (size > Capacity)
 		{
 			T* newPtr = (T*)NormalAllocator::Get()->Allocate(size * sizeof(T));
-			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			NormalAllocator::Get()->Deallocate(m_pData);
-			m_pData = newPtr;
-			m_capasity = size;
-			for (uint32 Offset = m_size; Offset < m_capasity; ++Offset)
+			memcpy(newPtr, Data, sizeof(T) * ArrayNum);
+			NormalAllocator::Get()->Deallocate(Data);
+			Data = newPtr;
+			Capacity = size;
+			for (uint32 Offset = ArrayNum; Offset < Capacity; ++Offset)
 			{
-				::new (m_pData + Offset) T();
+				::new (Data + Offset) T();
 			}
-			m_size = size;
+			ArrayNum = size;
 		}
 		else
 		{
-			m_size = size;
+			ArrayNum = size;
 		}
 	}
 
 	template<typename T>
 	inline void WArray<T>::Reserve(size_t size)
 	{
-		if (size > m_capasity)
+		if (size > Capacity)
 		{
 			T* newPtr = (T*)NormalAllocator::Get()->Allocate(size * sizeof(T));
-			memcpy(newPtr, m_pData, sizeof(T) * m_size);
-			NormalAllocator::Get()->Deallocate(m_pData);
-			m_pData = newPtr;
-			m_capasity = size;
-			memset(m_pData + m_size, 0, sizeof(T) * (m_capasity - m_size));
+			memcpy(newPtr, Data, sizeof(T) * ArrayNum);
+			NormalAllocator::Get()->Deallocate(Data);
+			Data = newPtr;
+			Capacity = size;
+			memset(Data + ArrayNum, 0, sizeof(T) * (Capacity - ArrayNum));
 		}
 	}
 
 	template<typename T>
 	inline void WArray<T>::Clear()
 	{
-		for (size_t i = 0; i < m_size; ++i)
+		for (size_t i = 0; i < ArrayNum; ++i)
 		{
-			(m_pData + i)->~T();
+			(Data + i)->~T();
 		}
-		memset(m_pData, 0, sizeof(T) * m_size);
-		m_size = 0;
+		memset(Data, 0, sizeof(T) * ArrayNum);
+		ArrayNum = 0;
 	}
 
 	template<typename T>
 	inline bool WArray<T>::Empty()
 	{
-		return m_size == 0;
+		return ArrayNum == 0;
 	}
 
 	template<typename T>
 	inline size_t WArray<T>::Size() const
 	{
-		return m_size;
+		return ArrayNum;
 	}
 
 	template<typename T>
 	inline T* WArray<T>::GetData() const
 	{
-		return m_pData;
+		return Data;
 	}
 
 	template<typename T>
 	inline T* WArray<T>::begin()
 	{
-		return m_pData;
+		return Data;
 	}
 
 	template<typename T>
 	inline const T* WArray<T>::begin() const
 	{
-		return m_pData;
+		return Data;
 	}
 
 	template<typename T>
 	inline T* WArray<T>::end()
 	{
-		return m_pData + m_size;
+		return Data + ArrayNum;
 	}
 
 	template<typename T>
 	inline const T* WArray<T>::end() const
 	{
-		return m_pData + m_size;
+		return Data + ArrayNum;
 	}
 
 	//template<typename T>
 	//template<typename ...Args>
 	//inline void WArray<T>::Push(Args ...args)
 	//{
-	//	if (m_size == m_capasity)
+	//	if (ArrayNum == Capacity)
 	//	{
-	//		void* newPtr = NormalAllocator::Get()->Allocate(2 * m_capasity * sizeof(T));
-	//		memcpy(newPtr, m_pData, sizeof(T) * m_size);
-	//		NormalAllocator::Get()->Deallocate(m_pData);
-	//		m_pData = newPtr;
-	//		m_capasity *= 2;
+	//		void* newPtr = NormalAllocator::Get()->Allocate(2 * Capacity * sizeof(T));
+	//		memcpy(newPtr, Data, sizeof(T) * ArrayNum);
+	//		NormalAllocator::Get()->Deallocate(Data);
+	//		Data = newPtr;
+	//		Capacity *= 2;
 	//	}
 
-	//	::new ((T*)m_pData + m_size) T(args...);
-	//	m_size++;
+	//	::new ((T*)Data + ArrayNum) T(args...);
+	//	ArrayNum++;
 	//}
 
 }

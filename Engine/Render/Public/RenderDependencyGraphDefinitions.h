@@ -279,10 +279,19 @@ enum class EUniformBaseType : uint16
 	UB_RDG_BUFFER,
 	UB_RDG_BUFFER_SRV,
 	UB_RDG_BUFFER_UAV,
+	UB_RDG_UNIFORM_BUFFER,
 
 	UB_RTV,
 
-	UB_STRUCT,
+	UB_REFERENCED_STRUCT,
+	UB_INCLUDED_STRUCT,
+};
+
+enum EUniformBufferUsage : uint8
+{
+	UniformBuffer_SingleDraw = 0,
+	UniformBuffer_SingleFrame,
+	UniformBuffer_MultiFrame,
 };
 
 enum class EPassFlag : uint16

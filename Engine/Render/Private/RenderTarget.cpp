@@ -4,7 +4,7 @@
 #include "RHI/Public/RHIContext.h"
 #include "Render/Descriptor/Public/RHITextureDescriptor.h"
 
-WRenderTarget::WRenderTarget(uint32 inWidth, uint32 inHeight, Format inFormat)
+WRenderTarget::WRenderTarget(uint32 inWidth, uint32 inHeight, EFormat inFormat)
 {
 }
 

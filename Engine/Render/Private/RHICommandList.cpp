@@ -118,6 +118,14 @@ void RHIRenderCommandList::SetScissor(int32 OffsetX, int32 OffsetY, uint32 Width
     GetDynamicRHI()->RHISetScissor(OffsetX, OffsetY, Width, Height);
 }
 
+void RHIRenderCommandList::SetShaderUniformBuffer(RHIGraphicsShader* ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer)
+{
+    if(IsOutOfRenderThread() && IsOutOfRHIThread())
+    {
+    }
+    GetDynamicRHI()->RHISetShaderUniformBuffer(ShaderRHI, BufferIndex, UniformBuffer);
+}
+
 void RHIRenderCommandList::CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY)
 {
     GetDynamicRHI()->CopyImageToBackBuffer(SrcTexture, DstTexture, SrcSizeX, SrcSizeY, DstSizeX, DstSizeY);
@@ -134,7 +142,7 @@ WIndexBufferRHIRef RHIRenderCommandList::CreateIndexBuffer(uint8* InContents, ui
     return GetDynamicRHI()->CreateIndexBuffer(InContents, InCount, InUsage);
 }
 
-WUniformBufferRHIRef RHIRenderCommandList::CreateUniformBuffer(uint8* InContents, const ShaderParametersLayout * InLayout, EBufferUsageFlags InUsage)
+WUniformBufferRHIRef RHIRenderCommandList::CreateUniformBuffer(uint8* InContents, const ShaderParametersLayout * InLayout, EUniformBufferUsage InUsage)
 {
     return GetDynamicRHI()->CreateUniformBuffer(InContents, InLayout, InUsage);
 }

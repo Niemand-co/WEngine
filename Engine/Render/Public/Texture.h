@@ -36,7 +36,7 @@ protected:
 
 	EFormat format;
 
-	WTexture2DRHIRef Texture;
+	WTextureRHIRef RHI;
 
 };
 

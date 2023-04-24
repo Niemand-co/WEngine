@@ -12,21 +12,21 @@ public:
 
 	virtual ~DeferredRenderer();
 
-	virtual void Render() override;
+	virtual void Render(WRDGBuilder& GraphBuilder) override;
 
-	void RenderPrePass(WViewInfo &View);
+	void RenderPrePass(WRDGBuilder& GraphBuilder, WViewInfo &View);
 
-	void RenderBasePass(WViewInfo& View);
+	void RenderBasePass(WRDGBuilder& GraphBuilder, WViewInfo& View);
 
-	void RenderShadowPass(WViewInfo& View);
+	void RenderShadowPass(WRDGBuilder& GraphBuilder, WViewInfo& View);
 
-	void RenderLightPass(WViewInfo& View);
+	void RenderLightPass(WRDGBuilder& GraphBuilder, WViewInfo& View);
 
-	void RenderSkybox(WViewInfo& View);
+	void RenderSkybox(WRDGBuilder& GraphBuilder, WViewInfo& View);
 
-	void RenderTranslucent(WViewInfo& View);
+	void RenderTranslucent(WRDGBuilder& GraphBuilder, WViewInfo& View);
 
-	void RenderPostEffect(WViewInfo& View);
+	void RenderPostEffect(WRDGBuilder& GraphBuilder, WViewInfo& View);
 
 private:
 
@@ -35,7 +35,5 @@ private:
 	uint8 bRenderPrePass : 1;
 
 	float MaxDrawDistance;
-
-	class WRDGBuilder* GraphBuilder;
 
 };

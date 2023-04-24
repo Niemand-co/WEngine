@@ -5,7 +5,7 @@ class WRenderTarget : public RenderResource
 {
 public:
 
-	WRenderTarget(uint32 inWidth, uint32 inHeight, Format inFormat);
+	WRenderTarget(uint32 inWidth, uint32 inHeight, EFormat inFormat);
 
 	virtual void InitRHIResource() override;
 
@@ -13,12 +13,12 @@ public:
 
 	virtual void UpdateRHIResource() override;
 
-	virtual WTexture2DRHIRef GetHandle() const { return Texture; }
+	virtual WTextureRHIRef GetHandle() const { return Texture; }
 
 	~WRenderTarget() = default;
 
 protected:
 
-	WTexture2DRHIRef Texture;
+	WTextureRHIRef Texture;
 
 };

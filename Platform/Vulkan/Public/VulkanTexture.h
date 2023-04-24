@@ -42,7 +42,7 @@ namespace Vulkan
 
 		VkImageAspectFlags GetAspect(EFormat Format);
 
-		static void CopyBufferToImage(VkBuffer SrcBuffer, VkImage DstImage, uint32 DstSizeX, uint32 DstSizeY, uint32 DstSizeZ, uint32 DstLayerCount, VkImageAspectFlags Aspect);
+		static void CopyBufferToImage(class VulkanStagingBuffer* StagingBuffer, VulkanTexture* Texture, uint32 DstSizeX, uint32 DstSizeY, uint32 DstSizeZ, uint32 DstLayerCount, VkImageAspectFlags Aspect);
 
 	protected:
 

@@ -11,7 +11,7 @@ public:
 
 	virtual ~ScriptableRenderer() = default;
 
-	virtual void Render() = 0;
+	virtual void Render(class WRDGBuilder& GraphBuilder) = 0;
 
 	void* operator new(size_t size)
 	{

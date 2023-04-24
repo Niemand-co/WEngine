@@ -7,19 +7,20 @@
 #include "Scene/Components/Public/MaterialComponent.h"
 
 BEGIN_SHADER_PARAMETERS_STRUCT(DeferredBasePassParameters)
-	SHADER_PARAMETER_TEXTURE(WBuffer, sa)
+	SHADER_PARAMETER_TEXTURE(Texture2D, sa)
 	RENDER_TARGET_SLOTS()
 END_SHADER_PARAMETERS_STRUCT
 
-void DeferredRenderer::RenderBasePass(WViewInfo& View)
+void DeferredRenderer::RenderBasePass(WRDGBuilder& GraphBuilder, WViewInfo& View)
 {
 	glm::vec2 ViewRect = View.ViewMatrices.Rect;
-	WRDGTexture* GBuffer0 = GetRDGBuilder()->RegisterExternalTexture(View.Family->RenderTarget->GetHandle());
+	WRDGTexture* GBuffer0 = GraphBuilder.RegisterExternalTexture(View.Family->RenderTarget->GetHandle());
 
-	DeferredBasePassParameters* Parameters = GetRDGBuilder()->AllocateParameterStruct<DeferredBasePassParameters>();
+	DeferredBasePassParameters* Parameters = GraphBuilder.AllocateParameterStruct<DeferredBasePassParameters>();
 	Parameters->RenderTarget.ColorTextures[0].Texture = GBuffer0;
+	Parameters->sa = GetRenderCommandList()->CreateTexture(RHITextureDesc::CreateTexture2D(EFormat::A16R16G16B16_SFloat, {1, 0, 0, 0}, {1024, 1024}, 1, 1, ETextureCreateFlags::TextureCreate_SRV));
 
-	GetRDGBuilder()->AddPass("BasePass", Parameters, [&View, this](RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
+	GraphBuilder.AddPass("BasePass", Parameters, [&View, this](RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
 	{
 		CmdList.SetViewport(View.ViewRect.Min.X, View.ViewRect.Min.Y, View.ViewRect.Max.X, View.ViewRect.Max.Y, 0.0f, 1.0f);
 		CmdList.SetScissor(0, 0, View.ViewRect.Max.X - View.ViewRect.Min.X, View.ViewRect.Max.Y - View.ViewRect.Min.Y);

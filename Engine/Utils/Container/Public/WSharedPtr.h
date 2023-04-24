@@ -136,7 +136,7 @@ namespace WEngine
 			return !(m_ptr == ptr);
 		}
 
-		~WSharedPtr();
+		virtual ~WSharedPtr();
 
 		void* operator new(size_t size)
 		{

@@ -64,7 +64,7 @@ WIndexBufferRHIRef DynamicRHIContext::CreateIndexBuffer(uint8* InContents, uint3
 	return pDevice->CreateIndexBuffer(&descriptor);
 }
 
-WUniformBufferRHIRef DynamicRHIContext::CreateUniformBuffer(uint8* InContents, const ShaderParametersLayout* InLayout, EBufferUsageFlags InUsage)
+WUniformBufferRHIRef DynamicRHIContext::CreateUniformBuffer(uint8* InContents, const ShaderParametersLayout* InLayout, EUniformBufferUsage InUsage)
 {
 	return pDevice->CreateUniformBuffer(InContents, InLayout, InUsage);
 }

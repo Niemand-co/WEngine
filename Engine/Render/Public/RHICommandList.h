@@ -77,13 +77,15 @@ public:
 
 	void SetScissor(int32 OffsetX, int32 OffsetY, uint32 Width, uint32 Height);
 
+	void SetShaderUniformBuffer(class RHIGraphicsShader *ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer);
+
 	void CopyImageToBackBuffer(class RHITexture *SrcTexture, class RHITexture *DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY);
 
 	WVertexBufferRHIRef CreateVertexBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage);
 
 	WIndexBufferRHIRef CreateIndexBuffer(uint8* InContents, uint32 InCount, EBufferUsageFlags InUsage);
 
-	WUniformBufferRHIRef CreateUniformBuffer(uint8* InContents, const class ShaderParametersLayout * InLayout, EBufferUsageFlags InUsage);
+	WUniformBufferRHIRef CreateUniformBuffer(uint8* InContents, const class ShaderParametersLayout *InLayout, EUniformBufferUsage InUsage);
 
 	WVertexShaderRHIRef CreateVertexShader(ShaderCodeBlob& blob);
 

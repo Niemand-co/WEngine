@@ -1,8 +1,5 @@
 #pragma once
 
-struct BufferResourceInfo;
-struct TextureResourceInfo;
-
 class RHIBuffer : public RHIResource
 {
 public:

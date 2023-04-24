@@ -8,6 +8,7 @@
 #include "Render/Public/Viewport.h"
 #include "Render/Renderer/Public/DeferredRenderer.h"
 #include "Scene/Public/World.h"
+#include "Render/Public/RenderDependencyGraph.h"
 
 namespace WEngine
 {
@@ -38,7 +39,9 @@ namespace WEngine
 
 		SceneRenderer *Renderer = SceneRenderer::CreateRenderer(&ViewFamily);
 
-		Renderer->Render();
+		WRDGBuilder GraphBuilder;
+		Renderer->Render(GraphBuilder);
+		GraphBuilder.Execute();
 	}
 
 }

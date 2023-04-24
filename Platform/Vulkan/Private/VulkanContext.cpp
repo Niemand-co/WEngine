@@ -237,6 +237,32 @@ namespace Vulkan
 		Pipeline->Bind(pCommandBufferManager->GetActiveCommandBuffer());
 	}
 
+	void VulkanDynamicContext::RHISetShaderUniformBuffer(RHIGraphicsShader* ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer)
+	{
+		VulkanShaderBase *Shader = nullptr;
+		VkShaderStageFlags ShaderStage = 0;
+		switch (ShaderRHI->GetFrequency())
+		{
+		case EShaderFrequency::SF_Vertex:
+			ShaderStage = VK_SHADER_STAGE_VERTEX_BIT;
+			Shader = static_cast<VulkanVertexShader*>(ShaderRHI);
+			break;
+		case EShaderFrequency::SF_Geometry:
+			ShaderStage = VK_SHADER_STAGE_GEOMETRY_BIT;
+			Shader = static_cast<VulkanGeometryShader*>(ShaderRHI);
+			break;
+		case EShaderFrequency::SF_Pixel:
+			ShaderStage = VK_SHADER_STAGE_FRAGMENT_BIT;
+			Shader = static_cast<VulkanPixelShader*>(ShaderRHI);
+			break;
+		default:
+			RE_ASSERT(false, "Undefined type of shader.");
+			break;
+		}
+
+		
+	}
+
 	void VulkanDynamicContext::UpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void* Contents)
 	{
 		VulkanCommandBuffer *ActiveCmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();

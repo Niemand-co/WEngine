@@ -533,7 +533,7 @@ namespace Vulkan
 		return new VulkanIndexBuffer(this, descriptor);
 	}
 
-	WUniformBufferRHIRef VulkanDevice::CreateUniformBuffer(uint8* InContents, const ShaderParametersLayout* InLayout, EBufferUsageFlags InUsage)
+	WUniformBufferRHIRef VulkanDevice::CreateUniformBuffer(uint8* InContents, const ShaderParametersLayout* InLayout, EUniformBufferUsage InUsage)
 	{
 		return new VulkanUniformBuffer(this, InContents, InLayout, InUsage);
 	}

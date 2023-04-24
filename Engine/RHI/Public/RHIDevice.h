@@ -38,7 +38,7 @@ public:
 
 	virtual WIndexBufferRHIRef CreateIndexBuffer(class RHIBufferDescriptor* descriptor) = 0;
 
-	virtual WUniformBufferRHIRef CreateUniformBuffer(uint8 *InContents, const class ShaderParametersLayout* InLayout, EBufferUsageFlags InUsage) = 0;
+	virtual WUniformBufferRHIRef CreateUniformBuffer(uint8 *InContents, const class ShaderParametersLayout* InLayout, EUniformBufferUsage InUsage) = 0;
 
 	virtual class RHIScissor* CreateScissor(class RHIScissorDescriptor *descriptor) = 0;
 

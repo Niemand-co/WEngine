@@ -26,7 +26,7 @@ DeferredRenderer::~DeferredRenderer()
 {
 }
 
-void DeferredRenderer::Render()
+void DeferredRenderer::Render(WRDGBuilder& GraphBuilder)
 {
 	PrepareViewForRendering();
 
@@ -36,46 +36,45 @@ void DeferredRenderer::Render()
 	{
 		WViewInfo& View = Views[ViewIndex];
 
-		RenderPrePass(View);
+		RenderPrePass(GraphBuilder, View);
 
-		RenderBasePass(View);
+		RenderBasePass(GraphBuilder, View);
 
-		RenderShadowPass(View);
+		RenderShadowPass(GraphBuilder, View);
 
-		RenderLightPass(View);
+		RenderLightPass(GraphBuilder, View);
 
-		RenderSkybox(View);
+		RenderSkybox(GraphBuilder, View);
 
-		RenderTranslucent(View);
+		RenderTranslucent(GraphBuilder, View);
 
-		RenderPostEffect(View);
+		RenderPostEffect(GraphBuilder, View);
 
 	}
-	GetRDGBuilder()->Execute();
 }
 
-void DeferredRenderer::RenderPrePass(WViewInfo& View)
+void DeferredRenderer::RenderPrePass(WRDGBuilder& GraphBuilder, WViewInfo& View)
 {
 
 }
 
-void DeferredRenderer::RenderShadowPass(WViewInfo& View)
+void DeferredRenderer::RenderShadowPass(WRDGBuilder& GraphBuilder, WViewInfo& View)
 {
 }
 
-void DeferredRenderer::RenderLightPass(WViewInfo& View)
+void DeferredRenderer::RenderLightPass(WRDGBuilder& GraphBuilder, WViewInfo& View)
 {
 	RE_LOG("Render Light Pass");
 }
 
-void DeferredRenderer::RenderSkybox(WViewInfo& View)
+void DeferredRenderer::RenderSkybox(WRDGBuilder& GraphBuilder, WViewInfo& View)
 {
 }
 
-void DeferredRenderer::RenderTranslucent(WViewInfo& View)
+void DeferredRenderer::RenderTranslucent(WRDGBuilder& GraphBuilder, WViewInfo& View)
 {
 }
 
-void DeferredRenderer::RenderPostEffect(WViewInfo& View)
+void DeferredRenderer::RenderPostEffect(WRDGBuilder& GraphBuilder, WViewInfo& View)
 {
 }

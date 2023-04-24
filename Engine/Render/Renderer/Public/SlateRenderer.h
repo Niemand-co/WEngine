@@ -9,7 +9,7 @@ public:
 
 	virtual ~SlateRenderer();
 
-	virtual void Render() override;
+	virtual void Render(WRDGBuilder& GraphBuilder) override;
 
 private:
 

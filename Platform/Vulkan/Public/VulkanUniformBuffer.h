@@ -1,8 +1,6 @@
 #pragma once
 #include "RHI/Public/RHIBuffer.h"
 
-class RHIBufferDescriptor;
-
 namespace Vulkan
 {
 
@@ -10,7 +8,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanUniformBuffer(class VulkanDevice* pInDevice, uint8* InContent, const ShaderParametersLayout* Layout, EBufferUsageFlags InUsage);
+		VulkanUniformBuffer(class VulkanDevice* pInDevice, uint8* InContents, const ShaderParametersLayout* Layout, EUniformBufferUsage InUsage);
 
 		virtual ~VulkanUniformBuffer();
 
@@ -23,6 +21,12 @@ namespace Vulkan
 		VulkanDevice* pDevice;
 
 		VkBuffer Buffer;
+
+		EUniformBufferUsage Usage;
+
+		WEngine::WArray<RHIResource*> ResourceTable;
+
+		VulkanAllocation Allocation;
 
 	};
 

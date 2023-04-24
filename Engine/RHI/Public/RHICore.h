@@ -556,6 +556,23 @@ enum class ETextureCreateFlags : uint32
 };
 ENUM_CLASS_FLAGS(ETextureCreateFlags)
 
+enum EShaderFrequency : uint8
+{
+	SF_Vertex           = 0,
+	SF_Mesh             = 1,
+	SF_Pixel            = 2,
+	SF_Geometry         = 3,
+	SF_Compute          = 4,
+	SF_RayGen           = 5,
+	SF_RayMiss          = 6,
+	SF_RayHitGroup      = 7,
+	SF_RayCallable      = 8,
+
+	SF_NumFrequencies   = 9,
+
+	SF_NumGraphicsFrequencies = 4,
+};
+
 struct RHIBlendStateInitializer
 {
 	bool bEnableBlend = true;
@@ -610,6 +627,8 @@ typedef class RHIVertexBuffer* WVertexBufferRHIRef;
 typedef class RHIIndexBuffer* WIndexBufferRHIRef;
 typedef class RHIUniformBuffer* WUniformBufferRHIRef;
 typedef class RHITextureBuffer* WTextureBufferRHIRef;
+
+typedef WEngine::WSharedPtr<RHIUniformBuffer> FUniformBufferRHIRef;
 
 typedef class RHIVertexShader* WVertexShaderRHIRef;
 typedef class RHIPixelShader* WPixelShaderRHIRef;

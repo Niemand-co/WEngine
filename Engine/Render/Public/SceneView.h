@@ -34,7 +34,7 @@ struct WSceneViewInfo
 
 	glm::vec2 Resolution;
 
-	WUniformBufferRHIRef ViewUniformBuffer;
+	FUniformBufferRHIRef ViewUniformBuffer;
 
 	class WSceneViewFamily* Family = nullptr;
 

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Render/Renderer/Public/ScriptableRenderer.h"
 #include "Render/Renderer/Public/DeferredRenderer.h"
+#include "Render/Public/ShaderParameterMacros.h"
 #include "Scene/Components/Public/CameraComponent.h"
 #include "Scene/Components/Public/PrimitiveComponent.h"
 #include "Render/Public/SceneVisibility.h"
@@ -137,7 +138,7 @@ void WViewInfo::SetupViewParameters(SceneViewUniformBufferParameters& Parameters
 
 void WViewInfo::CreateUniformBuffer(SceneViewUniformBufferParameters& Parameters)
 {
-	ViewUniformBuffer = SceneViewUniformBufferParameters::CreateUniformBuffer((uint8*)&Parameters, sizeof(Parameters), 1, EBufferUsageFlags::BF_UniformBuffer);
+	ViewUniformBuffer = TUniformBufferRef<SceneViewUniformBufferParameters>::CreateUniformBufferImmediate(Parameters, EUniformBufferUsage::UniformBuffer_SingleFrame);
 }
 
 void WViewInfo::InitRHIResources()

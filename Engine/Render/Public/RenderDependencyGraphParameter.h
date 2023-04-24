@@ -5,6 +5,8 @@
 
 void GetPassAccess(EPassFlag Flag, EAccess& SRVAccess, EAccess& UAVAccess);
 
+#define TO_STRING(File) File
+
 struct WRDGRenderTargetBinding
 {
 	WRDGTexture* Texture = nullptr;
@@ -80,6 +82,19 @@ struct WRDGRenderTargetBindingSlots
 
 		return true;
 	}
+
+	struct FTypeInfo
+	{
+		static constexpr int32 NumRows = 1;
+		static constexpr int32 NumColumns = 1;
+		static constexpr int32 NumElements = 0;
+		static constexpr int32 Alignment = 16;
+		static constexpr bool bIsStoredInConstantBuffer = false;
+
+		typedef WRDGRenderTargetBindingSlots AlignedType;
+
+		static WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
+	};
 };
 
 struct WParameterMember
@@ -118,9 +133,13 @@ public:
 
 	bool HasRenderTarget() const { return RenderTargetOffset != kInvalidOffset; }
 
+	const WEngine::WArray<ResourceInfo>& GetResources() const { return Resources; }
+
 	const WEngine::WArray<ResourceInfo>& GetUniforms() const { return UniformBuffers; }
 
 	const WEngine::WArray<ResourceInfo>& GetTextures() const { return GraphTextures; }
+
+	uint32 GetSize() const { return ConstantBufferSize; }
 
 private:
 
@@ -138,6 +157,8 @@ private:
 
 	WEngine::WArray<ResourceInfo> UniformBuffers;
 
+	uint32 ConstantBufferSize;
+
 	friend struct WShaderParameterMetaData;
 	friend struct WRDGParameterStruct;
 };
@@ -146,9 +167,10 @@ struct WShaderParameterMetaData
 {
 public:
 
-	WShaderParameterMetaData(const char* InName, const WEngine::WArray<WParameterMember>& InMembers)
+	WShaderParameterMetaData(const char* InName, const WEngine::WArray<WParameterMember>& InMembers, uint32 InSize)
 		: Name(InName),
-		  Members(InMembers)
+		  Members(InMembers),
+		  Size(InSize)
 	{
 		InitializeLayout();
 	}
@@ -168,6 +190,8 @@ private:
 	ShaderParametersLayout Layout;
 
 	WEngine::WArray<WParameterMember> Members;
+
+	uint32 Size;
 
 };
 
@@ -318,7 +342,7 @@ struct WParameterTypeInfo
 	static constexpr int32 NumColumns = 1;
 	static constexpr int32 Alignment = alignof(ParameterType);
 
-	typedef __declspec(align(Alignment)) ParameterType AlignType;
+	typedef __declspec(align(Alignment)) ParameterType AlignedType;
 
 	static constexpr WShaderParameterMetaData* GetStructMetaData() { return ParameterType::StructMetaData; }
 };
@@ -335,7 +359,7 @@ struct WParameterTypeInfo<bool>
 	static constexpr int32 NumColumns = 1;
 	static constexpr int32 Alignment = 4;
 
-	typedef __declspec(align(4)) bool AlignType;
+	typedef __declspec(align(4)) bool AlignedType;
 
 	static constexpr WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
 };
@@ -352,7 +376,7 @@ struct WParameterTypeInfo<int32>
 	static constexpr int32 NumColumns = 1;
 	static constexpr int32 Alignment = 4;
 
-	typedef __declspec(align(4)) int32 AlignType;
+	typedef __declspec(align(4)) int32 AlignedType;
 
 	static constexpr WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
 };
@@ -369,7 +393,7 @@ struct WParameterTypeInfo<uint32>
 	static constexpr int32 NumColumns = 1;
 	static constexpr int32 Alignment = 4;
 
-	typedef __declspec(align(4)) uint32 AlignType;
+	typedef __declspec(align(4)) uint32 AlignedType;
 
 	static constexpr WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
 };
@@ -386,7 +410,7 @@ struct WParameterTypeInfo<float>
 	static constexpr int32 NumColumns = 1;
 	static constexpr int32 Alignment = 4;
 
-	typedef __declspec(align(4)) float AlignType;
+	typedef __declspec(align(4)) float AlignedType;
 
 	static constexpr WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
 };
@@ -403,7 +427,7 @@ struct WParameterTypeInfo<glm::vec2>
 	static constexpr int32 NumColumns = 2;
 	static constexpr int32 Alignment = 8;
 
-	typedef __declspec(align(8)) glm::vec2 AlignType;
+	typedef __declspec(align(8)) glm::vec2 AlignedType;
 
 	static constexpr WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
 };
@@ -420,7 +444,7 @@ struct WParameterTypeInfo<glm::vec3>
 	static constexpr int32 NumColumns = 3;
 	static constexpr int32 Alignment = 16;
 
-	typedef __declspec(align(16)) glm::vec3 AlignType;
+	typedef __declspec(align(16)) glm::vec3 AlignedType;
 
 	static constexpr WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
 };
@@ -437,7 +461,7 @@ struct WParameterTypeInfo<glm::vec4>
 	static constexpr int32 NumColumns = 4;
 	static constexpr int32 Alignment = 16;
 
-	typedef __declspec(align(16)) glm::vec4 AlignType;
+	typedef __declspec(align(16)) glm::vec4 AlignedType;
 
 	static constexpr WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
 };
@@ -454,7 +478,7 @@ struct WParameterTypeInfo<glm::mat4>
 	static constexpr int32 NumColumns = 3;
 	static constexpr int32 Alignment = 16;
 
-	typedef __declspec(align(16)) glm::mat4 AlignType;
+	typedef __declspec(align(16)) glm::mat4 AlignedType;
 
 	static constexpr WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
 };
@@ -471,14 +495,14 @@ struct WParameterTypeInfo<WRDGRenderTargetBinding*>
 	static constexpr int32 NumColumns = 1;
 	static constexpr int32 Alignment = 8;
 
-	typedef __declspec(align(8)) WRDGRenderTargetBinding* AlignType;
+	typedef __declspec(align(8)) WRDGRenderTargetBinding* AlignedType;
 
 	static constexpr WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
 };
 
 #define EMPTY_UNIFORMBUFFER_CREATE_FUNCTION return nullptr;
 
-#define NORMAL_UNIFORM_BUFFER_CREATE_FUNCTION return GetRenderCommandList()->CreateUniformBuffer(InContents, InStride, InCount, InUsage);
+#define NORMAL_UNIFORM_BUFFER_CREATE_FUNCTION return GetRenderCommandList()->CreateUniformBuffer(InContents, InLayout, InUsage);
 
 #define BEGIN_SHADER_PARAMETERS_STRUCT(STRUCT_NAME) \
 		BEGIN_SHADER_PARAMETERS_STRUCT_INTERNAL(STRUCT_NAME, EMPTY_UNIFORMBUFFER_CREATE_FUNCTION)
@@ -491,12 +515,23 @@ struct WParameterTypeInfo<WRDGRenderTargetBinding*>
 	{\
 	public:\
 		STRUCT_NAME() = default;\
-		static WShaderParameterMetaData* GetStructMetaData()\
+		struct FTypeInfo\
 		{\
-			static WShaderParameterMetaData MetaData(#STRUCT_NAME, GetMembers());\
-			return &MetaData;\
-		}\
-		static WUniformBufferRHIRef CreateUniformBuffer(uint8 *InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)\
+			static constexpr int32 NumRows = 1;\
+			static constexpr int32 NumColumns = 1;\
+			static constexpr int32 NumElements = 0;\
+			static constexpr int32 Alignment = 16;\
+			static constexpr bool bIsStoredInConstantBuffer = true;\
+			static constexpr const char* const FileName = __FILE__;\
+			static constexpr int32 FileLine = __LINE__;\
+			using AlignedType = STRUCT_NAME;\
+			static WShaderParameterMetaData* GetStructMetaData()\
+			{\
+				static WShaderParameterMetaData MetaData(#STRUCT_NAME, GetMembers(), sizeof(STRUCT_NAME));\
+				return &MetaData;\
+			}\
+		};\
+		static WUniformBufferRHIRef CreateUniformBuffer(uint8 *InContents, const ShaderParametersLayout *InLayout, EBufferUsageFlags InUsage)\
 		{\
 			UNIFORM_BUFFER_CREATE_FUNCTION\
 		}\
@@ -511,15 +546,15 @@ struct WParameterTypeInfo<WRDGRenderTargetBinding*>
 		typedef FuncPtr(*AppendMemberType)(FuncPtrIdentity, WEngine::WArray<WParameterMember>&);\
 		typedef FuncPtrIdentity
 
-#define SHADER_PARAMETER_INTERNAL(MEMBER_TYPE, PARAMETER_TYPE, PARAMETER_NAME, DEFAULT_VALUE)\
+#define SHADER_PARAMETER_INTERNAL(MEMBER_TYPE, TypeInfo, PARAMETER_NAME, DEFAULT_VALUE)\
 	PreFuncPtrIdentity##PARAMETER_NAME;\
 public:\
-	WParameterTypeInfo<PARAMETER_TYPE>::AlignType PARAMETER_NAME DEFAULT_VALUE;\
+	TypeInfo::AlignedType PARAMETER_NAME DEFAULT_VALUE;\
 private:\
 	struct FuncPtrIdentity##PARAMETER_NAME {};\
 	static FuncPtr AppendMember(FuncPtrIdentity##PARAMETER_NAME, WEngine::WArray<WParameterMember>& Members)\
 	{\
-		Members.Push(WParameterMember(#PARAMETER_NAME, MEMBER_TYPE, offsetof(ThisStruct, PARAMETER_NAME), WParameterTypeInfo<PARAMETER_TYPE>::NumRows, WParameterTypeInfo<PARAMETER_TYPE>::NumColumns, WParameterTypeInfo<PARAMETER_TYPE>::NumElements));\
+		Members.Push(WParameterMember(#PARAMETER_NAME, MEMBER_TYPE, offsetof(ThisStruct, PARAMETER_NAME), TypeInfo::NumRows, TypeInfo::NumColumns, TypeInfo::NumElements));\
 		FuncPtr(*Ptr)(PreFuncPtrIdentity##PARAMETER_NAME, WEngine::WArray<WParameterMember>&);\
 		Ptr = AppendMember;\
 		return (FuncPtr)Ptr;\
@@ -549,33 +584,37 @@ private:\
 	};
 
 #define RENDER_TARGET_SLOTS()\
-	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RTV, WRDGRenderTargetBindingSlots, RenderTarget, )
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RTV, WRDGRenderTargetBindingSlots::FTypeInfo, RenderTarget, )
 
-#define SHADER_PARAMETER(PARAMETER_TYPE, PARAMETER_NAME)\
-	SHADER_PARAMETER_INTERNAL(WParameterTypeInfo<PARAMETER_TYPE>::BaseType, PARAMETER_TYPE, PARAMETER_NAME, )
+#define SHADER_PARAMETER(PARAMETER_TYPE, MemberName)\
+	SHADER_PARAMETER_INTERNAL(WParameterTypeInfo<PARAMETER_TYPE>::BaseType, WParameterTypeInfo<PARAMETER_TYPE>, MemberName, )
 
-#define SHADER_PARAMETER_SAMPLER(PARAMETER_TYPE, PARAMETER_NAME)\
-	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_SAMPLER, PARAMETER_TYPE, PARAMETER_NAME, = nullptr)
+#define SHADER_PARAMETER_SAMPLER(PARAMETER_TYPE, MemberName)\
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_SAMPLER, WParameterTypeInfo<PARAMETER_TYPE>, MemberName, = nullptr)
 
-#define SHADER_PARAMETER_TEXTURE(PARAMETER_TYPE, PARAMETER_NAME)\
-	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_TEXTURE, RHITexture*, PARAMETER_NAME, = nullptr)
+#define SHADER_PARAMETER_TEXTURE(PARAMETER_TYPE, MemberName)\
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_TEXTURE, WParameterTypeInfo<WTextureRHIRef>, MemberName, = nullptr)
 
-#define SHADER_PARAMETER_SRV(PARAMETER_TYPE, PARAMETER_NAME)\
-	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RDG_TEXTURE_SRV, PARAMETER_TYPE, PARAMETER_NAME, = nullptr)
+#define SHADER_PARAMETER_SRV(PARAMETER_TYPE, MemberName)\
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RDG_TEXTURE_SRV, WParameterTypeInfo<PARAMETER_TYPE>, MemberName, = nullptr)
 
-#define SHADER_PARAMETER_UAV(PARAMETER_TYPE, PARAMETER_NAME)\
-	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RDG_TEXTURE_UAV, RHIUnordererResourceView*, PARAMETER_NAME, = nullptr)
+#define SHADER_PARAMETER_UAV(PARAMETER_TYPE, MemberName)\
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RDG_TEXTURE_UAV, WParameterTypeInfo<PARAMETER_TYPE>, MemberName, = nullptr)
 
-#define SHADER_PARAMETER_RDG_TEXTURE(PARAMETER_TYPE, PARAMETER_NAME)\
-	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RDG_TEXTURE, PARAMETER_TYPE, PARAMETER_NAME, = nullptr)
+#define SHADER_PARAMETER_RDG_TEXTURE(PARAMETER_TYPE, MemberName)\
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_RDG_TEXTURE, WParameterTypeInfo<PARAMETER_TYPE>, MemberName, = nullptr)
 
-#define SHADER_PARAMETER_STRUCT(PARAMETER_TYPE, PARAMETER_NAME)\
-	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_STRUCT, PARAMETER_TYPE, PARAMETER_NAME, )
+#define SHADER_PARAMETER_STRUCT_REF(STRUCT_TYPE, MemberName)\
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_REFERENCED_STRUCT, WParameterTypeInfo<TUniformBufferRef<STRUCT_TYPE>>, MemberName, )
 
-bool IsShaderParameterIgnoredByRHI(EUniformBaseType Type)
+#define SHADER_PARAMETER_STRUCT_INCLUDE(STRUCT_TYPE, MemberName)\
+	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_INCLUDED_STRUCT, STRUCT_TYPE::FTypeInfo, MemberName)
+
+bool IsShaderParameterTypeIgnoredByRHI(EUniformBaseType Type)
 {
-	return Type == EUniformBaseType::UB_RTV    ||
-		   Type == EUniformBaseType::UB_STRUCT ;
+	return Type == EUniformBaseType::UB_RTV				  ||
+		   Type == EUniformBaseType::UB_REFERENCED_STRUCT ||
+		   Type == EUniformBaseType::UB_RDG_UNIFORM_BUFFER ;
 }
 
 bool IsRDGResource(EUniformBaseType Type)
@@ -591,7 +630,7 @@ bool IsRDGResource(EUniformBaseType Type)
 
 RHIResource* GetShaderParameterRHI(const void* Contents, uint16 MemOffset, EUniformBaseType MemType)
 {
-	if (IsShaderParameterIgnoredByRHI(MemType))
+	if (IsShaderParameterTypeIgnoredByRHI(MemType))
 	{
 		return nullptr;
 	}

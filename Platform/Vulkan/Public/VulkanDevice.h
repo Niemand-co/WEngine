@@ -53,7 +53,7 @@ namespace Vulkan
 
 		virtual WIndexBufferRHIRef CreateIndexBuffer(RHIBufferDescriptor* descriptor) override;
 
-		virtual WUniformBufferRHIRef CreateUniformBuffer(uint8* InContents, const ShaderParametersLayout* InLayout, EBufferUsageFlags InUsage) override;
+		virtual WUniformBufferRHIRef CreateUniformBuffer(uint8* InContents, const ShaderParametersLayout* InLayout, EUniformBufferUsage InUsage) override;
 
 		virtual RHIScissor* CreateScissor(RHIScissorDescriptor *descriptor) override;
 
