@@ -17,6 +17,7 @@ namespace Vulkan
 		VkPipelineDepthStencilStateCreateInfo DepthStencilStateCreateInfo;
 
 		friend class VulkanDevice;
+		friend class VulkanPipelineStateManager;
 
 	};
 

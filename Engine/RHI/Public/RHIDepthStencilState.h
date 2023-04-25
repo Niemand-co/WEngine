@@ -4,7 +4,10 @@ class RHIDepthStencilState : public RHIResource
 {
 public:
 
-	RHIDepthStencilState() = default;
+	RHIDepthStencilState()
+		: RHIResource(ERHIResourceType::RRT_State)
+	{
+	}
 
 	virtual ~RHIDepthStencilState() = default;
 

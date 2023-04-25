@@ -9,34 +9,34 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 {
 	VertexInputStream VertexStream;
 
-	RHIGraphicsPipelineStateDescriptor PipelineInfo = {};
+	RHIGraphicsPipelineStateInitializer Initializer = {};
 	{
 		uint32 BlendIndex = 0;
 		for (; BlendIndex < MaxSimultaneousRenderTargets; ++BlendIndex)
 		{
 			if(RenderState.BlendStates[BlendIndex] == nullptr)
 				break;
-			PipelineInfo.BlendStates[BlendIndex] = RenderState.BlendStates[BlendIndex];
+			Initializer.BlendState->SetAttachmentBlendState(BlendIndex, RenderState.BlendStates[BlendIndex]);
 		}
 
-		PipelineInfo.RenderTargetCount = BlendIndex;
+		Initializer.RenderTargetEnabled = BlendIndex;
 
-		PipelineInfo.DepthStencilState = RenderState.DepthStencilState;
+		Initializer.DepthStencilState = RenderState.DepthStencilState;
 
-		PipelineInfo.RasterizationState = RenderState.RasterizationState;
+		Initializer.RasterizationState = RenderState.RasterizationState;
 
 		switch (Feature)
 		{
 		case EPassFeature::Default:
-			PipelineInfo.VertexInputState = MeshBatch.VertexFactory->GetVertexInput(EVertexInputType::Default);
+			Initializer.BoundShaderState.VertexInputState = MeshBatch.VertexFactory->GetVertexInput(EVertexInputType::Default);
 			MeshBatch.VertexFactory->GetStreams(EVertexInputType::Default, VertexStream);
 			break;
 		case EPassFeature::PositionOnly:
-			PipelineInfo.VertexInputState = MeshBatch.VertexFactory->GetVertexInput(EVertexInputType::PositionOnly);
+			Initializer.BoundShaderState.VertexInputState = MeshBatch.VertexFactory->GetVertexInput(EVertexInputType::PositionOnly);
 			MeshBatch.VertexFactory->GetStreams(EVertexInputType::PositionOnly, VertexStream);
 			break;
 		case EPassFeature::PositionAndNormal:
-			PipelineInfo.VertexInputState = MeshBatch.VertexFactory->GetVertexInput(EVertexInputType::PositionAndNormal);
+			Initializer.BoundShaderState.VertexInputState = MeshBatch.VertexFactory->GetVertexInput(EVertexInputType::PositionAndNormal);
 			MeshBatch.VertexFactory->GetStreams(EVertexInputType::PositionAndNormal, VertexStream);
 			break;
 		default:
@@ -45,9 +45,9 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 
 		PipelineInfo.MultiSampleState = RenderState.MultiSampleState;
 
-		PipelineInfo.Shaders[(uint8)EShaderStage::Vertex] = PassShader->GetVertexShader();
-		PipelineInfo.Shaders[(uint8)EShaderStage::Geometry] = PassShader->GetGeometryShader();
-		PipelineInfo.Shaders[(uint8)EShaderStage::Pixel] = PassShader->GetPixelShader();
+		Initializer.BoundShaderState.VertexShaderRHI = PassShader->GetVertexShader();
+		Initializer.BoundShaderState.GeometryShaderRHI = PassShader->GetGeometryShader();
+		Initializer.BoundShaderState.PixelShaderRHI = PassShader->GetPixelShader();
 	}
 
 	for (uint32 ElementIndex = 0; ElementIndex < MeshBatch.Elements.Size(); ++ElementIndex)
@@ -71,7 +71,7 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 			PassShader->GetPixelShader()->GetParametersBinding(View, &Material, ShaderBindings);
 		}
 
-		DrawCommand.SetParameters(MeshBatch, ElementIndex, VertexStream, PassShader, PipelineInfo);
+		DrawList->FinalizeCommand()
 	}
 
 }

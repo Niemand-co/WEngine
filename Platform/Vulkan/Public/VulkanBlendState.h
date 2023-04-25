@@ -3,20 +3,39 @@
 
 namespace Vulkan
 {
-
-	class VulkanBlendState : public RHIBlendState
+	
+	class VulkanAttachmentBlendState : public RHIAttachmentBlendState
 	{
 	public:
 
-		VulkanBlendState(const RHIBlendStateInitializer& Initializer);
+		VulkanAttachmentBlendState(const RHIBlendStateInitializer& Initializer);
 
-		virtual ~VulkanBlendState() = default;
+		virtual ~VulkanAttachmentBlendState() = default;
 
 	private:
 
 		VkPipelineColorBlendAttachmentState ColorBlendAttachmentState;
 
+		friend class VulkanPipelineStateManager;
+
+	};
+
+	class VulkanBlendState : public RHIBlendState
+	{
+	public:
+
+		VulkanBlendState() = default;
+
+		virtual ~VulkanBlendState() = default;
+
+		virtual void SetAttachmentBlendState(uint32, RHIAttachmentBlendState* InState) override;
+
+	private:
+
+		VulkanAttachmentBlendState* Attachments[MaxSimultaneousRenderTargets] = {0};
+
 		friend class VulkanDevice;
+		friend class VulkanPipelineStateManager;
 
 	};
 

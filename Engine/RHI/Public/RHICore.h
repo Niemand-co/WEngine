@@ -537,7 +537,7 @@ enum
 	MaxGraphicsPipelineShaderNum = 3,
 };
 
-enum class ETextureCreateFlags : uint32
+enum class ETextureCreateFlags : uint16
 {
 	TextureCreate_None                      = 0,
 	TextureCreate_Presentable               = 1 << 0,
@@ -595,6 +595,7 @@ typedef class RHIRenderPass* WRenderPassRHIRef;
 typedef class RHIFramebuffer* WFramebufferRHIRef;
 typedef class RHIPipelineStateObject* WPsoRHIRef;
 
+typedef class RHIAttachmentBlendState* WAttachmentBlendStateRHIRef;
 typedef class RHIBlendState* WBlendStateRHIRef;
 typedef class RHIDepthStencilState* WDepthStencilStateRHIRef;
 typedef class RHIRasterizationState* WRasterizationStateRHIRef;

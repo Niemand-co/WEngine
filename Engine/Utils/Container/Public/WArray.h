@@ -35,6 +35,8 @@ namespace WEngine
 
 		T& AddInitialized();
 
+		void AddInitialized(uint32 Num);
+
 		void AddZerod(uint32 Count);
 
 		T Pop();
@@ -328,6 +330,12 @@ namespace WEngine
 		::new (Data + ArrayNum) T();
 		ArrayNum++;
 		return *(Data + ArrayNum - 1);
+	}
+
+	template<typename T>
+	inline void WArray<T>::AddInitialized(uint32 Num)
+	{
+		Resize(ArrayNum + Num);
 	}
 
 	template<typename T>

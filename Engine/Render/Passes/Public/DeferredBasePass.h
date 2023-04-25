@@ -18,7 +18,7 @@ public:
 	virtual WVertexShaderRHIRef GetVertexShader() const override { return VertexShaderRHI; }
 
 	BEGIN_SHADER_PARAMETERS_STRUCT(WDeferredBasePassVSParameters)
-		SHADER_PARAMETER_STRUCT(SceneViewUniformBufferParameters, View)
+		SHADER_PARAMETER_STRUCT_INCLUDE(SceneViewUniformBufferParameters, View)
 	END_SHADER_PARAMETERS_STRUCT
 
 private:

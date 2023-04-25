@@ -4,6 +4,11 @@ class RHIDevice : public RHIResource
 {
 public:
 
+	RHIDevice()
+		: RHIResource(ERHIResourceType::RRT_Device)
+	{
+	}
+
 	virtual ~RHIDevice() = default;
 
 	virtual unsigned int GetQueueCount(RHIQueueType) = 0;
@@ -30,8 +35,6 @@ public:
 
 	virtual WTextureRHIRef CreateTexture(const class RHITextureDesc& InDesc) = 0;
 
-	virtual WTextureViewRHIRef CreateTextureView(class RHITextureViewDescriptor* descriptor, class RHITexture* InTexture) = 0;;
-
 	virtual class RHISampler* CreateSampler(class RHISamplerDescriptor * descriptor) = 0;
 
 	virtual WVertexBufferRHIRef CreateVertexBuffer(class RHIBufferDescriptor* descriptor) = 0;
@@ -43,10 +46,6 @@ public:
 	virtual class RHIScissor* CreateScissor(class RHIScissorDescriptor *descriptor) = 0;
 
 	virtual WViewportRHIRef CreateViewport(class RHIViewportDescriptor* descriptor) = 0;
-
-	virtual void UpdateUniformResourceToGroup(class RHIUpdateResourceDescriptor *descriptor) = 0;
-
-	virtual void UpdateTextureResourceToGroup(class RHIUpdateResourceDescriptor *descriptor) = 0;
 
 	virtual class RHISemaphore* GetSemaphore() = 0;
 

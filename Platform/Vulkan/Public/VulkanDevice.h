@@ -43,10 +43,6 @@ namespace Vulkan
 
 		virtual WTextureRHIRef CreateTexture(const RHITextureDesc& InDesc) override;
 
-		virtual WTextureViewRHIRef CreateTextureView(RHITextureViewDescriptor* descriptor, RHITexture* InTexture) override;
-
-		WTextureViewRHIRef CreateTextureView(RHITextureViewDescriptor* descriptor, VkImage InImage);
-
 		virtual RHISampler* CreateSampler(RHISamplerDescriptor * descriptor) override;
 
 		virtual WVertexBufferRHIRef CreateVertexBuffer(RHIBufferDescriptor* descriptor) override;
@@ -58,10 +54,6 @@ namespace Vulkan
 		virtual RHIScissor* CreateScissor(RHIScissorDescriptor *descriptor) override;
 
 		virtual WViewportRHIRef CreateViewport(RHIViewportDescriptor *descriptor) override;
-
-		virtual void UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor *descriptor) override;
-
-		virtual void UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor *descriptor) override;
 
 		virtual RHISemaphore* GetSemaphore() override;
 
@@ -85,6 +77,8 @@ namespace Vulkan
 
 		class VulkanStagingBufferManager* GetStagingBufferManager() const { return pStagingBufferManager; }
 
+		class VulkanPipelineStateManager* GetPipelineStateManager() const { return pPipelineStateManager; }
+
 	private:
 
 		VkImageUsageFlags GetImageUsage(ETextureCreateFlags Flag);
@@ -96,6 +90,8 @@ namespace Vulkan
 		VulkanMemoryManager *pMemoryManager;
 
 		VulkanStagingBufferManager *pStagingBufferManager;
+
+		VulkanPipelineStateManager *pPipelineStateManager;
 
 		WEngine::WArray<QueueStack> m_queues;
 

@@ -109,6 +109,8 @@ public:
 
 	WMultiSampleStateRHIRef CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer);
 
+	class RHIPipelineStateObject* CreateGraphicsPipelineState(class RHIGraphicsPipelineStateInitializer& GraphicsPipelineState);
+
 	WVertexInputStateRHIRef GetOrCreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements);
 
 	void UpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void *Contents);

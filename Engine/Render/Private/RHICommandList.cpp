@@ -55,6 +55,7 @@ void RHIRenderCommandList::BeginTransition(WEngine::WArray<RHIBarrierDescriptor>
 
 void RHIRenderCommandList::SetGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& GraphicsPipelineState)
 {
+    RHIPipelineStateObject *RHIPipelineState = 
     GetDynamicRHI()->RHISetGraphicsPipelineState(GraphicsPipelineState);
 }
 
@@ -128,48 +129,48 @@ void RHIRenderCommandList::SetShaderUniformBuffer(RHIGraphicsShader* ShaderRHI, 
 
 void RHIRenderCommandList::CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY)
 {
-    GetDynamicRHI()->CopyImageToBackBuffer(SrcTexture, DstTexture, SrcSizeX, SrcSizeY, DstSizeX, DstSizeY);
+    GetDynamicRHI()->RHICopyImageToBackBuffer(SrcTexture, DstTexture, SrcSizeX, SrcSizeY, DstSizeX, DstSizeY);
 }
 
 WVertexBufferRHIRef RHIRenderCommandList::CreateVertexBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
 {
     if(InCount == 0)return nullptr;
-    return GetDynamicRHI()->CreateVertexBuffer(InContents, InStride, InCount, InUsage);
+    return GetDynamicRHI()->RHICreateVertexBuffer(InContents, InStride, InCount, InUsage);
 }
 
 WIndexBufferRHIRef RHIRenderCommandList::CreateIndexBuffer(uint8* InContents, uint32 InCount, EBufferUsageFlags InUsage)
 {
-    return GetDynamicRHI()->CreateIndexBuffer(InContents, InCount, InUsage);
+    return GetDynamicRHI()->RHICreateIndexBuffer(InContents, InCount, InUsage);
 }
 
 WUniformBufferRHIRef RHIRenderCommandList::CreateUniformBuffer(uint8* InContents, const ShaderParametersLayout * InLayout, EUniformBufferUsage InUsage)
 {
-    return GetDynamicRHI()->CreateUniformBuffer(InContents, InLayout, InUsage);
+    return GetDynamicRHI()->RHICreateUniformBuffer(InContents, InLayout, InUsage);
 }
 
 WVertexShaderRHIRef RHIRenderCommandList::CreateVertexShader(ShaderCodeBlob& blob)
 {
-    return GetDynamicRHI()->CreateVertexShader(blob);
+    return GetDynamicRHI()->RHICreateVertexShader(blob);
 }
 
 WPixelShaderRHIRef RHIRenderCommandList::CreatePixelShader(ShaderCodeBlob& blob)
 {
-    return GetDynamicRHI()->CreatePixelShader(blob);
+    return GetDynamicRHI()->RHICreatePixelShader(blob);
 }
 
 WGeometryShaderRHIRef RHIRenderCommandList::CreateGeometryShader(ShaderCodeBlob& blob)
 {
-    return GetDynamicRHI()->CreateGeometryShader(blob);
+    return GetDynamicRHI()->RHICreateGeometryShader(blob);
 }
 
 WComputeShaderRHIRef RHIRenderCommandList::CreateComputeShader(ShaderCodeBlob& blob)
 {
-    return GetDynamicRHI()->CreateComputeShader(blob);
+    return GetDynamicRHI()->RHICreateComputeShader(blob);
 }
 
 WTextureRHIRef RHIRenderCommandList::CreateTexture(const RHITextureDesc& InDesc)
 {
-    return GetDynamicRHI()->CreateTexture(InDesc);
+    return GetDynamicRHI()->RHICreateTexture(InDesc);
 }
 }
 
@@ -211,6 +212,11 @@ WVertexInputStateRHIRef RHIRenderCommandList::GetOrCreateVertexInputState(const 
 void RHIRenderCommandList::UpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void* Contents)
 {
     GetDynamicRHI()->UpdateUniformBuffer(UniformBuffer, Contents);
+}
+
+RHIGraphicsPipelineState* RHIRenderCommandList::CreateGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& Initializer)
+{
+    return GetDynamicRHI()->RHICreateGraphicsPipelineState(Initializer);
 }
 
 RHIRenderCommandList* GetRenderCommandList()

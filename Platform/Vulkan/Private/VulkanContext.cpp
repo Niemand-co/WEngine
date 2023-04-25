@@ -162,7 +162,7 @@ namespace Vulkan
 		PipelineBarrier.Execute(static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager()->GetImmediateCommandBuffer());
 	}
 
-	void VulkanDynamicContext::CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY)
+	void VulkanDynamicContext::RHICopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY)
 	{
 		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetImmediateCommandBuffer();
 
@@ -231,10 +231,13 @@ namespace Vulkan
 		}
 	}
 
-	void VulkanDynamicContext::RHISetGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& Initializer)
+	void VulkanDynamicContext::RHISetGraphicsPipelineState(RHIPipelineStateObject *GraphicsPipelineState)
 	{
-		WPsoRHIRef Pipeline = Vulkan
-		Pipeline->Bind(pCommandBufferManager->GetActiveCommandBuffer());
+		VulkanGraphicsPipelineStateObject *Pipeline = static_cast<VulkanGraphicsPipelineStateObject*>(GraphicsPipelineState);
+		if (PendingState->SetGfxPipeline(Pipeline, false))
+		{
+			
+		}
 	}
 
 	void VulkanDynamicContext::RHISetShaderUniformBuffer(RHIGraphicsShader* ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer)
@@ -263,7 +266,7 @@ namespace Vulkan
 		
 	}
 
-	void VulkanDynamicContext::UpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void* Contents)
+	void VulkanDynamicContext::RHIUpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void* Contents)
 	{
 		VulkanCommandBuffer *ActiveCmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
 		if (ActiveCmdBuffer && ActiveCmdBuffer->HasBegun())
@@ -273,9 +276,14 @@ namespace Vulkan
 		}
 	}
 
-	WBlendStateRHIRef VulkanStaticContext::CreateBlendState(const RHIBlendStateInitializer& Initializer)
+	RHIPipelineStateObject* VulkanDynamicContext::RHICreateGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& Initializer)
 	{
-		return new VulkanBlendState(Initializer);
+		static_cast<VulkanDevice*>(pDevice)->GetPipelineStateManager();
+	}
+
+	WAttachmentBlendStateRHIRef VulkanStaticContext::CreateBlendState(const RHIBlendStateInitializer& Initializer)
+	{
+		return new VulkanAttachmentBlendState(Initializer);
 	}
 
 	WDepthStencilStateRHIRef VulkanStaticContext::CreateDepthStencilState(const RHIDepthStencilStateInitializer& Initializer)

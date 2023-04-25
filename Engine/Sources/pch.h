@@ -76,6 +76,7 @@
 #include "Utils/Container/Public/WQueue.h"
 #include "Utils/Container/Public/WStack.h"
 #include "Utils/Container/Public/WBitArray.h"
+#include "Utils/Container/Public/WStaticArray.h"
 #include "Utils/Public/NamingSystem.h"
 #include "HAL/Public/TaskGraph.h"
 #include "HAL/Public/WRWScopeLock.h"

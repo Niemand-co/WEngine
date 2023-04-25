@@ -19,7 +19,7 @@ void WMeshDrawShaderBindings::Add(EUniformBaseType InType, uint32 InCount)
 	Bindings.Push(ShaderBindingSlot(Bindings.Size(), InCount, InType));
 }
 
-void WMeshDrawCommand::SetParameters(const WMeshBatch& MeshBatch, uint32 MeshBatchElementIndex, VertexInputStream& Stream, const WMeshPassProcessorShaderBase* Shaders, const RHIGraphicsPipelineStateDescriptor& InPipelineDescriptor)
+void WMeshDrawCommand::SetParametersAndFinalize(const WMeshBatch& MeshBatch, uint32 MeshBatchElementIndex, const WMeshPassProcessorShaderBase* Shaders, const GraphicsPipelineStateId& InPipelineId)
 {
 	const WMeshBatchElement& Element = MeshBatch.Elements[MeshBatchElementIndex];
 
@@ -30,8 +30,12 @@ void WMeshDrawCommand::SetParameters(const WMeshBatch& MeshBatch, uint32 MeshBat
 	NumPrimitives = Element.NumPrimitives;
 	NumInstances = Element.NumInstances;
 
-	PipelineDescriptor = InPipelineDescriptor;
+	Finalize(InPipelineId, Shaders);
+}
 
+void WMeshDrawCommand::Finalize(GraphicsPipelineStateId InPipelineId, const WMeshPassProcessorShaderBase* Shaders)
+{
+	PipelineId = InPipelineId;
 	for (uint32 ShaderStage = 0; ShaderStage < MaxGraphicsPipelineShaderNum; ++ShaderStage)
 	{
 		ShaderBindings[ShaderStage].Initialize(Shaders);
@@ -44,12 +48,11 @@ WMeshDrawShaderBindings& WMeshDrawCommand::GetShaderBinding(uint32 ShaderStage)
 	return ShaderBindings[ShaderStage];
 }
 
-bool WMeshDrawCommand::SubmitDrawBegin(WRenderPassRHIRef RenderPass, RHIRenderCommandList& CmdList)
+bool WMeshDrawCommand::SubmitDrawBegin(const GraphicsPipelineStateSet& PipelineStateSet, RHIRenderCommandList& CmdList)
 {
-	PipelineDescriptor.RenderPass = RenderPass;
-	PipelineDescriptor.ShaderBindings = ShaderBindings;
+	RHIGraphicsPipelineStateInitializer PipelineState = PipelineStateSet.GetPipelineState(PipelineId);
 
-	CmdList.SetGraphicsPipelineState(&PipelineDescriptor);
+	CmdList.SetGraphicsPipelineState(PipelineState);
 
 	CmdList.SetStreamResource(VertexStream);
 
@@ -67,10 +70,14 @@ WMeshDrawCommand& WDynamicMeshPassDrawListContext::AddCommand()
 	return MeshCommands.AddInitialized();
 }
 
-void WDynamicMeshPassDrawListContext::FinalizeCommand(RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
+void WDynamicMeshPassDrawListContext::FinalizeCommand(
+	const WMeshBatch& MeshBatch,
+	uint32 BatchElementIndex,
+	const WMeshPassProcessorShaderBase* Shaders,
+	const RHIGraphicsPipelineStateInitializer& PipelineState,
+	WMeshDrawCommand& MeshDrawCommand)
 {
-	for (WMeshDrawCommand& Command : MeshCommands)
-	{
-		WMeshDrawCommand::SubmitDrawCommand(Command, RenderPass, CmdList);
-	}
+	GraphicsPipelineStateId PipelineId = PipelineStateSet.FindOrAdd(PipelineState);
+
+	MeshDrawCommand.SetParametersAndFinalize(MeshBatch, BatchElementIndex, Shaders, PipelineId);
 }

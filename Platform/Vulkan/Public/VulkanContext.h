@@ -12,7 +12,7 @@ namespace Vulkan
 
 		virtual ~VulkanStaticContext() = default;
 
-		virtual WBlendStateRHIRef CreateBlendState(const RHIBlendStateInitializer& Initializer) override;
+		virtual WAttachmentBlendStateRHIRef CreateBlendState(const RHIBlendStateInitializer& Initializer) override;
 
 		virtual WDepthStencilStateRHIRef CreateDepthStencilState(const RHIDepthStencilStateInitializer& Initializer) override;
 
@@ -56,17 +56,23 @@ namespace Vulkan
 
 		virtual void RHIBeginTransition(WEngine::WArray<RHIBarrierDescriptor>& Transitions) override;
 
-		virtual void CopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY) override;
+		virtual void RHICopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY) override;
 
-		virtual void RHISetGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& Initializer) override;
+		virtual void RHISetGraphicsPipelineState(RHIPipelineStateObject *GraphicsPipelineState) override;
 
 		virtual void RHISetShaderUniformBuffer(class RHIGraphicsShader* ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer) override;
 
-		virtual void UpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void* Contents) override;
+		virtual void RHIUpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void* Contents) override;
+
+		virtual RHIPipelineStateObject* RHICreateGraphicsPipelineState(class RHIGraphicsPipelineStateInitializer& Initializer) override;
 
 	private:
 
 		VulkanCommandBufferManager *pCommandBufferManager;
+
+		class VulkanPendingGfxState *PendingState;
+
+		class VulkanPendingComputeState *PendingComputeState;
 
 	};
 

@@ -32,3 +32,4 @@
 #include "Platform/Vulkan/Public/VulkanRasterizationState.h"
 #include "Platform/Vulkan/Public/VulkanMultiSampleState.h"
 #include "Platform/Vulkan/Public/VulkanVertexInputState.h"
+#include "Platform/Vulkan/Public/VulkanPendingState.h"

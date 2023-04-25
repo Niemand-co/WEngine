@@ -17,7 +17,7 @@ namespace Vulkan
 			Scissors.SetNumZeroed(1);
 		}
 
-		void SetGfxPipeline(class VulkanGraphicsPipelineStateObject* InGfxPipeline, bool bForceReset);
+		bool SetGfxPipeline(class VulkanGraphicsPipelineStateObject* InGfxPipeline, bool bForceReset);
 
 		void PrepareForDraw(class VulkanCommandBuffer *CmdBuffer);
 

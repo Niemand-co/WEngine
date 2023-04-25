@@ -4,7 +4,7 @@
 namespace Vulkan
 {
 
-	void VulkanPendingGfxState::SetGfxPipeline(VulkanGraphicsPipelineStateObject* InGfxPipeline, bool bForceReset)
+	bool VulkanPendingGfxState::SetGfxPipeline(VulkanGraphicsPipelineStateObject* InGfxPipeline, bool bForceReset)
 	{
 		bool bChanged = bForceReset;
 		if (InGfxPipeline != CurrentPipelineState)
@@ -18,6 +18,8 @@ namespace Vulkan
 		{
 			Reset();
 		}
+
+		return bChanged;
 	}
 
 }

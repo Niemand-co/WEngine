@@ -92,7 +92,8 @@ template<
 	EBlendFactor ColorDstFactor = EBlendFactor::FactorZero,
 	EBlendOP AlphaBlendOp = EBlendOP::BlendAdd,
 	EBlendFactor AlphaSrcFactor = EBlendFactor::FactorOne,
-	EBlendFactor AlphaDstFactor = EBlendFactor::FactorZero
+	EBlendFactor AlphaDstFactor = EBlendFactor::FactorZero,
+	uint8 ColorWirteMask = 0xFF
 >
 class TStaticBlendStateRHI : public TStaticStateRHI<TStaticBlendStateRHI<
 	bEnableBlend,
@@ -101,8 +102,9 @@ class TStaticBlendStateRHI : public TStaticStateRHI<TStaticBlendStateRHI<
 	ColorDstFactor,
 	AlphaBlendOp,
 	AlphaSrcFactor,
-	AlphaDstFactor
-	>, class RHIBlendState>
+	AlphaDstFactor,
+	ColorWriteMask
+	>, class RHIAttachmentBlendState>
 {
 public:
 
@@ -116,14 +118,15 @@ public:
 			ColorDstFactor,
 			AlphaBlendOp,
 			AlphaSrcFactor,
-			AlphaDstFactor
+			AlphaDstFactor,
+			ColorWriteMask
 		};
 		StaticRHI = GetRenderCommandList()->CreateBlendState(Initializer);
 	}
 
 public:
 
-	WBlendStateRHIRef StaticRHI;
+	WAttachmentBlendStateRHIRef StaticRHI;
 
 };
 

@@ -40,7 +40,7 @@ DynamicRHIContext::~DynamicRHIContext()
 	delete pInstance;
 }
 
-WVertexBufferRHIRef DynamicRHIContext::CreateVertexBuffer(uint8 *InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
+WVertexBufferRHIRef DynamicRHIContext::RHICreateVertexBuffer(uint8 *InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage)
 {
 	RHIBufferDescriptor descriptor = {};
 	{
@@ -52,7 +52,7 @@ WVertexBufferRHIRef DynamicRHIContext::CreateVertexBuffer(uint8 *InContents, uin
 	return pDevice->CreateVertexBuffer(&descriptor);
 }
 
-WIndexBufferRHIRef DynamicRHIContext::CreateIndexBuffer(uint8* InContents, uint32 InCount, EBufferUsageFlags InUsage)
+WIndexBufferRHIRef DynamicRHIContext::RHICreateIndexBuffer(uint8* InContents, uint32 InCount, EBufferUsageFlags InUsage)
 {
 	RHIBufferDescriptor descriptor = {};
 	{
@@ -64,12 +64,12 @@ WIndexBufferRHIRef DynamicRHIContext::CreateIndexBuffer(uint8* InContents, uint3
 	return pDevice->CreateIndexBuffer(&descriptor);
 }
 
-WUniformBufferRHIRef DynamicRHIContext::CreateUniformBuffer(uint8* InContents, const ShaderParametersLayout* InLayout, EUniformBufferUsage InUsage)
+WUniformBufferRHIRef DynamicRHIContext::RHICreateUniformBuffer(uint8* InContents, const ShaderParametersLayout* InLayout, EUniformBufferUsage InUsage)
 {
 	return pDevice->CreateUniformBuffer(InContents, InLayout, InUsage);
 }
 
-WVertexShaderRHIRef DynamicRHIContext::CreateVertexShader(ShaderCodeBlob& blob)
+WVertexShaderRHIRef DynamicRHIContext::RHICreateVertexShader(ShaderCodeBlob& blob)
 {
 	RHIShaderDescriptor descriptor = {};
 	{
@@ -80,7 +80,7 @@ WVertexShaderRHIRef DynamicRHIContext::CreateVertexShader(ShaderCodeBlob& blob)
 	return pDevice->CreateVertexShader(&descriptor);
 }
 
-WPixelShaderRHIRef DynamicRHIContext::CreatePixelShader(ShaderCodeBlob& blob)
+WPixelShaderRHIRef DynamicRHIContext::RHICreatePixelShader(ShaderCodeBlob& blob)
 {
 	RHIShaderDescriptor descriptor = {};
 	{
@@ -91,7 +91,7 @@ WPixelShaderRHIRef DynamicRHIContext::CreatePixelShader(ShaderCodeBlob& blob)
 	return pDevice->CreatePixelShader(&descriptor);
 }
 
-WGeometryShaderRHIRef DynamicRHIContext::CreateGeometryShader(ShaderCodeBlob& blob)
+WGeometryShaderRHIRef DynamicRHIContext::RHICreateGeometryShader(ShaderCodeBlob& blob)
 {
 	RHIShaderDescriptor descriptor = {};
 	{
@@ -102,7 +102,7 @@ WGeometryShaderRHIRef DynamicRHIContext::CreateGeometryShader(ShaderCodeBlob& bl
 	return pDevice->CreateGeometryShader(&descriptor);
 }
 
-WComputeShaderRHIRef DynamicRHIContext::CreateComputeShader(ShaderCodeBlob& blob)
+WComputeShaderRHIRef DynamicRHIContext::RHICreateComputeShader(ShaderCodeBlob& blob)
 {
 	RHIShaderDescriptor descriptor = {};
 	{
@@ -113,12 +113,12 @@ WComputeShaderRHIRef DynamicRHIContext::CreateComputeShader(ShaderCodeBlob& blob
 	return pDevice->CreateComputeShader(&descriptor);
 }
 
-WTextureRHIRef DynamicRHIContext::CreateTexture(const RHITextureDesc& InDesc)
+WTextureRHIRef DynamicRHIContext::RHICreateTexture(const RHITextureDesc& InDesc)
 {
 	return pDevice->CreateTexture(InDesc);
 }
 
-WTextureViewRHIRef DynamicRHIContext::CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, EDimension InDimension, EFormat InFormat, RHITexture* InTexture)
+WTextureViewRHIRef DynamicRHIContext::RHICreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, EDimension InDimension, EFormat InFormat, RHITexture* InTexture)
 {
 	RHITextureViewDescriptor descriptor = {};
 	{
@@ -132,22 +132,12 @@ WTextureViewRHIRef DynamicRHIContext::CreateTextureView(uint32 InMipIndex, uint3
 	return pDevice->CreateTextureView(&descriptor, InTexture);
 }
 
-void DynamicRHIContext::CopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height)
+void DynamicRHIContext::RHICopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height)
 {
 
 }
 
-void DynamicRHIContext::UpdateUniformResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
-{
-	pDevice->UpdateUniformResourceToGroup(descriptor);
-}
-
-void DynamicRHIContext::UpdateTextureResourceToGroup(RHIUpdateResourceDescriptor* descriptor)
-{
-	pDevice->UpdateTextureResourceToGroup(descriptor);
-}
-
-WViewportRHIRef DynamicRHIContext::CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, EFormat InFormat)
+WViewportRHIRef DynamicRHIContext::RHICreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, EFormat InFormat)
 {
 	RHIViewportDescriptor descriptor = {};
 	{

@@ -21,7 +21,7 @@ public:
 
 	~StaticRHIContext() = default;
 
-	virtual WBlendStateRHIRef CreateBlendState(const RHIBlendStateInitializer& Initializer) = 0;
+	virtual WAttachmentBlendStateRHIRef CreateBlendState(const RHIBlendStateInitializer& Initializer) = 0;
 
 	virtual WDepthStencilStateRHIRef CreateDepthStencilState(const RHIDepthStencilStateInitializer& Initializer) = 0;
 
@@ -41,33 +41,31 @@ public:
 
 	virtual ~DynamicRHIContext();
 
-	WVertexBufferRHIRef CreateVertexBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage);
+	WVertexBufferRHIRef RHICreateVertexBuffer(uint8* InContents, uint32 InStride, uint32 InCount, EBufferUsageFlags InUsage);
 
-	WIndexBufferRHIRef CreateIndexBuffer(uint8* InContents, uint32 InCount, EBufferUsageFlags InUsage);
+	WIndexBufferRHIRef RHICreateIndexBuffer(uint8* InContents, uint32 InCount, EBufferUsageFlags InUsage);
 
-	WUniformBufferRHIRef CreateUniformBuffer(uint8* InContents, const class ShaderParametersLayout* InLayout, EUniformBufferUsage InUsage);
+	WUniformBufferRHIRef RHICreateUniformBuffer(uint8* InContents, const class ShaderParametersLayout* InLayout, EUniformBufferUsage InUsage);
 
-	WVertexShaderRHIRef CreateVertexShader(class ShaderCodeBlob& blob);
+	WVertexShaderRHIRef RHICreateVertexShader(class ShaderCodeBlob& blob);
 
-	WPixelShaderRHIRef CreatePixelShader(class ShaderCodeBlob& blob);
+	WPixelShaderRHIRef RHICreatePixelShader(class ShaderCodeBlob& blob);
 
-	WGeometryShaderRHIRef CreateGeometryShader(class ShaderCodeBlob& blob);
+	WGeometryShaderRHIRef RHICreateGeometryShader(class ShaderCodeBlob& blob);
 
-	WComputeShaderRHIRef CreateComputeShader(class ShaderCodeBlob& blob);
+	WComputeShaderRHIRef RHICreateComputeShader(class ShaderCodeBlob& blob);
 
-	WTextureRHIRef CreateTexture(const class RHITextureDesc& InDesc);
+	WTextureRHIRef RHICreateTexture(const class RHITextureDesc& InDesc);
 
-	WTextureViewRHIRef CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, EDimension InDimension, EFormat InFormat, class RHITexture* InTexture);
+	WTextureViewRHIRef RHICreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, EDimension InDimension, EFormat InFormat, class RHITexture* InTexture);
 
-	virtual void CopyBufferToImage(class RHITexture* pTexture, class RHIBuffer* pBuffer, unsigned int width, unsigned int height);
+	virtual RHIPipelineStateObject* RHICreateGraphicsPipelineState(class RHIGraphicsPipelineStateInitializer& Initializer) = 0;
 
-	virtual void UpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void *Contents) = 0;
+	virtual void RHICopyBufferToImage(class RHITexture* pTexture, class RHIBuffer* pBuffer, unsigned int width, unsigned int height);
 
-	virtual void UpdateUniformResourceToGroup(class RHIUpdateResourceDescriptor* descriptor);
+	virtual void RHIUpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void *Contents) = 0;
 
-	virtual void UpdateTextureResourceToGroup(class RHIUpdateResourceDescriptor* descriptor);
-
-	virtual WViewportRHIRef CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, EFormat InFormat);
+	virtual WViewportRHIRef RHICreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, EFormat InFormat);
 
 	virtual void RHIBeginDrawingViewport(class RHIViewport* Viewport) = 0;
 
@@ -91,9 +89,9 @@ public:
 
 	virtual void RHIBeginTransition(WEngine::WArray<class RHIBarrierDescriptor>& Transitions) = 0;
 
-	virtual void CopyImageToBackBuffer(class RHITexture* SrcTexture, WTextureRHIRef DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY) = 0;
+	virtual void RHICopyImageToBackBuffer(class RHITexture* SrcTexture, WTextureRHIRef DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY) = 0;
 
-	virtual void RHISetGraphicsPipelineState(class RHIGraphicsPipelineStateInitializer& Initializer) = 0;
+	virtual void RHISetGraphicsPipelineState(class RHIPipelineStateObject *GraphicsPipelineState) = 0;
 
 	virtual void RHISetShaderUniformBuffer(class RHIGraphicsShader *ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer) = 0;
 

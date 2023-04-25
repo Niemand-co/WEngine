@@ -33,7 +33,9 @@ void DeferredRenderer::RenderBasePass(WRDGBuilder& GraphBuilder, WViewInfo& View
 
 		WDeferredBasePassMeshProcessor Processor(View.Family->Scene, &View, RenderState);
 
-		WDynamicMeshPassDrawListContext DrawList;
+		GraphicsPipelineStateSet PipelineStateSet;
+
+		WDynamicMeshPassDrawListContext DrawList(PipelineStateSet);
 		Processor.SetDrawListContext(&DrawList);
 
 		const WEngine::WArray<WMeshBatch>& BatchElements = Collector.GetBatches();
@@ -41,7 +43,6 @@ void DeferredRenderer::RenderBasePass(WRDGBuilder& GraphBuilder, WViewInfo& View
 		{
 			Processor.AddMeshBatch(BatchElements[MeshIndex]);
 		}
-		DrawList.FinalizeCommand(CmdList, RenderPass);
 	});
 }
 
@@ -74,7 +75,7 @@ void WDeferredBasePassPS::GetParametersBinding(const WViewInfo* View, const Mate
 {
 	WMaterialShader::GetParametersBinding(View, Material, Bindings);
 	Parameters.Color = glm::vec3(1, 0, 0);
-	const ShaderParametersLayout& Layout = Parameters.GetStructMetaData()->GetLayout();
+	const ShaderParametersLayout& Layout = WDeferredBasePassPSParameters::FTypeInfo::GetStructMetaData()->GetLayout();
 
 	{
 		const WEngine::WArray<ShaderParametersLayout::ResourceInfo>& Uniforms = Layout.GetUniforms();

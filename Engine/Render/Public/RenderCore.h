@@ -16,9 +16,10 @@ enum class EVertexInputType : uint8
 	PositionAndColor,
 };
 
-enum class EFormat : uint16
+enum class EFormat : uint8
 {
-	R8_SInt = 0,
+	Unknown = 0,
+	R8_SInt,
 	R8_UInt,
 	R8_UNorm,
 	R8_SNorm,
@@ -217,20 +218,20 @@ enum class EBlendOP : uint8
 	BlendMax,
 };
 
-enum class AttachmentLoadOP
+enum class EAttachmentLoadOP : uint8
 {
 	Load = 0,
 	DontCare,
 	Clear,
 };
 
-enum class AttachmentStoreOP
+enum class EAttachmentStoreOP : uint8
 {
 	Store = 0,
 	DontCare,
 };
 
-enum class AttachmentLayout
+enum class EAttachmentLayout : uint8
 {
 	Undefined = 0,
 	Present,
