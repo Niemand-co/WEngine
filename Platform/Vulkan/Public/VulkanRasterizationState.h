@@ -19,6 +19,7 @@ namespace Vulkan
 		VkPipelineInputAssemblyStateCreateInfo InputAssemblyStateCreateInfo;
 
 		friend class VulkanDevice;
+		friend class VulkanPipelineStateManager;
 
 	};
 

@@ -9,6 +9,7 @@ namespace Vulkan
 		uint32 VertexInputKey;
 		uint16 RasterizationSamples;
 		uint32 Topology;
+		uint32 SubpassIndex;
 
 		struct FBlendAttachment
 		{
@@ -152,7 +153,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanGraphicsPipelineStateObject(class VulkanDevice* pInDevice, VkGraphicsPipelineCreateInfo* pInfo);
+		VulkanGraphicsPipelineStateObject(class VulkanDevice* pInDevice, const GfxPipelineDesc& InDesc);
 
 		virtual ~VulkanGraphicsPipelineStateObject();
 
@@ -165,9 +166,11 @@ namespace Vulkan
 		class VulkanDevice *pDevice;
 		class VulkanRenderPass *RenderPass;
 		class VulkanLayout *Layout;
+		GfxPipelineDesc Desc;
 
 		VkPipeline Pipeline;
 
+		friend class VulkanPipelineStateManager;
 	};
 
 	class VulkanComputePipelineStateObject : public RHIPipelineStateObject
@@ -184,7 +187,7 @@ namespace Vulkan
 		{
 		}
 
-		VulkanGraphicsPipelineDescriptorState* RHICreateGraphicsPipelineState(const RHIGraphicsPipelineStateInitializer& Initializer);
+		VulkanGraphicsPipelineStateObject* RHICreateGraphicsPipelineState(const RHIGraphicsPipelineStateInitializer& Initializer);
 
 		VulkanGraphicsPipelineStateObject* GetGraphicsPipelineState(uint32 ID)
 		{
@@ -196,6 +199,10 @@ namespace Vulkan
 		}
 
 		void CreateGfxEntry(const RHIGraphicsPipelineStateInitializer& Initializer, class VulkanDescriptorSetLayout& DescriptorSetLayout, GfxPipelineDesc& Desc);
+
+		bool CreateGfxPipelineFromtEntry(const RHIGraphicsPipelineStateInitializer& Initializer, VulkanGraphicsPipelineStateObject* PSO);
+
+		void GetShaderModule(const RHIGraphicsPipelineStateInitializer& Initializer, VkShaderModule OutShaderModules[(uint8)EShaderStage::Count], const char* OutShaderEntries[(uint8)EShaderStage::Count]);
 
 		VulkanComputePipelineStateObject* GetComputePipelineState(uint32 ID)
 		{

@@ -43,7 +43,7 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 			RE_ASSERT(false, "Error pass feature.");
 		}
 
-		PipelineInfo.MultiSampleState = RenderState.MultiSampleState;
+		Initializer.MultiSampleState = RenderState.MultiSampleState;
 
 		Initializer.BoundShaderState.VertexShaderRHI = PassShader->GetVertexShader();
 		Initializer.BoundShaderState.GeometryShaderRHI = PassShader->GetGeometryShader();

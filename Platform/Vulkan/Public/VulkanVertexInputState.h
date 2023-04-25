@@ -22,9 +22,12 @@ namespace Vulkan
 
 		WEngine::WArray<VkVertexInputBindingDescription> Bindings;
 
+		uint32 NumAttributes = 0;
+
 		WEngine::WHashMap<uint32, uint32> BindingToStream;
 
 		friend class VulkanDevice;
+		friend class VulkanPipelineStateManager;
 
 	};
 

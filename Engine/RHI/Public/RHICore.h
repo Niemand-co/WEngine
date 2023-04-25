@@ -471,7 +471,7 @@ namespace WEngine
 		return VK_FORMAT_MAX_ENUM;
 	}
 
-	static VkShaderStageFlags ToVulkan(EShaderStage Stage)
+	static VkShaderStageFlagBits ToVulkan(EShaderStage Stage)
 	{
 		switch (Stage)
 		{
@@ -481,6 +481,14 @@ namespace WEngine
 			return VK_SHADER_STAGE_GEOMETRY_BIT;
 		case EShaderStage::Pixel:
 			return VK_SHADER_STAGE_FRAGMENT_BIT;
+		case EShaderStage::RayGen:
+			return VK_SHADER_STAGE_RAYGEN_BIT_NV;
+		case EShaderStage::RayMiss:
+			return VK_SHADER_STAGE_MISS_BIT_NV;
+		case EShaderStage::RayHitGroup:
+			return VK_SHADER_STAGE_ANY_HIT_BIT_NV;
+		case EShaderStage::RayCallable:
+			return VK_SHADER_STAGE_CALLABLE_BIT_NV;
 		default:
 			RE_ASSERT(false, "Error Type Shader Stage.")
 		}

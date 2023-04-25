@@ -33,12 +33,12 @@ namespace Vulkan
 			if ((StreamIndexBitMask & (1 << BindingIndex)) != 0)
 			{
 				BindingToStream[BindingIndex] = Bindings.Size();
-				VertexInputAttributes[BindingIndex].binding = Bindings.Size();
+				VertexInputBindings[BindingIndex].binding = Bindings.Size();
 				Bindings.Push(VertexInputBindings[BindingIndex]);
 			}
 		}
 
-		uint32 NumAttributes = 0;
+		NumAttributes = 0;
 		for (const VertexInputElement& Element : Elements)
 		{
 			if(!(1 << Element.AttribIndex) || !BindingToStream.Find(Element.StreamIndex))

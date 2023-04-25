@@ -55,8 +55,8 @@ void RHIRenderCommandList::BeginTransition(WEngine::WArray<RHIBarrierDescriptor>
 
 void RHIRenderCommandList::SetGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& GraphicsPipelineState)
 {
-    RHIPipelineStateObject *RHIPipelineState = 
-    GetDynamicRHI()->RHISetGraphicsPipelineState(GraphicsPipelineState);
+    RHIPipelineStateObject *RHIPipelineState = CreateGraphicsPipelineState(GraphicsPipelineState);
+    GetDynamicRHI()->RHISetGraphicsPipelineState(RHIPipelineState);
 }
 
 void RHIRenderCommandList::BindVertexBuffer(WVertexFactory* InVertexFactory)

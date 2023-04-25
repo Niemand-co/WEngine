@@ -288,8 +288,13 @@ enum class ECullMode : uint8
 enum class EShaderStage : uint8
 {
 	Vertex = 0,
-	Geometry = 1,
-	Pixel = 2,
+	Pixel = 1,
+	Geometry = 2,
+	RayGen = 3,
+	RayMiss = 4,
+	RayHitGroup = 5,
+	RayCallable = 6,
+	Count = 7,
 };
 
 enum class EVertexElementType : uint32
