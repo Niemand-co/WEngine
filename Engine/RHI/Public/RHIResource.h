@@ -21,6 +21,7 @@ enum ERHIResourceType : uint8
 	RRT_Subresource,
 	RRT_Device,
 	RRT_State,
+	RRT_PSO,
 };
 
 class RHIResource
@@ -151,6 +152,9 @@ public:
 
 	using TRenderTargetFormats = WEngine::WStaticArray<uint8 /* EFormat */, MaxSimultaneousRenderTargets>;
 	using TRenderTargetFlags = WEngine::WStaticArray<uint16 /* ETextureCreateFlags */, MaxSimultaneousRenderTargets>;
+	using TRenderTargetLoadOps = WEngine::WStaticArray<uint8 /* EAttachmentLoadOp */, MaxSimultaneousRenderTargets>;
+	using TRenderTargetStoreOps = WEngine::WStaticArray<uint8 /* EAttachmentStoreOp */, MaxSimultaneousRenderTargets>;
+	using TRenderTargetInitialLayouts = WEngine::WStaticArray<uint8 /* EAttachmentLayout */, MaxSimultaneousRenderTargets>;
 
 	RHIGraphicsPipelineStateInitializer()
 		: BlendState(nullptr),
@@ -161,30 +165,40 @@ public:
 		  RenderTargetEnabled(0),
 		  RenderTargetFormats(EFormat::Unknown),
 		  RenderTargetFlags(ETextureCreateFlags::TextureCreate_None),
+		  RenderTargetLoadOps(EAttachmentLoadOP::Load),
+		  RenderTargetStoreOps(EAttachmentStoreOP::DontCare),
+		  RenderTargetInitialLayouts(EAttachmentLayout::Undefined),
+		  DepthStencilFormat(EFormat::Unknown),
 		  DepthTargetLoadAction(EAttachmentLoadOP::DontCare),
 		  DepthTargetStoreAction(EAttachmentStoreOP::DontCare),
 		  StencilTargetLoadAction(EAttachmentLoadOP::DontCare),
 		  StencilTargetStoreAction(EAttachmentStoreOP::DontCare),
-		  SubpassIndex(0)
+		  SubpassIndex(0),
+		  NumSamples(0)
 	{
 	}
 
 	RHIGraphicsPipelineStateInitializer
 	(
-		RHIBoundShaderStateInput InBoundShaderState,
-		RHIBlendState*           InBlendState,
-		RHIDepthStencilState*    InDepthStencilState,
-		RHIRasterizationState*   InRasterizationState,
-		RHIMultiSampleState*     InMultiSampleState,
-		EPrimitiveTopology		 InPrimitiveType,
-		uint32					 InRenderTargetEnabled,
-		TRenderTargetFormats	 InRenderTargetFormats,
-		TRenderTargetFlags		 InRenderTargetFlags,
-		EAttachmentLoadOP		 InDepthTargetLoadAction,
-		EAttachmentStoreOP		 InDepthTargetStoreAction,
-		EAttachmentLoadOP		 InStencilTargetLoadAction,
-		EAttachmentStoreOP		 InStencilTargetStoreAction,
-		uint8					 InSubpassIndex
+		RHIBoundShaderStateInput    InBoundShaderState,
+		RHIBlendState*              InBlendState,
+		RHIDepthStencilState*       InDepthStencilState,
+		RHIRasterizationState*      InRasterizationState,
+		RHIMultiSampleState*        InMultiSampleState,
+		EPrimitiveTopology		    InPrimitiveType,
+		uint32					    InRenderTargetEnabled,
+		TRenderTargetFormats	    InRenderTargetFormats,
+		TRenderTargetFlags		    InRenderTargetFlags,
+		TRenderTargetLoadOps        InRenderTargetLoadOps,
+		TRenderTargetStoreOps       InRenderTargetStoreOps,
+		TRenderTargetInitialLayouts InRenderTargetInitialLayouts,
+		EFormat                     InDepthStencilFormat,
+		EAttachmentLoadOP		    InDepthTargetLoadAction,
+		EAttachmentStoreOP		    InDepthTargetStoreAction,
+		EAttachmentLoadOP		    InStencilTargetLoadAction,
+		EAttachmentStoreOP		    InStencilTargetStoreAction,
+		uint8					    InSubpassIndex,
+		uint16                      InNumSamples
 	)
 		: BoundShaderState(InBoundShaderState),
 		  BlendState(InBlendState),
@@ -195,29 +209,38 @@ public:
 		  RenderTargetEnabled(InRenderTargetEnabled),
 		  RenderTargetFormats(InRenderTargetFormats),
 		  RenderTargetFlags(InRenderTargetFlags),
+		  RenderTargetLoadOps(InRenderTargetLoadOps),
+		  RenderTargetStoreOps(InRenderTargetStoreOps),
+		  RenderTargetInitialLayouts(InRenderTargetInitialLayouts),
+		  DepthStencilFormat(InDepthStencilFormat),
 		  DepthTargetLoadAction(InDepthTargetLoadAction),
 		  DepthTargetStoreAction(InDepthTargetStoreAction),
 		  StencilTargetLoadAction(InStencilTargetLoadAction),
 		  StencilTargetStoreAction(InStencilTargetStoreAction),
-		  SubpassIndex(InSubpassIndex)
+		  SubpassIndex(InSubpassIndex),
+		  NumSamples(InNumSamples)
 	{
 	}
 
 	bool operator==(const RHIGraphicsPipelineStateInitializer& Other)
 	{
-		return BlendState == Other.BlendState                             &&
-			   DepthStencilState == Other.DepthStencilState               &&
-			   RasterizationState == Other.RasterizationState             &&
-			   MultiSampleState == Other.MultiSampleState                 &&
-			   PrimitiveType == Other.PrimitiveType                       &&
-			   RenderTargetEnabled == Other.RenderTargetEnabled           &&
-			   RenderTargetFormats == Other.RenderTargetFormats           &&
-			   RenderTargetFlags == Other.RenderTargetFlags               &&
-			   DepthTargetLoadAction == Other.DepthTargetLoadAction       &&
-			   DepthTargetStoreAction == Other.DepthTargetStoreAction     &&
-			   StencilTargetLoadAction == Other.StencilTargetLoadAction   &&
-			   StencilTargetStoreAction == Other.StencilTargetStoreAction &&
-			   SubpassIndex == Other.SubpassIndex;
+		return BlendState == Other.BlendState                                 &&
+			   DepthStencilState == Other.DepthStencilState                   &&
+			   RasterizationState == Other.RasterizationState                 &&
+			   MultiSampleState == Other.MultiSampleState                     &&
+			   PrimitiveType == Other.PrimitiveType                           &&
+			   RenderTargetEnabled == Other.RenderTargetEnabled               &&
+			   RenderTargetFormats == Other.RenderTargetFormats               &&
+			   RenderTargetFlags == Other.RenderTargetFlags				      &&
+			   RenderTargetLoadOps == Other.RenderTargetLoadOps               &&
+			   RenderTargetStoreOps == Other.RenderTargetStoreOps             &&
+			   RenderTargetInitialLayouts == Other.RenderTargetInitialLayouts &&
+			   DepthTargetLoadAction == Other.DepthTargetLoadAction           &&
+			   DepthTargetStoreAction == Other.DepthTargetStoreAction         &&
+			   StencilTargetLoadAction == Other.StencilTargetLoadAction       &&
+			   StencilTargetStoreAction == Other.StencilTargetStoreAction     &&
+			   SubpassIndex == Other.SubpassIndex                             &&
+			   NumSamples == Other.NumSamples;
 	}
 
 	uint32 GetValidRenderTargetNum()
@@ -236,20 +259,25 @@ public:
 
 public:
 
-	RHIBoundShaderStateInput BoundShaderState;
-	RHIBlendState*           BlendState;
-	RHIDepthStencilState*    DepthStencilState;
-	RHIRasterizationState*   RasterizationState;
-	RHIMultiSampleState*     MultiSampleState;
+	RHIBoundShaderStateInput    BoundShaderState;
+	RHIBlendState*              BlendState;
+	RHIDepthStencilState*       DepthStencilState;
+	RHIRasterizationState*      RasterizationState;
+	RHIMultiSampleState*        MultiSampleState;
 
-	EPrimitiveTopology   PrimitiveType;
-	uint32				 RenderTargetEnabled;
-	TRenderTargetFormats RenderTargetFormats;
-	TRenderTargetFlags   RenderTargetFlags;
-	EAttachmentLoadOP    DepthTargetLoadAction;
-	EAttachmentStoreOP   DepthTargetStoreAction;
-	EAttachmentLoadOP    StencilTargetLoadAction;
-	EAttachmentStoreOP   StencilTargetStoreAction;
-
-	uint8                SubpassIndex;
+	EPrimitiveTopology		    PrimitiveType;
+	uint32					    RenderTargetEnabled;
+	TRenderTargetFormats	    RenderTargetFormats;
+	TRenderTargetLoadOps        RenderTargetLoadOps;
+	TRenderTargetStoreOps       RenderTargetStoreOps;
+	TRenderTargetInitialLayouts RenderTargetInitialLayouts;
+	TRenderTargetFlags		    RenderTargetFlags;
+	EFormat                     DepthStencilFormat;
+	EAttachmentLoadOP		    DepthTargetLoadAction;
+	EAttachmentStoreOP		    DepthTargetStoreAction;
+	EAttachmentLoadOP		    StencilTargetLoadAction;
+	EAttachmentStoreOP		    StencilTargetStoreAction;
+							    
+	uint8					    SubpassIndex;
+	uint16					    NumSamples;
 };

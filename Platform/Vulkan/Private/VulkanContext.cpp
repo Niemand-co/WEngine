@@ -52,7 +52,7 @@ namespace Vulkan
 			Info.clearValueCount = ClearValues.Size();
 			Info.pClearValues = ClearValues.GetData();
 			Info.renderArea.offset = { 0, 0 };
-			Info.renderArea.extent = { FramebufferDescriptor->extent.width, FramebufferDescriptor->extent.height };
+			Info.renderArea.extent = { FramebufferDescriptor->Extent.width, FramebufferDescriptor->Extent.height };
 		}
 		vkCmdBeginRenderPass(CmdBuffer->GetHandle(), &Info, VK_SUBPASS_CONTENTS_INLINE);
 		CmdBuffer->State = VulkanCommandBuffer::ECmdState::IsInsideRenderPass;
@@ -231,9 +231,9 @@ namespace Vulkan
 		}
 	}
 
-	void VulkanDynamicContext::RHISetGraphicsPipelineState(RHIPipelineStateObject *GraphicsPipelineState)
+	void VulkanDynamicContext::RHISetGraphicsPipelineState(RHIGraphicsPipelineState *GraphicsPipelineState)
 	{
-		VulkanGraphicsPipelineStateObject *Pipeline = static_cast<VulkanGraphicsPipelineStateObject*>(GraphicsPipelineState);
+		VulkanGraphicsPipelineState *Pipeline = ResourceCast(GraphicsPipelineState);
 		if (PendingState->SetGfxPipeline(Pipeline, false))
 		{
 			

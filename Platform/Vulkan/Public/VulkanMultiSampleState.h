@@ -17,6 +17,7 @@ namespace Vulkan
 		VkPipelineMultisampleStateCreateInfo MultiSampleStateCreateInfo;
 
 		friend class VulkanDevice;
+		friend class VulkanPipelineStateManager;
 
 	};
 

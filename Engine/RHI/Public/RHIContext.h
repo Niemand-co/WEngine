@@ -91,7 +91,7 @@ public:
 
 	virtual void RHICopyImageToBackBuffer(class RHITexture* SrcTexture, WTextureRHIRef DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY) = 0;
 
-	virtual void RHISetGraphicsPipelineState(class RHIPipelineStateObject *GraphicsPipelineState) = 0;
+	virtual void RHISetGraphicsPipelineState(class RHIGraphicsPipelineState *GraphicsPipelineState) = 0;
 
 	virtual void RHISetShaderUniformBuffer(class RHIGraphicsShader *ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer) = 0;
 

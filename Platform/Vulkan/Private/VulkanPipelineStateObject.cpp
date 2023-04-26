@@ -4,33 +4,53 @@
 namespace Vulkan
 {
 
-	VulkanGraphicsPipelineStateObject::VulkanGraphicsPipelineStateObject(VulkanDevice *pInDevice, const GfxPipelineDesc& InDesc)
+	VulkanGraphicsPipelineState::VulkanGraphicsPipelineState(VulkanDevice *pInDevice, const RHIGraphicsPipelineStateInitializer& Initializer, const GfxPipelineDesc& InDesc)
 		: pDevice(pInDevice),
 		  Desc(InDesc)
 	{
+		WEngine::Memzero(VulkanShaders, sizeof(VulkanShaders));
+		VulkanShaders[(uint8)EShaderStage::Vertex] = ResourceCast(Initializer.BoundShaderState.VertexShaderRHI);
+		VulkanShaders[(uint8)EShaderStage::Pixel] = ResourceCast(Initializer.BoundShaderState.PixelShaderRHI);
+		VulkanShaders[(uint8)EShaderStage::Geometry] = ResourceCast(Initializer.BoundShaderState.GeometryShaderRHI);
 	}
 
-	VulkanGraphicsPipelineStateObject::~VulkanGraphicsPipelineStateObject()
+	VulkanGraphicsPipelineState::~VulkanGraphicsPipelineState()
 	{
 	}
 
-	void VulkanGraphicsPipelineStateObject::Bind(RHICommandBuffer* CmdBuffer)
+	void VulkanGraphicsPipelineState::Bind(RHICommandBuffer* CmdBuffer)
 	{
 		vkCmdBindPipeline(static_cast<VulkanCommandBuffer*>(CmdBuffer)->GetHandle(), VK_PIPELINE_BIND_POINT_GRAPHICS, Pipeline);
 	}
 
-	VulkanGraphicsPipelineStateObject* VulkanPipelineStateManager::RHICreateGraphicsPipelineState(const RHIGraphicsPipelineStateInitializer& Initializer)
+	VulkanGraphicsPipelineState* VulkanPipelineStateManager::RHICreateGraphicsPipelineState(const RHIGraphicsPipelineStateInitializer& Initializer)
 	{
+		uint32 PSOKey;
 		GfxPipelineDesc Desc;
 		VulkanDescriptorSetLayout DescriptorSetLayout;
-		CreateGfxEntry(Initializer, DescriptorSetLayout, Desc);
+		{
+			CreateGfxEntry(Initializer, DescriptorSetLayout, Desc);
+			PSOKey = Desc.GetKey();
+		}
 
-		VulkanGraphicsPipelineStateObject *NewPSO = new VulkanGraphicsPipelineStateObject(pDevice, Desc);
+		VulkanGraphicsPipelineState *NewPSO = nullptr;
+		{
+			WEngine::WScopeLock Lock(&GraphicsPSOLock);
+			if (GraphicsPipelines.Find(PSOKey))
+			{
+				NewPSO = GraphicsPipelines[PSOKey];
+				return NewPSO;
+			}
+		}
+
+		NewPSO = new VulkanGraphicsPipelineState(pDevice, Initializer, Desc);
+		NewPSO->RenderPass = GetDynamicRHI()->RHICreateRenderPass();
 		if (!CreateGfxPipelineFromtEntry(Initializer, NewPSO))
 		{
 			
 			return nullptr;
 		}
+
 
 		return NewPSO;
 	}
@@ -50,6 +70,12 @@ namespace Vulkan
 		}
 		
 		Desc.SubpassIndex = Initializer.SubpassIndex;
+
+		VulkanMultiSampleState *MultiSampleState = ResourceCast(Initializer.MultiSampleState);
+		Desc.RasterizationSamples = MultiSampleState->MultiSampleStateCreateInfo.rasterizationSamples;
+		Desc.RasterizationSamples = MultiSampleState->MultiSampleStateCreateInfo.alphaToCoverageEnable == VK_TRUE;
+
+		Desc.Topology = (uint32)(ResourceCast(Initializer.RasterizationState)->InputAssemblyStateCreateInfo.topology);
 
 		Desc.ColorBlendAttachmentStates.AddInitialized(Initializer.RenderTargetEnabled);
 		for (int32 Index = 0; Index < Initializer.RenderTargetEnabled; ++Index)
@@ -75,7 +101,7 @@ namespace Vulkan
 		}
 
 	}
-	bool VulkanPipelineStateManager::CreateGfxPipelineFromtEntry(const RHIGraphicsPipelineStateInitializer& Initializer, VulkanGraphicsPipelineStateObject* PSO)
+	bool VulkanPipelineStateManager::CreateGfxPipelineFromtEntry(const RHIGraphicsPipelineStateInitializer& Initializer, VulkanGraphicsPipelineState* PSO)
 	{
 		const GfxPipelineDesc& Desc = PSO->Desc;
 
@@ -105,6 +131,8 @@ namespace Vulkan
 
 		VkPipelineMultisampleStateCreateInfo MultiSampleStateInfo;
 		ZeroVulkanStruct(MultiSampleStateInfo, VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO);
+		MultiSampleStateInfo.rasterizationSamples = (VkSampleCountFlagBits)WEngine::Max<uint16>(1u, Desc.RasterizationSamples);
+		MultiSampleStateInfo.alphaToCoverageEnable = Desc.UseAlphaToCoverage;
 		GfxPipelineCreateInfo.pMultisampleState = &MultiSampleStateInfo;
 		
 		VkPipelineVertexInputStateCreateInfo VertexInputStateInfo;
@@ -162,7 +190,7 @@ namespace Vulkan
 		GfxPipelineCreateInfo.pDynamicState = &DynamicStateInfo;
 
 		GfxPipelineCreateInfo.renderPass = PSO->RenderPass->GetHandle();
-		GfxPipelineCreateInfo.layout = PSO->Layout;
+		GfxPipelineCreateInfo.layout = PSO->Layout->GetHandle();
 		GfxPipelineCreateInfo.subpass = Desc.SubpassIndex;
 
 		VkResult Result = vkCreateGraphicsPipelines(pDevice->GetHandle(), VK_NULL_HANDLE, 1, &GfxPipelineCreateInfo, ResourceCast(NormalAllocator::Get())->GetCallbacks(), &PSO->Pipeline);
@@ -315,6 +343,101 @@ namespace Vulkan
 		OutState.back.writeMask = BackWriteMask;
 		OutState.back.compareMask = BackCompareMask;
 		OutState.back.reference = BackReference;
+	}
+
+	void GfxPipelineDesc::FRenderTargets::FAttachmentReference::ReadFrom(const VkAttachmentReference& InState)
+	{
+		AttachmentIndex = InState.attachment;
+		Layout = (uint64)InState.layout;
+	}
+
+	void GfxPipelineDesc::FRenderTargets::FAttachmentReference::WriteInto(VkAttachmentReference& OutState) const
+	{
+		OutState.attachment = AttachmentIndex;
+		OutState.layout = (VkImageLayout)Layout;
+	}
+
+	void GfxPipelineDesc::FRenderTargets::FAttachment::ReadFrom(const VkAttachmentDescription& InState)
+	{
+		Format = (uint32)InState.format;
+		Flags = InState.flags;
+		LoadOp = (uint8)InState.loadOp;
+		StoreOp = (uint8)InState.storeOp;
+		StencilLoadOp = (uint8)InState.stencilLoadOp;
+		StencilStoreOp = (uint8)InState.stencilStoreOp;
+		InitialLayout = (uint64)InState.initialLayout;
+		FinalLayout = (uint64)InState.finalLayout;
+	}
+
+	void GfxPipelineDesc::FRenderTargets::FAttachment::WriteInto(VkAttachmentDescription& OutState) const
+	{
+		OutState.format = (VkFormat)Format;
+		OutState.flags = Flags;
+		OutState.loadOp = (VkAttachmentLoadOp)LoadOp;
+		OutState.storeOp = (VkAttachmentStoreOp)StoreOp;
+		OutState.loadOp = (VkAttachmentLoadOp)LoadOp;
+		OutState.stencilStoreOp = (VkAttachmentStoreOp)StencilStoreOp;
+		OutState.initialLayout = (VkImageLayout)InitialLayout;
+		OutState.finalLayout = (VkImageLayout)FinalLayout;
+	}
+
+	void GfxPipelineDesc::FRenderTargets::ReadFrom(const VulkanRenderTargetLayout& InState)
+	{
+		NumAttachments = InState.NumAttachments;
+		NumColorAttachments = InState.NumColorAttachments;
+		bHasDepthStencil = InState.bHasDepthStencilAttachment;
+		bHasResolveAttachments = InState.bHasResolveAttachments;
+		NumUsedClearValues = InState.NumUsedClearValues;
+
+		RenderPassHash = InState.Hash;
+
+		auto CopyAttachmentRefs = [&](WEngine::WArray<FAttachmentReference>& Desc, const VkAttachmentReference *Src, uint32 Count)
+		{
+			Desc.Resize(Count);
+			for (uint32 Index = 0; Index < Count; ++Index)
+			{
+				Desc[Index].ReadFrom(Src[Index]);
+			}
+		};
+		CopyAttachmentRefs(ColorAttachments, InState.ColorReferences, InState.NumColorAttachments);
+		DepthStencil.ReadFrom(InState.DepthStencilReference);
+
+		Attachments.Resize(InState.NumAttachments);
+		for (uint32 Index = 0; Index < InState.NumAttachments; ++Index)
+		{
+			Attachments[Index].ReadFrom(InState.Attachments[Index]);
+		}
+	}
+
+	void GfxPipelineDesc::FRenderTargets::WriteInto(VulkanRenderTargetLayout& OutState) const
+	{
+		OutState.NumAttachments = NumAttachments;
+		OutState.NumColorAttachments = NumColorAttachments;
+		OutState.bHasDepthStencilAttachment = bHasDepthStencil;
+		OutState.bHasResolveAttachments = bHasResolveAttachments;
+		OutState.NumUsedClearValues = NumUsedClearValues;
+
+		OutState.Hash = RenderPassHash;
+
+		auto CopyAttachmentRefs = [&](const WEngine::WArray<FAttachmentReference>& Desc, VkAttachmentReference* Src, uint32 Count)
+		{
+			for (uint32 Index = 0; Index < Count; ++Index)
+			{
+				Desc[Index].WriteInto(Src[Index]);
+			}
+		};
+		CopyAttachmentRefs(ColorAttachments, OutState.ColorReferences, OutState.NumColorAttachments);
+		DepthStencil.WriteInto(OutState.DepthStencilReference);
+
+		for (uint32 Index = 0; Index < OutState.NumAttachments; ++Index)
+		{
+			Attachments[Index].WriteInto(OutState.Attachments[Index]);
+		}
+	}
+
+	uint32 GfxPipelineDesc::GetKey() const
+	{
+		return WEngine::MemCrc32(this, sizeof(GfxPipelineDesc));
 	}
 
 }

@@ -10,7 +10,7 @@ void GetPassAccess(EPassFlag Flag, EAccess& SRVAccess, EAccess& UAVAccess);
 struct WRDGRenderTargetBinding
 {
 	WRDGTexture* Texture = nullptr;
-	AttachmentLoadOP LoadOP = AttachmentLoadOP::DontCare;
+	EAttachmentLoadOP LoadOP = EAttachmentLoadOP::DontCare;
 	uint8 MipIndex = 0;
 	uint8 ArrayIndex = -1;
 
@@ -23,8 +23,8 @@ struct WRDGRenderTargetBinding
 struct WRDGDepthStencilBinding
 {
 	WRDGTexture *Texture = nullptr;
-	AttachmentLoadOP DepthLoadOP = AttachmentLoadOP::DontCare;
-	AttachmentLoadOP StencilLoadOP = AttachmentLoadOP::DontCare;
+	EAttachmentLoadOP DepthLoadOP = EAttachmentLoadOP::DontCare;
+	EAttachmentLoadOP StencilLoadOP = EAttachmentLoadOP::DontCare;
 
 	bool operator==(const WRDGDepthStencilBinding& other) const
 	{

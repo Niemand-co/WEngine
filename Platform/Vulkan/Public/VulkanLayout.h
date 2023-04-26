@@ -11,6 +11,8 @@ namespace Vulkan
 
 		virtual ~VulkanLayout();
 
+		VkPipelineLayout GetHandle() const { return PipelineLayout; }
+
 	private:
 
 		VulkanDevice *pDevice;

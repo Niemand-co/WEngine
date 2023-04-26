@@ -250,15 +250,15 @@ namespace WEngine
 		return VK_BLEND_OP_MAX_ENUM;
 	}
 
-	static VkAttachmentLoadOp ToVulkan(AttachmentLoadOP op)
+	static VkAttachmentLoadOp ToVulkan(EAttachmentLoadOP op)
 	{
 		switch (op)
 		{
-		case AttachmentLoadOP::Load:
+		case EAttachmentLoadOP::Load:
 			return VK_ATTACHMENT_LOAD_OP_LOAD;
-		case AttachmentLoadOP::DontCare:
+		case EAttachmentLoadOP::DontCare:
 			return VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		case AttachmentLoadOP::Clear:
+		case EAttachmentLoadOP::Clear:
 			return VK_ATTACHMENT_LOAD_OP_CLEAR;
 		default:
 			RE_ASSERT(false, "Error Type Attachment Load Operation.");
@@ -266,13 +266,13 @@ namespace WEngine
 		return VK_ATTACHMENT_LOAD_OP_MAX_ENUM;
 	}
 
-	static VkAttachmentStoreOp ToVulkan(AttachmentStoreOP op)
+	static VkAttachmentStoreOp ToVulkan(EAttachmentStoreOP op)
 	{
 		switch (op)
 		{
-		case AttachmentStoreOP::Store:
+		case EAttachmentStoreOP::Store:
 			return VK_ATTACHMENT_STORE_OP_STORE;
-		case AttachmentStoreOP::DontCare:
+		case EAttachmentStoreOP::DontCare:
 			return VK_ATTACHMENT_STORE_OP_DONT_CARE;
 		default:
 			RE_ASSERT(false, "Error Type Attachment Store Operation.");
@@ -324,29 +324,29 @@ namespace WEngine
 		return VK_DESCRIPTOR_TYPE_MAX_ENUM;
 	}
 
-	static VkImageLayout ToVulkan(AttachmentLayout layout)
+	static VkImageLayout ToVulkan(EAttachmentLayout layout)
 	{
 		switch (layout)
 		{
-		case AttachmentLayout::Undefined:
+		case EAttachmentLayout::Undefined:
 			return VK_IMAGE_LAYOUT_UNDEFINED;
-		case AttachmentLayout::Present:
+		case EAttachmentLayout::Present:
 			return VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-		case AttachmentLayout::BlitSrc:
+		case EAttachmentLayout::BlitSrc:
 			return VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-		case AttachmentLayout::BlitDst:
+		case EAttachmentLayout::BlitDst:
 			return VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-		case AttachmentLayout::Attachment:
+		case EAttachmentLayout::Attachment:
 			return VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
-		case AttachmentLayout::ColorBuffer:
+		case EAttachmentLayout::ColorBuffer:
 			return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-		case AttachmentLayout::DepthBuffer:
+		case EAttachmentLayout::DepthBuffer:
 			return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		case AttachmentLayout::General:
+		case EAttachmentLayout::General:
 			return VK_IMAGE_LAYOUT_GENERAL;
-		case AttachmentLayout::ReadOnlyColor:
+		case EAttachmentLayout::ReadOnlyColor:
 			return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		case AttachmentLayout::ReadOnlyDepth:
+		case EAttachmentLayout::ReadOnlyDepth:
 			return VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 		default:
 			RE_ASSERT(false, "Error Type Image Layout.");

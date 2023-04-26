@@ -6,10 +6,10 @@ namespace Vulkan
 
 	struct GfxPipelineDesc
 	{
-		uint32 VertexInputKey;
 		uint16 RasterizationSamples;
 		uint32 Topology;
-		uint32 SubpassIndex;
+		uint8 UseAlphaToCoverage;
+		uint8 SubpassIndex;
 
 		struct FBlendAttachment
 		{
@@ -147,15 +147,103 @@ namespace Vulkan
 		};
 		FDepthStencil DepthStencil;
 
+		struct FRenderTargets
+		{
+			struct FAttachmentReference
+			{
+				uint32 AttachmentIndex;
+				uint64 Layout;
+
+				void ReadFrom(const VkAttachmentReference& InState);
+				void WriteInto(VkAttachmentReference& OutState) const;
+				bool operator==(const FAttachmentReference& Other) const
+				{
+					return AttachmentIndex == Other.AttachmentIndex && Layout == Other.Layout;
+				}
+			};
+			WEngine::WArray<FAttachmentReference> ColorAttachments;
+			WEngine::WArray<FAttachmentReference> ResolveAttachments;
+			FAttachmentReference DepthStencil;
+
+			struct FAttachment
+			{
+				uint32 Format;
+				uint8 Flags;
+				uint8 Samples;
+				uint8 LoadOp;
+				uint8 StoreOp;
+				uint8 StencilLoadOp;
+				uint8 StencilStoreOp;
+				uint64 InitialLayout;
+				uint64 FinalLayout;
+
+				void ReadFrom(const VkAttachmentDescription& InState);
+				void WriteInto(VkAttachmentDescription& OutState) const;
+				bool operator==(const FAttachment& Other) const
+				{
+					return Format == Other.Format &&
+						   Flags == Other.Flags &&
+						   Samples == Other.Samples &&
+						   LoadOp == Other.LoadOp &&
+						   StoreOp == Other.StoreOp &&
+						   StencilLoadOp == Other.StencilStoreOp &&
+						   StencilStoreOp == Other.StencilStoreOp &&
+						   InitialLayout == Other.InitialLayout &&
+						   FinalLayout == Other.FinalLayout;
+				}
+			};
+			WEngine::WArray<FAttachment> Attachments;
+
+			uint8 NumAttachments;
+			uint8 NumColorAttachments;
+			uint8 bHasDepthStencil;
+			uint8 bHasResolveAttachments;
+			uint8 NumUsedClearValues;
+			uint32 RenderPassHash;
+			glm::vec3 Extent3D;
+
+			void ReadFrom(const VulkanRenderTargetLayout& InState);
+			void WriteInto(VulkanRenderTargetLayout& OutState) const;
+			bool operator==(const FRenderTargets& Other) const
+			{
+				return ColorAttachments == Other.ColorAttachments &&
+					   ResolveAttachments == Other.ResolveAttachments &&
+					   DepthStencil == Other.DepthStencil &&
+					   Attachments == Other.Attachments &&
+					   NumAttachments == Other.NumAttachments &&
+					   NumColorAttachments == Other.NumColorAttachments &&
+					   bHasDepthStencil == Other.bHasDepthStencil &&
+					   bHasResolveAttachments == Other.bHasResolveAttachments &&
+					   NumUsedClearValues == Other.NumUsedClearValues &&
+					   Extent3D == Other.Extent3D;
+			}
+		};
+		FRenderTargets RenderTargets;
+
+		bool operator==(const GfxPipelineDesc& Other) const
+		{
+			return RasterizationSamples == Other.RasterizationSamples &&
+				   Topology == Other.Topology &&
+				   UseAlphaToCoverage == Other.UseAlphaToCoverage &&
+				   SubpassIndex == Other.SubpassIndex &&
+				   ColorBlendAttachmentStates == Other.ColorBlendAttachmentStates &&
+				   Rasterizer == Other.Rasterizer &&
+				   DepthStencil == Other.DepthStencil &&
+				   VertexBindings == Other.VertexBindings &&
+				   VertexAttributes == Other.VertexAttributes &&
+				   RenderTargets == Other.RenderTargets;
+		}
+
+		uint32 GetKey() const;
 	};
 
-	class VulkanGraphicsPipelineStateObject : public RHIPipelineStateObject
+	class VulkanGraphicsPipelineState : public RHIGraphicsPipelineState
 	{
 	public:
 
-		VulkanGraphicsPipelineStateObject(class VulkanDevice* pInDevice, const GfxPipelineDesc& InDesc);
+		VulkanGraphicsPipelineState(class VulkanDevice* pInDevice, const RHIGraphicsPipelineStateInitializer& Initializer, const GfxPipelineDesc& InDesc);
 
-		virtual ~VulkanGraphicsPipelineStateObject();
+		virtual ~VulkanGraphicsPipelineState();
 
 		virtual void Bind(class RHICommandBuffer *CmdBuffer) override;
 
@@ -168,12 +256,14 @@ namespace Vulkan
 		class VulkanLayout *Layout;
 		GfxPipelineDesc Desc;
 
+		VulkanShaderBase* VulkanShaders[(uint8)EShaderStage::Count];
+
 		VkPipeline Pipeline;
 
 		friend class VulkanPipelineStateManager;
 	};
 
-	class VulkanComputePipelineStateObject : public RHIPipelineStateObject
+	class VulkanComputePipelineState : public RHIComputePipelineState
 	{
 
 	};
@@ -187,49 +277,21 @@ namespace Vulkan
 		{
 		}
 
-		VulkanGraphicsPipelineStateObject* RHICreateGraphicsPipelineState(const RHIGraphicsPipelineStateInitializer& Initializer);
-
-		VulkanGraphicsPipelineStateObject* GetGraphicsPipelineState(uint32 ID)
-		{
-			if (GraphicsPipelines.Find(ID))
-			{
-				return GraphicsPipelines[ID];
-			}
-			return nullptr;
-		}
+		VulkanGraphicsPipelineState* RHICreateGraphicsPipelineState(const RHIGraphicsPipelineStateInitializer& Initializer);
 
 		void CreateGfxEntry(const RHIGraphicsPipelineStateInitializer& Initializer, class VulkanDescriptorSetLayout& DescriptorSetLayout, GfxPipelineDesc& Desc);
 
-		bool CreateGfxPipelineFromtEntry(const RHIGraphicsPipelineStateInitializer& Initializer, VulkanGraphicsPipelineStateObject* PSO);
+		bool CreateGfxPipelineFromtEntry(const RHIGraphicsPipelineStateInitializer& Initializer, VulkanGraphicsPipelineState* PSO);
 
 		void GetShaderModule(const RHIGraphicsPipelineStateInitializer& Initializer, VkShaderModule OutShaderModules[(uint8)EShaderStage::Count], const char* OutShaderEntries[(uint8)EShaderStage::Count]);
-
-		VulkanComputePipelineStateObject* GetComputePipelineState(uint32 ID)
-		{
-			if (ComputePipelines.Find(ID))
-			{
-				return ComputePipelines[ID];
-			}
-			return nullptr;
-		}
-
-		void AddGraphicsPipelineState(uint32 ID, VulkanGraphicsPipelineStateObject* Pipeline)
-		{
-			GraphicsPipelines.Insert(ID, Pipeline);
-		}
-
-		void AddComputePipelineState(uint32 ID, VulkanComputePipelineStateObject* Pipeline)
-		{
-			ComputePipelines.Insert(ID, Pipeline);
-		}
 
 	private:
 
 		VulkanDevice *pDevice;
 
-		WEngine::WHashMap<uint32, VulkanGraphicsPipelineStateObject*> GraphicsPipelines;
+		WCriticalSection GraphicsPSOLock;
 
-		WEngine::WHashMap<uint32, VulkanComputePipelineStateObject*> ComputePipelines;
+		WEngine::WHashMap<uint32, VulkanGraphicsPipelineState*> GraphicsPipelines;
 
 	};
 

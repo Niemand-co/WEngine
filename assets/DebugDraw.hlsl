@@ -1,12 +1,14 @@
 struct VSInput
 {
 	float3 Position : POSITION;
+	min16float3 Color : COLOR;
 	// int index : SV_VertexID;
 };
 
 struct VSOutput
 {
 	float4 Position : SV_POSITION;
+	min16float3 Color : TEXCOORD0;
 };
 
 struct SceneData
@@ -22,7 +24,7 @@ VSOutput VSMain(VSInput input)
 	// output.Position = mul(sceneData.VP, float4(input.Position, 1.0));
 	output.Position = float4(input.Position, 1.0);
 	// output.Position.y *= -1.0f;
-    // output.Color = input.Color;
+    output.Color = input.Color;
 	return output;
 }
 

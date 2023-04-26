@@ -69,8 +69,8 @@ RHIRenderPassDescriptor WRDGParameterStruct::GetRenderPassInfo() const
 	RenderTargets.Enumerate([&descriptor, &ColorAttachmentIndex](const WRDGRenderTargetBinding& RenderTarget)
 	{
 		WRDGTexture *Texture = RenderTarget.Texture;
-		AttachmentStoreOP StoreOp = WEngine::EnumHasFlags(Texture->Desc.Flags, ETextureCreateFlags::TextureCreate_CPUReadable) ? AttachmentStoreOP::DontCare : AttachmentStoreOP::Store;
-		AttachmentLoadOP LoadOp = RenderTarget.LoadOP;
+		EAttachmentStoreOP StoreOp = WEngine::EnumHasFlags(Texture->Desc.Flags, ETextureCreateFlags::TextureCreate_CPUReadable) ? EAttachmentStoreOP::DontCare : EAttachmentStoreOP::Store;
+		EAttachmentLoadOP LoadOp = RenderTarget.LoadOP;
 
 		{
 			descriptor.ColorAttachmentDescriptors[ColorAttachmentIndex].attachmentFormat = Texture->Desc.Format;
@@ -87,10 +87,10 @@ RHIRenderPassDescriptor WRDGParameterStruct::GetRenderPassInfo() const
 	if (DepthStencil.Texture)
 	{
 		WRDGTexture *Texture = DepthStencil.Texture;
-		AttachmentStoreOP DepthStoreOp = Texture->Desc.IsDepthFormat() ? AttachmentStoreOP::Store : AttachmentStoreOP::DontCare;
-		AttachmentStoreOP StencilStoreOp = Texture->Desc.IsStencilFormat() ? AttachmentStoreOP::Store : AttachmentStoreOP::DontCare;
-		AttachmentLoadOP DepthLoadOp = DepthStencil.DepthLoadOP;
-		AttachmentLoadOP StencilLoadOp = DepthStencil.StencilLoadOP;
+		EAttachmentStoreOP DepthStoreOp = Texture->Desc.IsDepthFormat() ? EAttachmentStoreOP::Store : EAttachmentStoreOP::DontCare;
+		EAttachmentStoreOP StencilStoreOp = Texture->Desc.IsStencilFormat() ? EAttachmentStoreOP::Store : EAttachmentStoreOP::DontCare;
+		EAttachmentLoadOP DepthLoadOp = DepthStencil.DepthLoadOP;
+		EAttachmentLoadOP StencilLoadOp = DepthStencil.StencilLoadOP;
 
 		descriptor.DepthStencilAttachmentDescriptor.attachmentFormat = Texture->Desc.Format;
 		descriptor.DepthStencilAttachmentDescriptor.attachmentLoadOP = DepthLoadOp;
@@ -115,18 +115,18 @@ RHIFramebufferDescriptor WRDGParameterStruct::GetFramebufferInfo() const
 	{
 		WRDGTexture *Texture = RenderTarget.Texture;
 		descriptor.Attachments[NumColorAttachment++] = (WTextureRHIRef)Texture->GetRHI();
-		descriptor.extent.width = Texture->Desc.Extent.width < descriptor.extent.width ? Texture->Desc.Extent.width : descriptor.extent.width;
-		descriptor.extent.height = Texture->Desc.Extent.height < descriptor.extent.height ? Texture->Desc.Extent.height : descriptor.extent.height;
-		descriptor.extent.depth = Texture->Desc.Extent.depth < descriptor.extent.depth ? Texture->Desc.Extent.depth : descriptor.extent.depth;
+		descriptor.Extent.width = Texture->Desc.Extent.width < descriptor.Extent.width ? Texture->Desc.Extent.width : descriptor.Extent.width;
+		descriptor.Extent.height = Texture->Desc.Extent.height < descriptor.Extent.height ? Texture->Desc.Extent.height : descriptor.Extent.height;
+		descriptor.Extent.depth = Texture->Desc.Extent.depth < descriptor.Extent.depth ? Texture->Desc.Extent.depth : descriptor.Extent.depth;
 	});
 
 	WRDGTexture *DepthStencil = RenderTargets.DepthStencilTexture.Texture;
 	if (DepthStencil)
 	{
 		descriptor.Attachments[NumColorAttachment++] = (WTextureRHIRef)DepthStencil->GetRHI();
-		descriptor.extent.width = DepthStencil->Desc.Extent.width < descriptor.extent.width ? DepthStencil->Desc.Extent.width : descriptor.extent.width;
-		descriptor.extent.height = DepthStencil->Desc.Extent.height < descriptor.extent.height ? DepthStencil->Desc.Extent.height : descriptor.extent.height;
-		descriptor.extent.depth = DepthStencil->Desc.Extent.depth < descriptor.extent.depth ? DepthStencil->Desc.Extent.depth : descriptor.extent.depth;
+		descriptor.Extent.width = DepthStencil->Desc.Extent.width < descriptor.Extent.width ? DepthStencil->Desc.Extent.width : descriptor.Extent.width;
+		descriptor.Extent.height = DepthStencil->Desc.Extent.height < descriptor.Extent.height ? DepthStencil->Desc.Extent.height : descriptor.Extent.height;
+		descriptor.Extent.depth = DepthStencil->Desc.Extent.depth < descriptor.Extent.depth ? DepthStencil->Desc.Extent.depth : descriptor.Extent.depth;
 	}
 	descriptor.AttachmentCount = NumColorAttachment;
 

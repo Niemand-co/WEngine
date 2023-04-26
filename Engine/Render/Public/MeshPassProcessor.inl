@@ -11,15 +11,22 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 
 	RHIGraphicsPipelineStateInitializer Initializer = {};
 	{
-		uint32 BlendIndex = 0;
-		for (; BlendIndex < MaxSimultaneousRenderTargets; ++BlendIndex)
+		
+		for (uint32 BlendIndex = 0; BlendIndex < MaxSimultaneousRenderTargets; ++BlendIndex)
 		{
 			if(RenderState.BlendStates[BlendIndex] == nullptr)
 				break;
 			Initializer.BlendState->SetAttachmentBlendState(BlendIndex, RenderState.BlendStates[BlendIndex]);
+			Initializer.RenderTargetFormats[BlendIndex] = RenderState.RenderTargets[BlendIndex].Format;
+			Initializer.RenderTargetLoadOps[BlendIndex] = RenderState.RenderTargets[BlendIndex].LoadOp;
+			Initializer.RenderTargetStoreOps[BlendIndex] = RenderState.RenderTargets[BlendIndex].StoreOp;
+			Initializer.RenderTargetInitialLayouts[BlendIndex] = RenderState.RenderTargets[BlendIndex].InitialLayout;
+			Initializer.RenderTargetEnabled++;
 		}
 
-		Initializer.RenderTargetEnabled = BlendIndex;
+		Initializer.DepthStencilFormat = RenderState.DepthStencil.Format;
+		Initializer.DepthStencilLoadAction = RenderState.DepthStencil.LoadOp;
+		Initializer.DepthTargetStoreAction = RenderState.DepthStencil.StoreOp;
 
 		Initializer.DepthStencilState = RenderState.DepthStencilState;
 
@@ -48,6 +55,7 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 		Initializer.BoundShaderState.VertexShaderRHI = PassShader->GetVertexShader();
 		Initializer.BoundShaderState.GeometryShaderRHI = PassShader->GetGeometryShader();
 		Initializer.BoundShaderState.PixelShaderRHI = PassShader->GetPixelShader();
+
 	}
 
 	for (uint32 ElementIndex = 0; ElementIndex < MeshBatch.Elements.Size(); ++ElementIndex)

@@ -54,7 +54,7 @@
 #include "Math/Matrix.h"
 #include "Log/Public/Logger.h"
 #include "Platform/Vulkan/Allocator/Public/VulkanAllocator.h"
-#include "Platform/Vulkan/Public/VulkanMacro.h"
+#include "Platform/Vulkan/Public/VulkanRHIPrivate.h"
 #include "Render/Public/RenderCore.h"
 #include "Render/Public/RenderResource.h"
 #include "RHI/Public/RHIResource.h"

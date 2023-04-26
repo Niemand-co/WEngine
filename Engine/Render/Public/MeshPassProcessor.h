@@ -26,7 +26,23 @@ public:
 
 	void SetDepthStencilState(const WDepthStencilStateRHIRef& InDepthStencilState) { DepthStencilState = InDepthStencilState; }
 
-	void SetBlendState(uint32 AttachmentIndex, const WBlendStateRHIRef& InBlendState) { BlendStates[AttachmentIndex] = InBlendState; }
+	void SetBlendState(uint32 AttachmentIndex, const WAttachmentBlendStateRHIRef& InBlendState) { BlendStates[AttachmentIndex] = InBlendState; }
+
+	void SetRenderTarget(uint32 AttachmentIndex, EFormat Format, EAttachmentLoadOP LoadOp, EAttachmentStoreOP StoreOp, EAttachmentLayout InitialLayout)
+	{
+		RenderTargets[AttachmentIndex].Format = Format;
+		RenderTargets[AttachmentIndex].LoadOp = LoadOp;
+		RenderTargets[AttachmentIndex].StoreOp = StoreOp;
+		RenderTargets[AttachmentIndex].InitialLayout = InitialLayout;
+	}
+
+	void SetDepthStencil(EFormat Format, EAttachmentLoadOP LoadOp, EAttachmentStoreOP StoreOp, EAttachmentLayout InitialLayout)
+	{
+		DepthStencil.Format = Format;
+		DepthStencil.LoadOp = LoadOp;
+		DepthStencil.StoreOp = StoreOp;
+		DepthStencil.InitialLayout = InitialLayout;
+	}
 
 	void SetRasterizationState(const WRasterizationStateRHIRef& InRasterizationState) { RasterizationState = InRasterizationState; }
 
@@ -34,17 +50,29 @@ public:
 
 	const WDepthStencilStateRHIRef& GetDepthStencilState() const { return DepthStencilState; }
 
-	const WBlendStateRHIRef& GetBlendState(uint32 AttachmentIndex) const { return BlendStates[AttachmentIndex]; }
+	const WAttachmentBlendStateRHIRef& GetBlendState(uint32 AttachmentIndex) const { return BlendStates[AttachmentIndex]; }
 
 	const WRasterizationStateRHIRef& GetRasterizationState() const { return RasterizationState; }
 
 	const WMultiSampleStateRHIRef& GetMultiSamlpState() const { return MultiSampleState; }
 
+	struct RenderTarget
+	{
+		EFormat Format = EFormat::Unknown;
+		EAttachmentLoadOP LoadOp = EAttachmentLoadOP::Load;
+		EAttachmentStoreOP StoreOp = EAttachmentStoreOP::DontCare;
+		EAttachmentLayout InitialLayout = EAttachmentLayout::ColorBuffer;
+	};
+	
 private:
 
 	WDepthStencilStateRHIRef DepthStencilState = nullptr;
 
-	WBlendStateRHIRef BlendStates[MaxSimultaneousRenderTargets] = {0};
+	WAttachmentBlendStateRHIRef BlendStates[MaxSimultaneousRenderTargets] = {0};
+
+	RenderTarget RenderTargets[MaxSimultaneousRenderTargets];
+
+	RenderTarget DepthStencil;
 
 	WRasterizationStateRHIRef RasterizationState = nullptr;
 

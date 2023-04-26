@@ -111,6 +111,24 @@ namespace WEngine
 			return *this;
 		}
 
+		bool operator==(const WArray<T>& Other) const
+		{
+			if (ArrayNum != Other.ArrayNum)
+			{
+				return false;
+			}
+
+			for (uint32 Index = 0; Index < ArrayNum; ++Index)
+			{
+				if (Data[Index] != Other[Index])
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
 		void* operator new(size_t size)
 		{
 			return NormalAllocator::Get()->Allocate(size);

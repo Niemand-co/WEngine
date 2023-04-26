@@ -58,9 +58,9 @@ namespace Vulkan
 
 		virtual void RHICopyImageToBackBuffer(RHITexture* SrcTexture, RHITexture* DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY) override;
 
-		virtual void RHISetGraphicsPipelineState(RHIPipelineStateObject *GraphicsPipelineState) override;
+		virtual void RHISetGraphicsPipelineState(RHIGraphicsPipelineState *GraphicsPipelineState) override;
 
-		virtual void RHISetShaderUniformBuffer(class RHIGraphicsShader* ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer) override;
+		virtual void RHISetShaderUniformBuffer(RHIGraphicsShader* ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer) override;
 
 		virtual void RHIUpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void* Contents) override;
 

@@ -17,7 +17,7 @@ namespace Vulkan
 			Scissors.SetNumZeroed(1);
 		}
 
-		bool SetGfxPipeline(class VulkanGraphicsPipelineStateObject* InGfxPipeline, bool bForceReset);
+		bool SetGfxPipeline(class VulkanGraphicsPipelineState* InGfxPipeline, bool bForceReset);
 
 		void PrepareForDraw(class VulkanCommandBuffer *CmdBuffer);
 
@@ -30,7 +30,7 @@ namespace Vulkan
 
 		float WireLineWidth = 1.0f;
 
-		class VulkanGraphicsPipelineStateObject* CurrentPipelineState;
+		class VulkanGraphicsPipelineState* CurrentPipelineState;
 		class VulkanGraphicsPipelineDescriptorState *CurrentState;
 	};
 

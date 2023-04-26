@@ -1,5 +1,10 @@
 #pragma once
 
+class RHIGraphicsPipelineState;
+class RHIComputePipelineState;
+class RHIFence;
+class RHISemaphore;
+
 namespace Vulkan
 {
 
@@ -101,13 +106,13 @@ namespace Vulkan
 	};
 
 	template<>
-	struct TVulkanResourceTraits<class RHIFence>
+	struct TVulkanResourceTraits<RHIFence>
 	{
 		typedef class VulkanFence type;
 	};
 
 	template<>
-	struct TVulkanResourceTraits<class RHISemaphore>
+	struct TVulkanResourceTraits<RHISemaphore>
 	{
 		typedef class VulkanSemaphore type;
 	};
@@ -128,6 +133,18 @@ namespace Vulkan
 	struct TVulkanResourceTraits<NormalAllocator>
 	{
 		typedef VulkanAllocator type;
+	};
+
+	template<>
+	struct TVulkanResourceTraits<RHIGraphicsPipelineState>
+	{
+		typedef class VulkanGraphicsPipelineState type;
+	};
+
+	template<>
+	struct TVulkanResourceTraits<RHIComputePipelineState>
+	{
+		typedef class VulkanComputePipelineState type;
 	};
 
 	template<typename RHIType>

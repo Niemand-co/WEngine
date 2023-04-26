@@ -7,7 +7,6 @@
 #include "Scene/Components/Public/MaterialComponent.h"
 
 BEGIN_SHADER_PARAMETERS_STRUCT(DeferredBasePassParameters)
-	SHADER_PARAMETER_TEXTURE(Texture2D, sa)
 	RENDER_TARGET_SLOTS()
 END_SHADER_PARAMETERS_STRUCT
 
@@ -18,7 +17,6 @@ void DeferredRenderer::RenderBasePass(WRDGBuilder& GraphBuilder, WViewInfo& View
 
 	DeferredBasePassParameters* Parameters = GraphBuilder.AllocateParameterStruct<DeferredBasePassParameters>();
 	Parameters->RenderTarget.ColorTextures[0].Texture = GBuffer0;
-	Parameters->sa = GetRenderCommandList()->CreateTexture(RHITextureDesc::CreateTexture2D(EFormat::A16R16G16B16_SFloat, {1, 0, 0, 0}, {1024, 1024}, 1, 1, ETextureCreateFlags::TextureCreate_SRV));
 
 	GraphBuilder.AddPass("BasePass", Parameters, [&View, this](RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
 	{
@@ -27,6 +25,7 @@ void DeferredRenderer::RenderBasePass(WRDGBuilder& GraphBuilder, WViewInfo& View
 		WMeshPassProcessorRenderState RenderState;
 
 		RenderState.SetBlendState(0, TStaticBlendStateRHI<true, EBlendOP::BlendAdd, EBlendFactor::FactorSrcAlpha, EBlendFactor::FactorOneMinusSrcAlpha>::GetRHI());
+		RenderState.SetRenderTarget(0, EFormat::B8G8R8A8_UNorm, EAttachmentLoadOP::Clear, EAttachmentStoreOP::Store, EAttachmentLayout::Undefined);
 		RenderState.SetDepthStencilState(TStaticDepthStencilStateRHI<false, false>::GetRHI());
 		RenderState.SetRasterizationState(TStaticRasterizationStateRHI<ECullMode::None>::GetRHI());
 		RenderState.SetMultiSampleState(TStaticMultiSampleStateRHI<>::GetRHI());
