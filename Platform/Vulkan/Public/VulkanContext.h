@@ -66,6 +66,8 @@ namespace Vulkan
 
 		virtual RHIPipelineStateObject* RHICreateGraphicsPipelineState(class RHIGraphicsPipelineStateInitializer& Initializer) override;
 
+		virtual WSamplerStateRHIRef RHICreateSamplerState(const RHISamplerStateInitializer& Initializer) override;
+
 	private:
 
 		VulkanCommandBufferManager *pCommandBufferManager;

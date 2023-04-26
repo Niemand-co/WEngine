@@ -256,9 +256,9 @@ enum class ResourceType
 
 enum class EFilter : uint8
 {
-	Linear = 0,
-	Nearest,
-	Cube,
+	FL_Linear = 0,
+	FL_Nearest,
+	FL_Cube,
 };
 
 enum class EPolygonMode : uint8

@@ -4,6 +4,18 @@
 namespace Vulkan
 {
 
+	class VulkanShaderCodeHeader
+	{
+	public:
+
+		struct FUniformBufferInfo
+		{
+			uint32 LayoutHash;
+		};
+		WEngine::WArray<FUniformBufferInfo> UniformBuffers;
+
+	};
+
 	class VulkanShaderBase : public VulkanResource
 	{
 	public:

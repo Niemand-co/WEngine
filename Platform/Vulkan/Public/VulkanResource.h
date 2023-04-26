@@ -4,6 +4,7 @@ class RHIGraphicsPipelineState;
 class RHIComputePipelineState;
 class RHIFence;
 class RHISemaphore;
+class RHIDevice;
 
 namespace Vulkan
 {
@@ -145,6 +146,12 @@ namespace Vulkan
 	struct TVulkanResourceTraits<RHIComputePipelineState>
 	{
 		typedef class VulkanComputePipelineState type;
+	};
+
+	template<>
+	struct TVulkanResourceTraits<RHIDevice>
+	{
+		typedef class VulkanDevice type;
 	};
 
 	template<typename RHIType>

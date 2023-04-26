@@ -17,6 +17,7 @@ enum ERHIResourceType : uint8
 	RRT_ComputePipelineState,
 	RRT_UnorderedAccessView,
 	RRT_ShaderResourceView,
+	RRT_SamplerState,
 	RRT_Barrier,
 	RRT_Subresource,
 	RRT_Device,
@@ -120,6 +121,17 @@ struct RHIMultiSampleStateInitializer
 	float MinSampleShading = 0.f;
 	bool bEnableAlphaToCoverage = false;
 	bool bEnableAlphaToOne = false;
+};
+
+struct RHISamplerStateInitializer
+{
+	EFilter Filter = EFilter::FL_Linear;
+	ESamplerAddressMode ModeU = ESamplerAddressMode::AM_Clamp;
+	ESamplerAddressMode ModeV = ESamplerAddressMode::AM_Clamp;
+	ESamplerAddressMode ModeW = ESamplerAddressMode::AM_Clamp;
+	int32 MipBias = 0;
+	int32 MaxAnisotropy = 1;
+	uint32 BorderColor = 0;
 };
 
 struct RHIBoundShaderStateInput

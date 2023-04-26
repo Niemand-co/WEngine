@@ -109,7 +109,9 @@ public:
 
 	WMultiSampleStateRHIRef CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer);
 
-	class RHIPipelineStateObject* CreateGraphicsPipelineState(class RHIGraphicsPipelineStateInitializer& GraphicsPipelineState);
+	WSamplerStateRHIRef CreateSamplerState(const RHISamplerStateInitializer& Initialzer);
+
+	class RHIGraphicsPipelineState* CreateGraphicsPipelineState(class RHIGraphicsPipelineStateInitializer& GraphicsPipelineState);
 
 	WVertexInputStateRHIRef GetOrCreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements);
 

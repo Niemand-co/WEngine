@@ -22,7 +22,7 @@
 #include "Platform/Vulkan/Public/VulkanTexture.h"
 #include "Platform/Vulkan/Public/VulkanView.h"
 #include "Platform/Vulkan/Public/VulkanEvent.h"
-#include "Platform/Vulkan/Public/VulkanSampler.h"
+#include "Platform/Vulkan/Public/VulkanSamplerState.h"
 #include "Platform/Vulkan/Public/VulkanScissor.h"
 #include "Platform/Vulkan/Public/VulkanViewport.h"
 #include "Platform/Vulkan/Public/VulkanPipelineBarrier.h"

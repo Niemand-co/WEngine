@@ -93,7 +93,7 @@ template<
 	EBlendOP AlphaBlendOp = EBlendOP::BlendAdd,
 	EBlendFactor AlphaSrcFactor = EBlendFactor::FactorOne,
 	EBlendFactor AlphaDstFactor = EBlendFactor::FactorZero,
-	uint8 ColorWirteMask = 0xFF
+	uint8 ColorWriteMask = 0xFF
 >
 class TStaticBlendStateRHI : public TStaticStateRHI<TStaticBlendStateRHI<
 	bEnableBlend,
@@ -205,5 +205,47 @@ public:
 public:
 
 	WMultiSampleStateRHIRef StaticRHI;
+
+};
+
+template<
+	EFilter Filter = EFilter::FL_Linear,
+	ESamplerAddressMode ModeU = ESamplerAddressMode::AM_Clamp,
+	ESamplerAddressMode ModeV = ESamplerAddressMode::AM_Clamp,
+	ESamplerAddressMode ModeW = ESamplerAddressMode::AM_Clamp,
+	int32 MipBias = 0,
+	int32 MaxAnisotropy = 1,
+	uint32 BorderColor = 0
+>
+class TStaticSamplerStateRHI : public TStaticStateRHI<TStaticSamplerStateRHI<
+	Filter,
+	ModeU,
+	ModeV,
+	ModeW,
+	MipBias,
+	MaxAnisotropy,
+	BorderColor
+>, class RHISamplerState>
+{
+public:
+
+	TStaticSamplerStateRHI()
+	{
+		RHISamplerStateInitializer Initializer = 
+		{
+			Filter,
+			ModeU,
+			ModeV,
+			ModeW,
+			MipBias,
+			MaxAnisotropy,
+			BorderColor
+		};
+		StaticRHI = GetRenderCommandList()->CreateSamplerState(Initializer);
+	}
+
+public:
+
+	WSamplerStateRHIRef StaticRHI;
 
 };

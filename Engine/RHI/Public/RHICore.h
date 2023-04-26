@@ -358,16 +358,34 @@ namespace WEngine
 	{
 		switch (filter)
 		{
-		case EFilter::Linear:
+		case EFilter::FL_Linear:
 			return VK_FILTER_LINEAR;
-		case EFilter::Nearest:
+		case EFilter::FL_Nearest:
 			return VK_FILTER_NEAREST;
-		case EFilter::Cube:
+		case EFilter::FL_Cube:
 			return VK_FILTER_CUBIC_IMG;
 		default:
 			RE_ASSERT(false, "Error Type Filter.");
 		}
 		return VK_FILTER_MAX_ENUM;
+	}
+
+	static VkSamplerAddressMode ToVulkan(ESamplerAddressMode Mode)
+	{
+		switch (Mode)
+		{
+		case ESamplerAddressMode::AM_Border:
+			return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+		case ESamplerAddressMode::AM_Clamp:
+			return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		case ESamplerAddressMode::AM_Mirror:
+			return VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
+		case ESamplerAddressMode::AM_Repeat:
+			return VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		default:
+			RE_ASSERT(false, "Error Type Sampler Address Mode.");
+		}
+		return VK_SAMPLER_ADDRESS_MODE_MAX_ENUM;
 	}
 
 	static VkPolygonMode ToVulkan(EPolygonMode mode)
@@ -581,6 +599,14 @@ enum EShaderFrequency : uint8
 	SF_NumGraphicsFrequencies = 4,
 };
 
+enum ESamplerAddressMode : uint8
+{
+	AM_Clamp,
+	AM_Repeat,
+	AM_Mirror,
+	AM_Border,
+};
+
 typedef class RHIVertexBuffer* WVertexBufferRHIRef;
 typedef class RHIIndexBuffer* WIndexBufferRHIRef;
 typedef class RHIUniformBuffer* WUniformBufferRHIRef;
@@ -608,6 +634,7 @@ typedef class RHIBlendState* WBlendStateRHIRef;
 typedef class RHIDepthStencilState* WDepthStencilStateRHIRef;
 typedef class RHIRasterizationState* WRasterizationStateRHIRef;
 typedef class RHIMultiSampleState* WMultiSampleStateRHIRef;
+typedef class RHISamplerState* WSamplerStateRHIRef;
 typedef class RHIVertexInputState* WVertexInputStateRHIRef;
 
 struct VertexInputStreamElement

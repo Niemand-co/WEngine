@@ -55,7 +55,7 @@ void RHIRenderCommandList::BeginTransition(WEngine::WArray<RHIBarrierDescriptor>
 
 void RHIRenderCommandList::SetGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& GraphicsPipelineState)
 {
-    RHIPipelineStateObject *RHIPipelineState = CreateGraphicsPipelineState(GraphicsPipelineState);
+    RHIGraphicsPipelineState *RHIPipelineState = CreateGraphicsPipelineState(GraphicsPipelineState);
     GetDynamicRHI()->RHISetGraphicsPipelineState(RHIPipelineState);
 }
 
@@ -202,6 +202,11 @@ WRasterizationStateRHIRef RHIRenderCommandList::CreateRasterizationState(const R
 WMultiSampleStateRHIRef RHIRenderCommandList::CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer)
 {
     return GetStaticRHI()->CreateMultiSampleState(Initializer);
+}
+
+WSamplerStateRHIRef RHIRenderCommandList::CreateSamplerState(const RHISamplerStateInitializer& Initialzer)
+{
+    return GetDynamicRHI()->RHICreateSamplerState(Initializer);
 }
 
 WVertexInputStateRHIRef RHIRenderCommandList::GetOrCreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements)

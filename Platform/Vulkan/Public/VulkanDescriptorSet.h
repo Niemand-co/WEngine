@@ -2,6 +2,13 @@
 
 namespace Vulkan
 {
+	
+	struct UniformBufferGatherInfo
+	{
+		WEngine::WHashMap<uint32, VkShaderStageFlags> LayoutsToStageMap;
+
+		const class VulkanShaderCodeHeader *CodeHeaders[(uint8)EShaderStage::Count];
+	};
 
 	class VulkanDescriptorSetLayout : public VulkanResource
 	{
@@ -56,7 +63,9 @@ namespace Vulkan
 
 		WEngine::WArray<SetLayout>& GetLayouts() { return Layouts; }
 
-		void ProcessBindingForStage(VkShaderStageFlags ShaderStage);
+		void ProcessBindingForStage(VkShaderStageFlags ShaderStage, UniformBufferGatherInfo& OutGatherInfo, const class VulkanShaderCodeHeader& CodeHeader);
+
+		void FinalizeBindings(const VulkanDevice *Device, const UniformBufferGatherInfo& GatherInfo, const WEngine::WArray<RHISamplerState>)
 
 	private:
 

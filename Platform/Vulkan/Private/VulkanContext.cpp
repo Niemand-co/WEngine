@@ -281,6 +281,12 @@ namespace Vulkan
 		static_cast<VulkanDevice*>(pDevice)->GetPipelineStateManager();
 	}
 
+	WSamplerStateRHIRef VulkanDynamicContext::RHICreateSamplerState(const RHISamplerStateInitializer& Initializer)
+	{
+
+		VulkanSamplerStateManager *Manager = ResourceCast(pDevice)->GetSamplerStateManager();
+	}
+
 	WAttachmentBlendStateRHIRef VulkanStaticContext::CreateBlendState(const RHIBlendStateInitializer& Initializer)
 	{
 		return new VulkanAttachmentBlendState(Initializer);

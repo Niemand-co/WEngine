@@ -57,6 +57,8 @@ namespace Vulkan
 
 	void VulkanPipelineStateManager::CreateGfxEntry(const RHIGraphicsPipelineStateInitializer& Initializer, VulkanDescriptorSetLayout& DescriptorSetLayout, GfxPipelineDesc& Desc)
 	{
+		VulkanVertexShader
+
 		DescriptorSetLayout.ProcessBindingForStage(VK_SHADER_STAGE_VERTEX_BIT);
 
 		if (Initializer.BoundShaderState.PixelShaderRHI)

@@ -20,6 +20,7 @@ namespace Vulkan
 		pMemoryManager = new VulkanMemoryManager(this);
 		pStagingBufferManager = new VulkanStagingBufferManager(this);
 		pPipelineStateManager = new VulkanPipelineStateManager(this);
+		pSamplerStateManager = new VulkanSamplerStateManager(this);
 
 		vkGetPhysicalDeviceProperties(*pGPU->GetHandle(), &GPUProps);
 	}

@@ -23,8 +23,6 @@ void WMeshDrawCommand::SetParametersAndFinalize(const WMeshBatch& MeshBatch, uin
 {
 	const WMeshBatchElement& Element = MeshBatch.Elements[MeshBatchElementIndex];
 
-	VertexStream = Stream;
-
 	IndexBuffer = Element.IndexBuffer ? Element.IndexBuffer->GetRHI() : nullptr;
 	FirstIndex = Element.FirstIndex;
 	NumPrimitives = Element.NumPrimitives;

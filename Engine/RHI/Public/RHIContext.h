@@ -95,6 +95,8 @@ public:
 
 	virtual void RHISetShaderUniformBuffer(class RHIGraphicsShader *ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer) = 0;
 
+	virtual WSamplerStateRHIRef RHICreateSamplerState(const RHISamplerStateInitializer& Initializer) = 0;
+
 	inline class RHIInstance* GetInstance() const { return pInstance; }
 
 	class RHIGPU* GetGPU() const;
