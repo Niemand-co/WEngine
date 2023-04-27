@@ -44,33 +44,59 @@ namespace Vulkan
 		}
 
 		NewPSO = new VulkanGraphicsPipelineState(pDevice, Initializer, Desc);
-		NewPSO->RenderPass = GetDynamicRHI()->RHICreateRenderPass();
+		{
+			VulkanLayout *Layout = FindOrAddLayout(DescriptorSetLayout);
+			NewPSO->Layout = Layout;
+		}
+		NewPSO->RenderPass = ResourceCast(GetDynamicRHI()->RHICreateRenderPass(Initializer));
 		if (!CreateGfxPipelineFromtEntry(Initializer, NewPSO))
 		{
 			
 			return nullptr;
 		}
 
+		NewPSO->pVertexInputState = ResourceCast(Initializer.BoundShaderState.VertexInputState);
 
+		GraphicsPipelines.Insert(PSOKey, NewPSO);
 		return NewPSO;
+	}
+
+	VulkanLayout* VulkanPipelineStateManager::FindOrAddLayout(const VulkanDescriptorSetLayout& DescriptorSetLayout)
+	{
+		WEngine::WScopeLock Lock(&LayoutLock);
+		uint32 LayoutHash = DescriptorSetLayout.GetTypeHash();
+		if (Layouts.Find(LayoutHash))
+		{
+			return Layouts[LayoutHash];
+		}
 	}
 
 	void VulkanPipelineStateManager::CreateGfxEntry(const RHIGraphicsPipelineStateInitializer& Initializer, VulkanDescriptorSetLayout& DescriptorSetLayout, GfxPipelineDesc& Desc)
 	{
-		VulkanVertexShader
+		VulkanShaderBase *VulkanShaders[(uint8)EShaderStage::Count];
+		{
+			VulkanShaders[(uint8)EShaderStage::Vertex] = ResourceCast(Initializer.BoundShaderState.PixelShaderRHI);
+			VulkanShaders[(uint8)EShaderStage::Geometry] = ResourceCast(Initializer.BoundShaderState.GeometryShaderRHI);
+			VulkanShaders[(uint8)EShaderStage::Pixel] = ResourceCast(Initializer.BoundShaderState.PixelShaderRHI);
+		}
 
-		DescriptorSetLayout.ProcessBindingForStage(VK_SHADER_STAGE_VERTEX_BIT);
+		UniformBufferGatherInfo UBGatherInfo;
+		DescriptorSetLayout.ProcessBindingForStage(VK_SHADER_STAGE_VERTEX_BIT, UBGatherInfo, VulkanShaders[(uint8)EShaderStage::Vertex]->GetCodeHeader());
 
 		if (Initializer.BoundShaderState.PixelShaderRHI)
 		{
-			DescriptorSetLayout.ProcessBindingForStage(VK_SHADER_STAGE_FRAGMENT_BIT);
+			DescriptorSetLayout.ProcessBindingForStage(VK_SHADER_STAGE_FRAGMENT_BIT, UBGatherInfo, VulkanShaders[(uint8)EShaderStage::Pixel]->GetCodeHeader());
 		}
 
 		if (Initializer.BoundShaderState.GeometryShaderRHI)
 		{
-			DescriptorSetLayout.ProcessBindingForStage(VK_SHADER_STAGE_GEOMETRY_BIT);
+			DescriptorSetLayout.ProcessBindingForStage(VK_SHADER_STAGE_GEOMETRY_BIT, UBGatherInfo, VulkanShaders[(uint8)EShaderStage::Geometry]->GetCodeHeader());
 		}
 		
+		uint32 NumImmutableSamplerStates = Initializer.ImmutableSamplers.Size();
+		WEngine::WArray<RHISamplerState*> ImmutableSamplerStates(NumImmutableSamplerStates, NumImmutableSamplerStates > 0 ? Initializer.ImmutableSamplers[0] : nullptr);
+		DescriptorSetLayout.FinalizeBindings(pDevice, UBGatherInfo, ImmutableSamplerStates);
+
 		Desc.SubpassIndex = Initializer.SubpassIndex;
 
 		VulkanMultiSampleState *MultiSampleState = ResourceCast(Initializer.MultiSampleState);

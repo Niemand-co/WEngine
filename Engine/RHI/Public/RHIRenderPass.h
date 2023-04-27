@@ -1,8 +1,13 @@
 #pragma once
 
-class RHIRenderPass
+class RHIRenderPass : public RHIResource
 {
 public:
+
+	RHIRenderPass()
+		: RHIResource(ERHIResourceType::RRT_RenderPass)
+	{
+	}
 
 	virtual ~RHIRenderPass() = default;
 

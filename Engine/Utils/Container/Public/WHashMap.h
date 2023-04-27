@@ -82,6 +82,24 @@ namespace WEngine
 			return this->operator[](key);
 		}
 
+		const v& operator[](const k& key) const
+		{
+			size_t id = Hash(key);
+			size_t index = GetIndex(id);
+			Entry<k, v>* head = m_table[index];
+			while (head)
+			{
+				if (head->id == id)
+				{
+					return head->pair.Second();
+				}
+				head = head->next;
+			}
+
+			Insert(key, {});
+			return this->operator[](key);
+		}
+
 	private:
 
 		size_t GetIndex(const size_t& index);

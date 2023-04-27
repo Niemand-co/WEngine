@@ -66,49 +66,23 @@ namespace Vulkan
 		CmdBuffer->State = VulkanCommandBuffer::ECmdState::IsInsideBegin;
 	}
 
-	void VulkanDynamicContext::RHISetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth)
+	void VulkanDynamicContext::RHISetViewport(float MinX, float MinY, float MaxX, float MaxY, float MinZ, float MaxZ)
 	{
-		VulkanCommandBuffer* CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
-		VkViewport Viewport = { X, Y, Width, Height, MinDepth, MaxDepth };
-		vkCmdSetViewport(CmdBuffer->GetHandle(), 0, 1, &Viewport);
+		PendingState->SetViewport(MinX, MinY, MinZ, MaxX, MaxY, MaxZ);
 	}
 
-	void VulkanDynamicContext::RHISetScissor(int32 OffsetX, int32 OffsetY, uint32 Width, uint32 Height)
+	void VulkanDynamicContext::RHISetScissor(uint32 MinX, uint32 MinY, uint32 Width, uint32 Height)
 	{
-		VulkanCommandBuffer* CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
-		VkRect2D Scissor = { OffsetX, OffsetY, Width, Height };
-		vkCmdSetScissor(CmdBuffer->GetHandle(), 0, 1, &Scissor);
+		PendingState->SetScissorRect(MinX, MinY, Width, Height);
 	}
 
 	void VulkanDynamicContext::RHIBindVertexBuffer(WVertexFactory *InVertexFactory)
 	{
 	}
 
-	void VulkanDynamicContext::RHISetStreamResource(const VertexInputStream& InStream)
+	void VulkanDynamicContext::RHISetStreamResource(uint32 StreamIndex, WVertexBufferRHIRef Buffer, uint32 Offset)
 	{
-		struct WTemporalVB
-		{
-			VkBuffer VertexBuffers[MaxVertexInputElementCount];
-			VkDeviceSize Offsets[MaxVertexInputElementCount];
-			int32 NumUsed = 0;
-
-			void Add(VkBuffer InBuffer, VkDeviceSize InOffset)
-			{
-				RE_ASSERT(NumUsed < MaxVertexInputElementCount, "Too many vertex input.");
-				VertexBuffers[NumUsed] = InBuffer;
-				Offsets[NumUsed] = InOffset;
-				++NumUsed;
-			}
-		} TemporalVB;
-
-		for (uint32 StreamIndex = 0; StreamIndex < InStream.Size(); ++StreamIndex)
-		{
-			const VertexInputStreamElement& Element = InStream[StreamIndex];
-			TemporalVB.Add(static_cast<VulkanVertexBuffer*>(Element.VertexBuffer)->GetHandle(), Element.Offset);
-		}
-
-		VulkanCommandBuffer* CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
-		vkCmdBindVertexBuffers(CmdBuffer->GetHandle(), 0, TemporalVB.NumUsed, TemporalVB.VertexBuffers, TemporalVB.Offsets);
+		PendingState->SetStreamSource(StreamIndex, ResourceCast(Buffer)->GetHandle(), Offset);
 	}
 
 	void VulkanDynamicContext::RHIBindIndexBuffer(WIndexBufferRHIRef InIndexBuffer)
@@ -234,9 +208,14 @@ namespace Vulkan
 	void VulkanDynamicContext::RHISetGraphicsPipelineState(RHIGraphicsPipelineState *GraphicsPipelineState)
 	{
 		VulkanGraphicsPipelineState *Pipeline = ResourceCast(GraphicsPipelineState);
-		if (PendingState->SetGfxPipeline(Pipeline, false))
+
+		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
+		bool bForceResetPipeline = !CmdBuffer->bHasPipeline;
+
+		if (PendingState->SetGfxPipeline(Pipeline, bForceResetPipeline))
 		{
-			
+			PendingState->Bind(CmdBuffer);
+			CmdBuffer->bHasPipeline = true;
 		}
 	}
 
@@ -278,13 +257,28 @@ namespace Vulkan
 
 	RHIPipelineStateObject* VulkanDynamicContext::RHICreateGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& Initializer)
 	{
-		static_cast<VulkanDevice*>(pDevice)->GetPipelineStateManager();
+		return static_cast<VulkanDevice*>(pDevice)->GetPipelineStateManager()->RHICreateGraphicsPipelineState(Initializer);
+	}
+
+	RHIRenderPass* VulkanDynamicContext::RHICreateRenderPass(const RHIGraphicsPipelineStateInitializer& Initializer)
+	{
+		VulkanRenderTargetLayout RTLayout(Initializer);
+		return ResourceCast(pDevice)->GetLayoutManager()->GetOrCreateRenderPass(RTLayout);
 	}
 
 	WSamplerStateRHIRef VulkanDynamicContext::RHICreateSamplerState(const RHISamplerStateInitializer& Initializer)
 	{
+		VkSamplerCreateInfo Info;
+		VulkanSamplerState::SetupCreateInfo(Initializer, Info);
+		uint32 Key = WEngine::MemCrc32(&Info, sizeof(VkSamplerCreateInfo));
 
 		VulkanSamplerStateManager *Manager = ResourceCast(pDevice)->GetSamplerStateManager();
+		VulkanSamplerState *Sampler = Manager->GetSamplerState(Key);
+		if (!Sampler)
+		{
+			Sampler = new VulkanSamplerState(ResourceCast(pDevice), Info);
+		}
+		return Sampler;
 	}
 
 	WAttachmentBlendStateRHIRef VulkanStaticContext::CreateBlendState(const RHIBlendStateInitializer& Initializer)

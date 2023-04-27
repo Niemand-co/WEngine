@@ -7,12 +7,14 @@ enum ERHIResourceType : uint8
 	RRT_VertexShader,
 	RRT_PixelShader,
 	RRT_GeometryShader,
+	RRT_CommandBuffer,
 	RRT_Texture,
 	RRT_Buffer,
 	RRT_BlendState,
 	RRT_RasterizationState,
 	RRT_DepthStencilState,
 	RRT_MultiSampleState,
+	RRT_RenderPass,
 	RRT_GraphicsPipelineState,
 	RRT_ComputePipelineState,
 	RRT_UnorderedAccessView,
@@ -167,12 +169,14 @@ public:
 	using TRenderTargetLoadOps = WEngine::WStaticArray<uint8 /* EAttachmentLoadOp */, MaxSimultaneousRenderTargets>;
 	using TRenderTargetStoreOps = WEngine::WStaticArray<uint8 /* EAttachmentStoreOp */, MaxSimultaneousRenderTargets>;
 	using TRenderTargetInitialLayouts = WEngine::WStaticArray<uint8 /* EAttachmentLayout */, MaxSimultaneousRenderTargets>;
+	using TImmutableSamplerStates = WEngine::WStaticArray<RHISamplerState*, 2>;
 
 	RHIGraphicsPipelineStateInitializer()
 		: BlendState(nullptr),
 		  DepthStencilState(nullptr),
 		  RasterizationState(nullptr),
 		  MultiSampleState(nullptr),
+		  ImmutableSamplers(nullptr),
 		  PrimitiveType(EPrimitiveTopology::TriangleList),
 		  RenderTargetEnabled(0),
 		  RenderTargetFormats(EFormat::Unknown),
@@ -197,6 +201,7 @@ public:
 		RHIDepthStencilState*       InDepthStencilState,
 		RHIRasterizationState*      InRasterizationState,
 		RHIMultiSampleState*        InMultiSampleState,
+		TImmutableSamplerStates     InImmutableSamplers,
 		EPrimitiveTopology		    InPrimitiveType,
 		uint32					    InRenderTargetEnabled,
 		TRenderTargetFormats	    InRenderTargetFormats,
@@ -217,6 +222,7 @@ public:
 		  DepthStencilState(InDepthStencilState),
 		  RasterizationState(InRasterizationState),
 		  MultiSampleState(InMultiSampleState),
+		  ImmutableSamplers(InImmutableSamplers),
 		  PrimitiveType(InPrimitiveType),
 		  RenderTargetEnabled(InRenderTargetEnabled),
 		  RenderTargetFormats(InRenderTargetFormats),
@@ -240,6 +246,7 @@ public:
 			   DepthStencilState == Other.DepthStencilState                   &&
 			   RasterizationState == Other.RasterizationState                 &&
 			   MultiSampleState == Other.MultiSampleState                     &&
+			   ImmutableSamplers == Other.ImmutableSamplers                   &&
 			   PrimitiveType == Other.PrimitiveType                           &&
 			   RenderTargetEnabled == Other.RenderTargetEnabled               &&
 			   RenderTargetFormats == Other.RenderTargetFormats               &&
@@ -276,6 +283,7 @@ public:
 	RHIDepthStencilState*       DepthStencilState;
 	RHIRasterizationState*      RasterizationState;
 	RHIMultiSampleState*        MultiSampleState;
+	TImmutableSamplerStates     ImmutableSamplers;
 
 	EPrimitiveTopology		    PrimitiveType;
 	uint32					    RenderTargetEnabled;

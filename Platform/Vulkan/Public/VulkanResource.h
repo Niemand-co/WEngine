@@ -5,6 +5,8 @@ class RHIComputePipelineState;
 class RHIFence;
 class RHISemaphore;
 class RHIDevice;
+class RHIRenderPass;
+class RHIVertexBuffer;
 
 namespace Vulkan
 {
@@ -49,31 +51,31 @@ namespace Vulkan
 	template<>
 	struct TVulkanResourceTraits<RHIBlendState>
 	{
-		typedef VulkanBlendState type;
+		typedef class VulkanBlendState type;
 	};
 
 	template<>
 	struct TVulkanResourceTraits<RHIVertexInputState>
 	{
-		typedef VulkanVertexInputState type;
+		typedef class VulkanVertexInputState type;
 	};
 
 	template<>
 	struct TVulkanResourceTraits<RHIDepthStencilState>
 	{
-		typedef VulkanDepthStencilState type;
+		typedef class VulkanDepthStencilState type;
 	};
 
 	template<>
 	struct TVulkanResourceTraits<RHIRasterizationState>
 	{
-		typedef VulkanRasterizationState type;
+		typedef class VulkanRasterizationState type;
 	};
 
 	template<>
 	struct TVulkanResourceTraits<RHIMultiSampleState>
 	{
-		typedef VulkanMultiSampleState type;
+		typedef class VulkanMultiSampleState type;
 	};
 
 	template<>
@@ -98,6 +100,12 @@ namespace Vulkan
 	struct TVulkanResourceTraits<RHITexture>
 	{
 		typedef class VulkanTexture type;
+	};
+
+	template<>
+	struct TVulkanResourceTraits<RHIVertexBuffer>
+	{
+		typedef class VulkanVertexBuffer type;
 	};
 
 	template<>
@@ -152,6 +160,12 @@ namespace Vulkan
 	struct TVulkanResourceTraits<RHIDevice>
 	{
 		typedef class VulkanDevice type;
+	};
+
+	template<>
+	struct TVulkanResourceTraits<RHIRenderPass>
+	{
+		typedef class VulkanRenderPass type;
 	};
 
 	template<typename RHIType>

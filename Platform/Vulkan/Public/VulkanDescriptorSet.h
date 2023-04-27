@@ -63,9 +63,11 @@ namespace Vulkan
 
 		WEngine::WArray<SetLayout>& GetLayouts() { return Layouts; }
 
+		uint32 GetTypeHash() const { return Hash; }
+
 		void ProcessBindingForStage(VkShaderStageFlags ShaderStage, UniformBufferGatherInfo& OutGatherInfo, const class VulkanShaderCodeHeader& CodeHeader);
 
-		void FinalizeBindings(const VulkanDevice *Device, const UniformBufferGatherInfo& GatherInfo, const WEngine::WArray<RHISamplerState>)
+		void FinalizeBindings(const VulkanDevice *Device, const UniformBufferGatherInfo& GatherInfo, const WEngine::WArray<RHISamplerState*>& InnutableSamplers);
 
 	private:
 
@@ -74,6 +76,8 @@ namespace Vulkan
 		VkDescriptorSetLayout DescriptorSetLayout;
 
 		WEngine::WArray<SetLayout> Layouts;
+
+		uint32 Hash;
 
 	};
 

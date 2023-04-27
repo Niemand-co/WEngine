@@ -23,7 +23,7 @@ void RHICommandBindVertexBuffer::Execute(RHICommandListBase* CmdList)
 
 void RHICommandSetStreamResource::Execute(RHICommandListBase* CmdList)
 {
-	ENCODER_EXECUTE(RHISetStreamResource)(Stream);
+	ENCODER_EXECUTE(RHISetStreamResource)(StreamIndex, Buffer, Offset);
 }
 
 void RHICommandBindIndexBuffer::Execute(RHICommandListBase* CmdList)

@@ -245,18 +245,21 @@ namespace Vulkan
 
 		virtual ~VulkanGraphicsPipelineState();
 
-		virtual void Bind(class RHICommandBuffer *CmdBuffer) override;
+		virtual void Bind(RHICommandBuffer *CmdBuffer) override;
+
+		const class VulkanVertexInputState* GetVertexInputState() const { return pVertexInputState; }
 
 		VkPipeline GetHandle() const { return Pipeline; }
 
 	private:
 
 		class VulkanDevice *pDevice;
+		class VulkanVertexInputState *pVertexInputState;
 		class VulkanRenderPass *RenderPass;
 		class VulkanLayout *Layout;
 		GfxPipelineDesc Desc;
 
-		VulkanShaderBase* VulkanShaders[(uint8)EShaderStage::Count];
+		class VulkanShaderBase* VulkanShaders[(uint8)EShaderStage::Count];
 
 		VkPipeline Pipeline;
 
@@ -279,6 +282,8 @@ namespace Vulkan
 
 		VulkanGraphicsPipelineState* RHICreateGraphicsPipelineState(const RHIGraphicsPipelineStateInitializer& Initializer);
 
+		VulkanLayout* FindOrAddLayout(const VulkanDescriptorSetLayout& DescriptorSetLayout);
+
 		void CreateGfxEntry(const RHIGraphicsPipelineStateInitializer& Initializer, class VulkanDescriptorSetLayout& DescriptorSetLayout, GfxPipelineDesc& Desc);
 
 		bool CreateGfxPipelineFromtEntry(const RHIGraphicsPipelineStateInitializer& Initializer, VulkanGraphicsPipelineState* PSO);
@@ -291,7 +296,11 @@ namespace Vulkan
 
 		WCriticalSection GraphicsPSOLock;
 
+		WCriticalSection LayoutLock;
+
 		WEngine::WHashMap<uint32, VulkanGraphicsPipelineState*> GraphicsPipelines;
+
+		WEngine::WHashMap<uint32, VulkanLayout*> Layouts;
 
 	};
 

@@ -5,6 +5,7 @@
 #include "Render/Public/RenderTarget.h"
 #include "Render/Public/RenderDependencyGraph.h"
 #include "Scene/Components/Public/MaterialComponent.h"
+#include "RHI/Public/RHIShader.h"
 
 BEGIN_SHADER_PARAMETERS_STRUCT(DeferredBasePassParameters)
 	RENDER_TARGET_SLOTS()
@@ -48,7 +49,7 @@ void DeferredRenderer::RenderBasePass(WRDGBuilder& GraphBuilder, WViewInfo& View
 WDeferredBasePassVS::WDeferredBasePassVS(WVertexShaderRHIRef InVertexShaderRHI)
 	: VertexShaderRHI(InVertexShaderRHI)
 {
-	//UniformBuffer = new WUniformBuffer(&Parameters.GetStructMetaData()->GetLayout());
+	//VertexShaderRHI->SetupParameters<WDeferredBasePassVSParameters>();
 }
 
 WDeferredBasePassVS::~WDeferredBasePassVS()

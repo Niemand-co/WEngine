@@ -92,7 +92,13 @@ namespace Vulkan
 
 		VulkanDevice *pDevice;
 
-		uint8 m_isSecondary : 1;
+		uint8 bHasPipeline : 1;
+		uint8 bHasViewport : 1;
+		uint8 bHasScissor : 1;
+
+		WEngine::WArray<VkViewport> CurrentViewports;
+		WEngine::WArray<VkRect2D> CurrentScissors;
+		uint32 CurrentStencilReference;
 
 		WEngine::WArray<class VulkanSemaphore*> WaitingSemaphores;
 
@@ -108,7 +114,7 @@ namespace Vulkan
 		friend class VulkanCommandPool;
 		friend class VulkanQueue;
 		friend class VulkanDynamicContext;
-
+		friend class VulkanPendingGfxState;
 	};
 
 	class VulkanCommandBufferManager : public RHIResource

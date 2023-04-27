@@ -28,6 +28,7 @@ namespace Vulkan
 
 		friend class VulkanDevice;
 		friend class VulkanPipelineStateManager;
+		friend class VulkanPendingGfxState;
 
 	};
 

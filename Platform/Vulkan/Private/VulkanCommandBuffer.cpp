@@ -8,7 +8,10 @@ namespace Vulkan
 
 	VulkanCommandBuffer::VulkanCommandBuffer(VulkanDevice* pInDevice, VulkanCommandPool *pInCommandPool, VkCommandBufferAllocateInfo* pInfo)
 		: pDevice(pInDevice),
-		  pCommandPool(pInCommandPool)
+		  pCommandPool(pInCommandPool),
+		  bHasPipeline(false),
+		  bHasViewport(false),
+		  bHasScissor(false)
 	{
 		vkAllocateCommandBuffers(pDevice->GetHandle(), pInfo, &CommandBuffer);
 		pFence = new VulkanFence(pDevice);

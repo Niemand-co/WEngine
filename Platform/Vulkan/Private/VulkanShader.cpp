@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanShader.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
+#include "Render/Public/RenderDependencyGraphParameter.h"
 
 namespace Vulkan
 {
@@ -23,6 +24,22 @@ namespace Vulkan
 
 	VulkanVertexShader::~VulkanVertexShader()
 	{
+	}
+
+	void VulkanVertexShader::SetupParametersInternal(const ShaderParametersLayout& Layout)
+	{
+		const WEngine::WArray<ShaderParametersLayout::ResourceInfo>& UniformBuffers =  Layout.GetUniforms();
+		VulkanShaderCodeHeader::FUniformBufferInfo& UBInfo = CodeHeader.UniformBuffers.AddInitialized();
+		for (int32 Index = 0; Index < UniformBuffers.Size(); ++Index)
+		{
+			VulkanShaderCodeHeader::FResourceInfo Resource;
+			Resource.ResourceIndex = Index;
+			Resource.UBBaseType = (uint16)UniformBuffers[Index].Type;
+			UBInfo.ResourceEntries.Push(Resource);
+		}
+
+		const WEngine::WArray<ShaderParametersLayout::ResourceInfo>& Textures = Layout.GetTextures();
+
 	}
 
 	VulkanGeometryShader::VulkanGeometryShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo* pInfo)

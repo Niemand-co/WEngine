@@ -124,6 +124,43 @@ namespace Vulkan
 
 	};
 
+	class VulkanLayoutManager
+	{
+	public:
+
+		VulkanLayoutManager(class VulkanDevice *pInDevice)
+			: pDevice(pInDevice),
+			  CurrentRenderPass(nullptr),
+			  CurrentFramebuffer(nullptr)
+		{
+		}
+
+		class VulkanRenderPass* GetOrCreateRenderPass(const VulkanRenderTargetLayout& RTLayout);
+
+		class VulkanFramebuffer* GetOrCreateFramebuffer();
+
+	public:
+
+		VulkanRenderPass *CurrentRenderPass;
+
+		VulkanFramebuffer *CurrentFramebuffer;
+
+	private:
+
+		WCriticalSection RenderPassLock;
+
+		VulkanDevice *pDevice;
+
+		WEngine::WHashMap<uint32, VulkanRenderPass*> RenderPasses;
+
+		struct FrameBufferList
+		{
+			WEngine::WArray<VulkanFramebuffer*> FrameBuffer;
+		};
+		WEngine::WHashMap<uint32, FrameBufferList*> FrameBuffers;
+		
+	};
+
 }
 
 #endif

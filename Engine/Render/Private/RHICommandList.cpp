@@ -69,14 +69,14 @@ void RHIRenderCommandList::BindVertexBuffer(WVertexFactory* InVertexFactory)
     GetDynamicRHI()->RHIBindVertexBuffer(InVertexFactory);
 }
 
-void RHIRenderCommandList::SetStreamResource(const VertexInputStream& Stream)
+void RHIRenderCommandList::SetStreamResource(uint32 StreamIndex, WVertexBufferRHIRef Buffer, uint32 Offset)
 {
     if (IsOutOfRenderThread() && IsOutOfRHIThread())
     {
-        ALLOC_COMMAND(RHICommandSetStreamResource)(Stream);
+        ALLOC_COMMAND(RHICommandSetStreamResource)(StreamIndex, Buffer, Offset);
         return;
     }
-    GetDynamicRHI()->RHISetStreamResource(Stream);
+    GetDynamicRHI()->RHISetStreamResource(StreamIndex, Buffer, Offset);
 }
 
 void RHIRenderCommandList::BindIndexBuffer(WIndexBufferRHIRef IndexBuffer)
@@ -99,7 +99,7 @@ void RHIRenderCommandList::DrawIndexedPrimitive(uint32 indexCount, uint32 firstI
     GetDynamicRHI()->RHIDrawIndexedPrimitive(indexCount, firstIndex, instanceCount);
 }
 
-void RHIRenderCommandList::SetViewport(float MinX, float MinY, float MaxX, float MaxY, float MinDepth, float MaxDepth)
+void RHIRenderCommandList::SetViewport(float MinX, float MinY, float MaxX, float MaxY, float MinZ, float MaxZ)
 {
     if (IsOutOfRenderThread() && IsOutOfRHIThread())
     {

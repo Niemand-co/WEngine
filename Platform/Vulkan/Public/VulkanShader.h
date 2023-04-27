@@ -8,9 +8,16 @@ namespace Vulkan
 	{
 	public:
 
+		struct FResourceInfo
+		{
+			uint16 ResourceIndex;
+			uint16 UBBaseType;
+		};
+
 		struct FUniformBufferInfo
 		{
 			uint32 LayoutHash;
+			WEngine::WArray<FResourceInfo> ResourceEntries;
 		};
 		WEngine::WArray<FUniformBufferInfo> UniformBuffers;
 
@@ -26,11 +33,15 @@ namespace Vulkan
 
 		VkShaderModule GetShaderModule() const { return ShaderModule; }
 
-	private:
+		const VulkanShaderCodeHeader& GetCodeHeader() const { return CodeHeader; }
+
+	protected:
 
 		VulkanDevice *pDevice;
 
 		VkShaderModule ShaderModule;
+
+		VulkanShaderCodeHeader CodeHeader;
 
 	};
 
@@ -42,6 +53,8 @@ namespace Vulkan
 
 		virtual ~VulkanVertexShader();
 
+		virtual void SetupParametersInternal(const ShaderParametersLayout& Layout) override;
+
 	};
 
 	class VulkanGeometryShader : public RHIGeometryShader, public VulkanShaderBase
@@ -51,6 +64,8 @@ namespace Vulkan
 		VulkanGeometryShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo* pInfo);
 
 		virtual ~VulkanGeometryShader();
+
+		virtual void SetupParametersInternal(const ShaderParametersLayout& Layout) override;
 
 	};
 
@@ -62,6 +77,8 @@ namespace Vulkan
 
 		virtual ~VulkanPixelShader();
 
+		virtual void SetupParametersInternal(const ShaderParametersLayout& Layout) override;
+
 	};
 
 	class VulkanComputeShader : public RHIComputeShader, public VulkanShaderBase
@@ -71,6 +88,8 @@ namespace Vulkan
 		VulkanComputeShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo* pInfo);
 
 		virtual ~VulkanComputeShader();
+
+		virtual void SetupParametersInternal(const ShaderParametersLayout& Layout) override;
 
 	};
 

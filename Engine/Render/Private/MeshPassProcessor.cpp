@@ -52,7 +52,11 @@ bool WMeshDrawCommand::SubmitDrawBegin(const GraphicsPipelineStateSet& PipelineS
 
 	CmdList.SetGraphicsPipelineState(PipelineState);
 
-	CmdList.SetStreamResource(VertexStream);
+	for (int32 VertexBindingIndex = 0; VertexBindingIndex < VertexStream.Size(); ++VertexBindingIndex)
+	{
+		VertexInputStreamElement& Element = VertexStream[VertexBindingIndex];
+		CmdList.SetStreamResource(Element.StreamIndex, Element.VertexBuffer, Element.Offset);
+	}
 
 	return true;
 }

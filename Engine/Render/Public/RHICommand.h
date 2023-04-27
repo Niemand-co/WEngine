@@ -57,10 +57,14 @@ struct RHICommandBindVertexBuffer final : public RHICommand<RHICommandBindVertex
 
 struct RHICommandSetStreamResource final : public RHICommand<RHICommandSetStreamResource>
 {
-	VertexInputStream Stream;
+	uint32 StreamIndex;
+	WVertexBufferRHIRef Buffer;
+	uint32 Offset;
 
-	RHICommandSetStreamResource(const VertexInputStream& InStream)
-		: Stream(InStream)
+	RHICommandSetStreamResource(uint32 InStreamIndex, WVertexBufferRHIRef InBuffer, uint32 InOffset)
+		: StreamIndex(InStreamIndex),
+		  Buffer(InBuffer),
+		  Offset(InOffset)
 	{
 	}
 

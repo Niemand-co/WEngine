@@ -17,7 +17,7 @@ namespace Vulkan
 		if (NumResources > 0)
 		{
 			ResourceTable.Clear();
-			ResourceTable.AddZero(NumResources);
+			ResourceTable.AddZerod(NumResources);
 
 			if (InContents)
 			{

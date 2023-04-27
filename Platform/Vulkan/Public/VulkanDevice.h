@@ -81,6 +81,8 @@ namespace Vulkan
 
 		class VulkanSamplerStateManager* GetSamplerStateManager() const { return pSamplerStateManager; }
 
+		class VulkanLayoutManager* GetLayoutManager() const { return pLayoutManager; }
+
 	private:
 
 		VkImageUsageFlags GetImageUsage(ETextureCreateFlags Flag);
@@ -96,6 +98,8 @@ namespace Vulkan
 		VulkanPipelineStateManager *pPipelineStateManager;
 
 		VulkanSamplerStateManager *pSamplerStateManager;
+
+		VulkanLayoutManager *pLayoutManager;
 
 		WEngine::WArray<QueueStack> m_queues;
 

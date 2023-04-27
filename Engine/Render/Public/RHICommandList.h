@@ -67,7 +67,7 @@ public:
 
 	void BindVertexBuffer(class WVertexFactory* InVertexFactory);
 
-	void SetStreamResource(const VertexInputStream& Stream);
+	void SetStreamResource(uint32 StreamIndex, WVertexBufferRHIRef Buffer, uint32 Offset);
 
 	void BindIndexBuffer(WIndexBufferRHIRef IndexBuffer);
 

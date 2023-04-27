@@ -9,6 +9,7 @@ namespace Vulkan
 	public:
 
 		VulkanRenderPass(class VulkanDevice *pInDevice, VkRenderPassCreateInfo *pInfo);
+		VulkanRenderPass(VulkanDevice *pInDevice, const class VulkanRenderTargetLayout& InRTLayout);
 
 		virtual ~VulkanRenderPass();
 

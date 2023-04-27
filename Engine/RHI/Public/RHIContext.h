@@ -75,13 +75,13 @@ public:
 
 	virtual void RHIEndRenderPass() = 0;
 
-	virtual void RHISetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth) = 0;
+	virtual void RHISetViewport(float MinX, float MinY, float MaxX, float MaxY, float MinZ, float MaxZ) = 0;
 
-	virtual void RHISetScissor(int32 OffsetX, int32 OffsetY, uint32 Width, uint32 Height) = 0;
+	virtual void RHISetScissor(uint32 MinX, uint32 MinY, uint32 Width, uint32 Height) = 0;
 
 	virtual void RHIBindVertexBuffer(class WVertexFactory* InVertexFactory) = 0;
 
-	virtual void RHISetStreamResource(const VertexInputStream& InStream) = 0;
+	virtual void RHISetStreamResource(uint32 StreamIndex, WVertexBufferRHIRef Buffer, uint32 Offset) = 0;
 
 	virtual void RHIBindIndexBuffer(WIndexBufferRHIRef InIndexBuffer) = 0;
 
@@ -92,6 +92,8 @@ public:
 	virtual void RHICopyImageToBackBuffer(class RHITexture* SrcTexture, WTextureRHIRef DstTexture, int32 SrcSizeX, int32 SrcSizeY, int32 DstSizeX, int32 DstSizeY) = 0;
 
 	virtual void RHISetGraphicsPipelineState(class RHIGraphicsPipelineState *GraphicsPipelineState) = 0;
+
+	virtual RHIRenderPass* RHICreateRenderPass(const class RHIGraphicsPipelineStateInitializer& Initializer) = 0;
 
 	virtual void RHISetShaderUniformBuffer(class RHIGraphicsShader *ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer) = 0;
 

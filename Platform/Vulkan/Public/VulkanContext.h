@@ -42,13 +42,13 @@ namespace Vulkan
 
 		virtual void RHIEndRenderPass() override;
 
-		virtual void RHISetViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth) override;
+		virtual void RHISetViewport(float MinX, float MinY, float MaxX, float MaxY, float MinZ, float MaxZ) override;
 
-		virtual void RHISetScissor(int32 OffsetX, int32 OffsetY, uint32 Width, uint32 Height) override;
+		virtual void RHISetScissor(uint32 MinX, uint32 MinY, uint32 Width, uint32 Height) override;
 
 		virtual void RHIBindVertexBuffer(WVertexFactory* InVertexFactory) override;
 
-		virtual void RHISetStreamResource(const VertexInputStream& InStream) override;
+		virtual void RHISetStreamResource(uint32 StreamIndex, WVertexBufferRHIRef Buffer, uint32 Offset) override;
 
 		virtual void RHIBindIndexBuffer(WIndexBufferRHIRef InIndexBuffer) override;
 
@@ -64,7 +64,9 @@ namespace Vulkan
 
 		virtual void RHIUpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void* Contents) override;
 
-		virtual RHIPipelineStateObject* RHICreateGraphicsPipelineState(class RHIGraphicsPipelineStateInitializer& Initializer) override;
+		virtual RHIPipelineStateObject* RHICreateGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& Initializer) override;
+
+		virtual RHIRenderPass* RHICreateRenderPass(const RHIGraphicsPipelineStateInitializer& Initializer) override;
 
 		virtual WSamplerStateRHIRef RHICreateSamplerState(const RHISamplerStateInitializer& Initializer) override;
 

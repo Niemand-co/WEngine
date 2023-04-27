@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanRHIPrivate.h"
+#include "Platform/Vulkan/Public/VulkanDevice.h"
+#include "Platform/Vulkan/Public/VulkanRenderPass.h"
 
 namespace Vulkan
 {
@@ -96,6 +98,32 @@ namespace Vulkan
 
 		Hash = WEngine::MemCrc32(&hashStruct, sizeof(HashStruct));
 		NumUsedClearValues = bHasClearOp ? NumAttachments : 0;
+	}
+
+	VulkanRenderPass* VulkanLayoutManager::GetOrCreateRenderPass(const VulkanRenderTargetLayout& RTLayout)
+	{
+		uint32 RenderPassHash = RTLayout.Hash;
+		VulkanRenderPass *RenderPass = nullptr;
+		{
+			WEngine::WScopeLock Lock(&RenderPassLock);
+			if (RenderPasses.Find(RenderPassHash))
+			{
+				RenderPass = RenderPasses[RenderPassHash];
+				return RenderPass;
+			}
+		}
+		
+		RenderPass = new VulkanRenderPass(pDevice, RTLayout);
+		{
+			WEngine::WScopeLock Loc(&RenderPassLock);
+			if (RenderPasses.Find(RenderPassHash))
+			{
+				delete RenderPass;
+				return RenderPasses[RenderPassHash];
+			}
+			RenderPasses.Insert(RenderPassHash, RenderPass);
+		}
+		return RenderPass;
 	}
 
 }

@@ -214,6 +214,12 @@ namespace WEngine
 	}
 
 	template<typename T>
+	static FORCEINLINE void* Memzero(T& Dst)
+	{
+		return memset(&Dst, 0, sizeof(T));
+	}
+
+	template<typename T>
 	static constexpr T Min(T a, T b)
 	{
 		return a < b ? a : b;

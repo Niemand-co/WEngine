@@ -28,6 +28,11 @@ class RHICommandBuffer : public RHIResource
 {
 public:
 
+	RHICommandBuffer()
+		: RHIResource(ERHIResourceType::RRT_CommandBuffer)
+	{
+	}
+
 	virtual ~RHICommandBuffer() = default;
 
 	virtual void BeginScopePass(const WEngine::WString& passName) = 0;
