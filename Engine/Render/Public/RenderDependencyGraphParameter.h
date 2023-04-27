@@ -93,7 +93,7 @@ struct WRDGRenderTargetBindingSlots
 
 		typedef WRDGRenderTargetBindingSlots AlignedType;
 
-		static WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
+		static struct WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
 	};
 };
 
@@ -531,7 +531,7 @@ struct WParameterTypeInfo<WRDGRenderTargetBinding*>
 				return &MetaData;\
 			}\
 		};\
-		static WUniformBufferRHIRef CreateUniformBuffer(uint8 *InContents, const ShaderParametersLayout *InLayout, EBufferUsageFlags InUsage)\
+		static WUniformBufferRHIRef CreateUniformBuffer(uint8 *InContents, const ShaderParametersLayout *InLayout, EUniformBufferUsage InUsage)\
 		{\
 			UNIFORM_BUFFER_CREATE_FUNCTION\
 		}\

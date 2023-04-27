@@ -9,9 +9,11 @@ namespace Vulkan
 	VulkanCommandBuffer::VulkanCommandBuffer(VulkanDevice* pInDevice, VulkanCommandPool *pInCommandPool, VkCommandBufferAllocateInfo* pInfo)
 		: pDevice(pInDevice),
 		  pCommandPool(pInCommandPool),
+		  bNeedsUpdateDynamicStates(true),
 		  bHasPipeline(false),
 		  bHasViewport(false),
-		  bHasScissor(false)
+		  bHasScissor(false),
+		  bHasStencil(false)
 	{
 		vkAllocateCommandBuffers(pDevice->GetHandle(), pInfo, &CommandBuffer);
 		pFence = new VulkanFence(pDevice);
@@ -33,6 +35,8 @@ namespace Vulkan
 		RE_ASSERT(vkBeginCommandBuffer(CommandBuffer, &CommandbufferBeginInfo) == VK_SUCCESS, "Failed to Begin Command Buffer.");
 
 		State = ECmdState::IsInsideBegin;
+
+		bNeedsUpdateDynamicStates = true;
 	}
 
 	void VulkanCommandBuffer::EndScopePass()

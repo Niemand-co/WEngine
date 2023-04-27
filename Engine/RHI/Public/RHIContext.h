@@ -29,7 +29,7 @@ public:
 
 	virtual WMultiSampleStateRHIRef CreateMultiSampleState(const RHIMultiSampleStateInitializer& Initializer) = 0;
 
-	virtual WVertexInputStateRHIRef GetOrCreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements) = 0;
+	virtual WVertexInputStateRHIRef GetOrCreateVertexInputState(const WEngine::WArray<struct VertexInputElement>& InElements) = 0;
 
 };
 
@@ -59,7 +59,7 @@ public:
 
 	WTextureViewRHIRef RHICreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, EDimension InDimension, EFormat InFormat, class RHITexture* InTexture);
 
-	virtual RHIPipelineStateObject* RHICreateGraphicsPipelineState(class RHIGraphicsPipelineStateInitializer& Initializer) = 0;
+	virtual class RHIGraphicsPipelineState* RHICreateGraphicsPipelineState(class RHIGraphicsPipelineStateInitializer& Initializer) = 0;
 
 	virtual void RHICopyBufferToImage(class RHITexture* pTexture, class RHIBuffer* pBuffer, unsigned int width, unsigned int height);
 

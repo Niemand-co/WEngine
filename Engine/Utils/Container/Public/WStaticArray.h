@@ -18,7 +18,7 @@ namespace WEngine
 
 		template<typename... Args>
 		explicit WStaticArray(Args&&... args)
-			: Storage(Forward<Args>(args)...)
+			: Storage(TMakeIntegerSequence<uint32, NumElements>(), Forward<Args>(args)...)
 		{
 		}
 
@@ -80,7 +80,7 @@ namespace WEngine
 			AlignedElementType() = default;
 
 			template<typename... Args>
-			explicit AlignedElementType(Args&&... args)
+			explicit AlignedElementType(uint32 /* Index */, Args&&... args)
 				: Element(Forward<Args>(args)...)
 			{
 			}
@@ -95,9 +95,9 @@ namespace WEngine
 			{
 			}
 
-			template<typename... Args>
-			explicit ArrayStorage(Args&&... args)
-				: Elements{ AlignedElementType(args...)... }
+			template<uint32... Indices, typename... Args>
+			explicit ArrayStorage(TIntegerSequence<uint32, Indices...>, Args&&... args)
+				: Elements{ AlignedElementType(Indices, args...)... }
 			{
 			}
 

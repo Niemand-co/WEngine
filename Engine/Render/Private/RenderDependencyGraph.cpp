@@ -171,22 +171,22 @@ WRDGBuffer* WRDGBuilder::CreateBuffer(const WRDGBufferDesc& inDesc, const char* 
 WRDGTexture* WRDGBuilder::RegisterExternalTexture(RHITexture* ExternalTexture)
 {
 	WRDGTextureDesc Desc;
-	uint32 MipCount = ExternalTexture->GetMipCount();
-	uint32 LayerCount = ExternalTexture->GetLayerCount();
-	uint32 SampleCount = ExternalTexture->GetSampleCount();
-	uint32 Width = ExternalTexture->GetWidth();
-	uint32 Height = ExternalTexture->GetHeight();
-	uint32 Depth = ExternalTexture->GetDepth();
-	switch (ExternalTexture->GetDimension())
+	uint32 MipCount = ExternalTexture->GetDesc().NumMips;
+	uint32 LayerCount = ExternalTexture->GetDesc().ArraySize;
+	uint32 SampleCount = ExternalTexture->GetDesc().NumSamples;
+	uint32 Width = ExternalTexture->GetDesc().Extent.width;
+	uint32 Height = ExternalTexture->GetDesc().Extent.height;
+	uint32 Depth = ExternalTexture->GetDesc().Extent.depth;
+	switch (ExternalTexture->GetDesc().Dimension)
 	{
 	case EDimension::Texture2D:
-		Desc = WRDGTextureDesc::GetTexture2DDesc(ExternalTexture->GetFormat(), { Width, Height, Depth }, ExternalTexture->GetClearValue(), MipCount, SampleCount, ExternalTexture->GetFlags());
+		Desc = WRDGTextureDesc::GetTexture2DDesc(ExternalTexture->GetDesc().Format, { Width, Height, Depth }, ExternalTexture->GetDesc().ClearValue, MipCount, SampleCount, ExternalTexture->GetDesc().Flags);
 		break;
 	case EDimension::Texture2DArray:
-		Desc = WRDGTextureDesc::GetTexture2DArrayDesc(ExternalTexture->GetFormat(), {Width, Height, Depth}, ExternalTexture->GetClearValue(), MipCount, SampleCount, ExternalTexture->GetLayerCount(), ExternalTexture->GetFlags());
+		Desc = WRDGTextureDesc::GetTexture2DArrayDesc(ExternalTexture->GetDesc().Format, {Width, Height, Depth}, ExternalTexture->GetDesc().ClearValue, MipCount, SampleCount, ExternalTexture->GetDesc().ArraySize, ExternalTexture->GetDesc().Flags);
 		break;
 	case EDimension::Texture3D:
-		Desc = WRDGTextureDesc::GetTexture3DDesc(ExternalTexture->GetFormat(), { Width, Height, Depth }, ExternalTexture->GetClearValue(), MipCount, SampleCount, ExternalTexture->GetFlags());
+		Desc = WRDGTextureDesc::GetTexture3DDesc(ExternalTexture->GetDesc().Format, { Width, Height, Depth }, ExternalTexture->GetDesc().ClearValue, MipCount, SampleCount, ExternalTexture->GetDesc().Flags);
 		break;
 	case EDimension::TextureCube:
 	case EDimension::TextureCubeArray:

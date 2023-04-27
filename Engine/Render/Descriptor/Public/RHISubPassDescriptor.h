@@ -4,7 +4,7 @@ struct SubPassAttachment
 {
 	unsigned int attachmentIndex;
 
-	AttachmentLayout attachmentLayout;
+	EAttachmentLayout attachmentLayout;
 };
 
 class RHISubPassDescriptor

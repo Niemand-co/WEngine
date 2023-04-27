@@ -17,6 +17,11 @@ class WRDGResource : public RHIResource
 {
 public:
 
+	WRDGResource()
+		: RHIResource(ERHIResourceType::RRT_None)
+	{
+	}
+
 	virtual ~WRDGResource() = default;
 
 	bool IsExternal() const { return bExternal; }

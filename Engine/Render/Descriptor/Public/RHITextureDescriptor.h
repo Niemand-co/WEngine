@@ -10,7 +10,7 @@ public:
 
 public:
 
-	Format format = Format::A16R16G16B16_SFloat;
+	EFormat format = EFormat::A16R16G16B16_SFloat;
 
 	uint32 width = 0;
 
@@ -28,6 +28,6 @@ public:
 
 	EAccess initialState;
 
-	ClearValue clearValue = { 0, 0, 0, 0 };
+	FClearValue clearValue = { 0, 0, 0, 0 };
 
 };

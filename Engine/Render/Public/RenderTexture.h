@@ -46,7 +46,7 @@ protected:
 
 	RHITextureViewDescriptor m_textureViewDescriptor;
 
-	AttachmentLayout m_layout;
+	EAttachmentLayout m_layout;
 
 	/** Whether the texture has been created. */
 	uint8 m_bCreated : 1;

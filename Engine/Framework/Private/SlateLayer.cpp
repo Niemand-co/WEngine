@@ -35,7 +35,7 @@ namespace WEngine
 		Gui* pGui = Gui::CreateGui(WEngine::Backend::Vulkan);
 		pGui->Init(&guiConfigure);
 
-		Viewport = new WEditorViewport(1920, 1080, Format::A16R16G16B16_SFloat);
+		Viewport = new WEditorViewport(1920, 1080, EFormat::A16R16G16B16_SFloat);
 
 		m_imageID.Resize(3);
 		//for (unsigned int i = 0; i < RHIContext::g_maxFrames; ++i)

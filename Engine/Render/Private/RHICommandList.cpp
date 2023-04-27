@@ -103,10 +103,10 @@ void RHIRenderCommandList::SetViewport(float MinX, float MinY, float MaxX, float
 {
     if (IsOutOfRenderThread() && IsOutOfRHIThread())
     {
-        ALLOC_COMMAND(RHICommandSetViewport)(MinX, MaxX, MinY, MaxY, MinDepth, MaxDepth);
+        ALLOC_COMMAND(RHICommandSetViewport)(MinX, MaxX, MinY, MaxY, MinZ, MaxZ);
         return;
     }
-    GetDynamicRHI()->RHISetViewport(MinX, MinY, MaxX - MinX, MaxY - MinY, MinDepth, MaxDepth);
+    GetDynamicRHI()->RHISetViewport(MinX, MinY, MaxX - MinX, MaxY - MinY, MinZ, MaxZ);
 }
 
 void RHIRenderCommandList::SetScissor(int32 OffsetX, int32 OffsetY, uint32 Width, uint32 Height)
@@ -172,16 +172,15 @@ WTextureRHIRef RHIRenderCommandList::CreateTexture(const RHITextureDesc& InDesc)
 {
     return GetDynamicRHI()->RHICreateTexture(InDesc);
 }
-}
 
 WTextureViewRHIRef RHIRenderCommandList::CreateTextureView(uint32 InMipIndex, uint32 InMipCount, uint32 InLayerIndex, uint32 InLayerCount, uint32 InPlaneIndex, uint32 InPlaneCount, EDimension InDimension, EFormat InFormat, RHITexture* InTexture)
 {
-    return GetDynamicRHI()->CreateTextureView(InMipIndex, InMipCount, InLayerIndex, InLayerCount, InPlaneIndex, InPlaneCount, InDimension, InFormat, InTexture);
+    return GetDynamicRHI()->RHICreateTextureView(InMipIndex, InMipCount, InLayerIndex, InLayerCount, InPlaneIndex, InPlaneCount, InDimension, InFormat, InTexture);
 }
 
 WViewportRHIRef RHIRenderCommandList::CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, EFormat InFormat)
 {
-    return GetDynamicRHI()->CreateViewport(InWidth, InHeight, bInFullScreen, InFormat);
+    return GetDynamicRHI()->RHICreateViewport(InWidth, InHeight, bInFullScreen, InFormat);
 }
 
 WBlendStateRHIRef RHIRenderCommandList::CreateBlendState(const RHIBlendStateInitializer& Initializer)
@@ -204,19 +203,19 @@ WMultiSampleStateRHIRef RHIRenderCommandList::CreateMultiSampleState(const RHIMu
     return GetStaticRHI()->CreateMultiSampleState(Initializer);
 }
 
-WSamplerStateRHIRef RHIRenderCommandList::CreateSamplerState(const RHISamplerStateInitializer& Initialzer)
+WSamplerStateRHIRef RHIRenderCommandList::CreateSamplerState(const RHISamplerStateInitializer& Initializer)
 {
     return GetDynamicRHI()->RHICreateSamplerState(Initializer);
 }
 
-WVertexInputStateRHIRef RHIRenderCommandList::GetOrCreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements)
+WVertexInputStateRHIRef RHIRenderCommandList::GetOrCreateVertexInputState(const WEngine::WArray<VertexInputElement>& InElements)
 {
     return GetStaticRHI()->GetOrCreateVertexInputState(InElements);
 }
 
 void RHIRenderCommandList::UpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void* Contents)
 {
-    GetDynamicRHI()->UpdateUniformBuffer(UniformBuffer, Contents);
+    GetDynamicRHI()->RHIUpdateUniformBuffer(UniformBuffer, Contents);
 }
 
 RHIGraphicsPipelineState* RHIRenderCommandList::CreateGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& Initializer)

@@ -25,7 +25,7 @@ namespace Vulkan
 			Viewports[0].maxDepth = MaxZ;
 		}
 
-		SetScissor((uint32)MinX, (uint32)MinY, (uint32)(MaxX - MinX), (uint32)(MaxY - MinY));
+		SetScissorRect((uint32)MinX, (uint32)MinY, (uint32)(MaxX - MinX), (uint32)(MaxY - MinY));
 		bScissorEnable = false;
 	}
 
@@ -80,16 +80,46 @@ namespace Vulkan
 
 	void VulkanPendingGfxState::UpdateDynamicStates(VulkanCommandBuffer* CmdBuffer)
 	{
-		const bool bNeedsUpdateViewport = Viewports.Size() != CmdBuffer->CurrentViewports.Size() || memcmp(Viewports.GetData(), CmdBuffer->CurrentViewports.GetData(), sizeof(VkViewport) * Viewports.Size()) != 0;
+		const bool bNeedsUpdateViewport = !CmdBuffer->bHasViewport || Viewports.Size() != CmdBuffer->CurrentViewports.Size() || memcmp(Viewports.GetData(), CmdBuffer->CurrentViewports.GetData(), sizeof(VkViewport) * Viewports.Size()) != 0;
 		if (bNeedsUpdateViewport)
 		{
+			WEngine::WArray<VkViewport> FlipViewports = Viewports;
+			for(VkViewport& FlipViewport : FlipViewports)
+			{
+				FlipViewport.y += FlipViewport.height;
+				FlipViewport.height = -FlipViewport.height;
+			}
+			vkCmdSetViewport(CmdBuffer->GetHandle(), 0, FlipViewports.Size(), FlipViewports.GetData());
 
+			CmdBuffer->CurrentViewports = Viewports;
+			CmdBuffer->bHasViewport = true;
 		}
+
+		const bool bNeedsUpdateScissor = !CmdBuffer->bHasScissor || Scissors.Size() != CmdBuffer->CurrentScissors.Size() || memcmp(Scissors.GetData(), CmdBuffer->CurrentScissors.GetData(), sizeof(VkRect2D) * Scissors.Size());
+		if (bNeedsUpdateScissor)
+		{
+			vkCmdSetScissor(CmdBuffer->GetHandle(), 0, Scissors.Size(), Scissors.GetData());
+			CmdBuffer->CurrentScissors = Scissors;
+			CmdBuffer->bHasScissor = true;
+		}
+
+		const bool bNeedsUpdateStencil = !CmdBuffer->bHasStencil || StencilReference != CmdBuffer->CurrentStencilReference;
+		if (bNeedsUpdateStencil)
+		{
+			vkCmdSetStencilReference(CmdBuffer->GetHandle(), VK_STENCIL_FRONT_AND_BACK, StencilReference);
+			CmdBuffer->CurrentStencilReference = StencilReference;
+			CmdBuffer->bHasStencil = true;
+		}
+
+		CmdBuffer->bNeedsUpdateDynamicStates = false;
 	}
 
 	void VulkanPendingGfxState::PrepareForDraw(VulkanCommandBuffer* CmdBuffer)
 	{
-		UpdateDynamicStates(CmdBuffer);
+		if (CmdBuffer->bNeedsUpdateDynamicStates)
+		{
+			UpdateDynamicStates(CmdBuffer);
+		}
 
 		if(bVertexStreamDirty)
 		{

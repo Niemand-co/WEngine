@@ -14,6 +14,6 @@ public:
 
     uint32 Height = 0;
 
-	Format format = Format::A16R16G16B16_SFloat;
+	EFormat format = EFormat::A16R16G16B16_SFloat;
 
 };

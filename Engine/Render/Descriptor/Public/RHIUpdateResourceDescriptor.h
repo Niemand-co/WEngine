@@ -18,7 +18,7 @@ struct TextureResourceInfo
 {
 	RHITextureView *pTextureView;
 	RHISampler *pSampler;
-	AttachmentLayout layout;
+	EAttachmentLayout layout;
 };
 
 struct RHIBindingDescriptor

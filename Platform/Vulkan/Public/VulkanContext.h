@@ -64,7 +64,7 @@ namespace Vulkan
 
 		virtual void RHIUpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void* Contents) override;
 
-		virtual RHIPipelineStateObject* RHICreateGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& Initializer) override;
+		virtual RHIGraphicsPipelineState* RHICreateGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& Initializer) override;
 
 		virtual RHIRenderPass* RHICreateRenderPass(const RHIGraphicsPipelineStateInitializer& Initializer) override;
 

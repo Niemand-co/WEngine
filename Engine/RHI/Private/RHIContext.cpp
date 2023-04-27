@@ -129,7 +129,7 @@ WTextureViewRHIRef DynamicRHIContext::RHICreateTextureView(uint32 InMipIndex, ui
 		descriptor.arrayLayerCount = InLayerCount;
 		descriptor.Dimension = InDimension;
 	}
-	return pDevice->CreateTextureView(&descriptor, InTexture);
+	return nullptr;
 }
 
 void DynamicRHIContext::RHICopyBufferToImage(RHITexture* pTexture, RHIBuffer* pBuffer, unsigned int width, unsigned int height)

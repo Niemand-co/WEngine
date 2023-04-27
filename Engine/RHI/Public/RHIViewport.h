@@ -15,6 +15,6 @@ public:
 
 	virtual int32 Present(RHICommandBuffer *CmdBuffer, RHIQueue* Queue) = 0;
 
-	virtual WTexture2DRHIRef GetRenderTarget() const = 0;
+	virtual WTextureRHIRef GetRenderTarget() const = 0;
 
 };

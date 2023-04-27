@@ -1,4 +1,66 @@
 #pragma once
+#include "Utils/Container/Public/WSharedPtr.h"
+
+enum
+{
+	MaxVertexInputElementCount = 17,
+	MaxVertexInputElementCount_NumBits = 5,
+};
+
+enum
+{
+	MaxSimultaneousRenderTargets = 8,
+	MaxSimultaneousRenderTargets_NumBits = 4,
+};
+
+enum
+{
+	MaxGraphicsPipelineShaderNum = 3,
+};
+
+enum class ETextureCreateFlags : uint16
+{
+	TextureCreate_None = 0,
+	TextureCreate_Presentable = 1 << 0,
+	TextureCreate_RenderTarget = 1 << 1,
+	TextureCreate_DepthStencil = 1 << 2,
+	TextureCreate_SRV = 1 << 3,
+	TextureCreate_UAV = 1 << 4,
+	TextureCreate_NoTiling = 1 << 5,
+	TextureCreate_CPUWritable = 1 << 6,
+	TextureCreate_CPUReadable = 1 << 7,
+	TextureCreate_Transient = 1 << 8,
+	TextureCreate_InputAttachmentReadable = 1 << 9,
+	TextureCreate_Memoryless = 1 << 10,
+	TextureCreate_ResolveTarget = 1 << 11,
+	TextureCreate_DepthStencilResolveTarget = 1 << 12,
+};
+ENUM_CLASS_FLAGS(ETextureCreateFlags)
+
+enum EShaderFrequency : uint8
+{
+	SF_Vertex = 0,
+	SF_Mesh = 1,
+	SF_Pixel = 2,
+	SF_Geometry = 3,
+	SF_Compute = 4,
+	SF_RayGen = 5,
+	SF_RayMiss = 6,
+	SF_RayHitGroup = 7,
+	SF_RayCallable = 8,
+
+	SF_NumFrequencies = 9,
+
+	SF_NumGraphicsFrequencies = 4,
+};
+
+enum ESamplerAddressMode : uint8
+{
+	AM_Clamp,
+	AM_Repeat,
+	AM_Mirror,
+	AM_Border,
+};
 
 namespace WEngine
 {
@@ -544,67 +606,6 @@ struct WResolveRect
 	{
 		return X1 == other.X1 && Y1 == other.Y1 && X2 == other.X2 && Y2 == other.Y2;
 	}
-};
-
-enum
-{
-	MaxVertexInputElementCount = 17,
-	MaxVertexInputElementCount_NumBits = 5,
-};
-
-enum
-{
-	MaxSimultaneousRenderTargets = 8,
-	MaxSimultaneousRenderTargets_NumBits = 4,
-};
-
-enum
-{
-	MaxGraphicsPipelineShaderNum = 3,
-};
-
-enum class ETextureCreateFlags : uint16
-{
-	TextureCreate_None                      = 0,
-	TextureCreate_Presentable               = 1 << 0,
-	TextureCreate_RenderTarget              = 1 << 1,
-	TextureCreate_DepthStencil              = 1 << 2,
-	TextureCreate_SRV                       = 1 << 3,
-	TextureCreate_UAV                       = 1 << 4,
-	TextureCreate_NoTiling                  = 1 << 5,
-	TextureCreate_CPUWritable               = 1 << 6,
-	TextureCreate_CPUReadable               = 1 << 7,
-	TextureCreate_Transient                 = 1 << 8,
-	TextureCreate_InputAttachmentReadable   = 1 << 9,
-	TextureCreate_Memoryless                = 1 << 10,
-	TextureCreate_ResolveTarget             = 1 << 11,
-	TextureCreate_DepthStencilResolveTarget = 1 << 12,
-};
-ENUM_CLASS_FLAGS(ETextureCreateFlags)
-
-enum EShaderFrequency : uint8
-{
-	SF_Vertex           = 0,
-	SF_Mesh             = 1,
-	SF_Pixel            = 2,
-	SF_Geometry         = 3,
-	SF_Compute          = 4,
-	SF_RayGen           = 5,
-	SF_RayMiss          = 6,
-	SF_RayHitGroup      = 7,
-	SF_RayCallable      = 8,
-
-	SF_NumFrequencies   = 9,
-
-	SF_NumGraphicsFrequencies = 4,
-};
-
-enum ESamplerAddressMode : uint8
-{
-	AM_Clamp,
-	AM_Repeat,
-	AM_Mirror,
-	AM_Border,
 };
 
 typedef class RHIVertexBuffer* WVertexBufferRHIRef;

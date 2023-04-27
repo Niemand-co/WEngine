@@ -63,7 +63,7 @@ public:
 
 	void BeginTransition(WEngine::WArray<class RHIBarrierDescriptor>& Transitions);
 
-	void SetGraphicsPipelineState(class RHIGraphicsPipelineStateInitializer& GraphicsPipelineState);
+	void SetGraphicsPipelineState(struct RHIGraphicsPipelineStateInitializer& GraphicsPipelineState);
 
 	void BindVertexBuffer(class WVertexFactory* InVertexFactory);
 
@@ -113,7 +113,7 @@ public:
 
 	class RHIGraphicsPipelineState* CreateGraphicsPipelineState(class RHIGraphicsPipelineStateInitializer& GraphicsPipelineState);
 
-	WVertexInputStateRHIRef GetOrCreateVertexInputState(const WEngine::WArray<class VertexInputElement>& InElements);
+	WVertexInputStateRHIRef GetOrCreateVertexInputState(const WEngine::WArray<struct VertexInputElement>& InElements);
 
 	void UpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void *Contents);
 

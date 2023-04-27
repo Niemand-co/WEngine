@@ -18,7 +18,7 @@ public:
 
 	virtual void UpdateRHIResource() override;
 
-	void BindMeshVertexBuffer(class WStaticMeshDataType& Data) const;
+	void BindMeshVertexBuffer(struct WStaticMeshDataType& Data) const;
 
 private:
 

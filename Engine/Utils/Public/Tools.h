@@ -189,6 +189,13 @@ namespace WEngine
 		static constexpr int64 Min() { return INT64_MIN; }
 		static constexpr int64 Max() { return INT64_MAX; }
 	};
+	template<typename T, T... Indices>
+	struct TIntegerSequence
+	{
+	};
+
+	template <typename T, T N>
+	using TMakeIntegerSequence = __make_integer_seq<TIntegerSequence, T, N>;
 
 	template<typename Enum>
 	constexpr bool EnumHasFlags(Enum Flags, Enum Contains)
@@ -232,11 +239,13 @@ namespace WEngine
 	}
 
 	template<typename ElementType>
-	FORCEINLINE void DestructItems(ElementType* Data, uint32 Num)
+	FORCEINLINE void DestructItems(ElementType* Data, uint32 Count)
 	{
-		whlie(Num)
+		while (Count > 0)
 		{
-			Data->~ElementType();
+			typedef ElementType DestructItemsElementTypeTypedef;
+
+			Data->DestructItemsElementTypeTypedef::~DestructItemsElementTypeTypedef();
 			++Data;
 			--Count;
 		}

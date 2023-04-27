@@ -19,6 +19,6 @@ public:
 
 	unsigned int clearCount;
 
-	ClearValue *pClearValues;
+	FClearValue *pClearValues;
 
 };

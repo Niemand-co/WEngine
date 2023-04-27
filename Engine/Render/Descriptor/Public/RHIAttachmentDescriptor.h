@@ -8,16 +8,16 @@ public:
 
 public:
 
-	Format attachmentFormat;
+	EFormat attachmentFormat;
 
 	unsigned int sampleCount;
 
-	AttachmentLoadOP attachmentLoadOP;
+	EAttachmentLoadOP attachmentLoadOP;
 
-	AttachmentStoreOP attachmentStoreOP;
+	EAttachmentStoreOP attachmentStoreOP;
 
-	AttachmentLoadOP stencilLoadOP;
+	EAttachmentLoadOP stencilLoadOP;
 
-	AttachmentStoreOP stencilStoreOP;
+	EAttachmentStoreOP stencilStoreOP;
 
 };

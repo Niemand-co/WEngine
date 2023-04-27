@@ -92,9 +92,11 @@ namespace Vulkan
 
 		VulkanDevice *pDevice;
 
+		uint8 bNeedsUpdateDynamicStates : 1;
 		uint8 bHasPipeline : 1;
 		uint8 bHasViewport : 1;
 		uint8 bHasScissor : 1;
+		uint8 bHasStencil : 1;
 
 		WEngine::WArray<VkViewport> CurrentViewports;
 		WEngine::WArray<VkRect2D> CurrentScissors;

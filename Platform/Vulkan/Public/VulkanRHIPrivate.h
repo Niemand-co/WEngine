@@ -2,6 +2,10 @@
 
 #define VULKAN_API
 #ifdef VULKAN_API
+#include "Render/Public/RenderCore.h"
+#include "Utils/Container/Public/WArray.h"
+#include "RHI/Public/RHICore.h"
+#include "Utils/Container/Public/WHashMap.h"
 
 enum class EBufferUsageFlags : uint32
 {
@@ -53,7 +57,7 @@ constexpr const VkComponentMapping ComponentMappingRR01 = { VK_COMPONENT_SWIZZLE
 template<uint8 PixelFormat>
 struct FormatComponentMapping
 {
-	static const VkComponentMapping ComponentMapping = ComponentMappingRGBA;
+	static constexpr const VkComponentMapping ComponentMapping = ComponentMappingRGBA;
 };
 
 template<>
@@ -149,7 +153,7 @@ namespace Vulkan
 
 		WCriticalSection RenderPassLock;
 
-		VulkanDevice *pDevice;
+		class VulkanDevice *pDevice;
 
 		WEngine::WHashMap<uint32, VulkanRenderPass*> RenderPasses;
 

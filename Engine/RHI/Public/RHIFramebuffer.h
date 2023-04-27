@@ -4,6 +4,11 @@ class RHIFramebuffer : public RHIResource
 {
 public:
 
+	RHIFramebuffer()
+		: RHIResource(ERHIResourceType::RRT_Framebuffer)
+	{
+	}
+
 	virtual ~RHIFramebuffer() = default;
 
 };

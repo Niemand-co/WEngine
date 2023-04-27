@@ -94,6 +94,7 @@ namespace Vulkan
 	void VulkanDynamicContext::RHIDrawIndexedPrimitive(uint32 indexCount, uint32 firstIndex, uint32 instanceCount)
 	{
 		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
+		PendingState->PrepareForDraw(CmdBuffer);
 		vkCmdDrawIndexed(CmdBuffer->GetHandle(), indexCount, instanceCount, firstIndex, 0, 0);
 		//vkCmdDraw(CmdBuffer->GetHandle(), 3, 1, 0, 0);
 	}
@@ -255,7 +256,7 @@ namespace Vulkan
 		}
 	}
 
-	RHIPipelineStateObject* VulkanDynamicContext::RHICreateGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& Initializer)
+	RHIGraphicsPipelineState* VulkanDynamicContext::RHICreateGraphicsPipelineState(RHIGraphicsPipelineStateInitializer& Initializer)
 	{
 		return static_cast<VulkanDevice*>(pDevice)->GetPipelineStateManager()->RHICreateGraphicsPipelineState(Initializer);
 	}

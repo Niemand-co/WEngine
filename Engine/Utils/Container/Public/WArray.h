@@ -441,7 +441,7 @@ namespace WEngine
 
 			uint32 NumHoles = Num;
 			uint32 NumAfterHoles = ArrayNum - Index - Num;
-			uint32 NumToMove = WEngine::Min(NumHoles, NumAfterHolse);
+			uint32 NumToMove = WEngine::Min(NumHoles, NumAfterHoles);
 			if (NumToMove)
 			{
 				memcpy(Data + Index, Data + (ArrayNum - NumToMove), NumToMove * sizeof(T));

@@ -14,11 +14,11 @@ public:
 
 	unsigned int count = 1;
 
-	Format format = Format::A16R16G16B16_SFloat;
+	EFormat format = EFormat::A16R16G16B16_SFloat;
 
 	ColorSpace colorSpace = ColorSpace::SRGB_Linear;
 
-	Extent extent = Extent();
+	FExtent extent = FExtent();
 
 	RHIInstance *instance = nullptr;
 

@@ -1,5 +1,9 @@
 #pragma once
 #include "Utils/Allocator/Public/Allocator.h"
+#include "Utils/Container/Public/WStaticArray.h"
+#include "RHI/Public/RHICore.h"
+#include "Render/Public/RenderDependencyGraphDefinitions.h"
+#include "Render/Public/RenderCore.h"
 
 enum ERHIResourceType : uint8
 {
@@ -15,6 +19,7 @@ enum ERHIResourceType : uint8
 	RRT_DepthStencilState,
 	RRT_MultiSampleState,
 	RRT_RenderPass,
+	RRT_Framebuffer,
 	RRT_GraphicsPipelineState,
 	RRT_ComputePipelineState,
 	RRT_UnorderedAccessView,
