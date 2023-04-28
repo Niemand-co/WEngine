@@ -7,6 +7,11 @@ class RHIViewport : public RHIResource
 {
 public:
 
+	RHIViewport()
+		: RHIResource(ERHIResourceType::RRT_Viewport)
+	{
+	}
+
 	virtual ~RHIViewport() = default;
 
 	virtual void Tick() = 0;

@@ -101,7 +101,7 @@ public:
 
 	WViewportRHIRef CreateViewport(uint32 InWidth, uint32 InHeight, bool bInFullScreen, EFormat InFormat);
 
-	WBlendStateRHIRef CreateBlendState(const RHIBlendStateInitializer& Initializer);
+	WAttachmentBlendStateRHIRef CreateBlendState(const RHIBlendStateInitializer& Initializer);
 
 	WDepthStencilStateRHIRef CreateDepthStencilState(const RHIDepthStencilStateInitializer& Initializer);
 

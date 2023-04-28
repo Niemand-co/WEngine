@@ -157,7 +157,7 @@ namespace Vulkan
 			bufferImageCopy.imageSubresource.mipLevel = 0;
 			bufferImageCopy.imageSubresource.layerCount = 1;
 		}
-		vkCmdCopyBufferToImage(CommandBuffer, static_cast<VulkanTextureBuffer*>(pBuffer)->GetHandle(), static_cast<VulkanTexture2D*>(pTexture)->GetHandle(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
+		vkCmdCopyBufferToImage(CommandBuffer, static_cast<VulkanTextureBuffer*>(pBuffer)->GetHandle(), ResourceCast(pTexture)->GetHandle(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
 	}
 
 	void VulkanCommandBuffer::SetEvent(RHIEvent* pEvent)

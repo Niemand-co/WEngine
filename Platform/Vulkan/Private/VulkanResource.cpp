@@ -13,7 +13,7 @@ namespace Vulkan
 			ImageViewCreateInfo.image = InImage;
 			ImageViewCreateInfo.viewType = ViewType;
 			ImageViewCreateInfo.format = WEngine::ToVulkan(Format);
-			ImageViewCreateInfo.components = FormatComponentMapping<Format>::ComponentMapping;
+			ImageViewCreateInfo.components = FormatComponentMapping(Format);
 			ImageViewCreateInfo.subresourceRange.aspectMask = AspectFlags;
 
 			ImageViewCreateInfo.subresourceRange.baseMipLevel = FirstMip;

@@ -208,7 +208,7 @@ namespace Vulkan
 		LastFrameCmdBuffer = static_cast<VulkanQueue*>(GetDynamicRHI()->GetQueue())->GetLastSubmittedCmdBuffer();
 	}
 
-	WTexture2DRHIRef VulkanViewport::GetRenderTarget() const
+	WTextureRHIRef VulkanViewport::GetRenderTarget() const
 	{
 		return RenderingBackBuffer.Get();
 	}
@@ -219,7 +219,7 @@ namespace Vulkan
 		{
 			SwapchainDescriptor.instance = GetDynamicRHI()->GetInstance();
 			SwapchainDescriptor.count = 3;
-			SwapchainDescriptor.extent = Extent(Width, Height);
+			SwapchainDescriptor.Extent = FExtent(Width, Height);
 			SwapchainDescriptor.colorSpace = ColorSpace::SRGB_Linear;
 			SwapchainDescriptor.format = PixelFormat;
 		}
@@ -247,10 +247,11 @@ namespace Vulkan
 
 		for (uint32 ImageIndex = 0; ImageIndex < BackBufferImages.Size(); ++ImageIndex)
 		{
-			TextureViews[ImageIndex] = static_cast<VulkanTextureView*>(pDevice->CreateTextureView(&TextureViewDescriptor, BackBufferImages[ImageIndex]));
+			TextureViews[ImageIndex]->Create(pDevice, BackBufferImages[ImageIndex], VK_IMAGE_VIEW_TYPE_2D, VK_IMAGE_ASPECT_COLOR_BIT, PixelFormat, 0, 1, 0, 1, 0);
 		}
 
-		RenderingBackBuffer = static_cast<VulkanTexture2D*>(GetRenderCommandList()->CreateTexture2D(Width, Height, PixelFormat, 1, { 1, 0, 0, 1 }, ETextureCreateFlags::TextureCreate_RenderTarget | ETextureCreateFlags::TextureCreate_SRV, EAccess::RTV));
+		const RHITextureDesc Desc = RHITextureDesc::CreateTexture2D(PixelFormat, {1.0f, 0.0f, 0.0f, 1.0f}, FExtent(Width, Height, 1), 1, 1, ETextureCreateFlags::TextureCreate_RenderTarget | ETextureCreateFlags::TextureCreate_SRV);
+		RenderingBackBuffer = ResourceCast(GetRenderCommandList()->CreateTexture(Desc));
 	}
 
 	void VulkanViewport::DestroySwapchain()

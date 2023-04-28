@@ -492,7 +492,7 @@ namespace WEngine
 		if (Capacity > ArrayNum)
 		{
 			T* NewPtr = (T*)NormalAllocator::Get()->Allocate(ArrayNum * sizeof(T));
-			memcpy(NewPtr, Data, ArrayNum * sizoef(T));
+			memcpy(NewPtr, Data, ArrayNum * sizeof(T));
 			NormalAllocator::Get()->Deallocate(Data);
 			Data = NewPtr;
 			Capacity = ArrayNum;

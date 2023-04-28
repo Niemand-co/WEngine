@@ -119,7 +119,7 @@ namespace Vulkan
 		friend class VulkanPendingGfxState;
 	};
 
-	class VulkanCommandBufferManager : public RHIResource
+	class VulkanCommandBufferManager : public VulkanResource
 	{
 	public:
 

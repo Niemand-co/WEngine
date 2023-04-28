@@ -259,6 +259,14 @@ enum class EFilter : uint8
 	FL_Linear = 0,
 	FL_Nearest,
 	FL_Cube,
+	FL_AnisotropicLinear,
+	FL_AnisotropicNearest,
+};
+
+enum class ESamplerCompareFunction
+{
+	SCF_Never,
+	SCF_Less,
 };
 
 enum class EPolygonMode : uint8

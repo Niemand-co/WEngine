@@ -222,7 +222,7 @@ public:
 
 	template<typename ParameterStructType>
 	WRDGParameterStruct(const ParameterStructType* Parameters)
-		: WRDGParameterStruct(reinterpret_cast<const uint8*>(Parameters), &Parameters->GetStructMetaData()->GetLayout())
+		: WRDGParameterStruct(reinterpret_cast<const uint8*>(Parameters), &ParameterStructType::FTypeInfo::GetStructMetaData()->GetLayout())
 	{
 	}
 

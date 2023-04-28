@@ -18,7 +18,7 @@ public:
 
 	ColorSpace colorSpace = ColorSpace::SRGB_Linear;
 
-	FExtent extent = FExtent();
+	FExtent Extent;
 
 	RHIInstance *instance = nullptr;
 

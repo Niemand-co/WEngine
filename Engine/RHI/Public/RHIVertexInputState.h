@@ -6,7 +6,8 @@ class RHIVertexInputState : public RHIResource
 public:
 
 	RHIVertexInputState(const WEngine::WArray<VertexInputElement>& InElements)
-		: Elements(InElements)
+		: RHIResource(ERHIResourceType::RRT_State),
+		  Elements(InElements)
 	{
 	}
 

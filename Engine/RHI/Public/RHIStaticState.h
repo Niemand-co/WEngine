@@ -215,7 +215,8 @@ template<
 	ESamplerAddressMode ModeW = ESamplerAddressMode::AM_Clamp,
 	int32 MipBias = 0,
 	int32 MaxAnisotropy = 1,
-	uint32 BorderColor = 0
+	uint32 BorderColor = 0,
+	ESamplerCompareFunction Comparision = ESamplerCompareFunction::SCF_Never
 >
 class TStaticSamplerStateRHI : public TStaticStateRHI<TStaticSamplerStateRHI<
 	Filter,
@@ -224,7 +225,8 @@ class TStaticSamplerStateRHI : public TStaticStateRHI<TStaticSamplerStateRHI<
 	ModeW,
 	MipBias,
 	MaxAnisotropy,
-	BorderColor
+	BorderColor,
+	Comparision
 >, class RHISamplerState>
 {
 public:
@@ -239,7 +241,8 @@ public:
 			ModeW,
 			MipBias,
 			MaxAnisotropy,
-			BorderColor
+			BorderColor,
+			Comparision
 		};
 		StaticRHI = GetRenderCommandList()->CreateSamplerState(Initializer);
 	}

@@ -282,9 +282,9 @@ namespace Vulkan
 
 		VulkanGraphicsPipelineState* RHICreateGraphicsPipelineState(const RHIGraphicsPipelineStateInitializer& Initializer);
 
-		VulkanLayout* FindOrAddLayout(const VulkanDescriptorSetLayout& DescriptorSetLayout);
+		VulkanLayout* FindOrAddLayout(const class VulkanDescriptorSetLayout& DescriptorSetLayout);
 
-		void CreateGfxEntry(const RHIGraphicsPipelineStateInitializer& Initializer, class VulkanDescriptorSetLayout& DescriptorSetLayout, GfxPipelineDesc& Desc);
+		void CreateGfxEntry(const RHIGraphicsPipelineStateInitializer& Initializer, VulkanDescriptorSetLayout& DescriptorSetLayout, GfxPipelineDesc& Desc);
 
 		bool CreateGfxPipelineFromtEntry(const RHIGraphicsPipelineStateInitializer& Initializer, VulkanGraphicsPipelineState* PSO);
 

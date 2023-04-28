@@ -31,11 +31,7 @@ public:
 
 	virtual WFramebufferRHIRef GetOrCreateFramebuffer(class RHIFramebufferDescriptor* descriptor, class RHIRenderPass* RenderPass) = 0;
 
-	virtual WPsoRHIRef GetOrCreateGraphicsPipelineState(class RHIGraphicsPipelineStateDescriptor *descriptor) = 0;
-
 	virtual WTextureRHIRef CreateTexture(const class RHITextureDesc& InDesc) = 0;
-
-	virtual class RHISampler* CreateSampler(class RHISamplerDescriptor * descriptor) = 0;
 
 	virtual WVertexBufferRHIRef CreateVertexBuffer(class RHIBufferDescriptor* descriptor) = 0;
 

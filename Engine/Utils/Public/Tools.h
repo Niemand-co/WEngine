@@ -238,6 +238,16 @@ namespace WEngine
 		return a > b ? a : b;
 	}
 
+	static constexpr FORCEINLINE float Clamp(const float X, const float Min, const float Max)
+	{
+		return X < Min ? Min : ( X > Max ? Max : X );
+	}
+
+	static constexpr FORCEINLINE double Clamp(const double X, const double Min, const double Max)
+	{
+		return X < Min ? Min : (X > Max ? Max : X);
+	}
+
 	template<typename ElementType>
 	FORCEINLINE void DestructItems(ElementType* Data, uint32 Count)
 	{

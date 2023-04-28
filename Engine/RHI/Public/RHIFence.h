@@ -4,6 +4,11 @@ class RHIFence : public RHIResource
 {
 public:
 
+	RHIFence()
+		: RHIResource(ERHIResourceType::RRT_Fence)
+	{
+	}
+
 	virtual ~RHIFence() = default;
 
 	virtual void Reset() = 0;

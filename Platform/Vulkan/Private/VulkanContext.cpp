@@ -270,7 +270,7 @@ namespace Vulkan
 	WSamplerStateRHIRef VulkanDynamicContext::RHICreateSamplerState(const RHISamplerStateInitializer& Initializer)
 	{
 		VkSamplerCreateInfo Info;
-		VulkanSamplerState::SetupCreateInfo(Initializer, Info);
+		VulkanSamplerState::SetupCreateInfo(Initializer, ResourceCast(pDevice), Info);
 		uint32 Key = WEngine::MemCrc32(&Info, sizeof(VkSamplerCreateInfo));
 
 		VulkanSamplerStateManager *Manager = ResourceCast(pDevice)->GetSamplerStateManager();

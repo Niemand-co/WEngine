@@ -1,5 +1,6 @@
 #pragma once
 #include "Utils/Public/WGuid.h"
+#include "Log/Public/Logger.h"
 
 namespace WEngine
 {
@@ -95,14 +96,12 @@ namespace WEngine
 				}
 				head = head->next;
 			}
-
-			Insert(key, {});
-			return this->operator[](key);
+			RE_ASSERT(false, "No such key.");
 		}
 
 	private:
 
-		size_t GetIndex(const size_t& index);
+		size_t GetIndex(const size_t& index) const;
 
 	private:
 
@@ -196,7 +195,7 @@ namespace WEngine
 	}
 
 	template<typename k, typename v, size_t(*Hash)(k key)>
-	inline size_t WHashMap<k, v, Hash>::GetIndex(const size_t& index)
+	inline size_t WHashMap<k, v, Hash>::GetIndex(const size_t& index) const
 	{
 		return index & 63;
 	}

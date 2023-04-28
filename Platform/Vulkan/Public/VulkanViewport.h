@@ -24,7 +24,7 @@ namespace Vulkan
 
 		void WaitForFrameEvenCompletion();
 
-		virtual WTexture2DRHIRef GetRenderTarget() const;
+		virtual WTextureRHIRef GetRenderTarget() const;
 
 	private:
 
@@ -48,13 +48,13 @@ namespace Vulkan
 
 		WEngine::WArray<class VulkanTextureView*> TextureViews;
 
-		WEngine::WSharedPtr<class VulkanTexture2D> RenderingBackBuffer;
+		WEngine::WSharedPtr<class VulkanTexture> RenderingBackBuffer;
 
 		uint32 Width;
 
 		uint32 Height;
 
-		Format PixelFormat;
+		EFormat PixelFormat;
 
 		int32 AcquiredImageIndex;
 

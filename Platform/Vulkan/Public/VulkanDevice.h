@@ -39,11 +39,7 @@ namespace Vulkan
 
 		virtual WFramebufferRHIRef GetOrCreateFramebuffer(RHIFramebufferDescriptor *descriptor, RHIRenderPass* RenderPass) override;
 
-		virtual WPsoRHIRef GetOrCreateGraphicsPipelineState(RHIGraphicsPipelineStateDescriptor *descriptor) override;
-
 		virtual WTextureRHIRef CreateTexture(const RHITextureDesc& InDesc) override;
-
-		virtual RHISampler* CreateSampler(RHISamplerDescriptor * descriptor) override;
 
 		virtual WVertexBufferRHIRef CreateVertexBuffer(RHIBufferDescriptor* descriptor) override;
 

@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanGroupPool.h"
-#include "Platform/Vulkan/Public/VulkanGroup.h"
-#include "Platform/Vulkan/Public/VulkanGroupLayout.h"
+#include "Platform/Vulkan/Public/VulkanDescriptorSet.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
 #include "Render/Descriptor/Public/RHIGroupLayoutDescriptor.h"
 

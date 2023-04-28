@@ -8,7 +8,10 @@ class RHIInstance : public RHIResource
 {
 public:
 
-	RHIInstance() = default;
+	RHIInstance()
+		: RHIResource(ERHIResourceType::RRT_Instance)
+	{
+	}
 
 	RHIInstance(const RHIInstance&) = delete;
 

@@ -131,11 +131,6 @@ namespace Vulkan
 		ImGui_ImplVulkan_Init(&m_vulkanInitInfo, static_cast<VulkanRenderPass*>(pRenderPass)->GetHandle());
 	}
 
-	ImTextureID VulkanGui::LoadTexture(RHITextureView* pTextureView, RHISampler* pSampler)
-	{
-		return (ImTextureID)ImGui_ImplVulkan_AddTexture(*static_cast<VulkanSampler*>(pSampler)->GetHandle(), static_cast<VulkanTextureView*>(pTextureView)->GetHandle(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-	}
-
 	void VulkanGui::RemoveTexture(ImTextureID& ID)
 	{
 		ImGui_ImplVulkan_RemoveTexture((VkDescriptorSet)ID);

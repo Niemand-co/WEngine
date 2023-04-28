@@ -432,6 +432,20 @@ namespace WEngine
 		return VK_FILTER_MAX_ENUM;
 	}
 
+	static VkCompareOp ToVulkan(ESamplerCompareFunction Comparision)
+	{
+		switch (Comparision)
+		{
+		case ESamplerCompareFunction::SCF_Never:
+			return VK_COMPARE_OP_NEVER;
+		case ESamplerCompareFunction::SCF_Less:
+			return VK_COMPARE_OP_LESS;
+		default:
+			RE_ASSERT(false, "Error Type Sampler Compare Function.");
+		}
+		return VK_COMPARE_OP_MAX_ENUM;
+	}
+
 	static VkSamplerAddressMode ToVulkan(ESamplerAddressMode Mode)
 	{
 		switch (Mode)

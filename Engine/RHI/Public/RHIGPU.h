@@ -22,7 +22,5 @@ public:
 protected:
 	
 	WEngine::WString GPUName;
-
-	GPUFeature m_feature;
 	
 };

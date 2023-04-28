@@ -79,6 +79,12 @@ namespace Vulkan
 	};
 
 	template<>
+	struct TVulkanResourceTraits<RHISamplerState>
+	{
+		typedef class VulkanSamplerState type;
+	};
+
+	template<>
 	struct TVulkanResourceTraits<RHIVertexShader>
 	{
 		typedef class VulkanVertexShader type;
@@ -178,7 +184,7 @@ namespace Vulkan
 	void ZeroVulkanStruct(VulkanStructType& Struct, int32 VulkanType)
 	{
 		Struct = {};
-		Struct.sType = VulkanType;
+		(int32&)Struct.sType = VulkanType;
 	}
 
 }

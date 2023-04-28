@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanUniformBuffer.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
-#include "Platform/Vulkan/Allocator/Public/VulkanMemoryManager.h"
 #include "Render/Descriptor/Public/RHIBufferDescriptor.h"
 #include "Render/Public/RenderDependencyGraphParameter.h"
 

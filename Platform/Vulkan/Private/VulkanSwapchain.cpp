@@ -120,7 +120,7 @@ namespace Vulkan
 		vkGetSwapchainImagesKHR(pDevice->GetHandle(), Swapchain, &NumSwapchainImageCount, OutImages.GetData());
 
 		VulkanPipelineBarrier Barrier;
-		VkImageSubresourceRange Range = VulkanPipelineBarrier::GetTextureSubresourceRange(IMAGE_ASPECT_COLOR, 0, 1, 0, 1);
+		VkImageSubresourceRange Range = VulkanPipelineBarrier::GetTextureSubresourceRange(VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1);
 		for (uint32 ImageIndex = 0; ImageIndex < NumSwapchainImageCount; ++ImageIndex)
 		{
 			Barrier.AddTransition(OutImages[ImageIndex], Range, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);

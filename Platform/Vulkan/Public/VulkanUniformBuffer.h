@@ -1,5 +1,6 @@
 #pragma once
 #include "RHI/Public/RHIBuffer.h"
+#include "platform/Vulkan/Allocator/Public/VulkanMemoryManager.h"
 
 namespace Vulkan
 {

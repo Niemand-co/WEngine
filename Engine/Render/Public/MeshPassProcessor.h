@@ -235,6 +235,7 @@ public:
 	GraphicsPipelineStateId& operator=(const GraphicsPipelineStateId& NewId)
 	{
 		Id = NewId.Id;
+		return *this;
 	}
 
 	bool operator==(int32 OtherId)

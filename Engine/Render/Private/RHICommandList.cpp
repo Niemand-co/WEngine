@@ -183,7 +183,7 @@ WViewportRHIRef RHIRenderCommandList::CreateViewport(uint32 InWidth, uint32 InHe
     return GetDynamicRHI()->RHICreateViewport(InWidth, InHeight, bInFullScreen, InFormat);
 }
 
-WBlendStateRHIRef RHIRenderCommandList::CreateBlendState(const RHIBlendStateInitializer& Initializer)
+WAttachmentBlendStateRHIRef RHIRenderCommandList::CreateBlendState(const RHIBlendStateInitializer& Initializer)
 {
     return GetStaticRHI()->CreateBlendState(Initializer);
 }

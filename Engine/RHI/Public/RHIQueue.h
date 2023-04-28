@@ -3,6 +3,11 @@
 class RHIQueue : public RHIResource
 {
 public:
+
+	RHIQueue()
+		: RHIResource(ERHIResourceType::RRT_Queue)
+	{
+	}
 	
 	virtual ~RHIQueue() = default;
 

@@ -16,11 +16,16 @@ namespace WEngine
 		{
 		}
 
-		template<typename... Args>
-		explicit WStaticArray(Args&&... args)
-			: Storage(TMakeIntegerSequence<uint32, NumElements>(), Forward<Args>(args)...)
+		explicit WStaticArray(ElementType DefaultValue)
+			: Storage(TMakeIntegerSequence<uint32, NumElements>(), DefaultValue)
 		{
 		}
+
+		//template<typename... Args>
+		//explicit WStaticArray(Args&&... args)
+		//	: Storage(TMakeIntegerSequence<uint32, NumElements>(), Forward<Args>(args)...)
+		//{
+		//}
 
 		WStaticArray(WStaticArray&&) = default;
 		WStaticArray(const WStaticArray&) = default;

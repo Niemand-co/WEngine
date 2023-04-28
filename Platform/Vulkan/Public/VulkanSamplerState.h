@@ -12,7 +12,9 @@ namespace Vulkan
 
 		virtual ~VulkanSamplerState() = default;
 
-		static void SetupCreateInfo(const RHISamplerStateInitializer& Initializer, VkSamplerCreateInfo& OutInfo);
+		static void SetupCreateInfo(const RHISamplerStateInitializer& Initializer, VulkanDevice* pDevice, VkSamplerCreateInfo& OutInfo);
+
+		VkSampler GetHandle() const { return Sampler; }
 
 	private:
 
@@ -24,7 +26,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanSamplerStateManager(VulkanDevice* pInDevice)
+		VulkanSamplerStateManager(class VulkanDevice* pInDevice)
 			: pDevice(pInDevice)
 		{
 		}

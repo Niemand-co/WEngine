@@ -25,7 +25,7 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 		}
 
 		Initializer.DepthStencilFormat = RenderState.DepthStencil.Format;
-		Initializer.DepthStencilLoadAction = RenderState.DepthStencil.LoadOp;
+		Initializer.DepthTargetLoadAction = RenderState.DepthStencil.LoadOp;
 		Initializer.DepthTargetStoreAction = RenderState.DepthStencil.StoreOp;
 
 		Initializer.DepthStencilState = RenderState.DepthStencilState;
@@ -52,9 +52,9 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 
 		Initializer.MultiSampleState = RenderState.MultiSampleState;
 
-		Initializer.BoundShaderState.VertexShaderRHI = PassShader->GetVertexShader();
-		Initializer.BoundShaderState.GeometryShaderRHI = PassShader->GetGeometryShader();
-		Initializer.BoundShaderState.PixelShaderRHI = PassShader->GetPixelShader();
+		Initializer.BoundShaderState.VertexShaderRHI = PassShader->GetVertexShaderRHI();
+		Initializer.BoundShaderState.GeometryShaderRHI = PassShader->GetGeometryShaderRHI();
+		Initializer.BoundShaderState.PixelShaderRHI = PassShader->GetPixelShaderRHI();
 
 	}
 
@@ -79,7 +79,7 @@ void WMeshPassProcessor::BuildMeshDrawCommand(const WMeshBatch& MeshBatch,
 			PassShader->GetPixelShader()->GetParametersBinding(View, &Material, ShaderBindings);
 		}
 
-		DrawList->FinalizeCommand()
+		DrawList->FinalizeCommand(MeshBatch, ElementIndex, PassShader, Initializer, DrawCommand);
 	}
 
 }

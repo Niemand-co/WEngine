@@ -166,7 +166,8 @@ namespace Vulkan
 	}
 
 	VulkanStagingBuffer::VulkanStagingBuffer(VulkanDevice* pInDevice)
-		: pDevice(pInDevice),
+		: RHIBuffer(0, 0, EBufferUsageFlags::BF_TransferSrc),
+		  pDevice(pInDevice),
 		  Buffer(VK_NULL_HANDLE),
 		  MemoryPropertyFlags(VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
 		  Size(0)

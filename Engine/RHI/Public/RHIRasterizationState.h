@@ -4,7 +4,10 @@ class RHIRasterizationState : public RHIResource
 {
 public:
 
-	RHIRasterizationState() = default;
+	RHIRasterizationState()
+		: RHIResource(ERHIResourceType::RRT_State)
+	{
+	}
 
 	virtual ~RHIRasterizationState() = default;
 

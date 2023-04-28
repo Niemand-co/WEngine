@@ -54,49 +54,38 @@ constexpr const VkComponentMapping ComponentMapping000R = { VK_COMPONENT_SWIZZLE
 constexpr const VkComponentMapping ComponentMappingR000 = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_ZERO, VK_COMPONENT_SWIZZLE_ZERO, VK_COMPONENT_SWIZZLE_ZERO };
 constexpr const VkComponentMapping ComponentMappingRR01 = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_ZERO, VK_COMPONENT_SWIZZLE_ONE };
 
-template<uint8 PixelFormat>
-struct FormatComponentMapping
+static VkComponentMapping FormatComponentMapping(EFormat Format)
 {
-	static constexpr const VkComponentMapping ComponentMapping = ComponentMappingRGBA;
-};
+	switch (Format)
+	{
+		case EFormat::R8_SInt:
+		case EFormat::R8_SNorm:
+		case EFormat::R8_UInt:
+		case EFormat::R8_UNorm:
+		case EFormat::R16_UInt:
+		case EFormat::R16_SInt:
+		case EFormat::R16_SFloat:
+		case EFormat::R32_UInt:
+		case EFormat::R32_SInt:
+		case EFormat::R32_SFloat:
+			return ComponentMappingR001;
+		case EFormat::D16_Unorm:
+			return ComponentMappingRIII;
+		case EFormat::D32_SFloat:
+			return ComponentMappingR000;
+		case EFormat::D16_UNORM_S8_UINT:
+		case EFormat::D24_UNORM_S8_UINT:
+		case EFormat::D32_SFLOAT_S8_UINT: 
+			return ComponentMappingR000;
+		case EFormat::R16G16_UInt:
+		case EFormat::R16G16_SInt:
+		case EFormat::R16G16_SFloat:
+			return ComponentMappingRG01;
+		default:
+			return ComponentMappingRGBA;
+	}
 
-template<>
-struct FormatComponentMapping<(uint8)EFormat::R8_SInt> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingR001; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::R8_SNorm> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingR001; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::R8_UInt> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingR001; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::R8_UNorm> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingR001; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::R16_UInt> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingR001; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::R16_SInt> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingR001; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::R16_SFloat> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingR001; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::R32_UInt> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingR001; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::R32_SInt> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingR001; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::R32_SFloat> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingR001; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::D16_Unorm> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingRIII; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::D32_SFloat> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingR000; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::D16_UNORM_S8_UINT> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingR000; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::D24_UNORM_S8_UINT> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingR000; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::D32_SFLOAT_S8_UINT> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingR000; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::R16G16_UInt> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingRG01; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::R16G16_SInt> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingRG01; };
-template<>
-struct FormatComponentMapping<(uint8)EFormat::R16G16_SFloat> { static constexpr const VkComponentMapping ComponentMapping = ComponentMappingRG01; };
-
+}
 class RHIGraphicsPipelineStateInitializer;
 
 namespace Vulkan

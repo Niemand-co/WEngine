@@ -8,10 +8,14 @@
 enum ERHIResourceType : uint8
 {
 	RRT_None,
+	RRT_Instance,
+	RRT_Device,
+	RRT_Queue,
 	RRT_VertexShader,
 	RRT_PixelShader,
 	RRT_GeometryShader,
 	RRT_CommandBuffer,
+	RRT_CommandBufferPool,
 	RRT_Texture,
 	RRT_Buffer,
 	RRT_BlendState,
@@ -27,9 +31,11 @@ enum ERHIResourceType : uint8
 	RRT_SamplerState,
 	RRT_Barrier,
 	RRT_Subresource,
-	RRT_Device,
 	RRT_State,
 	RRT_PSO,
+	RRT_Viewport,
+	RRT_Fence,
+	RRT_Semaphore,
 };
 
 class RHIResource
@@ -139,6 +145,7 @@ struct RHISamplerStateInitializer
 	int32 MipBias = 0;
 	int32 MaxAnisotropy = 1;
 	uint32 BorderColor = 0;
+	ESamplerCompareFunction Comparision = ESamplerCompareFunction::SCF_Never;
 };
 
 struct RHIBoundShaderStateInput
@@ -169,11 +176,11 @@ struct RHIGraphicsPipelineStateInitializer
 {
 public:
 
-	using TRenderTargetFormats = WEngine::WStaticArray<uint8 /* EFormat */, MaxSimultaneousRenderTargets>;
-	using TRenderTargetFlags = WEngine::WStaticArray<uint16 /* ETextureCreateFlags */, MaxSimultaneousRenderTargets>;
-	using TRenderTargetLoadOps = WEngine::WStaticArray<uint8 /* EAttachmentLoadOp */, MaxSimultaneousRenderTargets>;
-	using TRenderTargetStoreOps = WEngine::WStaticArray<uint8 /* EAttachmentStoreOp */, MaxSimultaneousRenderTargets>;
-	using TRenderTargetInitialLayouts = WEngine::WStaticArray<uint8 /* EAttachmentLayout */, MaxSimultaneousRenderTargets>;
+	using TRenderTargetFormats = WEngine::WStaticArray<EFormat, MaxSimultaneousRenderTargets>;
+	using TRenderTargetFlags = WEngine::WStaticArray<ETextureCreateFlags, MaxSimultaneousRenderTargets>;
+	using TRenderTargetLoadOps = WEngine::WStaticArray<EAttachmentLoadOP, MaxSimultaneousRenderTargets>;
+	using TRenderTargetStoreOps = WEngine::WStaticArray<EAttachmentStoreOP, MaxSimultaneousRenderTargets>;
+	using TRenderTargetInitialLayouts = WEngine::WStaticArray<EAttachmentLayout, MaxSimultaneousRenderTargets>;
 	using TImmutableSamplerStates = WEngine::WStaticArray<RHISamplerState*, 2>;
 
 	RHIGraphicsPipelineStateInitializer()
@@ -271,7 +278,7 @@ public:
 	{
 		for (uint32 Index = 0; Index < MaxSimultaneousRenderTargets; ++Index)
 		{
-			if (RenderTargetFormats[Index] == (uint8)EFormat::Unknown)
+			if (RenderTargetFormats[Index] == EFormat::Unknown)
 			{
 				RenderTargetEnabled = Index;
 				return Index;

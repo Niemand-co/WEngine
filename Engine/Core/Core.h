@@ -34,8 +34,8 @@ typedef long long int64;
 #define UINT32_MAX       0xffffffffui32
 #define UINT64_MAX       0xffffffffffffffffui64
 
-uint32 GFrameGameThread = 1;
-uint32 GFrameRenderThread = 1;
+static uint32 GFrameGameThread = 1;
+static uint32 GFrameRenderThread = 1;
 
 template<typename BIT32, typename BIT64, size_t pointerLenth>
 struct SelectIntPointerType

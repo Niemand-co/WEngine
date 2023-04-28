@@ -55,7 +55,7 @@ namespace Vulkan
 		swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 		swapchainCreateInfo.imageFormat = WEngine::ToVulkan(descriptor->format);
 		swapchainCreateInfo.imageColorSpace = WEngine::ToVulkan(descriptor->colorSpace);
-		swapchainCreateInfo.imageExtent = { descriptor->extent.width, descriptor->extent.height };
+		swapchainCreateInfo.imageExtent = { descriptor->Extent.width, descriptor->Extent.height };
 		swapchainCreateInfo.minImageCount = descriptor->count;
 		swapchainCreateInfo.imageArrayLayers = 1;
 		swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
@@ -258,9 +258,9 @@ namespace Vulkan
 			FramebufferCreateInfo.renderPass = static_cast<VulkanRenderPass*>(RenderPass)->GetHandle();
 			FramebufferCreateInfo.attachmentCount = ImageViews.Size();
 			FramebufferCreateInfo.pAttachments = ImageViews.GetData();
-			FramebufferCreateInfo.width = descriptor->extent.width;
-			FramebufferCreateInfo.height = descriptor->extent.height;
-			FramebufferCreateInfo.layers = descriptor->extent.depth;
+			FramebufferCreateInfo.width = descriptor->Extent.width;
+			FramebufferCreateInfo.height = descriptor->Extent.height;
+			FramebufferCreateInfo.layers = descriptor->Extent.depth;
 		}
 		
 		Framebuffer = new VulkanFramebuffer(this, &FramebufferCreateInfo);
@@ -268,44 +268,9 @@ namespace Vulkan
 		return Framebuffer;
 	}
 
-	RHIPipelineStateObject* VulkanDevice::GetOrCreateGraphicsPipelineState(RHIGraphicsPipelineStateDescriptor* descriptor)
-	{
-
-	}
-
 	WTextureRHIRef VulkanDevice::CreateTexture(const RHITextureDesc& InDesc)
 	{
 		return new VulkanTexture(this, InDesc);
-	}
-
-	RHISampler* VulkanDevice::CreateSampler(RHISamplerDescriptor* descriptor)
-	{
-		VkSamplerCreateInfo samplerCreateInfo = {};
-		{
-			samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-			samplerCreateInfo.anisotropyEnable = false;
-			samplerCreateInfo.maxAnisotropy = 16;
-			samplerCreateInfo.magFilter = WEngine::ToVulkan(descriptor->magFilter);
-			samplerCreateInfo.minFilter = WEngine::ToVulkan(descriptor->minFilter);
-			samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-			samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-			samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-			samplerCreateInfo.compareEnable = false;
-			samplerCreateInfo.compareOp = VK_COMPARE_OP_NEVER;
-			samplerCreateInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_WHITE;
-			samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-			samplerCreateInfo.minLod = 0;
-			samplerCreateInfo.maxLod = 0;
-			samplerCreateInfo.mipLodBias = 0;
-		}
-
-		VkSampler *pSampler = (VkSampler*)NormalAllocator::Get()->Allocate(sizeof(VkSampler));
-		RE_ASSERT(vkCreateSampler(Device, &samplerCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pSampler) == VK_SUCCESS, "Failed to Create Sampler.");
-		
-		VulkanSampler *sampler = (VulkanSampler*)NormalAllocator::Get()->Allocate(sizeof(VulkanSampler));
-		::new (sampler) VulkanSampler(pSampler);
-
-		return sampler;
 	}
 
 	WVertexBufferRHIRef VulkanDevice::CreateVertexBuffer(RHIBufferDescriptor* descriptor)

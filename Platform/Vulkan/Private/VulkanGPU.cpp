@@ -20,49 +20,10 @@ namespace Vulkan
 		GPUName = properties.deviceName;
 		RE_LOG(GPUName);
 
-		if(properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-			m_feature.PHYSICAL_DEVICE_TYPE |= DEVICE_TYPE_DISCRETE_GPU;
-		else if(properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
-			m_feature.PHYSICAL_DEVICE_TYPE |= DEVICE_TYPE_INTEGRATED_GPU;
-		else
-			m_feature.PHYSICAL_DEVICE_TYPE |= DEVICE_TYPE_OTHER;
-
-		m_feature.minUBOAlignment = properties.limits.minUniformBufferOffsetAlignment;
-
-		VkPhysicalDeviceFeatures features;
-		vkGetPhysicalDeviceFeatures(*m_pPhysicalDevice, &features);
-
-		if(features.geometryShader)
-			m_feature.SHDAER_SUPPORT |= FEATURE_GEOMETRY_SHADER;
-		if(features.tessellationShader)
-			m_feature.SHDAER_SUPPORT |= FEATURE_TESSELATION_SHADER;
-
-		VkPhysicalDeviceMemoryProperties memoryProperties;
-		vkGetPhysicalDeviceMemoryProperties(*m_pPhysicalDevice, &memoryProperties);
-		m_feature.memorySupports.Resize(memoryProperties.memoryHeapCount);
-		for (unsigned int i = 0; i < memoryProperties.memoryHeapCount; ++i)
-		{
-			m_feature.memorySupports[i] = new MemoryTypeSupport();
-			if(memoryProperties.memoryHeaps[i].flags == VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
-				m_feature.memorySupports[i]->type = MemoryType::LocalMemory;
-			else
-				m_feature.memorySupports[i]->type = MemoryType::HostMemory;
-			m_feature.memorySupports[i]->size = memoryProperties.memoryHeaps[i].size;
-		}
-		for (unsigned int i = 0; i < memoryProperties.memoryTypeCount; ++i)
-		{
-			m_feature.memorySupports[memoryProperties.memoryTypes[i].heapIndex]->properties |= memoryProperties.memoryTypes[i].propertyFlags;
-		}
-
 	}
 
 	VulkanGPU::~VulkanGPU()
 	{
-	}
-
-	const GPUFeature& VulkanGPU::GetFeature() const
-	{
-		return RHIGPU::m_feature;
 	}
 
 	const WEngine::WString& VulkanGPU::GetGPUName() const
