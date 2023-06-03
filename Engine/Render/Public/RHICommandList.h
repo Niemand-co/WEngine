@@ -12,12 +12,12 @@ public:
 
 	void* operator new(size_t size)
 	{
-		return NormalAllocator::Get()->Allocate(size);
+		return GetCPUAllocator()->Allocate(size);
 	}
 
 	void operator delete(void* pData)
 	{
-		NormalAllocator::Get()->Deallocate(pData);
+		GetCPUAllocator()->Deallocate(pData);
 	}
 
 	const class RHIContext* GetContext() const { return m_pContext; }
@@ -57,7 +57,7 @@ public:
 
 	void EndDrawingViewport(RHIViewport *Viewport, bool bPresent);
 
-	WRenderPassRHIRef BeginRenderPass(class RHIRenderPassDescriptor *RenderPasDescriptor, class RHIFramebufferDescriptor *FramebufferDescriptor);
+	void BeginRenderPass(class RHIRenderPassDescriptor *RenderPasDescriptor, class RHIFramebufferDescriptor *FramebufferDescriptor);
 
 	void EndRenderPass();
 
@@ -87,13 +87,7 @@ public:
 
 	WUniformBufferRHIRef CreateUniformBuffer(uint8* InContents, const class ShaderParametersLayout *InLayout, EUniformBufferUsage InUsage);
 
-	WVertexShaderRHIRef CreateVertexShader(ShaderCodeBlob& blob);
-
-	WPixelShaderRHIRef CreatePixelShader(ShaderCodeBlob& blob);
-
-	WGeometryShaderRHIRef CreateGeometryShader(ShaderCodeBlob& blob);
-
-	WComputeShaderRHIRef CreateComputeShader(ShaderCodeBlob& blob);
+	WShaderRHIRef CreateShader(EShaderFrequency InFrequency, ShaderCodeBlob& InBlob);
 
 	WTextureRHIRef CreateTexture(const class RHITextureDesc& InDesc);
 

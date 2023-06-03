@@ -12,7 +12,7 @@ namespace Vulkan
 
 	VulkanScissor::~VulkanScissor()
 	{
-		NormalAllocator::Get()->Deallocate(m_pScissor);
+		GetCPUAllocator()->Deallocate(m_pScissor);
 	}
 
 }

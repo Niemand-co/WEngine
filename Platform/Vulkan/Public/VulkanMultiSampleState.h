@@ -1,5 +1,4 @@
 #pragma once
-#include "RHI/Public/RHIMultiSampleState.h"
 
 namespace Vulkan
 {

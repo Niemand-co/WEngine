@@ -57,3 +57,9 @@ namespace WEngine
 }
 
 NormalAllocator* NormalAllocator::g_pInstance = new Vulkan::VulkanAllocator();
+
+NormalAllocator* GetCPUAllocator()
+{
+	static NormalAllocator* Allocator = new Vulkan::VulkanAllocator();
+	return Allocator;
+}

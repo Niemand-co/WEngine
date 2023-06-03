@@ -7,7 +7,7 @@ namespace Vulkan
 	{
 		WEngine::WHashMap<uint32, VkShaderStageFlags> LayoutsToStageMap;
 
-		const class VulkanShaderCodeHeader *CodeHeaders[(uint8)EShaderStage::Count];
+		const class VulkanShaderCodeHeader *CodeHeaders[(uint8)EShaderStage::Count] = {0};
 	};
 
 	class VulkanDescriptorSetLayout : public VulkanResource
@@ -61,7 +61,7 @@ namespace Vulkan
 
 		VkDescriptorSetLayout GetHandle() const { return DescriptorSetLayout; }
 
-		WEngine::WArray<SetLayout>& GetLayouts() { return Layouts; }
+		const WEngine::WArray<SetLayout>& GetLayouts() const { return Layouts; }
 
 		uint32 GetTypeHash() const { return Hash; }
 
@@ -99,27 +99,21 @@ namespace Vulkan
 
 	};
 
-	class VulkanDescriptorSetLayoutManager : public VulkanResource
+	class VulkanDescriptorSetManager : VulkanResource
 	{
 	public:
 
-		static VulkanDescriptorSetLayout* GetDescriptorSetLayout(uint32 ID)
-		{
-			if (Layouts.Find(ID))
-			{
-				return Layouts[ID];
-			}
-			return nullptr;
-		}
+		VulkanDescriptorSetManager(VulkanDevice *pInDevice);
 
-		static void AddDescriptorLayout(uint32 ID, VulkanDescriptorSetLayout* Layout)
-		{
-			Layouts[ID] = Layout;
-		}
+		virtual ~VulkanDescriptorSetManager();
+
+		void GetDescriptorSets(uint32 DSetKey, const VulkanDescriptorSetLayout& Layout, )
 
 	private:
 
-		static WEngine::WHashMap<uint32, VulkanDescriptorSetLayout*> Layouts;
+		VulkanDevice *pDevice;
+
+		WEngine::WArray<VkDescriptorPool> Pools;
 
 	};
 

@@ -47,13 +47,7 @@ public:
 
 	WUniformBufferRHIRef RHICreateUniformBuffer(uint8* InContents, const class ShaderParametersLayout* InLayout, EUniformBufferUsage InUsage);
 
-	WVertexShaderRHIRef RHICreateVertexShader(class ShaderCodeBlob& blob);
-
-	WPixelShaderRHIRef RHICreatePixelShader(class ShaderCodeBlob& blob);
-
-	WGeometryShaderRHIRef RHICreateGeometryShader(class ShaderCodeBlob& blob);
-
-	WComputeShaderRHIRef RHICreateComputeShader(class ShaderCodeBlob& blob);
+	WShaderRHIRef RHICreateShader(EShaderFrequency InFrequency, ShaderCodeBlob& InBlob);
 
 	WTextureRHIRef RHICreateTexture(const class RHITextureDesc& InDesc);
 
@@ -71,7 +65,7 @@ public:
 
 	virtual void RHIEndDrawingViewport(class RHIViewport* Viewport, bool bPresent) = 0;
 
-	virtual WRenderPassRHIRef RHIBeginRenderPass(class RHIRenderPassDescriptor* RenderPasDescriptor, class RHIFramebufferDescriptor* FramebufferDescriptor) = 0;
+	virtual void RHIBeginRenderPass(class RHIRenderPassDescriptor* RenderPasDescriptor, class RHIFramebufferDescriptor* FramebufferDescriptor) = 0;
 
 	virtual void RHIEndRenderPass() = 0;
 
@@ -95,7 +89,7 @@ public:
 
 	virtual RHIRenderPass* RHICreateRenderPass(const class RHIGraphicsPipelineStateInitializer& Initializer) = 0;
 
-	virtual void RHISetShaderUniformBuffer(class RHIGraphicsShader *ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer) = 0;
+	virtual void RHISetShaderUniformBuffer(WShaderRHIRef ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer) = 0;
 
 	virtual WSamplerStateRHIRef RHICreateSamplerState(const RHISamplerStateInitializer& Initializer) = 0;
 

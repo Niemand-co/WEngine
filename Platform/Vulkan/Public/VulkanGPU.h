@@ -17,8 +17,6 @@ namespace Vulkan
 
 		virtual ~VulkanGPU();
 
-		virtual const GPUFeature& GetFeature() const override;
-
 		virtual const WEngine::WString& GetGPUName() const override;
 
 		virtual RHIDevice* CreateDevice(RHIDeviceDescriptor *descriptor) override;

@@ -82,7 +82,7 @@ namespace WEngine
 		size_t rest = byteLength % 64;
 		size_t addLength = rest < 56 ? 64 - rest : 128 - rest;
 		size_t length = byteLength + addLength;
-		byte *byteArr = (byte*)NormalAllocator::Get()->Allocate(length);
+		byte *byteArr = (byte*)GetCPUAllocator()->Allocate(length);
 
 		size_t index = 0;
 		for (; index < byteLength; ++index)
@@ -198,7 +198,7 @@ namespace WEngine
 	template<>
 	void MD5(const WString& data, unsigned int& A, unsigned int& B, unsigned int& C, unsigned int& D)
 	{
-		MD5Internal((byte*)data.Data(), data.Size(), A, B, C, D);
+		MD5Internal((byte*)data.GetData(), data.Size(), A, B, C, D);
 	}
 
 	template<>

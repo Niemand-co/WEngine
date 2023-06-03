@@ -87,7 +87,10 @@ public:
 	}
 
 
-	~RHIBarrierDescriptor() = default;
+	~RHIBarrierDescriptor()
+	{
+		Resource = nullptr;
+	}
 
 public:
 

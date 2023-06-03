@@ -10,6 +10,7 @@ namespace Vulkan
 	VulkanDynamicContext::VulkanDynamicContext()
 	{
 		pCommandBufferManager = new VulkanCommandBufferManager(static_cast<VulkanDevice*>(pDevice), static_cast<VulkanQueue*>(pQueue));
+		PendingState = new VulkanPendingGfxState();
 	}
 
 	VulkanDynamicContext::~VulkanDynamicContext()
@@ -31,10 +32,11 @@ namespace Vulkan
 		}
 	}
 
-	WRenderPassRHIRef VulkanDynamicContext::RHIBeginRenderPass(RHIRenderPassDescriptor* RenderPasDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor)
+	void VulkanDynamicContext::RHIBeginRenderPass(RHIRenderPassDescriptor* RenderPassDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor)
 	{
-		VulkanRenderPass *Pass = static_cast<VulkanRenderPass*>(pDevice->GetOrCreateRenderPass(RenderPasDescriptor));
-		VulkanFramebuffer *Framebuffer = static_cast<VulkanFramebuffer*>(pDevice->GetOrCreateFramebuffer(FramebufferDescriptor, Pass));
+		VulkanRenderTargetLayout RTLayout(RenderPassDescriptor);
+		VulkanRenderPass * RenderPass = ResourceCast(pDevice)->GetLayoutManager()->GetOrCreateRenderPass(RTLayout);
+		VulkanFramebuffer *Framebuffer = ResourceCast(pDevice)->GetLayoutManager()->GetOrCreateFramebuffer(FramebufferDescriptor, RTLayout, RenderPass);
 
 		VulkanCommandBuffer *CmdBuffer = pCommandBufferManager->GetActiveCommandBuffer();
 		if (!CmdBuffer)
@@ -47,16 +49,15 @@ namespace Vulkan
 		VkRenderPassBeginInfo Info = {};
 		{
 			Info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-			Info.renderPass = Pass->GetHandle();
+			Info.renderPass = RenderPass->GetHandle();
 			Info.framebuffer = Framebuffer->GetHandle();
 			Info.clearValueCount = ClearValues.Size();
 			Info.pClearValues = ClearValues.GetData();
-			Info.renderArea.offset = { 0, 0 };
+			Info.renderArea.offset = { (int32)FramebufferDescriptor->Offset.x, (int32)FramebufferDescriptor->Offset.y };
 			Info.renderArea.extent = { FramebufferDescriptor->Extent.width, FramebufferDescriptor->Extent.height };
 		}
 		vkCmdBeginRenderPass(CmdBuffer->GetHandle(), &Info, VK_SUBPASS_CONTENTS_INLINE);
 		CmdBuffer->State = VulkanCommandBuffer::ECmdState::IsInsideRenderPass;
-		return Pass;
 	}
 
 	void VulkanDynamicContext::RHIEndRenderPass()
@@ -220,7 +221,7 @@ namespace Vulkan
 		}
 	}
 
-	void VulkanDynamicContext::RHISetShaderUniformBuffer(RHIGraphicsShader* ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer)
+	void VulkanDynamicContext::RHISetShaderUniformBuffer(WShaderRHIRef ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer)
 	{
 		VulkanShaderBase *Shader = nullptr;
 		VkShaderStageFlags ShaderStage = 0;

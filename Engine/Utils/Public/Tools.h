@@ -197,6 +197,103 @@ namespace WEngine
 	template <typename T, T N>
 	using TMakeIntegerSequence = __make_integer_seq<TIntegerSequence, T, N>;
 
+	template<typename ElementType>
+	struct TIsElementTypePOD
+	{
+		enum { Value = false };
+	};
+
+	template<typename T>
+	struct TIsEnum
+	{
+		enum { Value = __is_enum(T) };
+	};
+
+	template<typename T>
+	struct TIsPointer
+	{
+		enum { Value = false };
+	};
+
+	template<typename T>
+	struct TIsPointer<T*>
+	{
+		enum { Value = true };
+	};
+
+	template<typename T> struct TIsPointer<const          T> { enum { Value = TIsPointer<T>::Value }; };
+	template<typename T> struct TIsPointer<      volatile T> { enum { Value = TIsPointer<T>::Value }; };
+	template<typename T> struct TIsPointer<const volatile T> { enum { Value = TIsPointer<T>::Value }; };
+
+	template<typename T>
+	struct TIsArithmetic
+	{
+		enum { Value = false };
+	};
+
+	template<> struct TIsArithmetic<int8> { enum { Value = true }; };
+	template<> struct TIsArithmetic<int16> { enum { Value = true }; };
+	template<> struct TIsArithmetic<int32> { enum { Value = true }; };
+	template<> struct TIsArithmetic<int64> { enum { Value = true }; };
+	template<> struct TIsArithmetic<uint8> { enum { Value = true }; };
+	template<> struct TIsArithmetic<uint16> { enum { Value = true }; };
+	template<> struct TIsArithmetic<uint32> { enum { Value = true }; };
+	template<> struct TIsArithmetic<uint64> { enum { Value = true }; };
+	template<> struct TIsArithmetic<float> { enum { Value = true }; };
+	template<> struct TIsArithmetic<double> { enum { Value = true }; };
+	template<> struct TIsArithmetic<long double> { enum { Value = true }; };
+	template<> struct TIsArithmetic<bool> { enum { Value = true }; };
+	template<> struct TIsArithmetic<long> { enum { Value = true }; };
+	template<> struct TIsArithmetic<unsigned long> { enum { Value = true }; };
+
+	template<typename T> struct TIsArithmetic<const          T> { enum { Value = TIsArithmetic<T>::Value }; };
+	template<typename T> struct TIsArithmetic<      volatile T> { enum { Value = TIsArithmetic<T>::Value }; };
+	template<typename T> struct TIsArithmetic<const volatile T> { enum { Value = TIsArithmetic<T>::Value }; };
+
+	template<> struct TIsElementTypePOD<int8> { enum { Value = true }; };
+	template<> struct TIsElementTypePOD<int16> { enum { Value = true }; };
+	template<> struct TIsElementTypePOD<int32> { enum { Value = true }; };
+	template<> struct TIsElementTypePOD<int64> { enum { Value = true }; };
+	template<> struct TIsElementTypePOD<uint8> { enum { Value = true }; };
+	template<> struct TIsElementTypePOD<uint16> { enum { Value = true }; };
+	template<> struct TIsElementTypePOD<uint32> { enum { Value = true }; };
+	template<> struct TIsElementTypePOD<uint64> { enum { Value = true }; };
+	template<> struct TIsElementTypePOD<float> { enum { Value = true }; };
+	template<> struct TIsElementTypePOD<double> { enum { Value = true }; };
+
+	template<typename T> struct TIsElementTypePOD<const          T> { enum { Value = TIsElementTypePOD<T>::Value }; };
+	template<typename T> struct TIsElementTypePOD<      volatile T> { enum { Value = TIsElementTypePOD<T>::Value }; };
+	template<typename T> struct TIsElementTypePOD<const volatile T> { enum { Value = TIsElementTypePOD<T>::Value }; };
+
+	template <typename... Types>
+	struct TOr;
+
+	template <bool LHSValue, typename... RHS>
+	struct TOrValue
+	{
+		static constexpr bool Value = TOr<RHS...>::value;
+		static constexpr bool value = TOr<RHS...>::value;
+	};
+
+	template <typename... RHS>
+	struct TOrValue<true, RHS...>
+	{
+		static constexpr bool Value = true;
+		static constexpr bool value = true;
+	};
+
+	template <typename LHS, typename... RHS>
+	struct TOr<LHS, RHS...> : TOrValue<LHS::Value, RHS...>
+	{
+	};
+
+	template <>
+	struct TOr<>
+	{
+		static constexpr bool Value = false;
+		static constexpr bool value = false;
+	};
+
 	template<typename Enum>
 	constexpr bool EnumHasFlags(Enum Flags, Enum Contains)
 	{
@@ -226,6 +323,18 @@ namespace WEngine
 		return memset(&Dst, 0, sizeof(T));
 	}
 
+	static FORCEINLINE void MemcpyWithNoType(void* Dst, void* Src, size_t Size)
+	{
+		memcpy(Dst, Src, Size);
+	}
+
+	template<typename T>
+	static FORCEINLINE void Memcpy(void* Dst, T* Src, size_t Size)
+	{
+		if(Src && Dst)
+			memcpy(Dst, (void*)Src, Size);
+	}
+
 	template<typename T>
 	static constexpr T Min(T a, T b)
 	{
@@ -248,6 +357,45 @@ namespace WEngine
 		return X < Min ? Min : (X > Max ? Max : X);
 	}
 
+	template<typename T, typename R>
+	struct TBitWiseConstructible
+	{
+		enum { Value = false };
+	};
+
+	template<typename T>
+	struct TBitWiseConstructible<T, T>
+	{
+		enum { Value = TIsElementTypePOD<T>::Value };
+	};
+
+	template<typename T, typename R>
+	struct TBitWiseConstructible<const T, R> : public TBitWiseConstructible<T, R>
+	{
+
+	};
+
+	template<typename T>
+	struct TBitWiseConstructible<const T*, T*>
+	{
+		enum { Value = true };
+	};
+
+	template<> struct TBitWiseConstructible<uint8, int8> { enum { Value = true }; };
+	template<> struct TBitWiseConstructible<int8, uint8> { enum { Value = true }; };
+	template<> struct TBitWiseConstructible<uint16, int16> { enum { Value = true }; };
+	template<> struct TBitWiseConstructible<int16, uint16> { enum { Value = true }; };
+	template<> struct TBitWiseConstructible<uint32, int32> { enum { Value = true }; };
+	template<> struct TBitWiseConstructible<int32, uint32> { enum { Value = true }; };
+	template<> struct TBitWiseConstructible<uint64, int64> { enum { Value = true }; };
+	template<> struct TBitWiseConstructible<int64, uint64> { enum { Value = true }; };
+
+	template<typename T>
+	struct TIsZeroConstructType
+	{
+		enum { Value = TOr<TIsEnum<T>, TIsArithmetic<T>, TIsPointer<T>>::Value };
+	};
+
 	template<typename ElementType>
 	FORCEINLINE void DestructItems(ElementType* Data, uint32 Count)
 	{
@@ -258,6 +406,44 @@ namespace WEngine
 			Data->DestructItemsElementTypeTypedef::~DestructItemsElementTypeTypedef();
 			++Data;
 			--Count;
+		}
+	}
+
+	template<typename DestinationType, typename ElementType>
+	FORCEINLINE void ConstructItems(void* Dst, ElementType *Src, uint32 Count)
+	{
+		if constexpr (TBitWiseConstructible<DestinationType, ElementType>::Value)
+		{
+			Memcpy(Dst, Src, (size_t)Count * sizeof(ElementType));
+		}
+		else
+		{
+			while (Count > 0)
+			{
+				::new (Dst) DestinationType(*Src);
+				++(DestinationType*&)Dst;
+				++Src;
+				--Count;
+			}
+		}
+	}
+
+	template<typename ElementType>
+	FORCEINLINE void DefaultConstructItems(void *Address, uint32 Count)
+	{
+		if constexpr (TIsZeroConstructType<ElementType>::Value)
+		{
+			Memzero(Address, (size_t)Count * sizeof(ElementType));
+		}
+		else
+		{
+			ElementType *Element = (ElementType*)Address;
+			while (Count)
+			{
+				::new (Element) ElementType;
+				++Element;
+				--Count;
+			}
 		}
 	}
 

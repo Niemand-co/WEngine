@@ -10,13 +10,13 @@ namespace Vulkan
 	VulkanGroupPool::VulkanGroupPool(VulkanDevice *pInDevice, VkDescriptorPoolCreateInfo *pInfo, VkDescriptorSetLayout InDescriptorSetLayout)
 		: pDevice(pInDevice)
 	{
-		vkCreateDescriptorPool(pDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DescriptorSetPool);
+		vkCreateDescriptorPool(pDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), &DescriptorSetPool);
 	}
 
 	VulkanGroupPool::~VulkanGroupPool()
 	{
-		vkDestroyDescriptorPool(pDevice->GetHandle(), DescriptorSetPool, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
-		vkDestroyDescriptorSetLayout(pDevice->GetHandle(), DescriptorSetLayout, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkDestroyDescriptorPool(pDevice->GetHandle(), DescriptorSetPool, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks());
+		vkDestroyDescriptorSetLayout(pDevice->GetHandle(), DescriptorSetLayout, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks());
 	}
 
 	VkDescriptorSet VulkanGroupPool::GetDescriptorSet()

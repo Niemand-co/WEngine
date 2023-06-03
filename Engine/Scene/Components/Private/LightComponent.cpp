@@ -33,7 +33,7 @@ LightInfo* LightComponent::GetLightInfo()
 	{
 		if (m_pInfo == nullptr)
 		{
-			m_pInfo = (LightInfo*)NormalAllocator::Get()->Allocate(sizeof(LightInfo));
+			m_pInfo = (LightInfo*)GetCPUAllocator()->Allocate(sizeof(LightInfo));
 		}
 		::new (m_pInfo) LightInfo(this);
 		bMarkedDirty = false;

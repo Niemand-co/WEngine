@@ -11,11 +11,11 @@ public:
 
 	virtual ~WShader() = default;
 
-	virtual WVertexShaderRHIRef GetVertexShader() const { return nullptr; }
+	virtual WShaderRHIRef GetVertexShader() const { return nullptr; }
 
-	virtual WGeometryShaderRHIRef GetGeometryShader() const { return nullptr; }
+	virtual WShaderRHIRef GetGeometryShader() const { return nullptr; }
 
-	virtual WPixelShaderRHIRef GetPixelShader() const { return nullptr; }
+	virtual WShaderRHIRef GetPixelShader() const { return nullptr; }
 
 };
 
@@ -57,11 +57,11 @@ public:
 
 	void UpdateRHIResource() override;
 
-	WComputeShaderRHIRef GetRHI() const { return Shader; }
+	WShaderRHIRef GetRHI() const { return Shader; }
 
 private:
 
-	WComputeShaderRHIRef Shader;
+	WShaderRHIRef Shader;
 
 };
 
@@ -71,7 +71,7 @@ class WShaderLibrary
 {
 public:
 
-	static class RHIShader* GetShader(const WEngine::WString& Name)
+	static WShaderRHIRef GetShader(const WEngine::WString& Name)
 	{
 		if (Shaders.Find(Name))
 		{
@@ -80,7 +80,7 @@ public:
 		return nullptr;
 	}
 
-	static void AddShader(const WEngine::WString& Name, RHIShader* Shader)
+	static void AddShader(const WEngine::WString& Name, WShaderRHIRef Shader)
 	{
 		Shaders[Name] = Shader;
 	}
@@ -89,6 +89,6 @@ public:
 
 private:
 
-	static WEngine::WHashMap<WEngine::WString, RHIShader*, ShaderHash> Shaders;
+	static WEngine::WHashMap<WEngine::WString, WShaderRHIRef, ShaderHash> Shaders;
 
 };

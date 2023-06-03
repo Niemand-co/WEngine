@@ -2,6 +2,9 @@
 #include "Platform/Vulkan/Public/VulkanRHIPrivate.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
 #include "Platform/Vulkan/Public/VulkanRenderPass.h"
+#include "Platform/Vulkan/Public/VulkanFramebuffer.h"
+#include "Render/Descriptor/Public/RHIRenderPassDescriptor.h"
+#include "Render/Descriptor/Public/RHIFramebufferDescriptor.h"
 
 namespace Vulkan
 {
@@ -17,7 +20,8 @@ namespace Vulkan
 	};
 
 	VulkanRenderTargetLayout::VulkanRenderTargetLayout(const RHIGraphicsPipelineStateInitializer& Initializer)
-		: NumColorAttachments(0),
+		: NumAttachments(0),
+		  NumColorAttachments(0),
 		  NumInputAttachments(0),
 		  bHasResolveAttachments(false),
 		  bHasDepthStencilAttachment(false)
@@ -29,6 +33,7 @@ namespace Vulkan
 		WEngine::Memzero(&DepthStencilReference, sizeof(VkAttachmentReference));
 
 		HashStruct hashStruct;
+		WEngine::Memzero(hashStruct);
 		bool bHasClearOp = false;
 
 		for (uint32 Index = 0; Index < Initializer.RenderTargetEnabled; ++Index)
@@ -44,7 +49,7 @@ namespace Vulkan
 				Attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 				Attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 
-				Attachment.initialLayout = WEngine::ToVulkan((EAttachmentLayout)Initializer.RenderTargetInitialLayouts[Index]);
+				Attachment.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 				Attachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
 				ColorReferences[NumColorAttachments].attachment = NumAttachments;
@@ -100,6 +105,96 @@ namespace Vulkan
 		NumUsedClearValues = bHasClearOp ? NumAttachments : 0;
 	}
 
+	VulkanRenderTargetLayout::VulkanRenderTargetLayout(const RHIRenderPassDescriptor* Descriptor)
+		: NumAttachments(0),
+		  NumColorAttachments(0),
+		  NumInputAttachments(0),
+		  bHasResolveAttachments(false),
+		  bHasDepthStencilAttachment(false)
+	{
+		WEngine::Memzero(Attachments, (2 * MaxSimultaneousRenderTargets + 2) * sizeof(VkAttachmentReference));
+		WEngine::Memzero(ColorReferences, MaxSimultaneousRenderTargets * sizeof(VkAttachmentReference));
+		WEngine::Memzero(InputReferences, (MaxSimultaneousRenderTargets + 1) * sizeof(VkAttachmentReference));
+		WEngine::Memzero(ResolveReferences, MaxSimultaneousRenderTargets * sizeof(VkAttachmentReference));
+		WEngine::Memzero(&DepthStencilReference, sizeof(VkAttachmentReference));
+
+		HashStruct hashStruct;
+		WEngine::Memzero(hashStruct);
+		bool bHasClearOp = false;
+		uint32 NumSamples = 0;
+
+		for (uint32 Index = 0; Index < Descriptor->ColorAttachmentCount; ++Index)
+		{
+			EFormat Format = (EFormat)Descriptor->ColorAttachmentDescriptors[Index].attachmentFormat;
+			if (Format != EFormat::Unknown)
+			{
+				NumSamples = Descriptor->ColorAttachmentDescriptors[Index].sampleCount;
+				VkAttachmentDescription& Attachment = Attachments[Index];
+				Attachment.format = WEngine::ToVulkan(Format);
+				Attachment.samples = WEngine::ToVulkan(NumSamples);
+				Attachment.loadOp = WEngine::ToVulkan((EAttachmentLoadOP)Descriptor->ColorAttachmentDescriptors[Index].attachmentLoadOP);
+				Attachment.storeOp = WEngine::ToVulkan((EAttachmentStoreOP)Descriptor->ColorAttachmentDescriptors[Index].attachmentStoreOP);
+				Attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+				Attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+				Attachment.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+				Attachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+				ColorReferences[NumColorAttachments].attachment = NumAttachments;
+				ColorReferences[NumColorAttachments].layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+				if (Attachment.initialLayout == VK_ATTACHMENT_LOAD_OP_CLEAR)
+				{
+					bHasClearOp = true;
+				}
+
+				hashStruct.Formats[Index] = Attachment.format;
+				hashStruct.LoadOps[Index] = Attachment.loadOp;
+				hashStruct.StoreOps[Index] = Attachment.storeOp;
+				hashStruct.Layouts[Index] = Attachment.initialLayout;
+
+				++NumAttachments;
+				++NumColorAttachments;
+			}
+		}
+
+		if (Descriptor->bHasDepthStencilAttachment)
+		{
+			NumSamples = Descriptor->DepthStencilAttachmentDescriptor.sampleCount;
+			VkAttachmentDescription& Attachment = Attachments[NumAttachments];
+			Attachment.format = WEngine::ToVulkan(Descriptor->DepthStencilAttachmentDescriptor.attachmentFormat);
+			Attachment.samples = WEngine::ToVulkan(NumSamples);
+			Attachment.loadOp = WEngine::ToVulkan(Descriptor->DepthStencilAttachmentDescriptor.attachmentLoadOP);
+			Attachment.storeOp = WEngine::ToVulkan(Descriptor->DepthStencilAttachmentDescriptor.attachmentStoreOP);
+			Attachment.stencilLoadOp = WEngine::ToVulkan(Descriptor->DepthStencilAttachmentDescriptor.stencilLoadOP);
+			Attachment.stencilStoreOp = WEngine::ToVulkan(Descriptor->DepthStencilAttachmentDescriptor.stencilStoreOP);
+
+			Attachment.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			Attachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+			DepthStencilReference.attachment = NumAttachments;
+			DepthStencilReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+			if (Attachment.loadOp == VK_ATTACHMENT_LOAD_OP_CLEAR || Attachment.stencilLoadOp == VK_ATTACHMENT_LOAD_OP_CLEAR)
+			{
+				bHasClearOp = true;
+			}
+
+			hashStruct.Formats[NumAttachments] = Attachment.format;
+			hashStruct.LoadOps[NumAttachments] = Attachment.loadOp;
+			hashStruct.StoreOps[NumAttachments] = Attachment.storeOp;
+
+			++NumAttachments;
+			bHasDepthStencilAttachment = true;
+		}
+
+		hashStruct.NumAttachments = NumAttachments;
+		hashStruct.NumSamples = NumSamples;
+
+		Hash = WEngine::MemCrc32(&hashStruct, sizeof(HashStruct));
+		NumUsedClearValues = bHasClearOp ? NumAttachments : 0;
+	}
+
 	VulkanRenderPass* VulkanLayoutManager::GetOrCreateRenderPass(const VulkanRenderTargetLayout& RTLayout)
 	{
 		uint32 RenderPassHash = RTLayout.Hash;
@@ -124,6 +219,40 @@ namespace Vulkan
 			RenderPasses.Insert(RenderPassHash, RenderPass);
 		}
 		return RenderPass;
+	}
+
+	VulkanFramebuffer* VulkanLayoutManager::GetOrCreateFramebuffer(const RHIFramebufferDescriptor* RTInfo, const VulkanRenderTargetLayout& RTLayout, VulkanRenderPass *RenderPass)
+	{
+		uint32 FramebufferHash = RTLayout.Hash;
+		FramebufferList *NewFramebuffer = nullptr;
+		{
+			WEngine::WScopeLock Lock(&FramebufferLock);
+			if (Framebuffers.Find(FramebufferHash))
+			{
+				NewFramebuffer = Framebuffers[FramebufferHash];
+				for (VulkanFramebuffer* Framebuffer : NewFramebuffer->Framebuffer)
+				{
+					VkRect2D RenderArea = Framebuffer->GetRenderArea();
+
+					if (Framebuffer->MatchInfo(RTInfo) &&
+					RenderArea.extent.width == RTInfo->Extent.width && RenderArea.extent.height == RTInfo->Extent.height &&
+					RenderArea.offset.x == RTInfo->Offset.x && RenderArea.offset.y == RTInfo->Offset.y)
+					{
+						return Framebuffer;
+					}
+				}
+			}
+			else
+			{
+				NewFramebuffer = new FramebufferList;
+				Framebuffers.Insert(FramebufferHash, NewFramebuffer);
+			}
+		}
+
+
+		VulkanFramebuffer *Framebuffer = new VulkanFramebuffer(pDevice, RTInfo, RTLayout, RenderPass);
+		NewFramebuffer->Framebuffer.Push(Framebuffer);
+		return Framebuffer;
 	}
 
 }

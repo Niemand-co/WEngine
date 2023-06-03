@@ -7,10 +7,11 @@
 namespace Vulkan
 {
 
-	void VulkanAllocation::Init(EVulkanAllocationType InType, EVulkanAllocationMetaType InMetaType, uint32 InSize, uint32 InOffset, uint32 InAllocatorIndex, uint32 InAllocationIndex)
+	void VulkanAllocation::Init(EVulkanAllocationType InType, EVulkanAllocationMetaType InMetaType, VkBuffer InBuffer, uint32 InSize, uint32 InOffset, uint32 InAllocatorIndex, uint32 InAllocationIndex)
 	{
 		Type = InType;
 		MetaType = InMetaType;
+		Buffer = InBuffer;
 		Size = InSize;
 		Offset = InOffset;
 		AllocatorIndex = InAllocatorIndex;
@@ -101,8 +102,9 @@ namespace Vulkan
 		}
 	}
 
-	VulkanSubresourceAllocator::VulkanSubresourceAllocator(EVulkanAllocationType InType, class VulkanMemoryManager* InOwner, VulkanDeviceMemoryAllocation *InDeviceMemoryAllocation, uint32 InBufferSize, uint32 InAlignment, VkBufferUsageFlags InUsageFlags, VkMemoryPropertyFlags InMemoryPropertyFlags, uint32 InPoolSizeIndex)
+	VulkanSubresourceAllocator::VulkanSubresourceAllocator(EVulkanAllocationType InType, VkBuffer InBuffer, class VulkanMemoryManager* InOwner, VulkanDeviceMemoryAllocation *InDeviceMemoryAllocation, uint32 InBufferSize, uint32 InAlignment, VkBufferUsageFlags InUsageFlags, VkMemoryPropertyFlags InMemoryPropertyFlags, uint32 InPoolSizeIndex)
 		: Type(InType),
+		  Buffer(InBuffer),
 		  Owner(InOwner),
 		  DeviceMemoryAllocation(InDeviceMemoryAllocation),
 		  BufferSize(InBufferSize),
@@ -120,6 +122,7 @@ namespace Vulkan
 
 	VulkanSubresourceAllocator::VulkanSubresourceAllocator(EVulkanAllocationType InType, VulkanMemoryManager* InOwner, VulkanDeviceMemoryAllocation* InDeviceMemoryAllocation, uint32 InMemoryTypeIndex, uint32 InBucketId)
 		: Type(InType),
+		  Buffer(VK_NULL_HANDLE),
 		  Owner(InOwner),
 		  DeviceMemoryAllocation(InDeviceMemoryAllocation),
 		  BufferSize(InDeviceMemoryAllocation->GetSize()),
@@ -167,7 +170,7 @@ namespace Vulkan
 
 				if (AllocationFreeListHead)
 				{
-					OutAllocation.Init(Type, InMetaType, InSize, AlignedOffset, AllocatorIndex, NumAllocations);
+					OutAllocation.Init(Type, InMetaType, Buffer, InSize, AlignedOffset, AllocatorIndex, NumAllocations);
 					VulkanAllocationInternal& Data = Internals.AddInitialized();
 					Data.Alignment = InAlignment;
 					Data.AllocationSize = AllocateSize;
@@ -175,7 +178,7 @@ namespace Vulkan
 				}
 				else
 				{
-					OutAllocation.Init(Type, InMetaType, InSize, AlignedOffset, AllocatorIndex, AllocationFreeListHead);
+					OutAllocation.Init(Type, InMetaType, Buffer, InSize, AlignedOffset, AllocatorIndex, AllocationFreeListHead);
 					VulkanAllocationInternal& Data = Internals[AllocationFreeListHead];
 					AllocationFreeListHead = Data.PreFree;
 					Data.Alignment = InAlignment;
@@ -330,6 +333,7 @@ namespace Vulkan
 		  AllBufferAllocationsFreeListHead(-1)
 	{
 		vkGetPhysicalDeviceMemoryProperties(*pDevice->GetGPU()->GetHandle(), &MemoryProperties);
+		Init();
 	}
 
 	VulkanMemoryManager::~VulkanMemoryManager()
@@ -531,7 +535,7 @@ namespace Vulkan
 			MemoryAllocateInfo.memoryTypeIndex = MemoryTypeIndex;
 		}
 		VkDeviceMemory DeviceMemory;
-		RE_ASSERT(vkAllocateMemory(pDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DeviceMemory) == VK_SUCCESS, "Failed to allocate memory.");
+		RE_ASSERT(vkAllocateMemory(pDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), &DeviceMemory) == VK_SUCCESS, "Failed to allocate memory.");
 
 		VulkanDeviceMemoryAllocation *Allocation = new VulkanDeviceMemoryAllocation();
 		Allocation->Device = pDevice->GetHandle();
@@ -547,7 +551,7 @@ namespace Vulkan
 
 	bool VulkanMemoryManager::GetMemoryPropertyTypeIndex(uint32 MemoryPropertyBits, VkMemoryPropertyFlags MemoryPropertyFlags, uint32& OutTypeIndex)
 	{
-		for (int32 MemoryTypeIndex = 0; MemoryTypeIndex < MemoryProperties.memoryHeapCount; ++MemoryTypeIndex)
+		for (int32 MemoryTypeIndex = 0; MemoryTypeIndex < MemoryProperties.memoryTypeCount; ++MemoryTypeIndex)
 		{
 			if ((MemoryPropertyBits & (0x01 << MemoryTypeIndex) != 0) && ((MemoryProperties.memoryTypes[MemoryTypeIndex].propertyFlags & MemoryPropertyFlags) == MemoryPropertyFlags))
 			{
@@ -561,7 +565,7 @@ namespace Vulkan
 	void VulkanMemoryManager::Free(VulkanDeviceMemoryAllocation* Allocation)
 	{
 		WEngine::WScopeLock Lock(&DeviceMemoryCS);
-		vkFreeMemory(pDevice->GetHandle(), Allocation->Memory, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkFreeMemory(pDevice->GetHandle(), Allocation->Memory, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks());
 
 		delete Allocation;
 	}
@@ -615,7 +619,7 @@ namespace Vulkan
 			BufferCreateInfo.size = BufferSize;
 			BufferCreateInfo.usage = UsageFlags;
 		}
-		RE_ASSERT(vkCreateBuffer(pDevice->GetHandle(), &BufferCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Buffer) == VK_SUCCESS, "Failed to create buffer.");
+		RE_ASSERT(vkCreateBuffer(pDevice->GetHandle(), &BufferCreateInfo, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), &Buffer) == VK_SUCCESS, "Failed to create buffer.");
 
 		VkMemoryRequirements MemoryRequirements;
 		vkGetBufferMemoryRequirements(pDevice->GetHandle(), Buffer, &MemoryRequirements);
@@ -631,7 +635,7 @@ namespace Vulkan
 			DeviceMemoryAllocation->Map(BufferSize, 0);
 		}
 
-		VulkanSubresourceAllocator *NewSubresourceAllocator = new VulkanSubresourceAllocator(EVulkanAllocationType::EAT_PooledBuffer, this, DeviceMemoryAllocation, BufferSize, MemoryRequirements.alignment, UsageFlags, MemoryPropertyFlags, PoolSize);
+		VulkanSubresourceAllocator *NewSubresourceAllocator = new VulkanSubresourceAllocator(EVulkanAllocationType::EAT_PooledBuffer, Buffer, this, DeviceMemoryAllocation, BufferSize, MemoryRequirements.alignment, UsageFlags, MemoryPropertyFlags, PoolSize);
 
 		RegisterSubresourceAllocator(NewSubresourceAllocator);
 		UsedBufferAllocators[PoolSize].Push(NewSubresourceAllocator);
@@ -724,7 +728,7 @@ namespace Vulkan
 			BufferCreateInfo.size = InSize;
 			BufferCreateInfo.usage = InUsageFlags;
 		}
-		RE_ASSERT(vkCreateBuffer(pDevice->GetHandle(), &BufferCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &StagingBuffer->Buffer) == VK_SUCCESS, "Failed to create buffer.");
+		RE_ASSERT(vkCreateBuffer(pDevice->GetHandle(), &BufferCreateInfo, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), &StagingBuffer->Buffer) == VK_SUCCESS, "Failed to create buffer.");
 
 		VkMemoryRequirements MemoryRequirements;
 		vkGetBufferMemoryRequirements(pDevice->GetHandle(), StagingBuffer->Buffer, &MemoryRequirements);
@@ -743,6 +747,8 @@ namespace Vulkan
 			WEngine::WScopeLock Lock(&StagingBufferCS);
 			UsedStagingBuffers.Push(StagingBuffer);
 		}
+
+		return StagingBuffer;
 	}
 
 	void VulkanStagingBufferManager::ReleaseBuffer(VulkanStagingBuffer* StagingBuffer)

@@ -20,10 +20,7 @@ namespace WEngine
 	void LayerStack::PushLayer(Layer* pLayer)
 	{
 		pLayer->OnAttach();
-		if(m_pLayers.Empty())
-			m_pLayers.Push(pLayer);
-		else
-			m_pLayers.PushForward(pLayer);
+		m_pLayers.Push(pLayer);
 	}
 
 	void LayerStack::PushOverLayer(Layer* pLayer)

@@ -27,17 +27,7 @@ namespace Vulkan
 
 		virtual RHIEvent* GetEvent() override;
 
-		virtual WVertexShaderRHIRef CreateVertexShader(RHIShaderDescriptor* descriptor) override;
-
-		virtual WPixelShaderRHIRef CreatePixelShader(RHIShaderDescriptor* descriptor) override;
-
-		virtual WGeometryShaderRHIRef CreateGeometryShader(RHIShaderDescriptor* descriptor) override;
-
-		virtual WComputeShaderRHIRef CreateComputeShader(RHIShaderDescriptor* descriptor) override;
-
-		virtual WRenderPassRHIRef GetOrCreateRenderPass(RHIRenderPassDescriptor *descriptor) override;
-
-		virtual WFramebufferRHIRef GetOrCreateFramebuffer(RHIFramebufferDescriptor *descriptor, RHIRenderPass* RenderPass) override;
+		virtual WShaderRHIRef CreateShader(RHIShaderDescriptor* descriptor) override;
 
 		virtual WTextureRHIRef CreateTexture(const RHITextureDesc& InDesc) override;
 

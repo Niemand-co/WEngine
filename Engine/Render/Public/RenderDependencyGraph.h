@@ -26,7 +26,7 @@ public:
 
 	virtual ~WRDGPass() = default;
 
-	virtual void Execute(RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass) = 0;
+	virtual void Execute(RHIRenderCommandList& CmdList) = 0;
 
 	void SetNeverCulling(bool bInCulling) { Flag = (EPassFlag)((uint16)Flag | (uint16)EPassFlag::NeverCull); }
 
@@ -103,9 +103,9 @@ public:
 
 	virtual ~WRDGLambdaPass() = default;
 
-	virtual void Execute(RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass) override
+	virtual void Execute(RHIRenderCommandList& CmdList) override
 	{
-		Lambda(CmdList, RenderPass);
+		Lambda(CmdList);
 	}
 
 private:
@@ -124,7 +124,11 @@ public:
 
 	void Compile();
 
+	void ExecutePassPrologue(RHIRenderCommandList& CmdList, WRDGPass *Pass);
+
 	void Execute();
+
+	void ExecutePassEpilogue(RHIRenderCommandList& CmdList, WRDGPass* Pass);
 
 	void Clear();
 

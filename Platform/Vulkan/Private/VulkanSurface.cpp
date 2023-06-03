@@ -68,47 +68,47 @@ namespace Vulkan
 		  ViewType(ViewType),
 		  Aspect(0)
 	{
-		vkCreateImage(pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Image);
+		//vkCreateImage(pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), &Image);
 
-		vkGetImageMemoryRequirements(pInDevice->GetHandle(), Image, &MemoryRequirements);
+		//vkGetImageMemoryRequirements(pInDevice->GetHandle(), Image, &MemoryRequirements);
 
-		unsigned int index = 0;
-		GPUFeature feature = pInDevice->GetGPU()->GetFeature();
-		for (; index < feature.memorySupports.Size(); ++index)
-		{
-			if ((MemoryRequirements.memoryTypeBits & 1) && (feature.memorySupports[index]->properties & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) == VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)
-				break;
-			MemoryRequirements.memoryTypeBits >>= 1;
-		}
+		//unsigned int index = 0;
+		//GPUFeature feature = pInDevice->GetGPU()->GetFeature();
+		//for (; index < feature.memorySupports.Size(); ++index)
+		//{
+		//	if ((MemoryRequirements.memoryTypeBits & 1) && (feature.memorySupports[index]->properties & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) == VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)
+		//		break;
+		//	MemoryRequirements.memoryTypeBits >>= 1;
+		//}
 
-		VkMemoryAllocateInfo MemoryAllocateInfo = {};
-		{
-			MemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-			MemoryAllocateInfo.allocationSize = MemoryRequirements.size;
-			MemoryAllocateInfo.memoryTypeIndex = index;
-		}
-		vkAllocateMemory(pInDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &DeviceMemory);
+		//VkMemoryAllocateInfo MemoryAllocateInfo = {};
+		//{
+		//	MemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		//	MemoryAllocateInfo.allocationSize = MemoryRequirements.size;
+		//	MemoryAllocateInfo.memoryTypeIndex = index;
+		//}
+		//vkAllocateMemory(pInDevice->GetHandle(), &MemoryAllocateInfo, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), &DeviceMemory);
 
-		vkBindImageMemory(pInDevice->GetHandle(), Image, DeviceMemory, 0);
+		//vkBindImageMemory(pInDevice->GetHandle(), Image, DeviceMemory, 0);
 
-		Aspect = (IsDepthFormat(format)) ? ( IsStencilFormat(format) ? (VK_IMAGE_ASPECT_STENCIL_BIT | VK_IMAGE_ASPECT_DEPTH_BIT) : VK_IMAGE_ASPECT_DEPTH_BIT ) : ( IsStencilFormat(format) ? VK_IMAGE_ASPECT_STENCIL_BIT : VK_IMAGE_ASPECT_COLOR_BIT );
+		//Aspect = (IsDepthFormat(format)) ? ( IsStencilFormat(format) ? (VK_IMAGE_ASPECT_STENCIL_BIT | VK_IMAGE_ASPECT_DEPTH_BIT) : VK_IMAGE_ASPECT_DEPTH_BIT ) : ( IsStencilFormat(format) ? VK_IMAGE_ASPECT_STENCIL_BIT : VK_IMAGE_ASPECT_COLOR_BIT );
 
 
-		VkImageLayout InitLayout = GetInitialLayoutForAccess(InitState, Flags);
+		//VkImageLayout InitLayout = GetInitialLayoutForAccess(InitState, Flags);
 
-		//VulkanPipelineBarrier Barrier;
-		//VkImageSubresourceRange Range = VulkanPipelineBarrier::GetTextureSubresourceRange(Aspect);
-		//Barrier.AddTransition(Image, Range, VK_IMAGE_LAYOUT_UNDEFINED, InitLayout);
-		//VulkanCommandBuffer *CmdBuffer = static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager()->GetImmediateCommandBuffer();
-		//Barrier.Execute(CmdBuffer);
+		////VulkanPipelineBarrier Barrier;
+		////VkImageSubresourceRange Range = VulkanPipelineBarrier::GetTextureSubresourceRange(Aspect);
+		////Barrier.AddTransition(Image, Range, VK_IMAGE_LAYOUT_UNDEFINED, InitLayout);
+		////VulkanCommandBuffer *CmdBuffer = static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager()->GetImmediateCommandBuffer();
+		////Barrier.Execute(CmdBuffer);
 
-		VulkanTextureLayoutManager::AddLayout(Image, InitLayout);
+		//VulkanTextureLayoutManager::AddLayout(Image, InitLayout);
 	}
 
 	VulkanSurface::~VulkanSurface()
 	{
-		vkDestroyImage(pDevice->GetHandle(), Image, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
-		vkFreeMemory(pDevice->GetHandle(), DeviceMemory, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkDestroyImage(pDevice->GetHandle(), Image, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks());
+		vkFreeMemory(pDevice->GetHandle(), DeviceMemory, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks());
 	}
 
 }

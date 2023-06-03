@@ -51,12 +51,12 @@ public:
 
 	void* operator new(size_t size)
 	{
-		return NormalAllocator::Get()->Allocate(size);
+		return GetCPUAllocator()->Allocate(size);
 	}
 
 	void operator delete(void* pData)
 	{
-		NormalAllocator::Get()->Deallocate(pData);
+		GetCPUAllocator()->Deallocate(pData);
 	}
 
 protected:
@@ -155,9 +155,9 @@ struct RHIBoundShaderStateInput
 	RHIBoundShaderStateInput
 	(
 		RHIVertexInputState* InVertexInputState,
-		WVertexShaderRHIRef InVertexShaderRHI,
-		WPixelShaderRHIRef InPixelShaderRHI,
-		WGeometryShaderRHIRef InGeometryShaderRHI
+		WShaderRHIRef InVertexShaderRHI,
+		WShaderRHIRef InPixelShaderRHI,
+		WShaderRHIRef InGeometryShaderRHI
 	)
 		: VertexInputState(InVertexInputState),
 		  VertexShaderRHI(InVertexShaderRHI),
@@ -167,9 +167,108 @@ struct RHIBoundShaderStateInput
 	}
 
 	RHIVertexInputState *VertexInputState = nullptr;
-	WVertexShaderRHIRef VertexShaderRHI = nullptr;
-	WPixelShaderRHIRef PixelShaderRHI = nullptr;
-	WGeometryShaderRHIRef GeometryShaderRHI = nullptr;
+	WShaderRHIRef VertexShaderRHI = nullptr;
+	WShaderRHIRef PixelShaderRHI = nullptr;
+	WShaderRHIRef GeometryShaderRHI = nullptr;
+};
+
+class RHIAttachmentBlendState : public RHIResource
+{
+public:
+
+	RHIAttachmentBlendState()
+		: RHIResource(ERHIResourceType::RRT_State)
+	{
+	}
+
+	virtual ~RHIAttachmentBlendState() = default;
+
+};
+
+class RHIBlendState : public RHIResource
+{
+public:
+
+	RHIBlendState()
+		: RHIResource(ERHIResourceType::RRT_State)
+	{
+	}
+
+	virtual ~RHIBlendState() = default;
+
+	virtual void SetAttachmentBlendState(uint32 Index, RHIAttachmentBlendState* InState)
+	{
+		Attachments[Index] = InState;
+	}
+
+	bool operator==(const RHIBlendState& Other) const
+	{
+		for (int32 Index = 0; Index < MaxSimultaneousRenderTargets; ++Index)
+		{
+			if (Attachments[Index] != Other.Attachments[Index])
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+public:
+
+	RHIAttachmentBlendState* Attachments[MaxSimultaneousRenderTargets] = { 0 };
+
+};
+
+class RHIDepthStencilState : public RHIResource
+{
+public:
+
+	RHIDepthStencilState()
+		: RHIResource(ERHIResourceType::RRT_State)
+	{
+	}
+
+	virtual ~RHIDepthStencilState() = default;
+
+};
+
+class RHIMultiSampleState : public RHIResource
+{
+public:
+
+	RHIMultiSampleState()
+		: RHIResource(ERHIResourceType::RRT_State)
+	{
+	}
+
+	virtual ~RHIMultiSampleState() = default;
+
+};
+
+class RHIRasterizationState : public RHIResource
+{
+public:
+
+	RHIRasterizationState()
+		: RHIResource(ERHIResourceType::RRT_State)
+	{
+	}
+
+	virtual ~RHIRasterizationState() = default;
+
+};
+
+class RHISamplerState : public RHIResource
+{
+public:
+
+	RHISamplerState()
+		: RHIResource(ERHIResourceType::RRT_SamplerState)
+	{
+	}
+
+	virtual bool IsImmutable() const { return false; }
+
 };
 
 struct RHIGraphicsPipelineStateInitializer
@@ -184,8 +283,7 @@ public:
 	using TImmutableSamplerStates = WEngine::WStaticArray<RHISamplerState*, 2>;
 
 	RHIGraphicsPipelineStateInitializer()
-		: BlendState(nullptr),
-		  DepthStencilState(nullptr),
+		: DepthStencilState(nullptr),
 		  RasterizationState(nullptr),
 		  MultiSampleState(nullptr),
 		  ImmutableSamplers(nullptr),
@@ -209,7 +307,7 @@ public:
 	RHIGraphicsPipelineStateInitializer
 	(
 		RHIBoundShaderStateInput    InBoundShaderState,
-		RHIBlendState*              InBlendState,
+		RHIBlendState               InBlendState,
 		RHIDepthStencilState*       InDepthStencilState,
 		RHIRasterizationState*      InRasterizationState,
 		RHIMultiSampleState*        InMultiSampleState,
@@ -291,7 +389,7 @@ public:
 public:
 
 	RHIBoundShaderStateInput    BoundShaderState;
-	RHIBlendState*              BlendState;
+	RHIBlendState               BlendState;
 	RHIDepthStencilState*       DepthStencilState;
 	RHIRasterizationState*      RasterizationState;
 	RHIMultiSampleState*        MultiSampleState;

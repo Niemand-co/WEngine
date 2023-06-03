@@ -1,5 +1,6 @@
 #pragma once
 #ifndef NOT_INCLUDE
+#define NOT_INCLUDE
 
 #include <iostream>
 #include <stdint.h>

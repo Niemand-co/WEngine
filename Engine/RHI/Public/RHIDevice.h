@@ -19,17 +19,7 @@ public:
 
 	virtual class RHIEvent* GetEvent() = 0;
 
-	virtual WVertexShaderRHIRef CreateVertexShader(class RHIShaderDescriptor* descriptor) = 0;
-
-	virtual WPixelShaderRHIRef CreatePixelShader(class RHIShaderDescriptor* descriptor) = 0;
-
-	virtual WGeometryShaderRHIRef CreateGeometryShader(class RHIShaderDescriptor* descriptor) = 0;
-
-	virtual WComputeShaderRHIRef CreateComputeShader(class RHIShaderDescriptor* descriptor) = 0;
-
-	virtual WRenderPassRHIRef GetOrCreateRenderPass(class RHIRenderPassDescriptor *descriptor) = 0;
-
-	virtual WFramebufferRHIRef GetOrCreateFramebuffer(class RHIFramebufferDescriptor* descriptor, class RHIRenderPass* RenderPass) = 0;
+	virtual WShaderRHIRef CreateShader(class RHIShaderDescriptor* descriptor) = 0;
 
 	virtual WTextureRHIRef CreateTexture(const class RHITextureDesc& InDesc) = 0;
 

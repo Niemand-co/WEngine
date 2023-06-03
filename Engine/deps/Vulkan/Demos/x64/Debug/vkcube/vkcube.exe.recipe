@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>D:\ComputerGraphics\Vulkan\Demos\x64\Debug\vkcube.exe</FullPath>
+      <FullPath>D:\Projects\WEngine\Engine\deps\Vulkan\Demos\x64\Debug\vkcube.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

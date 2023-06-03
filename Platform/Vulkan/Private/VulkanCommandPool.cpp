@@ -10,12 +10,12 @@ namespace Vulkan
 		: pDevice(pInDevice),
 		  pManager(pInManager)
 	{
-		RE_ASSERT(vkCreateCommandPool(pDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &CommandPool) == VK_SUCCESS, "Failed to Get Command Pool.");
+		RE_ASSERT(vkCreateCommandPool(pDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), &CommandPool) == VK_SUCCESS, "Failed to Get Command Pool.");
 	}
 
 	VulkanCommandPool::~VulkanCommandPool()
 	{
-		vkDestroyCommandPool(pDevice->GetHandle(), CommandPool, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkDestroyCommandPool(pDevice->GetHandle(), CommandPool, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks());
 	}
 
 	RHICommandBuffer* VulkanCommandPool::GetCommandBuffer()

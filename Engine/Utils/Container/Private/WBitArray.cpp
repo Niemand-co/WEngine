@@ -19,7 +19,7 @@ namespace WEngine
 	{
 		if (Value)
 		{
-			Array = WArray(Count / 32, 0xFFFFFFFFu);
+			Array = WArray<uint32>(Count / 32);
 			Count = Count % 32;
 			if(Count == 0)return;
 			uint32 Last = 0x00000000;
@@ -32,9 +32,9 @@ namespace WEngine
 		else
 		{
 			if(Count % 32 > 0)
-				Array = WArray((Count / 32) + 1, 0x00000000u);
+				Array = WArray<uint32>((Count / 32) + 1);
 			else
-				Array = WArray(Count / 32, 0x00000000u);
+				Array = WArray<uint32>(Count / 32);
 		}
 	}
 
@@ -42,19 +42,29 @@ namespace WEngine
 	{
 	}
 
-	void WBitArray::Init(uint32 Count, bool Value)
+	void WBitArray::Init(uint32 InNumBits, bool Value)
 	{
-		if (Value)
+		NumBits = InNumBits;
+		if (NumBits > 0)
 		{
-			Array.Clear();
-			Array.Append(WArray(Count, 0xFFFFFFFFu));
+			if (NumBits > Array.Size() * 32)
+			{
+				uint32 Num = (NumBits + 31) / 32;
+				Array.Resize(Num);
+			}
+			
+			if (!Value)
+			{
+				Memzero(Array.GetData(), Array.Size() * 32);
+			}
+			else
+			{
+				for (uint32 Index = 0; Index < Array.Size(); ++Index)
+				{
+					Array[Index] = 0xFFFFFFFFu;
+				}
+			}
 		}
-		else
-		{
-			Array.Clear();
-			Array.Append(WArray(Count, 0x00000000u));
-		}
-		NumBits = Count;
 	}
 
 	void WBitArray::Push(const bool NewValue)

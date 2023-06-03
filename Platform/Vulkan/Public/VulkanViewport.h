@@ -46,7 +46,7 @@ namespace Vulkan
 
 		WEngine::WArray<VulkanSemaphore*> RenderingDoneSemaphores;
 
-		WEngine::WArray<class VulkanTextureView*> TextureViews;
+		WEngine::WArray<class VulkanTextureView> TextureViews;
 
 		WEngine::WSharedPtr<class VulkanTexture> RenderingBackBuffer;
 

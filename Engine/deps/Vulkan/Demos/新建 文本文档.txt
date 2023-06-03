@@ -1,0 +1,44 @@
+struct VSIn
+{
+    int ID : SV_VertexID;
+};
+
+struct VSOut
+{
+    float4 Position : VS_Position;
+    float4 texcoord : TEXCOORD0;
+    float3 frag_pos : TEXCOORD1;
+};
+
+
+struct buf
+{
+    float4x4 MVP;
+    float4 position[36];
+    float4 attr[36];
+};
+
+buf ubuf : register(b0, space0);
+
+Texture2D tex : register(t1, space0);
+
+SamplerState DummySampler;
+
+VSOut VSMain(VSIn VIn)
+{
+    VSOut o;
+    o.texcoord = ubuf.attr[VIn.ID];
+    o.Position = mul(ubuf.MVP, ubuf.position[VIn.ID]);
+    o.frag_pos = o.Position.xyz;
+    return o;
+}
+
+void PSMain(VSOut PIn,
+            out float4 Color : SV_Target0)
+{
+    float3 dX = ddx(PIn.frag_pos);
+    float3 dY = ddy(PIn.frag_pos);
+    float3 normal = normalize(cross(dX, dY));
+    float light = max(0.0, dot(float3(0.4239999949932098388671875, 0.5659999847412109375, 0.7070000171661376953125), normal));
+    Color = tex.Sample(DummySampler, PIn.texcoord.xy) * light;
+}

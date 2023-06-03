@@ -18,7 +18,7 @@ void RHICommandListBase::Execute()
 
 void* RHICommandListBase::AllocCommand(int32 InSize, int32 InAlignment)
 {
-    RHICommandBase *Result = (RHICommandBase*)NormalAllocator::Get()->Allocate(InSize);
+    RHICommandBase *Result = (RHICommandBase*)GetCPUAllocator()->Allocate(InSize);
     *CommandLink = Result;
     CommandLink = &Result->next;
     return Result;
@@ -38,9 +38,9 @@ void RHIRenderCommandList::EndDrawingViewport(RHIViewport* Viewport, bool bPrese
     GetDynamicRHI()->RHIEndDrawingViewport(Viewport, bPresent);
 }
 
-WRenderPassRHIRef RHIRenderCommandList::BeginRenderPass(RHIRenderPassDescriptor* RenderPasDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor)
+void RHIRenderCommandList::BeginRenderPass(RHIRenderPassDescriptor* RenderPasDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor)
 {
-    return GetDynamicRHI()->RHIBeginRenderPass(RenderPasDescriptor, FramebufferDescriptor);
+    GetDynamicRHI()->RHIBeginRenderPass(RenderPasDescriptor, FramebufferDescriptor);
 }
 
 void RHIRenderCommandList::EndRenderPass()
@@ -148,24 +148,9 @@ WUniformBufferRHIRef RHIRenderCommandList::CreateUniformBuffer(uint8* InContents
     return GetDynamicRHI()->RHICreateUniformBuffer(InContents, InLayout, InUsage);
 }
 
-WVertexShaderRHIRef RHIRenderCommandList::CreateVertexShader(ShaderCodeBlob& blob)
+WShaderRHIRef RHIRenderCommandList::CreateShader(EShaderFrequency InFrequency, ShaderCodeBlob& InBlob)
 {
-    return GetDynamicRHI()->RHICreateVertexShader(blob);
-}
-
-WPixelShaderRHIRef RHIRenderCommandList::CreatePixelShader(ShaderCodeBlob& blob)
-{
-    return GetDynamicRHI()->RHICreatePixelShader(blob);
-}
-
-WGeometryShaderRHIRef RHIRenderCommandList::CreateGeometryShader(ShaderCodeBlob& blob)
-{
-    return GetDynamicRHI()->RHICreateGeometryShader(blob);
-}
-
-WComputeShaderRHIRef RHIRenderCommandList::CreateComputeShader(ShaderCodeBlob& blob)
-{
-    return GetDynamicRHI()->RHICreateComputeShader(blob);
+    return GetDynamicRHI()->RHICreateShader(InFrequency, InBlob);
 }
 
 WTextureRHIRef RHIRenderCommandList::CreateTexture(const RHITextureDesc& InDesc)

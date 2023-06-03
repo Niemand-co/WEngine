@@ -7,7 +7,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanLayout(class VulkanDevice *pInDevice);
+		VulkanLayout(class VulkanDevice *pInDevice, const class VulkanDescriptorSetLayout& DescriptorSetLayout);
 
 		virtual ~VulkanLayout();
 

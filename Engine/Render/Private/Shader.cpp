@@ -20,7 +20,7 @@ size_t ShaderHash(WEngine::WGuid<WEngine::WString> key)
 	return (size_t(key.A) << 32) | (size_t(key.B));
 }
 
-WEngine::WHashMap<WEngine::WString, RHIShader*, ShaderHash> WShaderLibrary::Shaders = WEngine::WHashMap<WEngine::WString, RHIShader*, ShaderHash>();
+WEngine::WHashMap<WEngine::WString, RHIShader*, ShaderHash> WShaderLibrary::Shaders = WEngine::WHashMap<WEngine::WString, WShaderRHIRef, ShaderHash>();
 
 bool WShaderLibrary::LoadShader(const WEngine::WString& path)
 {
@@ -32,28 +32,28 @@ bool WShaderLibrary::LoadShader(const WEngine::WString& path)
 	if (ShaderType == "vs")
 	{
 		ShaderCodeBlob Blob(path);
-		RHIShader*shader = GetRenderCommandList()->CreateVertexShader(Blob);
+		WShaderRHIRef shader = GetRenderCommandList()->CreateShader(EShaderFrequency::SF_Vertex, Blob);
 		Shaders.Insert(ShaderName, shader);
 		return true;
 	}
 	else if (ShaderType == "ps")
 	{
 		ShaderCodeBlob Blob(path);
-		RHIShader*shader = GetRenderCommandList()->CreatePixelShader(Blob);
+		WShaderRHIRef shader = GetRenderCommandList()->CreateShader(EShaderFrequency::SF_Pixel, Blob);
 		Shaders.Insert(ShaderName, shader);
 		return true;
 	}
 	else if (ShaderType == "gs")
 	{
 		ShaderCodeBlob Blob(path);
-		RHIShader* shader = GetRenderCommandList()->CreateGeometryShader(Blob);
+		WShaderRHIRef shader = GetRenderCommandList()->CreateShader(EShaderFrequency::SF_Geometry, Blob);
 		Shaders.Insert(ShaderName, shader);
 		return true;
 	}
 	else if (ShaderType == "cs")
 	{
 		ShaderCodeBlob Blob(path);
-		RHIShader* shader = GetRenderCommandList()->CreateComputeShader(Blob);
+		WShaderRHIRef shader = GetRenderCommandList()->CreateShader(EShaderFrequency::SF_Compute, Blob);
 		Shaders.Insert(ShaderName, shader);
 		return true;
 	}
@@ -62,5 +62,5 @@ bool WShaderLibrary::LoadShader(const WEngine::WString& path)
 
 size_t ShaderHash(WEngine::WString Name)
 {
-	return WEngine::MemCrc32(Name.Data(), Name.Size());
+	return WEngine::MemCrc32(Name.GetData(), Name.Size());
 }

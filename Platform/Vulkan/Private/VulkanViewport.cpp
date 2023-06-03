@@ -247,7 +247,7 @@ namespace Vulkan
 
 		for (uint32 ImageIndex = 0; ImageIndex < BackBufferImages.Size(); ++ImageIndex)
 		{
-			TextureViews[ImageIndex]->Create(pDevice, BackBufferImages[ImageIndex], VK_IMAGE_VIEW_TYPE_2D, VK_IMAGE_ASPECT_COLOR_BIT, PixelFormat, 0, 1, 0, 1, 0);
+			TextureViews[ImageIndex].Create(pDevice, BackBufferImages[ImageIndex], VK_IMAGE_VIEW_TYPE_2D, VK_IMAGE_ASPECT_COLOR_BIT, PixelFormat, 0, 1, 0, 1, 0);
 		}
 
 		const RHITextureDesc Desc = RHITextureDesc::CreateTexture2D(PixelFormat, {1.0f, 0.0f, 0.0f, 1.0f}, FExtent(Width, Height, 1), 1, 1, ETextureCreateFlags::TextureCreate_RenderTarget | ETextureCreateFlags::TextureCreate_SRV);

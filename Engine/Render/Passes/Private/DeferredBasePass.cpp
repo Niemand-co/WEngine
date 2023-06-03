@@ -18,8 +18,9 @@ void DeferredRenderer::RenderBasePass(WRDGBuilder& GraphBuilder, WViewInfo& View
 
 	DeferredBasePassParameters* Parameters = GraphBuilder.AllocateParameterStruct<DeferredBasePassParameters>();
 	Parameters->RenderTarget.ColorTextures[0].Texture = GBuffer0;
+	Parameters->RenderTarget.ColorTextures[0].LoadOP = EAttachmentLoadOP::Clear;
 
-	GraphBuilder.AddPass("BasePass", Parameters, [&View, this](RHIRenderCommandList& CmdList, WRenderPassRHIRef RenderPass)
+	GraphBuilder.AddPass("BasePass", Parameters, [&View, this](RHIRenderCommandList& CmdList)
 	{
 		CmdList.SetViewport(View.ViewRect.Min.X, View.ViewRect.Min.Y, View.ViewRect.Max.X, View.ViewRect.Max.Y, 0.0f, 1.0f);
 		CmdList.SetScissor(0, 0, View.ViewRect.Max.X - View.ViewRect.Min.X, View.ViewRect.Max.Y - View.ViewRect.Min.Y);
@@ -43,13 +44,16 @@ void DeferredRenderer::RenderBasePass(WRDGBuilder& GraphBuilder, WViewInfo& View
 		{
 			Processor.AddMeshBatch(BatchElements[MeshIndex]);
 		}
+
+		DrawList.SubmitMeshDrawCommands(CmdList);
 	});
 }
 
-WDeferredBasePassVS::WDeferredBasePassVS(WVertexShaderRHIRef InVertexShaderRHI)
+WDeferredBasePassVS::WDeferredBasePassVS(WShaderRHIRef InVertexShaderRHI)
 	: VertexShaderRHI(InVertexShaderRHI)
 {
-	//VertexShaderRHI->SetupParameters<WDeferredBasePassVSParameters>();
+	VertexShaderRHI->SetupParameters<WDeferredBasePassVSParameters>();
+	
 }
 
 WDeferredBasePassVS::~WDeferredBasePassVS()
@@ -60,9 +64,10 @@ void WDeferredBasePassVS::GetParametersBinding(const WViewInfo *View, const Mate
 {
 	WMaterialShader::GetParametersBinding(View, Material, Bindings);
 	View->SetupViewParameters(Parameters.View);
+	DeferredBasePassParameters::FTypeInfo::GetStructMetaData()->GetLayout();
 }
 
-WDeferredBasePassPS::WDeferredBasePassPS(WPixelShaderRHIRef InPixelShaderRHI)
+WDeferredBasePassPS::WDeferredBasePassPS(WShaderRHIRef InPixelShaderRHI)
 	: PixelShaderRHI(InPixelShaderRHI)
 {
 }
@@ -75,18 +80,9 @@ void WDeferredBasePassPS::GetParametersBinding(const WViewInfo* View, const Mate
 {
 	WMaterialShader::GetParametersBinding(View, Material, Bindings);
 	Parameters.Color = glm::vec3(1, 0, 0);
-	const ShaderParametersLayout& Layout = WDeferredBasePassPSParameters::FTypeInfo::GetStructMetaData()->GetLayout();
-
-	{
-		const WEngine::WArray<ShaderParametersLayout::ResourceInfo>& Uniforms = Layout.GetUniforms();
-		for (auto& Info : Uniforms)
-		{
-			Bindings.Add(Info.Type, 1);
-		}
-	}
-	const WEngine::WArray<ShaderParametersLayout::ResourceInfo>& Uniforms = Layout.GetTextures();
-
-
+	Parameters.Metallic = 0;
+	Parameters.Roughness = 1.0f;
+	Bindings.Add(EUniformBaseType::UB_INCLUDED_STRUCT, 1);
 }
 
 WDeferredBasePassMeshProcessor::WDeferredBasePassMeshProcessor(const RScene* InScene, const WViewInfo* InView, const WMeshPassProcessorRenderState& InRenderState)
@@ -133,6 +129,6 @@ bool WDeferredBasePassMeshProcessor::ProcessForwardPlusShadingPath(const WMeshBa
 
 void GetBasePassShaders(WDeferredBasePassVS*& VertexShader, WDeferredBasePassPS*& PixelShader)
 {
-	VertexShader = new WDeferredBasePassVS((WVertexShaderRHIRef)WShaderLibrary::GetShader("DebugDrawVert"));
-	PixelShader = new WDeferredBasePassPS((WPixelShaderRHIRef)WShaderLibrary::GetShader("DebugDrawFrag"));
+	VertexShader = new WDeferredBasePassVS(WShaderLibrary::GetShader("DebugDrawVert"));
+	PixelShader = new WDeferredBasePassPS(WShaderLibrary::GetShader("DebugDrawFrag"));
 }

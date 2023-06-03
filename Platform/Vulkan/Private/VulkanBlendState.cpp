@@ -17,9 +17,6 @@ namespace Vulkan
 		ColorBlendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 	}
 
-	void VulkanBlendState::SetAttachmentBlendState(uint32 Index, RHIAttachmentBlendState* InState)
-	{
-		Attachments[Index] = static_cast<VulkanAttachmentBlendState*>(InState);
-	}
+
 
 }

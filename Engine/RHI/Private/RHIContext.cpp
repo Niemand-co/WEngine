@@ -17,7 +17,7 @@ DynamicRHIContext::DynamicRHIContext()
 	}
 	pInstance = RHIInstance::CreateInstance(&descriptor);
 
-	WEngine::WArray<RHIQueueDescriptor> queueDescriptors(1, RHIQueueDescriptor());
+	WEngine::WArray<RHIQueueDescriptor> queueDescriptors(1);
 	{
 		queueDescriptors[0].count = 1;
 		queueDescriptors[0].type = RHIQueueType::Graphics;
@@ -69,48 +69,16 @@ WUniformBufferRHIRef DynamicRHIContext::RHICreateUniformBuffer(uint8* InContents
 	return pDevice->CreateUniformBuffer(InContents, InLayout, InUsage);
 }
 
-WVertexShaderRHIRef DynamicRHIContext::RHICreateVertexShader(ShaderCodeBlob& blob)
+WShaderRHIRef DynamicRHIContext::RHICreateShader(EShaderFrequency InFrequency, ShaderCodeBlob& InBlob)
 {
 	RHIShaderDescriptor descriptor = {};
 	{
-		descriptor.codeSize = blob.GetSize();
-		descriptor.pCode = blob.GetCode();
-		descriptor.entryName = "VSMain";
+		descriptor.CodeSize = InBlob.GetSize();
+		descriptor.Code = InBlob.GetCode();
+		descriptor.EntryName = "VSMain";
+		descriptor.Frequency = InFrequency;
 	}
-	return pDevice->CreateVertexShader(&descriptor);
-}
-
-WPixelShaderRHIRef DynamicRHIContext::RHICreatePixelShader(ShaderCodeBlob& blob)
-{
-	RHIShaderDescriptor descriptor = {};
-	{
-		descriptor.codeSize = blob.GetSize();
-		descriptor.pCode = blob.GetCode();
-		descriptor.entryName = "PSMain";
-	}
-	return pDevice->CreatePixelShader(&descriptor);
-}
-
-WGeometryShaderRHIRef DynamicRHIContext::RHICreateGeometryShader(ShaderCodeBlob& blob)
-{
-	RHIShaderDescriptor descriptor = {};
-	{
-		descriptor.codeSize = blob.GetSize();
-		descriptor.pCode = blob.GetCode();
-		descriptor.entryName = "GSMain";
-	}
-	return pDevice->CreateGeometryShader(&descriptor);
-}
-
-WComputeShaderRHIRef DynamicRHIContext::RHICreateComputeShader(ShaderCodeBlob& blob)
-{
-	RHIShaderDescriptor descriptor = {};
-	{
-		descriptor.codeSize = blob.GetSize();
-		descriptor.pCode = blob.GetCode();
-		descriptor.entryName = "CSMain";
-	}
-	return pDevice->CreateComputeShader(&descriptor);
+	return pDevice->CreateShader(&descriptor);
 }
 
 WTextureRHIRef DynamicRHIContext::RHICreateTexture(const RHITextureDesc& InDesc)

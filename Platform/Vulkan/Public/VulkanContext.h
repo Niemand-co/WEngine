@@ -38,7 +38,7 @@ namespace Vulkan
 
 		virtual void RHIEndDrawingViewport(RHIViewport* Viewport, bool bPresent) override;
 
-		virtual WRenderPassRHIRef RHIBeginRenderPass(RHIRenderPassDescriptor* RenderPasDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor) override;
+		virtual void RHIBeginRenderPass(RHIRenderPassDescriptor* RenderPasDescriptor, RHIFramebufferDescriptor* FramebufferDescriptor) override;
 
 		virtual void RHIEndRenderPass() override;
 
@@ -60,7 +60,7 @@ namespace Vulkan
 
 		virtual void RHISetGraphicsPipelineState(RHIGraphicsPipelineState *GraphicsPipelineState) override;
 
-		virtual void RHISetShaderUniformBuffer(RHIGraphicsShader* ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer) override;
+		virtual void RHISetShaderUniformBuffer(WShaderRHIRef ShaderRHI, uint32 BufferIndex, WUniformBufferRHIRef UniformBuffer) override;
 
 		virtual void RHIUpdateUniformBuffer(WUniformBufferRHIRef UniformBuffer, void* Contents) override;
 

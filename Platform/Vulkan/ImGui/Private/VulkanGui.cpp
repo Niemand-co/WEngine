@@ -51,8 +51,8 @@ namespace Vulkan
 		pool_info.maxSets = 1000 * IM_ARRAYSIZE(pool_sizes);
 		pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
 		pool_info.pPoolSizes = pool_sizes;
-		VkDescriptorPool *pool = (VkDescriptorPool*)NormalAllocator::Get()->Allocate(sizeof(VkDescriptorPool));
-		vkCreateDescriptorPool(static_cast<VulkanDevice*>(pConfigure->pDevice)->GetHandle(), &pool_info, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pool);
+		VkDescriptorPool *pool = (VkDescriptorPool*)GetCPUAllocator()->Allocate(sizeof(VkDescriptorPool));
+		vkCreateDescriptorPool(static_cast<VulkanDevice*>(pConfigure->pDevice)->GetHandle(), &pool_info, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), pool);
 
 		{
 			m_vulkanInitInfo.Instance = static_cast<VulkanInstance*>(pConfigure->pInstance)->GetHandle();
@@ -66,7 +66,7 @@ namespace Vulkan
 			m_vulkanInitInfo.MinImageCount = 2;
 			m_vulkanInitInfo.ImageCount = pConfigure->imageCount;
 			m_vulkanInitInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-			m_vulkanInitInfo.Allocator = static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks();
+			m_vulkanInitInfo.Allocator = static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks();
 			m_vulkanInitInfo.CheckVkResultFn = check_vk_result;
 		}
 

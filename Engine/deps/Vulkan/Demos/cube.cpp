@@ -37,6 +37,7 @@
 #include <sstream>
 #include <iostream>
 #include <memory>
+#include <fstream>
 
 #define VULKAN_HPP_NO_EXCEPTIONS
 #define VULKAN_HPP_TYPESAFE_CONVERSION
@@ -86,6 +87,234 @@ VKAPI_ATTR void VKAPI_CALL vkDestroyDebugUtilsMessengerEXT(VkInstance instance, 
     return pfnVkDestroyDebugUtilsMessengerEXT(instance, messenger, pAllocator);
 }
 
+#define uint32 unsigned int
+#define int32 int
+#define int16 short
+#define uint16 unsigned short
+
+float Clamp(float factor, float a, float b)
+{
+    return factor * a + (1.0f - factor) * b;
+}
+
+static FORCEINLINE void StoreHalf(uint16* Ptr, float Value)
+{
+	union FP32T
+	{
+		uint32 u;
+		float f;
+	} FP32 = {};
+	uint16 FP16 = {};
+
+	FP32.f = Value;
+
+	FP32T f32infty = { uint32(255 << 23) };
+	FP32T f16max = { uint32(127 + 16) << 23 };
+	FP32T denorm_magic = { (uint32(127 - 15) + uint32(23 - 10) + 1) << 23 };
+	uint32 sign_mask = 0x80000000u;
+
+	uint32 sign = FP32.u & sign_mask;
+	FP32.u ^= sign;
+
+	// NOTE all the integer compares in this function can be safely
+	// compiled into signed compares since all operands are below
+	// 0x80000000. Important if you want fast straight SSE2 code
+	// (since there's no unsigned PCMPGTD).
+
+	if (FP32.u >= f16max.u) // result is Inf or NaN (all exponent bits set)
+	{
+		FP16 = (FP32.u > f32infty.u) ? 0x7e00 : 0x7c00; // NaN->qNaN and Inf->Inf
+	}
+	else // (De)normalized number or zero
+	{
+		if (FP32.u < uint32(113 << 23)) // resulting FP16 is subnormal or zero
+		{
+			// use a magic value to align our 10 mantissa bits at the bottom of
+			// the float. as long as FP addition is round-to-nearest-even this
+			// just works.
+			FP32.f += denorm_magic.f;
+
+			// and one integer subtract of the bias later, we have our final float!
+			FP16 = uint16(FP32.u - denorm_magic.u);
+		}
+		else
+		{
+			uint32 mant_odd = (FP32.u >> 13) & 1; // resulting mantissa is odd
+
+			// update exponent, rounding bias part 1
+			FP32.u += (uint32(15 - 127) << 23) + 0xfff;
+			// rounding bias part 2
+			FP32.u += mant_odd;
+			// take the bits!
+			FP16 = uint16(FP32.u >> 13);
+		}
+	}
+
+	FP16 |= sign >> 16;
+	*Ptr = FP16;
+}
+
+static FORCEINLINE float LoadHalf(const uint16* Ptr)
+{
+	uint16 FP16 = *Ptr;
+	uint32 shifted_exp = 0x7c00 << 13;			// exponent mask after shift
+	union FP32T
+	{
+		uint32 u;
+		float f;
+	} FP32, magic = { 113 << 23 };
+
+	FP32.u = (FP16 & 0x7fff) << 13;				// exponent/mantissa bits
+	uint32 exp = shifted_exp & FP32.u;			// just the exponent
+	FP32.u += uint32(127 - 15) << 23;			// exponent adjust
+
+	// handle exponent special cases
+	if (exp == shifted_exp)						// Inf/NaN?
+	{
+		FP32.u += uint32(128 - 16) << 23;		// extra exp adjust
+	}
+	else if (exp == 0)							// Zero/Denormal?
+	{
+		FP32.u += 1 << 23;						// extra exp adjust
+		FP32.f -= magic.f;						// renormalize
+	}
+
+	FP32.u |= (FP16 & 0x8000) << 16;			// sign bit
+	return FP32.f;
+}
+
+class FFloat16
+{
+public:
+
+    /* Float16 can store values in [-MaxF16Float,MaxF16Float] */
+    constexpr static float MaxF16Float = 65504.f;
+
+    uint16 Encoded;
+
+    /** Default constructor */
+    FFloat16();
+
+    /** Copy constructor. */
+    FFloat16(const FFloat16& FP16Value);
+
+    /** Conversion constructor. Convert from Fp32 to Fp16. */
+    FFloat16(float FP32Value);
+
+    /** Assignment operator. Convert from Fp32 to Fp16. */
+    FFloat16& operator=(float FP32Value);
+
+    /** Assignment operator. Copy Fp16 value. */
+    FFloat16& operator=(const FFloat16& FP16Value);
+
+    /** Convert from Fp16 to Fp32. */
+    operator float() const;
+
+    /** Convert from Fp32 to Fp16, round-to-nearest-even. (RTNE)
+    Stores values out of range as +-Inf */
+    void Set(float FP32Value);
+
+    /*Convert from Fp32 to Fp16, round-to-nearest-even. (RTNE)
+    Clamps values out of range as +-MaxF16Float */
+    void SetClamped(float FP32Value)
+    {
+        Set(Clamp(FP32Value, -MaxF16Float, MaxF16Float));
+    }
+
+    /** Set to 0.0 **/
+    void SetZero()
+    {
+        Encoded = 0;
+    }
+
+    /** Set to 1.0 **/
+    void SetOne()
+    {
+        Encoded = 0x3c00;
+    }
+
+    /** Return float clamp in [0,MaxF16Float] , no negatives or infinites or nans returned **/
+    FFloat16 GetClampedNonNegativeAndFinite() const;
+
+    /** Convert from Fp16 to Fp32. */
+    float GetFloat() const;
+
+    /** Is the float negative without converting
+    NOTE: returns true for negative zero! */
+    bool IsNegative() const
+    {
+        // negative if sign bit is on
+        // can be tested with int compare
+        return (int16)Encoded < 0;
+    }
+};
+
+FORCEINLINE FFloat16::FFloat16()
+    : Encoded(0)
+{ }
+
+
+FORCEINLINE FFloat16::FFloat16(const FFloat16& FP16Value)
+{
+    Encoded = FP16Value.Encoded;
+}
+
+
+FORCEINLINE FFloat16::FFloat16(float FP32Value)
+{
+    Set(FP32Value);
+}
+
+
+FORCEINLINE FFloat16& FFloat16::operator=(float FP32Value)
+{
+    Set(FP32Value);
+    return *this;
+}
+
+
+FORCEINLINE FFloat16& FFloat16::operator=(const FFloat16& FP16Value)
+{
+    Encoded = FP16Value.Encoded;
+    return *this;
+}
+
+
+FORCEINLINE FFloat16::operator float() const
+{
+    return GetFloat();
+}
+
+
+// NOTE: Set() on values out of F16 max range store them as +-Inf
+FORCEINLINE void FFloat16::Set(float FP32Value)
+{
+    // FPlatformMath::StoreHalf follows RTNE (round-to-nearest-even) rounding default convention
+    StoreHalf(&Encoded, FP32Value);
+}
+
+
+
+FORCEINLINE float FFloat16::GetFloat() const
+{
+    return LoadHalf(&Encoded);
+}
+
+/** Return float clamp in [0,MaxF16Float] , no negatives or infinites or nans returned **/
+FORCEINLINE FFloat16 FFloat16::GetClampedNonNegativeAndFinite() const
+{
+    FFloat16 ReturnValue;
+
+    if (Encoded < 0x7c00) // normal and non-negative, just pass through
+        ReturnValue.Encoded = Encoded;
+    else if (Encoded == 0x7c00) // infinity turns into largest normal
+        ReturnValue.Encoded = 0x7bff;
+    else // NaNs or anything negative turns into 0
+        ReturnValue.Encoded = 0;
+
+    return ReturnValue;
+}
+
 struct texture_object {
     vk::Sampler sampler;
 
@@ -105,11 +334,31 @@ static char const *const tex_files[] = {"lunarg.ppm"};
 
 static int validation_error = 0;
 
+struct FFloat16WithPadding
+{
+    FFloat16 X;
+    FFloat16 Padding;
+};
+
+struct FVector3WithPadding
+{
+    FFloat16 x, y, z;
+    FFloat16 Padding[3];
+};
+
+struct FVector4WithPadding
+{
+    FFloat16 x, y, z, w;
+    FFloat16 Padding[4];
+};
+
 struct vktexcube_vs_uniform {
     // Must start with MVP
     float mvp[4][4];
     float position[12 * 3][4];
     float attr[12 * 3][4];
+	FVector3WithPadding Color;
+	FFloat16WithPadding Roughness;
 };
 
 //--------------------------------------------------------------------------------------
@@ -1769,6 +2018,14 @@ void Demo::prepare_cube_data_buffers() {
         data.attr[i][3] = 0;
     }
 
+	data.Color.x.Set(1.0f);
+	data.Color.y.Set(0.0f);
+	data.Color.z.Set(0.0f);
+	data.Color.Padding[0].Set(2.0f);
+	data.Color.Padding[1].Set(3.0f);
+	data.Color.Padding[2].Set(4.0f);
+	data.Roughness.X.Set(0.5f);
+
     auto const buf_info = vk::BufferCreateInfo().setSize(sizeof(data)).setUsage(vk::BufferUsageFlagBits::eUniformBuffer);
 
     for (auto &swapchain_image_resource : swapchain_image_resources) {
@@ -1936,12 +2193,65 @@ void Demo::prepare_framebuffers() {
     }
 }
 
-vk::ShaderModule Demo::prepare_fs() {
-    const uint32_t fragShaderCode[] = {
-#include "cube.frag.inc"
-    };
+class ShaderCodeBlob
+{
+public:
 
-    frag_shader_module = prepare_shader_module(fragShaderCode, sizeof(fragShaderCode));
+	ShaderCodeBlob(const std::string& path);
+
+	~ShaderCodeBlob();
+
+public:
+
+	unsigned int GetSize();
+
+	unsigned int* GetCode();
+
+private:
+
+	void ReadShaderFromPath(const std::string& path);
+
+private:
+
+	std::vector<char> m_buffer;
+
+};
+
+ShaderCodeBlob::ShaderCodeBlob(const std::string& path)
+{
+	ReadShaderFromPath(path);
+}
+
+ShaderCodeBlob::~ShaderCodeBlob()
+{
+}
+
+unsigned int ShaderCodeBlob::GetSize()
+{
+	return m_buffer.size();
+}
+
+unsigned int* ShaderCodeBlob::GetCode()
+{
+	return reinterpret_cast<unsigned int*>(m_buffer.data());
+}
+
+void ShaderCodeBlob::ReadShaderFromPath(const std::string& path)
+{
+	std::ifstream file(path.data(), std::ios::ate | std::ios::binary);
+
+	size_t fileSize = (size_t)file.tellg();
+	m_buffer.resize(fileSize);
+
+	file.seekg(0);
+	file.read(m_buffer.data(), fileSize);
+
+	file.close();
+}
+
+vk::ShaderModule Demo::prepare_fs() {
+    ShaderCodeBlob Blob("D:/Projects/WEngine/Engine/deps/Vulkan/Demos/cube.ps");
+    frag_shader_module = prepare_shader_module((uint32_t*)Blob.GetCode(), Blob.GetSize());
 
     return frag_shader_module;
 }
@@ -1952,8 +2262,8 @@ void Demo::prepare_pipeline() {
     VERIFY(result == vk::Result::eSuccess);
 
     std::array<vk::PipelineShaderStageCreateInfo, 2> const shaderStageInfo = {
-        vk::PipelineShaderStageCreateInfo().setStage(vk::ShaderStageFlagBits::eVertex).setModule(prepare_vs()).setPName("main"),
-        vk::PipelineShaderStageCreateInfo().setStage(vk::ShaderStageFlagBits::eFragment).setModule(prepare_fs()).setPName("main")};
+        vk::PipelineShaderStageCreateInfo().setStage(vk::ShaderStageFlagBits::eVertex).setModule(prepare_vs()).setPName("VSMain"),
+        vk::PipelineShaderStageCreateInfo().setStage(vk::ShaderStageFlagBits::eFragment).setModule(prepare_fs()).setPName("PSMain")};
 
     vk::PipelineVertexInputStateCreateInfo const vertexInputInfo;
 
@@ -2268,11 +2578,8 @@ void Demo::prepare_textures() {
 }
 
 vk::ShaderModule Demo::prepare_vs() {
-    const uint32_t vertShaderCode[] = {
-#include "cube.vert.inc"
-    };
-
-    vert_shader_module = prepare_shader_module(vertShaderCode, sizeof(vertShaderCode));
+    ShaderCodeBlob Blob("D:/Projects/WEngine/Engine/deps/Vulkan/Demos/cube.vs");
+    vert_shader_module = prepare_shader_module((uint32_t*)Blob.GetCode(), Blob.GetSize());
 
     return vert_shader_module;
 }

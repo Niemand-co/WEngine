@@ -13,8 +13,6 @@ public:
 
 	virtual ~RHIGPU() = 0;
 
-	virtual const GPUFeature& GetFeature() const = 0;
-
 	virtual const WEngine::WString& GetGPUName() const = 0;
 
 	virtual RHIDevice* CreateDevice(RHIDeviceDescriptor *descriptor) = 0;

@@ -39,7 +39,7 @@ namespace WEngine
 	{
 		for (unsigned int threadIndex = 0; threadIndex < NUM_WORKING_THREAD; ++threadIndex)
 		{
-			m_threads[threadIndex] = (WThreadPack*)NormalAllocator::Get()->Allocate(sizeof(WThreadPack));
+			m_threads[threadIndex] = (WThreadPack*)GetCPUAllocator()->Allocate(sizeof(WThreadPack));
 			::new (m_threads[threadIndex]) WThreadPack();
 			m_threads[threadIndex]->pTaskThread = new WNamedTaskThread();
 			m_threads[threadIndex]->pTaskThread->m_threadId = (EThreadProperty)threadIndex;

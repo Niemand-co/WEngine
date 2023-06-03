@@ -10,10 +10,12 @@ public:
 
 public:
 
-	unsigned int* pCode;
+	uint32* Code;
 
-	size_t codeSize;
+	uint32 CodeSize;
 
-	WEngine::WString entryName;
+	WEngine::WString EntryName;
+
+	EShaderFrequency Frequency;
 
 };

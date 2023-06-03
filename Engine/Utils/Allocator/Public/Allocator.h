@@ -70,12 +70,13 @@ namespace WEngine
 	template<uint32 NumBlock>
 	void* Allocator<NumBlock>::Allocate(size_t size)
 	{
-		return malloc(size);
 		WScopeLock Lock(&Section);
 		if (size <= 0)
 		{
 			return nullptr;
 		}
+		return malloc(size);
+		/*
 		else if (size > GetBlockSize(NumBlock - 1))
 		{
 			BYTE* block = (BYTE*)malloc(size + sizeof(BYTE));
@@ -100,6 +101,7 @@ namespace WEngine
 			void* block = freeLists[index].Pop();
 			return block;
 		}
+		*/
 	}
 
 	template<uint32 NumBlock>
@@ -154,3 +156,5 @@ private:
 	static NormalAllocator *g_pInstance;	
 
 };
+
+NormalAllocator* GetCPUAllocator();

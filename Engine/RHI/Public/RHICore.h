@@ -629,10 +629,7 @@ typedef class RHITextureBuffer* WTextureBufferRHIRef;
 
 typedef WEngine::WSharedPtr<RHIUniformBuffer> FUniformBufferRHIRef;
 
-typedef class RHIVertexShader* WVertexShaderRHIRef;
-typedef class RHIPixelShader* WPixelShaderRHIRef;
-typedef class RHIGeometryShader* WGeometryShaderRHIRef;
-typedef class RHIComputeShader* WComputeShaderRHIRef;
+typedef class RHIShader* WShaderRHIRef;
 
 typedef class RHITexture* WTextureRHIRef;
 

@@ -9,13 +9,13 @@ class WDeferredBasePassVS : public WMaterialShader
 {
 public:
 
-	WDeferredBasePassVS(WVertexShaderRHIRef InVertexShaderRHI);
+	WDeferredBasePassVS(WShaderRHIRef InVertexShaderRHI);
 
 	virtual ~WDeferredBasePassVS();
 
 	virtual void GetParametersBinding(const WViewInfo* View, const MaterialProxy* Material, WMeshDrawShaderBindings& Bindings) override;
 
-	virtual WVertexShaderRHIRef GetVertexShader() const override { return VertexShaderRHI; }
+	virtual WShaderRHIRef GetVertexShader() const override { return VertexShaderRHI; }
 
 	BEGIN_SHADER_PARAMETERS_STRUCT(WDeferredBasePassVSParameters)
 		SHADER_PARAMETER_STRUCT_INCLUDE(SceneViewUniformBufferParameters, View)
@@ -23,7 +23,7 @@ public:
 
 private:
 
-	WVertexShaderRHIRef VertexShaderRHI;
+	WShaderRHIRef VertexShaderRHI;
 
 	WDeferredBasePassVSParameters Parameters;
 
@@ -35,16 +35,18 @@ class WDeferredBasePassPS : public WMaterialShader
 {
 public:
 
-	WDeferredBasePassPS(WPixelShaderRHIRef InPixelShaderRHI);
+	WDeferredBasePassPS(WShaderRHIRef InPixelShaderRHI);
 
 	virtual ~WDeferredBasePassPS();
 
 	virtual void GetParametersBinding(const WViewInfo* View, const MaterialProxy* Material, WMeshDrawShaderBindings& Bindings) override;
 
-	virtual WPixelShaderRHIRef GetPixelShader() const override { return PixelShaderRHI; }
+	virtual WShaderRHIRef GetPixelShader() const override { return PixelShaderRHI; }
 
 	BEGIN_SHADER_PARAMETERS_STRUCT(WDeferredBasePassPSParameters)
 		SHADER_PARAMETER(glm::vec3, Color)
+		SHADER_PARAMETER(float, Roughness)
+		SHADER_PARAMETER(float, Metallic)
 	END_SHADER_PARAMETERS_STRUCT
 
 private:

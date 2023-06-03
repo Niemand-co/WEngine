@@ -1,0 +1,4 @@
+﻿  cube.cpp
+D:\Projects\WEngine\Engine\deps\Vulkan\Demos\cube.cpp(904,25): warning C4834: discarding return value of function with 'nodiscard' attribute
+D:\Projects\WEngine\Engine\deps\Vulkan\Demos\cube.cpp(2231,24): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+  vkcubepp.vcxproj -> D:\Projects\WEngine\Engine\deps\Vulkan\Demos\x64\Debug\vkcubepp.exe

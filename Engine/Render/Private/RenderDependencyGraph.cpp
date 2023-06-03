@@ -118,6 +118,13 @@ void WRDGBuilder::Compile()
 	PassMerging();
 }
 
+void WRDGBuilder::ExecutePassPrologue(RHIRenderCommandList& CmdList, WRDGPass* Pass)
+{
+	RHIRenderPassDescriptor RenderPassInfo = Pass->Parameters.GetRenderPassInfo();
+	RHIFramebufferDescriptor FramebufferInfo = Pass->Parameters.GetFramebufferInfo();
+	CmdList.BeginRenderPass(&RenderPassInfo, &FramebufferInfo);
+}
+
 void WRDGBuilder::Execute()
 {
 	Compile();
@@ -144,6 +151,11 @@ void WRDGBuilder::Execute()
 	}
 
 	Clear();
+}
+
+void WRDGBuilder::ExecutePassEpilogue(RHIRenderCommandList& CmdList, WRDGPass* Pass)
+{
+	CmdList.EndRenderPass();
 }
 
 void WRDGBuilder::Clear()
@@ -355,11 +367,11 @@ void WRDGBuilder::ExecutePass(WRDGPass* Pass)
 	RHIRenderCommandList &CmdList = *GetRenderCommandList();
 	Pass->PrologueTransitions.Submit(CmdList);
 
-	RHIRenderPassDescriptor RenderPassdescriptor = Pass->Parameters.GetRenderPassInfo();
-	RHIFramebufferDescriptor FramebufferDescriptor = Pass->Parameters.GetFramebufferInfo();
-	WRenderPassRHIRef RenderPass = GetRenderCommandList()->BeginRenderPass(&RenderPassdescriptor, &FramebufferDescriptor);
-	Pass->Execute(CmdList, RenderPass);
-	GetRenderCommandList()->EndRenderPass();
+	ExecutePassPrologue(CmdList, Pass);
+
+	Pass->Execute(CmdList);
+
+	ExecutePassEpilogue(CmdList, Pass);
 }
 
 void WRDGBuilder::CollectResource(WRDGPassHandle PassHandle)

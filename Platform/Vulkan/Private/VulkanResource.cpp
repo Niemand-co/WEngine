@@ -47,7 +47,7 @@ namespace Vulkan
 			}
 		}
 
-		RE_ASSERT(vkCreateImageView(Device->GetHandle(), &ImageViewCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &ImageView) == VK_SUCCESS, "Failed to create image view.");
+		RE_ASSERT(vkCreateImageView(Device->GetHandle(), &ImageViewCreateInfo, ResourceCast(GetCPUAllocator())->GetCallbacks(), &ImageView) == VK_SUCCESS, "Failed to create image view.");
 
 		Image = InImage;
 	}

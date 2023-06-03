@@ -17,12 +17,12 @@ namespace WEngine
 
 	//	void* operator new(size_t size)
 	//	{
-	//		return NormalAllocator::Get()->Allocate(size);
+	//		return GetCPUAllocator()->Allocate(size);
 	//	}
 
 	//	void operator delete(void* pData)
 	//	{
-	//		NormalAllocator::Get()->Deallocate(pData);
+	//		GetCPUAllocator()->Deallocate(pData);
 	//	}
 
 	//public:

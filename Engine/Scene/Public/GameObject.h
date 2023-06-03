@@ -17,7 +17,7 @@ public:
 
 	bool IsName(WEngine::WString name);
 
-	inline const char* const GetNamePtr() const { return m_name.Data(); }
+	inline const char* const GetNamePtr() const { return m_name.GetData(); }
 
 	inline const WEngine::WString& GetName() { return m_name; }
 

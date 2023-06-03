@@ -33,12 +33,12 @@ namespace WEngine
 
 	//void* WEventWin::operator new(size_t size)
 	//{
-	//	return NormalAllocator::Get()->Allocate(size);
+	//	return GetCPUAllocator()->Allocate(size);
 	//}
 
 	//void WEventWin::operator delete(void* pData)
 	//{
-	//	NormalAllocator::Get()->Deallocate(pData);
+	//	GetCPUAllocator()->Deallocate(pData);
 	//}
 
 }

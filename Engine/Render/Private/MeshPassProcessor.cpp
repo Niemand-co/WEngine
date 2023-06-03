@@ -7,7 +7,6 @@
 #include "Render/Public/SceneView.h"
 #include "Render/Public/Buffer.h"
 #include "Render/Public/Shader.h"
-#include "Render/Descriptor/Public/RHIPipelineStateObjectDescriptor.h"
 
 void WMeshDrawShaderBindings::Initialize(const WMeshPassProcessorShaderBase* Shaders)
 {
@@ -67,9 +66,17 @@ void WMeshDrawCommand::SubmitDrawEnd(RHIRenderCommandList& CmdList)
 	CmdList.DrawIndexedPrimitive(NumPrimitives * 3, FirstIndex, NumInstances);
 }
 
-WMeshDrawCommand& WDynamicMeshPassDrawListContext::AddCommand()
+void WDynamicMeshPassDrawListContext::AddCommand(const WMeshDrawCommand& SharedDrawCommand)
 {
-	return MeshCommands.AddInitialized();
+	MeshCommands.Push(SharedDrawCommand);
+}
+
+void WDynamicMeshPassDrawListContext::SubmitMeshDrawCommands(RHIRenderCommandList& CmdList)
+{
+	for (WMeshDrawCommand& Command : MeshCommands)
+	{
+		WMeshDrawCommand::SubmitDrawCommand(Command, PipelineStateSet, CmdList);
+	}
 }
 
 void WDynamicMeshPassDrawListContext::FinalizeCommand(
@@ -82,4 +89,6 @@ void WDynamicMeshPassDrawListContext::FinalizeCommand(
 	GraphicsPipelineStateId PipelineId = PipelineStateSet.FindOrAdd(PipelineState);
 
 	MeshDrawCommand.SetParametersAndFinalize(MeshBatch, BatchElementIndex, Shaders, PipelineId);
+
+	AddCommand(MeshDrawCommand);
 }

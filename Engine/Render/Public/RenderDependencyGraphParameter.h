@@ -1,4 +1,4 @@
-#pragma once
+#include "Render/Public/ShaderParameterMacros.h"
 #include "Render/Public/RenderDependencyGraphResource.h"
 #include "Render/Descriptor/Public/RHIRenderPassDescriptor.h"
 #include "Render/Descriptor/Public/RHIFramebufferDescriptor.h"
@@ -500,6 +500,23 @@ struct WParameterTypeInfo<WRDGRenderTargetBinding*>
 	static constexpr WShaderParameterMetaData* GetStructMetaData() { return nullptr; }
 };
 
+template<typename UniformBufferStructType>
+struct WParameterTypeInfo <TUniformBufferRef<UniformBufferStructType>>
+{
+	typedef TUniformBufferRef<UniformBufferStructType> Type;
+
+	static constexpr EUniformBaseType BaseType = EUniformBaseType::UB_SRV;
+
+	static constexpr int32 NumElements = 0;
+	static constexpr int32 NumRows = 1;
+	static constexpr int32 NumColumns = 1;
+	static constexpr int32 Alignment = sizeof(uint64);
+
+	typedef __declspec(align(Alignment)) TUniformBufferRef<UniformBufferStructType> AlignedType;
+
+	static constexpr WShaderParameterMetaData* GetStructMetaData() { return UniformBufferStructType::FTypeInfo::GetStructMetaData(); }
+};
+
 #define EMPTY_UNIFORMBUFFER_CREATE_FUNCTION return nullptr;
 
 #define NORMAL_UNIFORM_BUFFER_CREATE_FUNCTION return GetRenderCommandList()->CreateUniformBuffer(InContents, InLayout, InUsage);
@@ -610,14 +627,14 @@ private:\
 #define SHADER_PARAMETER_STRUCT_INCLUDE(STRUCT_TYPE, MemberName)\
 	SHADER_PARAMETER_INTERNAL(EUniformBaseType::UB_INCLUDED_STRUCT, STRUCT_TYPE::FTypeInfo, MemberName)
 
-bool IsShaderParameterTypeIgnoredByRHI(EUniformBaseType Type)
+static bool IsShaderParameterTypeIgnoredByRHI(EUniformBaseType Type)
 {
 	return Type == EUniformBaseType::UB_RTV				  ||
 		   Type == EUniformBaseType::UB_REFERENCED_STRUCT ||
 		   Type == EUniformBaseType::UB_RDG_UNIFORM_BUFFER ;
 }
 
-bool IsRDGResource(EUniformBaseType Type)
+static bool IsRDGResource(EUniformBaseType Type)
 {
 	return Type == EUniformBaseType::UB_RDG_BUFFER         ||
 		   Type == EUniformBaseType::UB_RDG_BUFFER_SRV     ||
@@ -628,7 +645,7 @@ bool IsRDGResource(EUniformBaseType Type)
 		   Type == EUniformBaseType::UB_RDG_TEXTURE_ACCESS ;
 }
 
-RHIResource* GetShaderParameterRHI(const void* Contents, uint16 MemOffset, EUniformBaseType MemType)
+static RHIResource* GetShaderParameterRHI(const void* Contents, uint16 MemOffset, EUniformBaseType MemType)
 {
 	if (IsShaderParameterTypeIgnoredByRHI(MemType))
 	{

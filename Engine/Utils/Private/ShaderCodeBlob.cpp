@@ -22,7 +22,7 @@ unsigned int* ShaderCodeBlob::GetCode()
 
 void ShaderCodeBlob::ReadShaderFromPath(const WEngine::WString& path)
 {
-	std::ifstream file(path.Data(), std::ios::ate | std::ios::binary);
+	std::ifstream file(path.GetData(), std::ios::ate | std::ios::binary);
 	RE_ASSERT(file.is_open(), "Failed to Open Shader File.");
 
 	size_t fileSize = (size_t)file.tellg();

@@ -19,7 +19,7 @@ namespace Vulkan
 
 		void Unlock();
 
-		VkBuffer GetHandle() const { return Buffer; }
+		VkBuffer GetHandle() const { return Allocation.GetBufferHandle(); }
 
 		static VulkanBufferBase* Cast(RHIBuffer* Buffer)
 		{

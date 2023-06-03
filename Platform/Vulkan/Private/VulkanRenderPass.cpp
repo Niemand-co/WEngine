@@ -8,7 +8,7 @@ namespace Vulkan
 	VulkanRenderPass::VulkanRenderPass(class VulkanDevice* pInDevice, VkRenderPassCreateInfo* pInfo)
 		: pDevice(pInDevice)
 	{
-		vkCreateRenderPass(pDevice->GetHandle(), pInfo, ResourceCast(NormalAllocator::Get())->GetCallbacks(), &RenderPass);
+		vkCreateRenderPass(pDevice->GetHandle(), pInfo, ResourceCast(GetCPUAllocator())->GetCallbacks(), &RenderPass);
 	}
 
 	VulkanRenderPass::VulkanRenderPass(VulkanDevice* pInDevice, const VulkanRenderTargetLayout& InRTLayout)
@@ -21,8 +21,8 @@ namespace Vulkan
 		
 		uint32 NumSubpass = 0;
 		uint32 NumDependencies = 0;
-		VkSubpassDescription Subpasses[8];
-		VkSubpassDependency Dependencies[8];
+		VkSubpassDescription Subpasses[8] = {};
+		VkSubpassDependency Dependencies[8] = {};
 		RenderPassCreateInfo.pSubpasses = Subpasses;
 		RenderPassCreateInfo.pDependencies = Dependencies;
 
@@ -38,12 +38,12 @@ namespace Vulkan
 		RenderPassCreateInfo.subpassCount = NumSubpass;
 		RenderPassCreateInfo.dependencyCount = NumDependencies;
 
-		vkCreateRenderPass(pInDevice->GetHandle(), &RenderPassCreateInfo, ResourceCast(NormalAllocator::Get())->GetCallbacks(), &RenderPass);
+		vkCreateRenderPass(pInDevice->GetHandle(), &RenderPassCreateInfo, ResourceCast(GetCPUAllocator())->GetCallbacks(), &RenderPass);
 	}
 
 	VulkanRenderPass::~VulkanRenderPass()
 	{
-		vkDestroyRenderPass(pDevice->GetHandle(), RenderPass, ResourceCast(NormalAllocator::Get())->GetCallbacks());
+		vkDestroyRenderPass(pDevice->GetHandle(), RenderPass, ResourceCast(GetCPUAllocator())->GetCallbacks());
 	}
 
 	void VulkanRenderPass::Begin(VulkanCommandBuffer* CmdBuffer)

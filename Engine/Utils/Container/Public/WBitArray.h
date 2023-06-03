@@ -134,7 +134,7 @@ namespace WEngine
 
 		~WBitArray();
 
-		void Init(uint32 Count, bool Value);
+		void Init(uint32 InNumBits, bool Value);
 
 		void Push(const bool NewValue);
 

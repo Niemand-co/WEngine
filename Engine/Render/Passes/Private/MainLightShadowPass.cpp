@@ -307,7 +307,7 @@
 //			encoder->EndPass();
 //		}
 //		encoder->~RHIGraphicsEncoder();
-//		NormalAllocator::Get()->Deallocate(encoder);
+//		GetCPUAllocator()->Deallocate(encoder);
 //	}
 //	cmd->EndScopePass();
 //	context->ExecuteCommandBuffer(cmd);

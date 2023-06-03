@@ -67,7 +67,7 @@ namespace Vulkan
 		instanceCreateInfo.enabledExtensionCount = extensions.Size();
 		instanceCreateInfo.enabledLayerCount = 0;
 
-		VkAllocationCallbacks* callbacks = static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks();
+		VkAllocationCallbacks* callbacks = static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks();
 		RE_ASSERT(vkCreateInstance(&instanceCreateInfo, callbacks, &Instance) == VK_SUCCESS, "Failed to Create Vulkan Instance.");
 
 		if (enableDebugLayer)
@@ -79,7 +79,7 @@ namespace Vulkan
 	VulkanInstance::~VulkanInstance()
 	{
 		DestroyDebugUtilsMessengerEXT(Instance, m_debugUtilsMessenger, nullptr);
-		VkAllocationCallbacks *callbacks = static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks();
+		VkAllocationCallbacks *callbacks = static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks();
 		vkDestroyInstance(Instance, callbacks);
 	}
 
@@ -87,7 +87,7 @@ namespace Vulkan
 	{
 		unsigned int physicalDeviceCount = 0;
 		vkEnumeratePhysicalDevices(Instance, &physicalDeviceCount, nullptr);
-		VkPhysicalDevice *pPhysicalDevices = (VkPhysicalDevice*)NormalAllocator::Get()->Allocate(physicalDeviceCount * sizeof(VkPhysicalDevice));
+		VkPhysicalDevice *pPhysicalDevices = (VkPhysicalDevice*)GetCPUAllocator()->Allocate(physicalDeviceCount * sizeof(VkPhysicalDevice));
 		vkEnumeratePhysicalDevices(Instance, &physicalDeviceCount, pPhysicalDevices);
 
 		m_gpus.Resize(physicalDeviceCount);

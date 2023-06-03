@@ -52,7 +52,7 @@ namespace Vulkan
 
 		virtual ~VulkanAllocation() = default;
 
-		void Init(EVulkanAllocationType InType, EVulkanAllocationMetaType InMetaType, uint32 InSize, uint32 InOffset, uint32 InAllocatorIndex, uint32 InAllocationIndex);
+		void Init(EVulkanAllocationType InType, EVulkanAllocationMetaType InMetaType, VkBuffer InBuffer, uint32 InSize, uint32 InOffset, uint32 InAllocatorIndex, uint32 InAllocationIndex);
 
 		bool HasAllocation() const { return  Type != EVulkanAllocationType::EAT_Empty; }
 
@@ -68,6 +68,8 @@ namespace Vulkan
 
 		uint32 GetSize() const { return Size; }
 
+		VkBuffer GetBufferHandle() const { return Buffer; }
+
 	private:
 
 		uint32 Size = 0;
@@ -81,6 +83,8 @@ namespace Vulkan
 		EVulkanAllocationMetaType MetaType = EVulkanAllocationMetaType::EAMT_Unknown;
 
 		EVulkanAllocationType Type;
+
+		VkBuffer Buffer;
 
 		friend class VulkanSubresourceAllocator;
 		friend class VulkanMemoryManager;
@@ -141,7 +145,7 @@ namespace Vulkan
 	{
 	public:
 
-		VulkanSubresourceAllocator(EVulkanAllocationType InType, class VulkanMemoryManager *InOwner, VulkanDeviceMemoryAllocation *InDeviceMemoryAllocation, uint32 InBufferSize, uint32 InAlignment, VkBufferUsageFlags InUsageFlags, VkMemoryPropertyFlags InMemoryPropertyFlags, uint32 InPoolSizeIndex);
+		VulkanSubresourceAllocator(EVulkanAllocationType InType, VkBuffer InBuffer, class VulkanMemoryManager *InOwner, VulkanDeviceMemoryAllocation *InDeviceMemoryAllocation, uint32 InBufferSize, uint32 InAlignment, VkBufferUsageFlags InUsageFlags, VkMemoryPropertyFlags InMemoryPropertyFlags, uint32 InPoolSizeIndex);
 
 		VulkanSubresourceAllocator(EVulkanAllocationType InType, class VulkanMemoryManager *InOwner, VulkanDeviceMemoryAllocation *InDeviceMemoryAllocation, uint32 InMemoryTypeIndex, uint32 InBucketId);
 
@@ -164,6 +168,8 @@ namespace Vulkan
 	private:
 
 		EVulkanAllocationType Type;
+
+		VkBuffer Buffer;
 
 		uint16 AllocatorIndex;
 
@@ -220,7 +226,7 @@ namespace Vulkan
 			int32 PreFree = -1;
 		};
 		WEngine::WArray<VulkanAllocationInternal> Internals;
-
+		
 		int32 AllocationFreeListHead;
 
 		friend class VulkanMemoryManager;
@@ -426,3 +432,5 @@ namespace Vulkan
 	};
 
 }
+
+template<> struct WEngine::TIsElementTypePOD<Vulkan::VulkanSubresourceAllocator::VulkanAllocationInternal> { enum { Value = true }; };

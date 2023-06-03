@@ -7,7 +7,7 @@ namespace Vulkan
 
 	VulkanSamplerState::VulkanSamplerState(VulkanDevice* pInDevice, const VkSamplerCreateInfo& Info)
 	{
-		vkCreateSampler(pInDevice->GetHandle(), &Info, ResourceCast(NormalAllocator::Get())->GetCallbacks(), &Sampler);
+		vkCreateSampler(pInDevice->GetHandle(), &Info, ResourceCast(GetCPUAllocator())->GetCallbacks(), &Sampler);
 	}
 
 	void VulkanSamplerState::SetupCreateInfo(const RHISamplerStateInitializer& Initializer, VulkanDevice *pDevice, VkSamplerCreateInfo& OutInfo)

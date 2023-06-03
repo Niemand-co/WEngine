@@ -10,16 +10,32 @@ namespace WEngine
 	public:
 
 		WString();
-
 		WString(const char* str);
+		WString(const WString& Other);
+		explicit WString(WString&& Other);
 
-		WString(const WString& string);
+		WString& operator=(const WString& Other)
+		{
+			GetCPUAllocator()->Deallocate(Data);
+			CharNum = Other.CharNum;
+			Data = (char*)GetCPUAllocator()->Allocate(Other.CharNum + 1);
+			memcpy(Data, Other.Data, Other.CharNum + 1);
+			return *this;
+		}
+
+		WString& operator=(WString&& Other)
+		{
+			CharNum = Other.CharNum;
+			Data = Other.Data;
+			Other.Data = nullptr;
+			return *this;
+		}
 
 		~WString();
 
-		size_t Size() const { return m_size; }
+		size_t Size() const { return CharNum; }
 
-		const char* Data() const { return m_pData; }
+		const char* GetData() const { return Data; }
 
 		int32 find(const char& c) const;
 
@@ -35,47 +51,39 @@ namespace WEngine
 
 		void* operator new(size_t size)
 		{
-			return NormalAllocator::Get()->Allocate(size);
+			return GetCPUAllocator()->Allocate(size);
 		}
 
 		void operator delete(void* pData)
 		{
-			NormalAllocator::Get()->Deallocate(pData);
-		}
-
-		void operator=(const WString& string)
-		{
-			NormalAllocator::Get()->Deallocate(m_pData);
-			m_size = string.m_size;
-			m_pData = (char*)NormalAllocator::Get()->Allocate(string.m_size + 1);
-			memcpy(m_pData, string.m_pData, string.m_size + 1);
+			GetCPUAllocator()->Deallocate(pData);
 		}
 
 		void operator=(const char* str)
 		{
-			NormalAllocator::Get()->Deallocate(m_pData);
-			m_size = strlen(str);
-			m_pData = (char*)NormalAllocator::Get()->Allocate(m_size + 1);
-			memcpy(m_pData, str, m_size + 1);
+			GetCPUAllocator()->Deallocate(Data);
+			CharNum = strlen(str);
+			Data = (char*)GetCPUAllocator()->Allocate(CharNum + 1);
+			memcpy(Data, str, CharNum + 1);
 		}
 
 		char& operator[](const size_t& index)
 		{
-			return m_pData[index];
+			return Data[index];
 		}
 
 		const char& operator[](const size_t& index) const
 		{
-			return m_pData[index];
+			return Data[index];
 		}
 
 		bool operator==(WString& string) const
 		{
-			if(m_size != string.m_size)
+			if(CharNum != string.CharNum)
 				return false;
 
-			for(size_t index = 0; index < m_size; ++index)
-				if(m_pData[index] != string[index])
+			for(size_t index = 0; index < CharNum; ++index)
+				if(Data[index] != string[index])
 					return false;
 
 			return true;
@@ -83,11 +91,11 @@ namespace WEngine
 
 		bool operator==(const char* str) const
 		{
-			if (m_size != strlen(str))
+			if (CharNum != strlen(str))
 				return false;
 
-			for (size_t index = 0; index < m_size; ++index)
-				if (m_pData[index] != str[index])
+			for (size_t index = 0; index < CharNum; ++index)
+				if (Data[index] != str[index])
 					return false;
 
 			return true;
@@ -95,12 +103,12 @@ namespace WEngine
 
 		WString operator+(const WString& string) const
 		{
-			char* newPtr = (char*)NormalAllocator::Get()->Allocate(string.m_size + m_size + 1);
-			memcpy(newPtr, m_pData, m_size);
-			memcpy(newPtr + m_size, string.m_pData, string.m_size + 1);
+			char* newPtr = (char*)GetCPUAllocator()->Allocate(string.CharNum + CharNum + 1);
+			memcpy(newPtr, Data, CharNum);
+			memcpy(newPtr + CharNum, string.Data, string.CharNum + 1);
 			WString newString = WString();
-			newString.m_pData = newPtr;
-			newString.m_size = m_size + string.m_size;
+			newString.Data = newPtr;
+			newString.CharNum = CharNum + string.CharNum;
 			return newString;
 		}
 
@@ -111,23 +119,23 @@ namespace WEngine
 				return WString(*this);
 			}
 			size_t length = strlen(str);
-			char* newPtr = (char*)NormalAllocator::Get()->Allocate(length + m_size + 1);
-			memcpy(newPtr, m_pData, m_size);
-			memcpy(newPtr + m_size, str, length + 1);
+			char* newPtr = (char*)GetCPUAllocator()->Allocate(length + CharNum + 1);
+			memcpy(newPtr, Data, CharNum);
+			memcpy(newPtr + CharNum, str, length + 1);
 			WString newString = WString();
-			newString.m_pData = newPtr;
-			newString.m_size = m_size + length;
+			newString.Data = newPtr;
+			newString.CharNum = CharNum + length;
 			return newString;
 		}
 
 		void operator+=(const WString& string)
 		{
-			char* newPtr = (char*)NormalAllocator::Get()->Allocate(string.m_size + m_size + 1);
-			memcpy(newPtr, m_pData, m_size);
-			memcpy(newPtr + m_size, string.m_pData, string.m_size + 1);
-			NormalAllocator::Get()->Deallocate(m_pData);
-			m_pData = newPtr;
-			m_size += string.m_size;
+			char* newPtr = (char*)GetCPUAllocator()->Allocate(string.CharNum + CharNum + 1);
+			memcpy(newPtr, Data, CharNum);
+			memcpy(newPtr + CharNum, string.Data, string.CharNum + 1);
+			GetCPUAllocator()->Deallocate(Data);
+			Data = newPtr;
+			CharNum += string.CharNum;
 		}
 
 		void operator+=(const char *str)
@@ -137,12 +145,12 @@ namespace WEngine
 				return;
 			}
 			size_t length = strlen(str);
-			char* newPtr = (char*)NormalAllocator::Get()->Allocate(length + m_size + 1);
-			memcpy(newPtr, m_pData, m_size);
-			memcpy(newPtr + m_size, str, length + 1);
-			NormalAllocator::Get()->Deallocate(m_pData);
-			m_pData = newPtr;
-			m_size += length;
+			char* newPtr = (char*)GetCPUAllocator()->Allocate(length + CharNum + 1);
+			memcpy(newPtr, Data, CharNum);
+			memcpy(newPtr + CharNum, str, length + 1);
+			GetCPUAllocator()->Deallocate(Data);
+			Data = newPtr;
+			CharNum += length;
 		}
 
 		friend WString operator+(const char* str, const WString& string);
@@ -151,9 +159,9 @@ namespace WEngine
 
 	private:
 
-		char *m_pData;
+		char *Data;
 
-		size_t m_size;
+		size_t CharNum;
 
 	};
 

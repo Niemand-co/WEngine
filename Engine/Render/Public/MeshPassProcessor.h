@@ -125,11 +125,11 @@ class WMeshPassProcessorShaderBase
 {
 public:
 
-	virtual WVertexShaderRHIRef GetVertexShaderRHI() const = 0;
+	virtual WShaderRHIRef GetVertexShaderRHI() const = 0;
 
-	virtual WGeometryShaderRHIRef GetGeometryShaderRHI() const = 0;
+	virtual WShaderRHIRef GetGeometryShaderRHI() const = 0;
 
-	virtual WPixelShaderRHIRef GetPixelShaderRHI() const = 0;
+	virtual WShaderRHIRef GetPixelShaderRHI() const = 0;
 
 	virtual WMaterialShader* GetVertexShader() const = 0;
 
@@ -148,11 +148,11 @@ public:
 
 	~WMeshPassProcessorShader() = default;
 
-	virtual WVertexShaderRHIRef GetVertexShaderRHI() const override { return VertexShader ? VertexShader->GetVertexShader() : nullptr; }
+	virtual WShaderRHIRef GetVertexShaderRHI() const override { return VertexShader ? VertexShader->GetVertexShader() : nullptr; }
 
-	virtual WGeometryShaderRHIRef GetGeometryShaderRHI() const override { return GeometryShader ? GeometryShader->GetGeometryShader() : nullptr; }
+	virtual WShaderRHIRef GetGeometryShaderRHI() const override { return GeometryShader ? GeometryShader->GetGeometryShader() : nullptr; }
 
-	virtual WPixelShaderRHIRef GetPixelShaderRHI() const override { return PixelShader ? PixelShader->GetPixelShader() : nullptr; }
+	virtual WShaderRHIRef GetPixelShaderRHI() const override { return PixelShader ? PixelShader->GetPixelShader() : nullptr; }
 
 	virtual WMaterialShader* GetVertexShader() const { return VertexShader; }
 
@@ -341,7 +341,7 @@ public:
 
 	virtual ~WMeshPassDrawListContext() = default;
 
-	virtual WMeshDrawCommand& AddCommand() = 0;
+	virtual void AddCommand(const WMeshDrawCommand& SharedDrawCommand) = 0;
 
 	virtual void FinalizeCommand(
 		const WMeshBatch& MeshBatch,
@@ -349,6 +349,8 @@ public:
 		const WMeshPassProcessorShaderBase* Shaders,
 		const RHIGraphicsPipelineStateInitializer& PipelineState,
 		WMeshDrawCommand& MeshDrawCommand) = 0;
+
+	virtual void SubmitMeshDrawCommands(RHIRenderCommandList& CmdList) = 0;
 
 };
 
@@ -363,7 +365,7 @@ public:
 
 	virtual ~WDynamicMeshPassDrawListContext() = default;
 
-	virtual WMeshDrawCommand& AddCommand() override;
+	virtual void AddCommand(const WMeshDrawCommand& SharedDrawCommand) override;
 
 	virtual void FinalizeCommand(
 		const WMeshBatch& MeshBatch,
@@ -371,6 +373,8 @@ public:
 		const WMeshPassProcessorShaderBase* Shaders,
 		const RHIGraphicsPipelineStateInitializer& PipelineState,
 		WMeshDrawCommand& MeshDrawCommand) override;
+
+	virtual void SubmitMeshDrawCommands(RHIRenderCommandList& CmdList) override;
 
 public:
 
@@ -388,7 +392,7 @@ public:
 
 	virtual ~WCachedMeshPassDrawListContext();
 
-	virtual WMeshDrawCommand& AddCommand() override;
+	virtual void AddCommand(const WMeshDrawCommand& SharedDrawCommand) override;
 
 	virtual void FinalizeCommand(
 		const WMeshBatch& MeshBatch,

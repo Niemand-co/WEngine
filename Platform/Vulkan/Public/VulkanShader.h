@@ -1,6 +1,8 @@
 #pragma once
 #include "RHI/Public/RHIShader.h"
 
+class RHIShaderDescriptor;
+
 namespace Vulkan
 {
 
@@ -23,13 +25,15 @@ namespace Vulkan
 
 	};
 
-	class VulkanShaderBase : public VulkanResource
+	class VulkanShader : public RHIShader
 	{
 	public:
 	
-		VulkanShaderBase(class VulkanDevice *pInDevice, VkShaderModuleCreateInfo* pInfo);
+		VulkanShader(class VulkanDevice *pInDevice, RHIShaderDescriptor *Descriptor);
 
-		virtual ~VulkanShaderBase();
+		virtual ~VulkanShader();
+
+		virtual void SetupParametersInternal(const ShaderParametersLayout& Layout) override;
 
 		VkShaderModule GetShaderModule() const { return ShaderModule; }
 
@@ -42,54 +46,6 @@ namespace Vulkan
 		VkShaderModule ShaderModule;
 
 		VulkanShaderCodeHeader CodeHeader;
-
-	};
-
-	class VulkanVertexShader : public RHIVertexShader, public VulkanShaderBase
-	{
-	public:
-
-		VulkanVertexShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo* pInfo);
-
-		virtual ~VulkanVertexShader();
-
-		virtual void SetupParametersInternal(const ShaderParametersLayout& Layout) override;
-
-	};
-
-	class VulkanGeometryShader : public RHIGeometryShader, public VulkanShaderBase
-	{
-	public:
-
-		VulkanGeometryShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo* pInfo);
-
-		virtual ~VulkanGeometryShader();
-
-		virtual void SetupParametersInternal(const ShaderParametersLayout& Layout) override;
-
-	};
-
-	class VulkanPixelShader : public RHIPixelShader, public VulkanShaderBase
-	{
-	public:
-
-		VulkanPixelShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo* pInfo);
-
-		virtual ~VulkanPixelShader();
-
-		virtual void SetupParametersInternal(const ShaderParametersLayout& Layout) override;
-
-	};
-
-	class VulkanComputeShader : public RHIComputeShader, public VulkanShaderBase
-	{
-	public:
-
-		VulkanComputeShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo* pInfo);
-
-		virtual ~VulkanComputeShader();
-
-		virtual void SetupParametersInternal(const ShaderParametersLayout& Layout) override;
 
 	};
 

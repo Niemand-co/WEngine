@@ -6,40 +6,47 @@ namespace WEngine
 
 	WString::WString()
 	{
-		m_size = 0;
-		m_pData = nullptr;
+		CharNum = 0;
+		Data = nullptr;
 	}
 
 	WString::WString(const char* str)
 	{
 		if (str == nullptr)
 		{
-			m_size = 0;
-			m_pData = nullptr;
+			CharNum = 0;
+			Data = nullptr;
 			return;
 		}
-		m_size = strlen(str);
-		m_pData = (char*)NormalAllocator::Get()->Allocate(m_size + 1);
-		memcpy(m_pData, str, m_size + 1);
+		CharNum = strlen(str);
+		Data = (char*)GetCPUAllocator()->Allocate(CharNum + 1);
+		memcpy(Data, str, CharNum + 1);
 	}
 
-	WString::WString(const WString& string)
+	WString::WString(const WString& Other)
+		: CharNum(Other.CharNum)
 	{
-		m_size = string.m_size;
-		m_pData = (char*)NormalAllocator::Get()->Allocate(m_size + 1);
-		memcpy(m_pData, string.m_pData, m_size + 1);
+		Data = (char*)GetCPUAllocator()->Allocate(CharNum + 1);
+		memcpy(Data, Other.Data, CharNum + 1);
+	}
+
+	WString::WString(WString&& Other)
+		: CharNum(Other.CharNum),
+		  Data(Other.Data)
+	{
+		Other.Data = nullptr;
 	}
 
 	WString::~WString()
 	{
-		NormalAllocator::Get()->Deallocate(m_pData);
+		GetCPUAllocator()->Deallocate(Data);
 	}
 
 	int32 WString::find(const char& c) const
 	{
-		for (size_t index = 0; index < m_size; ++index)
+		for (size_t index = 0; index < CharNum; ++index)
 		{
-			if(m_pData[index] == c)
+			if(Data[index] == c)
 				return index;
 		}
 		return -1;
@@ -48,10 +55,10 @@ namespace WEngine
 	int32 WString::find(const char* str) const
 	{
 		size_t length = strlen(str);
-		for (size_t index = 0; index <= m_size - length; ++index)
+		for (size_t index = 0; index <= CharNum - length; ++index)
 		{
 			size_t start = 0;
-			while (m_pData[start] == str[start])
+			while (Data[start] == str[start])
 			{
 				++start;
 			}
@@ -64,10 +71,10 @@ namespace WEngine
 	int32 WString::find(const WString& string) const
 	{
 		size_t length = string.Size();
-		for (size_t index = 0; index <= m_size - length; ++index)
+		for (size_t index = 0; index <= CharNum - length; ++index)
 		{
 			size_t start = 0;
-			while (m_pData[start] == string[start])
+			while (Data[start] == string[start])
 			{
 				++start;
 			}
@@ -79,9 +86,9 @@ namespace WEngine
 
 	int32 WString::find_last_of(const char& c) const
 	{
-		for (int32 index = m_size - 1; index >= 0; --index)
+		for (int32 index = CharNum - 1; index >= 0; --index)
 		{
-			if(m_pData[index] == c)
+			if(Data[index] == c)
 				return index;
 		}
 		return -1;
@@ -89,41 +96,41 @@ namespace WEngine
 
 	WString WString::Substr(size_t length) const
 	{
-		RE_ASSERT(length <= m_size, "Out of String Length.");
+		RE_ASSERT(length <= CharNum, "Out of String Length.");
 		WString newstring;
-		newstring.m_size = length;
-		newstring.m_pData = (char*)NormalAllocator::Get()->Allocate(length + 1);
-		memcpy(newstring.m_pData, m_pData, length);
-		*(newstring.m_pData + length) = '\0';
+		newstring.CharNum = length;
+		newstring.Data = (char*)GetCPUAllocator()->Allocate(length + 1);
+		memcpy(newstring.Data, Data, length);
+		*(newstring.Data + length) = '\0';
 		return newstring;
 	}
 
 	WString WString::Substr(size_t start, size_t length) const
 	{
-		RE_ASSERT((start + length) <= m_size, "Out of String Length.");
+		RE_ASSERT((start + length) <= CharNum, "Out of String Length.");
 		WString newstring;
-		newstring.m_size = length;
-		newstring.m_pData = (char*)NormalAllocator::Get()->Allocate(length + 1);
-		memcpy(newstring.m_pData, m_pData + start, length);
-		*(newstring.m_pData + length) = '\0';
+		newstring.CharNum = length;
+		newstring.Data = (char*)GetCPUAllocator()->Allocate(length + 1);
+		memcpy(newstring.Data, Data + start, length);
+		*(newstring.Data + length) = '\0';
 		return newstring;
 	}
 
 	WString operator+(const char* str, const WString& string)
 	{
 		size_t length = strlen(str);
-		char* newPtr = (char*)NormalAllocator::Get()->Allocate(length + string.m_size + 1);
+		char* newPtr = (char*)GetCPUAllocator()->Allocate(length + string.CharNum + 1);
 		memcpy(newPtr, str, length);
-		memcpy(newPtr + length, string.m_pData, string.m_size + 1);
+		memcpy(newPtr + length, string.Data, string.CharNum + 1);
 		WString newString = WString();
-		newString.m_pData = newPtr;
-		newString.m_size = string.m_size + length;
+		newString.Data = newPtr;
+		newString.CharNum = string.CharNum + length;
 		return newString;
 	}
 
 	std::ostream& operator<<(std::ostream& o, const WString& string)
 	{
-		o << string.m_pData;
+		o << string.Data;
 		return o;
 	}
 

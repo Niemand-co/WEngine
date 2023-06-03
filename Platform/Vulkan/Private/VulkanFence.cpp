@@ -13,12 +13,12 @@ namespace Vulkan
 		{
 			info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		}
-		RE_ASSERT(vkCreateFence(pDevice->GetHandle(), &info, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Fence) == VK_SUCCESS, "Failed to create fence.");
+		RE_ASSERT(vkCreateFence(pDevice->GetHandle(), &info, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), &Fence) == VK_SUCCESS, "Failed to create fence.");
 	}
 
 	VulkanFence::~VulkanFence()
 	{
-		vkDestroyFence(pDevice->GetHandle(), Fence, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkDestroyFence(pDevice->GetHandle(), Fence, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks());
 	}
 
 	void VulkanFence::Reset()

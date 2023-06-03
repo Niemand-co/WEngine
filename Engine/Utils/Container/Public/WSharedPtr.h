@@ -45,12 +45,12 @@ namespace WEngine
 
 		void* operator new(size_t size)
 		{
-			return NormalAllocator::Get()->Allocate(size);
+			return GetCPUAllocator()->Allocate(size);
 		}
 
 		void operator delete(void* pData)
 		{
-			NormalAllocator::Get()->Deallocate(pData);
+			GetCPUAllocator()->Deallocate(pData);
 		}
 
 	private:
@@ -66,86 +66,98 @@ namespace WEngine
 
 		WSharedPtr() = default;
 
-		WSharedPtr(const WSharedPtr& ptr);
+		WSharedPtr(const WSharedPtr& Other);
+
+		explicit WSharedPtr(WSharedPtr&& Other);
 
 		WSharedPtr(T *ptr);
 
-		T* Get() const { return m_ptr; }
+		T* Get() const { return Ptr; }
 
-		RefCounterBase* GetCounter() const { return m_counter; }
+		RefCounterBase* GetCounter() const { return Counter; }
 
-		T* operator->() { return m_ptr; }
+		T* operator->() { return Ptr; }
 
-		const T* operator->() const { return m_ptr; }
+		const T* operator->() const { return Ptr; }
 
-		T& operator*() { return *m_ptr; }
+		T& operator*() { return *Ptr; }
 
-		void operator=(const WSharedPtr<T>& other)
+		WSharedPtr<T>& operator=(const WSharedPtr<T>& Other)
 		{
-			if(m_ptr == other.m_ptr)
-				return;
-			if (m_ptr != nullptr)
+			if(Ptr == Other.Ptr)
+				return *this;
+			if (Ptr != nullptr)
 			{
-				--(*m_counter);
-				if (m_counter->GetCount() == 0)
+				--(*Counter);
+				if (Counter->GetCount() == 0)
 				{
-					delete m_ptr;
-					delete m_counter;
+					delete Ptr;
+					delete Counter;
 				}
 			}
-			m_ptr = other.m_ptr;
-			m_counter = other.m_counter;
-			++(*m_counter);
+			Ptr = Other.Ptr;
+			Counter = Other.Counter;
+			++(*Counter);
+			return *this;
+		}
+
+		WSharedPtr<T>& operator=(WSharedPtr<T>&& Other)
+		{
+			Ptr = Other.Ptr;
+			Counter = Other.Counter;
+			Other.Counter = nullptr;
+			Other.Ptr = nullptr;
+			return *this;
 		}
 
 		void operator=(T* ptr)
 		{
-			if(m_ptr == ptr)
+			if(Ptr == ptr)
 				return;
-			if (m_ptr != nullptr)
+			if (Ptr != nullptr)
 			{
-				--(*m_counter);
-				if (m_counter->GetCount() == 0)
+				--(*Counter);
+				if (Counter->GetCount() == 0)
 				{
-					delete m_ptr;
-					delete m_counter;
+					delete Ptr;
+					delete Counter;
 				}
 			}
-			m_ptr = ptr;
-			m_counter = new RefCounterBase();
-			++(*m_counter);
+			Ptr = ptr;
+			Counter = new RefCounterBase();
+			++(*Counter);
 		}
 
 		bool operator==(const WSharedPtr<T>& other)
 		{
-			return m_ptr == other.m_ptr;
+			return Ptr == other.Ptr;
 		}
 
 		bool operator==(T* ptr)
 		{
-			return m_ptr == ptr;
+			return Ptr == ptr;
 		}
 
 		bool operator!=(const WSharedPtr<T>& other)
 		{
-			return !(m_ptr == other.m_ptr);
+			return !(Ptr == other.Ptr);
 		}
 
 		bool operator!=(T* ptr)
 		{
-			return !(m_ptr == ptr);
+			return !(Ptr == ptr);
 		}
 
 		virtual ~WSharedPtr();
 
 		void* operator new(size_t size)
 		{
-			return NormalAllocator::Get()->Allocate(size);
+			return GetCPUAllocator()->Allocate(size);
 		}
 
 		void operator delete(void* pData)
 		{
-			NormalAllocator::Get()->Deallocate(pData);
+			GetCPUAllocator()->Deallocate(pData);
 		}
 
 		template<typename Y, typename ...Args>
@@ -153,37 +165,47 @@ namespace WEngine
 
 	private:
 
-		T *m_ptr = nullptr;
+		T *Ptr = nullptr;
 
-		RefCounterBase *m_counter = nullptr;
+		RefCounterBase *Counter = nullptr;
 
 	};
 
 	template<typename T>
 	inline WSharedPtr<T>::WSharedPtr(T* ptr)
-		: m_ptr(ptr), m_counter(new RefCounterBase())
+		: Ptr(ptr), Counter(new RefCounterBase())
 	{
 		if(ptr != nullptr)
-			++(*m_counter);
+			++(*Counter);
 	}
 
 	template<typename T>
-	inline WSharedPtr<T>::WSharedPtr(const WSharedPtr& ptr)
-		: m_ptr(ptr.m_ptr), m_counter(ptr.m_counter)
+	inline WSharedPtr<T>::WSharedPtr(const WSharedPtr& Other)
+		: Ptr(Other.Ptr), Counter(Other.Counter)
 	{
-		++(*m_counter);
+		if(Counter)
+			++(*Counter);
+	}
+
+	template<typename T>
+	inline WSharedPtr<T>::WSharedPtr(WSharedPtr&& Other)
+		: Ptr(Other.Ptr),
+		  Counter(Other.Counter)
+	{
+		Other.Ptr = nullptr;
+		Other.Counter = nullptr;
 	}
 
 	template<typename T>
 	inline WSharedPtr<T>::~WSharedPtr()
 	{
-		if(m_ptr == nullptr)
+		if(Ptr == nullptr)
 			return;
-		--(*m_counter);
-		if (m_counter->GetCount() == 0)
+		--(*Counter);
+		if (Counter->GetCount() == 0)
 		{
-			delete m_ptr;
-			delete m_counter;
+			delete Ptr;
+			delete Counter;
 		}
 	}
 

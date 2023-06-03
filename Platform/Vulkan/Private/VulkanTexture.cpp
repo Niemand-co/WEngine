@@ -9,6 +9,82 @@
 namespace Vulkan
 {
 
+	static VkImageLayout GetInitialLayoutForAccess(EAccess Access, ETextureCreateFlags Flags)
+	{
+		if (WEngine::EnumHasFlags(Access, EAccess::RTV) || Access == EAccess::Present)
+		{
+			return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		}
+
+		if (WEngine::EnumHasFlags(Access, EAccess::DSVWrite))
+		{
+			return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		}
+
+		if (WEngine::EnumHasFlags(Access, EAccess::DSVRead))
+		{
+			return VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL;
+		}
+
+		if (WEngine::EnumHasFlags(Access, EAccess::SRV))
+		{
+			return WEngine::EnumHasFlags(Flags, ETextureCreateFlags::TextureCreate_DepthStencil) ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		}
+
+		if (WEngine::EnumHasFlags(Access, EAccess::UAV))
+		{
+			return VK_IMAGE_LAYOUT_GENERAL;
+		}
+
+		if (Access == EAccess::Unknown)
+		{
+			return VK_IMAGE_LAYOUT_UNDEFINED;
+		}
+
+		if (Access == EAccess::CopySrc)
+		{
+			return VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+		}
+
+		if (Access == EAccess::CopyDst)
+		{
+			return VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+		}
+
+		return VK_IMAGE_LAYOUT_UNDEFINED;
+	}
+
+	static EAccess GetDefaultResourceState(ETextureCreateFlags Flags, bool IsInitialized)
+	{
+		EAccess Access = EAccess::SRV;
+
+		if (!IsInitialized)
+		{
+			if (WEngine::EnumHasFlags(Flags, ETextureCreateFlags::TextureCreate_RenderTarget))
+			{
+				Access = EAccess::RTV;
+			}
+			else if (WEngine::EnumHasFlags(Flags, ETextureCreateFlags::TextureCreate_DepthStencil))
+			{
+				Access = (EAccess::DSVWrite | EAccess::DSVRead);
+			}
+			else if (WEngine::EnumHasFlags(Flags, ETextureCreateFlags::TextureCreate_UAV))
+			{
+				Access = EAccess::UAV;
+			}
+			else if (WEngine::EnumHasFlags(Flags, ETextureCreateFlags::TextureCreate_Presentable))
+			{
+				Access = EAccess::Present;
+			}
+			else if (WEngine::EnumHasFlags(Flags, ETextureCreateFlags::TextureCreate_SRV))
+			{
+				Access = EAccess::SRV;
+			}
+		}
+
+		return Access;
+	}
+
 	WEngine::WHashMap<VkImage, VkImageLayout> VulkanTextureLayoutManager::Layouts = WEngine::WHashMap<VkImage, VkImageLayout>();
 
 	VulkanTexture::VulkanTexture(VulkanDevice* pInDevice, const RHITextureDesc& InDesc)
@@ -67,7 +143,7 @@ namespace Vulkan
 			}
 		}
 
-		RE_ASSERT(vkCreateImage(pDevice->GetHandle(), &ImageCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Image), "Failed to create image");
+		RE_ASSERT(vkCreateImage(pDevice->GetHandle(), &ImageCreateInfo, ResourceCast(GetCPUAllocator())->GetCallbacks(), &Image) == VK_SUCCESS, "Failed to create image");
 
 		vkGetImageMemoryRequirements(pDevice->GetHandle(), Image, &MemoryRequirements);
 
@@ -79,6 +155,21 @@ namespace Vulkan
 		VkImageViewType ViewType = GetViewType(InDesc.Dimension);
 		VkImageAspectFlags Aspect = GetAspect(InDesc.Format);
 		DefaultView.Create(pDevice, Image, ViewType, Aspect, InDesc.Format, 0, WEngine::Max(InDesc.NumMips, (uint8)1), 0, InDesc.ArraySize);
+
+		if (Desc.InitialState == EAccess::Unknown)
+		{
+			Desc.InitialState = GetDefaultResourceState(Desc.Flags, Desc.BulkData != nullptr);
+		}
+
+		VkImageLayout InitLayout = GetInitialLayoutForAccess(Desc.InitialState, Desc.Flags);
+
+		VulkanPipelineBarrier Barrier;
+		VkImageSubresourceRange Range = VulkanPipelineBarrier::GetTextureSubresourceRange(Aspect);
+		Barrier.AddTransition(Image, Range, VK_IMAGE_LAYOUT_UNDEFINED, InitLayout);
+		VulkanCommandBuffer* CmdBuffer = static_cast<VulkanDynamicContext*>(GetDynamicRHI())->GetCmdBufferManager()->GetImmediateCommandBuffer();
+		Barrier.Execute(CmdBuffer);
+
+		VulkanTextureLayoutManager::AddLayout(Image, InitLayout);
 
 		if (!InDesc.BulkData)
 		{
@@ -183,6 +274,8 @@ namespace Vulkan
 		VkBuffer SrcBuffer = StagingBuffer->GetHandle();
 		VkImage DstImage = Texture->GetHandle();
 
+		VkImageLayout InitialLayout = VulkanTextureLayoutManager::FindLayout(DstImage);
+
 		VkBufferImageCopy Region = {};
 		{
 			Region.bufferOffset = 0;
@@ -203,7 +296,7 @@ namespace Vulkan
 
 		{
 			VulkanPipelineBarrier Barrier;
-			Barrier.AddTransition(DstImage, Aspect, 0, 0, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+			Barrier.AddTransition(DstImage, Aspect, 0, 0, InitialLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 			Barrier.Execute(CmdBuffer);
 		}
 		
@@ -211,7 +304,7 @@ namespace Vulkan
 
 		{
 			VulkanPipelineBarrier Barrier;
-			Barrier.AddTransition(DstImage, Aspect, 0, 0, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_UNDEFINED);
+			Barrier.AddTransition(DstImage, Aspect, 0, 0, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, InitialLayout);
 			Barrier.Execute(CmdBuffer);
 		}
 

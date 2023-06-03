@@ -10,7 +10,7 @@ StaticMeshComponent::StaticMeshComponent(GameObject* pGameObject, WStaticMesh* p
 {
 	if (pMesh != nullptr)
 	{
-		Proxy = (StaticMeshProxy*)NormalAllocator::Get()->Allocate(sizeof(StaticMeshProxy));
+		Proxy = (StaticMeshProxy*)GetCPUAllocator()->Allocate(sizeof(StaticMeshProxy));
 		::new (Proxy) StaticMeshProxy(this);
 		GWorld::GetWorld()->Scene->AddPrimitive(this);
 	}

@@ -87,6 +87,8 @@ static VkComponentMapping FormatComponentMapping(EFormat Format)
 
 }
 class RHIGraphicsPipelineStateInitializer;
+class RHIRenderPassDescriptor;
+class RHIFramebufferDescriptor;
 
 namespace Vulkan
 {
@@ -96,6 +98,8 @@ namespace Vulkan
 	public:
 
 		VulkanRenderTargetLayout(const RHIGraphicsPipelineStateInitializer& Initializer);
+
+		VulkanRenderTargetLayout(const RHIRenderPassDescriptor* Descriptor);
 
 	public:
 
@@ -130,7 +134,7 @@ namespace Vulkan
 
 		class VulkanRenderPass* GetOrCreateRenderPass(const VulkanRenderTargetLayout& RTLayout);
 
-		class VulkanFramebuffer* GetOrCreateFramebuffer();
+		class VulkanFramebuffer* GetOrCreateFramebuffer(const RHIFramebufferDescriptor* RTInfo, const VulkanRenderTargetLayout& RTLayout, VulkanRenderPass* RenderPass);
 
 	public:
 
@@ -142,15 +146,17 @@ namespace Vulkan
 
 		WCriticalSection RenderPassLock;
 
+		WCriticalSection FramebufferLock;
+
 		class VulkanDevice *pDevice;
 
 		WEngine::WHashMap<uint32, VulkanRenderPass*> RenderPasses;
 
-		struct FrameBufferList
+		struct FramebufferList
 		{
-			WEngine::WArray<VulkanFramebuffer*> FrameBuffer;
+			WEngine::WArray<VulkanFramebuffer*> Framebuffer;
 		};
-		WEngine::WHashMap<uint32, FrameBufferList*> FrameBuffers;
+		WEngine::WHashMap<uint32, FramebufferList*> Framebuffers;
 		
 	};
 

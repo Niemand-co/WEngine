@@ -35,8 +35,8 @@ namespace Vulkan
 		pDevice->GetMemoryManager()->AllocateBufferPooled(Allocation, pDescriptor->Stride * pDescriptor->Count, 0, BufferUsageFlags, MemoryPropertyFlags, EVulkanAllocationMetaType::EAMT_BufferOther);
 
 		void *Data = Lock(pDescriptor->Count * pDescriptor->Stride, 0);
-		memcpy(Data, pDescriptor->Data, pDescriptor->Count * pDescriptor->Stride);
-		Unlock();
+		WEngine::Memcpy(Data, pDescriptor->Data, pDescriptor->Count * pDescriptor->Stride);
+ 		Unlock();
 	}
 
 	VulkanBufferBase::~VulkanBufferBase()
@@ -73,7 +73,7 @@ namespace Vulkan
 				Region.srcOffset = Offset;
 				Region.dstOffset = 0;
 			}
-			vkCmdCopyBuffer(CmdBuffer->GetHandle(), Buffer, PendingLock.PendingBuffer->GetHandle(), 1, &Region);
+			vkCmdCopyBuffer(CmdBuffer->GetHandle(), Allocation.GetBufferHandle(), PendingLock.PendingBuffer->GetHandle(), 1, &Region);
 
 			VkMemoryBarrier BarrierAfter = {};
 			{
@@ -129,7 +129,7 @@ namespace Vulkan
 				Region.srcOffset = 0;
 				Region.dstOffset = Offset;
 			}
-			vkCmdCopyBuffer(CmdBuffer->GetHandle(), StagingBuffer->GetHandle(), Buffer, 1, &Region);
+			vkCmdCopyBuffer(CmdBuffer->GetHandle(), StagingBuffer->GetHandle(), Allocation.GetBufferHandle(), 1, &Region);
 
 			VkMemoryBarrier BarrierAfter = {};
 			{

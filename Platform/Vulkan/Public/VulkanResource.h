@@ -7,6 +7,7 @@ class RHISemaphore;
 class RHIDevice;
 class RHIRenderPass;
 class RHIVertexBuffer;
+class RHITexture;
 
 namespace Vulkan
 {
@@ -17,12 +18,12 @@ namespace Vulkan
 
 		void* operator new(size_t size)
 		{
-			return NormalAllocator::Get()->Allocate(size);
+			return GetCPUAllocator()->Allocate(size);
 		}
 
 		void operator delete(void* pData)
 		{
-			NormalAllocator::Get()->Deallocate(pData);
+			GetCPUAllocator()->Deallocate(pData);
 		}
 
 	};
@@ -49,9 +50,9 @@ namespace Vulkan
 	};
 
 	template<>
-	struct TVulkanResourceTraits<RHIBlendState>
+	struct TVulkanResourceTraits<RHIAttachmentBlendState>
 	{
-		typedef class VulkanBlendState type;
+		typedef class VulkanAttachmentBlendState type;
 	};
 
 	template<>
@@ -85,21 +86,9 @@ namespace Vulkan
 	};
 
 	template<>
-	struct TVulkanResourceTraits<RHIVertexShader>
+	struct TVulkanResourceTraits<RHIShader>
 	{
-		typedef class VulkanVertexShader type;
-	};
-
-	template<>
-	struct TVulkanResourceTraits<RHIPixelShader>
-	{
-		typedef class VulkanPixelShader type;
-	};
-
-	template<>
-	struct TVulkanResourceTraits<RHIGeometryShader>
-	{
-		typedef class VulkanGeometryShader type;
+		typedef class VulkanShader type;
 	};
 
 	template<>

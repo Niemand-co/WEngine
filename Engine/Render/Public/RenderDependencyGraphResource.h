@@ -117,6 +117,8 @@ public:
 
 	WEngine::WArray<WRDGResourceState*>& GetMergeState() { return MergeState; }
 
+	const WRDGTextureDesc& GetDesc() const { return Desc; }
+
 	template<typename LAMBDA>
 	void EnumerateSubresource(WRDGTextureSubresourceRange Range, LAMBDA lambda)
 	{
@@ -143,7 +145,7 @@ private:
 		  Name(inName),
 		  Layout(inDesc.GetSubresourceLayout()),
 		  RHI(nullptr),
-		  States(WEngine::WArray<WRDGResourceState>(Layout.MipCount* Layout.LayerCount* Layout.PlaneCount, WRDGResourceState()))
+		  States(WEngine::WArray<WRDGResourceState>(Layout.MipCount * Layout.LayerCount * Layout.PlaneCount))
 	{
 	}
 

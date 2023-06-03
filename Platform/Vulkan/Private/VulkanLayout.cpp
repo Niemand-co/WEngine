@@ -6,26 +6,24 @@
 namespace Vulkan
 {
 
-	VulkanLayout::VulkanLayout(VulkanDevice* pInDevice)
+	VulkanLayout::VulkanLayout(VulkanDevice* pInDevice, const VulkanDescriptorSetLayout& DescriptorSetLayout)
 		: pDevice(pInDevice)
 	{
-		//WEngine::WArray<VkDescriptorSetLayout> SetLayouts(DescriptorSetLayouts.Size());
-		//for (uint32 Index = 0; Index < SetLayouts.Size(); ++Index)
-		//{
-		//	SetLayouts[Index] = DescriptorSetLayouts[Index].GetHandle();
-		//}
-		//VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo = {};
-		//{
-		//	PipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		//	PipelineLayoutCreateInfo.setLayoutCount = SetLayouts.Size();
-		//	PipelineLayoutCreateInfo.pSetLayouts = SetLayouts.GetData();
-		//}
-		//vkCreatePipelineLayout(pDevice->GetHandle(), &PipelineLayoutCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &PipelineLayout);
+		VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo;
+		ZeroVulkanStruct(PipelineLayoutCreateInfo, VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO);
+		const WEngine::WArray<VulkanDescriptorSetLayout::SetLayout>& Layouts = DescriptorSetLayout.GetLayouts();
+		PipelineLayoutCreateInfo.setLayoutCount = Layouts.Size();
+		VkDescriptorSetLayout DescriptorSetLayouts[1];
+		VkDescriptorSetLayoutCreateInfo;
+		for (uint32 Index = 0; Index < Layouts.Size(); ++Index)
+		{
+			DescriptorSetLayouts[Index].
+		}
 	}
 
 	VulkanLayout::~VulkanLayout()
 	{
-		vkDestroyPipelineLayout(pDevice->GetHandle(), PipelineLayout, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkDestroyPipelineLayout(pDevice->GetHandle(), PipelineLayout, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks());
 	}
 
 }

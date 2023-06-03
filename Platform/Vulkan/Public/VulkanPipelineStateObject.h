@@ -8,7 +8,7 @@ namespace Vulkan
 	{
 		uint16 RasterizationSamples;
 		uint32 Topology;
-		uint8 UseAlphaToCoverage;
+		uint8 bUseAlphaToCoverage;
 		uint8 SubpassIndex;
 
 		struct FBlendAttachment
@@ -224,7 +224,7 @@ namespace Vulkan
 		{
 			return RasterizationSamples == Other.RasterizationSamples &&
 				   Topology == Other.Topology &&
-				   UseAlphaToCoverage == Other.UseAlphaToCoverage &&
+				   bUseAlphaToCoverage == Other.bUseAlphaToCoverage &&
 				   SubpassIndex == Other.SubpassIndex &&
 				   ColorBlendAttachmentStates == Other.ColorBlendAttachmentStates &&
 				   Rasterizer == Other.Rasterizer &&
@@ -259,7 +259,7 @@ namespace Vulkan
 		class VulkanLayout *Layout;
 		GfxPipelineDesc Desc;
 
-		class VulkanShaderBase* VulkanShaders[(uint8)EShaderStage::Count];
+		class VulkanShader* VulkanShaders[(uint8)EShaderStage::Count];
 
 		VkPipeline Pipeline;
 
@@ -312,12 +312,26 @@ namespace Vulkan
 
 		virtual ~VulkanCommonPipelineDescriptorState();
 
+		inline void MarkDirty(bool bDirty)
+		{
 
+		}
+
+		bool UpdateDescriptorSets(RHICommandListBase& CmdList, VulkanCommandBuffer *CmdBuffer);
+
+		virtual void UpdateDescriptorSetsInternal(RHICommandListBase& CmdList, VulkanCommandBuffer* CmdBuffer) = 0;
 
 	};
 
 	class VulkanGraphicsPipelineDescriptorState : public VulkanCommonPipelineDescriptorState
 	{
+	public:
+
+		VulkanGraphicsPipelineDescriptorState();
+
+		virtual ~VulkanGraphicsPipelineDescriptorState();
+
+		virtual void UpdateDescriptorSetsInternal(RHICommandListBase& CmdList, VulkanCommandBuffer* CmdBuffer) override;
 
 	};
 

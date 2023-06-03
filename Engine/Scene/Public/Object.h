@@ -18,12 +18,12 @@ public:
 
 	void* operator new(size_t size)
 	{
-		return NormalAllocator::Get()->Allocate(size);
+		return GetCPUAllocator()->Allocate(size);
 	}
 
 	void operator delete(void *ptr)
 	{
-		NormalAllocator::Get()->Deallocate(ptr);
+		GetCPUAllocator()->Deallocate(ptr);
 	}
 
 };
@@ -31,7 +31,7 @@ public:
 template<typename T>
 T* GetCopy(T* object)
 {
-	T *copy = (T*)NormalAllocator::Get()->Allocate(sizeof(T));
+	T *copy = (T*)GetCPUAllocator()->Allocate(sizeof(T));
 	memcpy(copy, object, sizeof(T));
 	return copy;
 }

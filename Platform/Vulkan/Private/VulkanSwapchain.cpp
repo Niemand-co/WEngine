@@ -23,7 +23,7 @@ namespace Vulkan
 
 		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(pInstance->GetHandle(), "vkCreateWin32SurfaceKHR");
 
-		RE_ASSERT(CreateWin32SurfaceKHR(pInstance->GetHandle(), &surfaceCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Surface) == VK_SUCCESS, "Failed to Create Win32 Surface.");
+		RE_ASSERT(CreateWin32SurfaceKHR(pInstance->GetHandle(), &surfaceCreateInfo, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), &Surface) == VK_SUCCESS, "Failed to Create Win32 Surface.");
 
 		pInfo->surface = Surface;
 
@@ -112,7 +112,7 @@ namespace Vulkan
 		pInfo->clipped = VK_TRUE;
 		pInfo->oldSwapchain = VK_NULL_HANDLE;
 
-		vkCreateSwapchainKHR(pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Swapchain);
+		vkCreateSwapchainKHR(pInDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), &Swapchain);
 
 		uint32 NumSwapchainImageCount = 0;
 		vkGetSwapchainImagesKHR(pDevice->GetHandle(), Swapchain, &NumSwapchainImageCount, nullptr);
@@ -146,8 +146,8 @@ namespace Vulkan
 
 	VulkanSwapchain::~VulkanSwapchain()
 	{
-		vkDestroySwapchainKHR(pDevice->GetHandle(), Swapchain, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
-		vkDestroySurfaceKHR(pInstance->GetHandle(), Surface, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkDestroySwapchainKHR(pDevice->GetHandle(), Swapchain, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks());
+		vkDestroySurfaceKHR(pInstance->GetHandle(), Surface, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks());
 	}
 
 	int32 VulkanSwapchain::AcquireImageIndex(VulkanSemaphore** OutSemaphore)
@@ -226,8 +226,8 @@ namespace Vulkan
 
 	void VulkanSwapchain::Recreate()
 	{
-		vkDestroySwapchainKHR(pDevice->GetHandle(), Swapchain, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
-		vkDestroySurfaceKHR(pInstance->GetHandle(), Surface, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkDestroySwapchainKHR(pDevice->GetHandle(), Swapchain, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks());
+		vkDestroySurfaceKHR(pInstance->GetHandle(), Surface, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks());
 
 		VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
 		surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
@@ -236,13 +236,13 @@ namespace Vulkan
 
 		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(pInstance->GetHandle(), "vkCreateWin32SurfaceKHR");
 
-		RE_ASSERT(CreateWin32SurfaceKHR(pInstance->GetHandle(), &surfaceCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Surface) == VK_SUCCESS, "Failed to Create Win32 Surface.");
+		RE_ASSERT(CreateWin32SurfaceKHR(pInstance->GetHandle(), &surfaceCreateInfo, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), &Surface) == VK_SUCCESS, "Failed to Create Win32 Surface.");
 
 		RecreateInfo.imageExtent.width = Window::cur_window->GetWidth();
 		RecreateInfo.imageExtent.height = Window::cur_window->GetHeight();
 		RecreateInfo.surface = Surface;
 
-		RE_ASSERT(vkCreateSwapchainKHR(pDevice->GetHandle(), &RecreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Swapchain) == VK_SUCCESS, "Failed to recreate swapchain.");
+		RE_ASSERT(vkCreateSwapchainKHR(pDevice->GetHandle(), &RecreateInfo, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), &Swapchain) == VK_SUCCESS, "Failed to recreate swapchain.");
 	}
 
 }

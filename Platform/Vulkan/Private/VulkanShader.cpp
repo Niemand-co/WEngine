@@ -1,72 +1,43 @@
 #include "pch.h"
 #include "Platform/Vulkan/Public/VulkanShader.h"
 #include "Platform/Vulkan/Public/VulkanDevice.h"
+#include "Render/Descriptor/Public/RHIShaderDescriptor.h"
 #include "Render/Public/RenderDependencyGraphParameter.h"
 
 namespace Vulkan
 {
 
-	VulkanShaderBase::VulkanShaderBase(VulkanDevice *pInDevice, VkShaderModuleCreateInfo* pInfo)
-		: pDevice(pInDevice)
+	VulkanShader::VulkanShader(VulkanDevice *pInDevice, RHIShaderDescriptor* Descriptor)
+		: RHIShader(Descriptor->Frequency),
+		  pDevice(pInDevice)
 	{
-		vkCreateShaderModule(pDevice->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &ShaderModule);
+		VkShaderModuleCreateInfo ShaderModuleCreateInfo;
+		ZeroVulkanStruct(ShaderModuleCreateInfo, VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO);
+		ShaderModuleCreateInfo.codeSize = Descriptor->CodeSize;
+		ShaderModuleCreateInfo.pCode = Descriptor->Code;
+
+		RE_ASSERT(vkCreateShaderModule(pDevice->GetHandle(), &ShaderModuleCreateInfo, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), &ShaderModule) == VK_SUCCESS, "Failed to creat shader module");
 	}
 
-	VulkanShaderBase::~VulkanShaderBase()
+	VulkanShader::~VulkanShader()
 	{
-		vkDestroyShaderModule(pDevice->GetHandle(), ShaderModule, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks());
+		vkDestroyShaderModule(pDevice->GetHandle(), ShaderModule, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks());
 	}
 
-	VulkanVertexShader::VulkanVertexShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo* pInfo)
-		: VulkanShaderBase(pInDevice, pInfo)
-	{
-	}
-
-	VulkanVertexShader::~VulkanVertexShader()
-	{
-	}
-
-	void VulkanVertexShader::SetupParametersInternal(const ShaderParametersLayout& Layout)
+	void VulkanShader::SetupParametersInternal(const ShaderParametersLayout& Layout)
 	{
 		const WEngine::WArray<ShaderParametersLayout::ResourceInfo>& UniformBuffers =  Layout.GetUniforms();
-		VulkanShaderCodeHeader::FUniformBufferInfo& UBInfo = CodeHeader.UniformBuffers.AddInitialized();
+
 		for (int32 Index = 0; Index < UniformBuffers.Size(); ++Index)
 		{
-			VulkanShaderCodeHeader::FResourceInfo Resource;
-			Resource.ResourceIndex = Index;
-			Resource.UBBaseType = (uint16)UniformBuffers[Index].Type;
-			UBInfo.ResourceEntries.Push(Resource);
+			if (UniformBuffers[Index].Type == EUniformBaseType::UB_INCLUDED_STRUCT || UniformBuffers[Index].Type == EUniformBaseType::UB_REFERENCED_STRUCT)
+			{
+				continue;
+			}
+			
 		}
 
 		const WEngine::WArray<ShaderParametersLayout::ResourceInfo>& Textures = Layout.GetTextures();
 
 	}
-
-	VulkanGeometryShader::VulkanGeometryShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo* pInfo)
-		: VulkanShaderBase(pInDevice, pInfo)
-	{
-	}
-
-	VulkanGeometryShader::~VulkanGeometryShader()
-	{
-	}
-
-	VulkanPixelShader::VulkanPixelShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo* pInfo)
-		: VulkanShaderBase(pInDevice, pInfo)
-	{
-	}
-
-	VulkanPixelShader::~VulkanPixelShader()
-	{
-	}
-
-	VulkanComputeShader::VulkanComputeShader(VulkanDevice* pInDevice, VkShaderModuleCreateInfo *pInfo)
-		: VulkanShaderBase(pInDevice, pInfo)
-	{
-	}
-
-	VulkanComputeShader::~VulkanComputeShader()
-	{
-	}
-
 }

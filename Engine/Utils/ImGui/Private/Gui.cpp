@@ -12,7 +12,7 @@ Gui* Gui::CreateGui(WEngine::Backend backend)
 		break;
 	case WEngine::Backend::Vulkan:
 	{
-		g_pGui = (Gui*)NormalAllocator::Get()->Allocate(sizeof(Vulkan::VulkanGui));
+		g_pGui = (Gui*)GetCPUAllocator()->Allocate(sizeof(Vulkan::VulkanGui));
 		::new (g_pGui) Vulkan::VulkanGui();
 		return g_pGui;
 	}
@@ -24,21 +24,21 @@ Gui* Gui::CreateGui(WEngine::Backend backend)
 
 void Gui::DrawSlider(WEngine::WString title, float* pValue, float minValue, float maxValue)
 {
-	ImGui::Text(title.Data());ImGui::SameLine();
+	ImGui::Text(title.GetData());ImGui::SameLine();
 	title = "##" + title;
-	ImGui::SliderFloat(title.Data(), pValue, minValue, maxValue);
+	ImGui::SliderFloat(title.GetData(), pValue, minValue, maxValue);
 }
 
 void Gui::DrawColorEdit(WEngine::WString title, float* pColor, bool hasAlpha)
 {
-	ImGui::Text(title.Data()); ImGui::SameLine();
+	ImGui::Text(title.GetData()); ImGui::SameLine();
 	title = "##" + title;
 	if (hasAlpha)
 	{
-		ImGui::ColorEdit4(title.Data(), pColor);
+		ImGui::ColorEdit4(title.GetData(), pColor);
 	}
 	else
 	{
-		ImGui::ColorEdit3(title.Data(), pColor);
+		ImGui::ColorEdit3(title.GetData(), pColor);
 	}
 }

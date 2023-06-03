@@ -69,11 +69,13 @@ namespace Vulkan
 		{
 			return Layouts[LayoutHash];
 		}
+
+		VulkanLayout *NewLayout = new VulkanLayout(pDevice, DescriptorSetLayout);
 	}
 
 	void VulkanPipelineStateManager::CreateGfxEntry(const RHIGraphicsPipelineStateInitializer& Initializer, VulkanDescriptorSetLayout& DescriptorSetLayout, GfxPipelineDesc& Desc)
 	{
-		VulkanShaderBase *VulkanShaders[(uint8)EShaderStage::Count];
+		VulkanShader *VulkanShaders[(uint8)EShaderStage::Count];
 		{
 			VulkanShaders[(uint8)EShaderStage::Vertex] = ResourceCast(Initializer.BoundShaderState.PixelShaderRHI);
 			VulkanShaders[(uint8)EShaderStage::Geometry] = ResourceCast(Initializer.BoundShaderState.GeometryShaderRHI);
@@ -94,7 +96,7 @@ namespace Vulkan
 		}
 		
 		uint32 NumImmutableSamplerStates = Initializer.ImmutableSamplers.Size();
-		WEngine::WArray<RHISamplerState*> ImmutableSamplerStates(NumImmutableSamplerStates, NumImmutableSamplerStates > 0 ? Initializer.ImmutableSamplers[0] : nullptr);
+		WEngine::WArray<RHISamplerState*> ImmutableSamplerStates(NumImmutableSamplerStates);
 		DescriptorSetLayout.FinalizeBindings(pDevice, UBGatherInfo, ImmutableSamplerStates);
 
 		Desc.SubpassIndex = Initializer.SubpassIndex;
@@ -103,13 +105,15 @@ namespace Vulkan
 		Desc.RasterizationSamples = MultiSampleState->MultiSampleStateCreateInfo.rasterizationSamples;
 		Desc.RasterizationSamples = MultiSampleState->MultiSampleStateCreateInfo.alphaToCoverageEnable == VK_TRUE;
 
+		Desc.bUseAlphaToCoverage = Initializer.NumSamples > 1;
+
 		Desc.Topology = (uint32)(ResourceCast(Initializer.RasterizationState)->InputAssemblyStateCreateInfo.topology);
 
 		Desc.ColorBlendAttachmentStates.AddInitialized(Initializer.RenderTargetEnabled);
 		for (int32 Index = 0; Index < Initializer.RenderTargetEnabled; ++Index)
 		{
-			VulkanBlendState *BlendState = ResourceCast(Initializer.BlendState);
-			Desc.ColorBlendAttachmentStates[Index].ReadFrom(BlendState->Attachments[Index]->ColorBlendAttachmentState);
+			VulkanAttachmentBlendState *AttachmentState = ResourceCast(Initializer.BlendState.Attachments[Index]);
+			Desc.ColorBlendAttachmentStates[Index].ReadFrom(AttachmentState->ColorBlendAttachmentState);
 		}
 
 		Desc.DepthStencil.ReadFrom(ResourceCast(Initializer.DepthStencilState)->DepthStencilStateCreateInfo);
@@ -160,7 +164,7 @@ namespace Vulkan
 		VkPipelineMultisampleStateCreateInfo MultiSampleStateInfo;
 		ZeroVulkanStruct(MultiSampleStateInfo, VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO);
 		MultiSampleStateInfo.rasterizationSamples = (VkSampleCountFlagBits)WEngine::Max<uint16>(1u, Desc.RasterizationSamples);
-		MultiSampleStateInfo.alphaToCoverageEnable = Desc.UseAlphaToCoverage;
+		MultiSampleStateInfo.alphaToCoverageEnable = Desc.bUseAlphaToCoverage;
 		GfxPipelineCreateInfo.pMultisampleState = &MultiSampleStateInfo;
 		
 		VkPipelineVertexInputStateCreateInfo VertexInputStateInfo;
@@ -191,18 +195,21 @@ namespace Vulkan
 		ViewportStateInfo.scissorCount = 1;
 		GfxPipelineCreateInfo.pViewportState = &ViewportStateInfo;
 
-		VkShaderModule ShaderModules[(uint8)EShaderStage::Count];
+		VkShaderModule ShaderModules[(uint8)EShaderStage::Count] = {0};
 		const char* ShaderEntries[(uint8)EShaderStage::Count];
 		GetShaderModule(Initializer, ShaderModules, ShaderEntries);
 		VkPipelineShaderStageCreateInfo ShaderStageInfo[(uint8)EShaderStage::Count];
 		GfxPipelineCreateInfo.pStages = ShaderStageInfo;
 		for (int32 Index = 0; Index < (int32)EShaderStage::Count; ++Index)
 		{
-			ZeroVulkanStruct(ShaderStageInfo[GfxPipelineCreateInfo.stageCount], VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
-			ShaderStageInfo[GfxPipelineCreateInfo.stageCount].stage = WEngine::ToVulkan((EShaderStage)Index);
-			ShaderStageInfo[GfxPipelineCreateInfo.stageCount].module = ShaderModules[Index];
-			ShaderStageInfo[GfxPipelineCreateInfo.stageCount].pName = ShaderEntries[Index];
-			GfxPipelineCreateInfo.stageCount++;
+			if (ShaderModules[Index])
+			{
+				ZeroVulkanStruct(ShaderStageInfo[GfxPipelineCreateInfo.stageCount], VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
+				ShaderStageInfo[GfxPipelineCreateInfo.stageCount].stage = WEngine::ToVulkan((EShaderStage)Index);
+				ShaderStageInfo[GfxPipelineCreateInfo.stageCount].module = ShaderModules[Index];
+				ShaderStageInfo[GfxPipelineCreateInfo.stageCount].pName = ShaderEntries[Index];
+				GfxPipelineCreateInfo.stageCount++;
+			}
 		}
 
 		VkPipelineDynamicStateCreateInfo DynamicStateInfo;
@@ -218,10 +225,10 @@ namespace Vulkan
 		GfxPipelineCreateInfo.pDynamicState = &DynamicStateInfo;
 
 		GfxPipelineCreateInfo.renderPass = PSO->RenderPass->GetHandle();
-		GfxPipelineCreateInfo.layout = PSO->Layout->GetHandle();
+		GfxPipelineCreateInfo.layout = PSO->Layout ? PSO->Layout->GetHandle() : nullptr;
 		GfxPipelineCreateInfo.subpass = Desc.SubpassIndex;
 
-		VkResult Result = vkCreateGraphicsPipelines(pDevice->GetHandle(), VK_NULL_HANDLE, 1, &GfxPipelineCreateInfo, ResourceCast(NormalAllocator::Get())->GetCallbacks(), &PSO->Pipeline);
+		VkResult Result = vkCreateGraphicsPipelines(pDevice->GetHandle(), VK_NULL_HANDLE, 1, &GfxPipelineCreateInfo, ResourceCast(GetCPUAllocator())->GetCallbacks(), &PSO->Pipeline);
 		if (Result != VK_SUCCESS)
 		{
 			RE_LOG("Failed to create pipeline state object.");
@@ -466,6 +473,16 @@ namespace Vulkan
 	uint32 GfxPipelineDesc::GetKey() const
 	{
 		return WEngine::MemCrc32(this, sizeof(GfxPipelineDesc));
+	}
+
+	bool VulkanCommonPipelineDescriptorState::UpdateDescriptorSets(RHICommandListBase& CmdList, VulkanCommandBuffer* CmdBuffer)
+	{
+		UpdateDescriptorSetsInternal(CmdList, CmdBuffer);
+	}
+
+	void VulkanGraphicsPipelineDescriptorState::UpdateDescriptorSetsInternal(RHICommandListBase& CmdList, VulkanCommandBuffer* CmdBuffer)
+	{
+		
 	}
 
 }

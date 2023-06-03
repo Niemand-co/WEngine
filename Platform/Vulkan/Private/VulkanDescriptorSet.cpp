@@ -44,7 +44,7 @@ namespace Vulkan
 					VkShaderStageFlags ShaderStage = GatherInfo.LayoutsToStageMap[LayoutHash];
 					if (ShaderStage)
 					{
-						
+						vkUpdateDescriptorSets()
 					}
 				}
 			}

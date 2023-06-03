@@ -36,6 +36,8 @@ namespace Vulkan
 
 		VkImage GetHandle() const { return Image; }
 
+		VkImageView GetViewHandle() const { return DefaultView.ImageView; }
+
 		VkImageUsageFlags GetImageUsage(ETextureCreateFlags Flag);
 
 		VkImageViewType GetViewType(EDimension Dimension);

@@ -8,12 +8,12 @@ public:
 
 	void* operator new(size_t size)
 	{
-		return NormalAllocator::Get()->Allocate(size);
+		return GetCPUAllocator()->Allocate(size);
 	}
 
 	void operator delete(void* pData)
 	{
-		NormalAllocator::Get()->Deallocate(pData);
+		GetCPUAllocator()->Deallocate(pData);
 	}
 
 };
@@ -43,12 +43,12 @@ public:
 
 	void* Allocate(size_t size)
 	{
-		return NormalAllocator::Get()->Allocate(size);
+		return GetCPUAllocator()->Allocate(size);
 	}
 
 	void Deallocate(void* pData)
 	{
-		NormalAllocator::Get()->Deallocate(pData);
+		GetCPUAllocator()->Deallocate(pData);
 	}
 
 	static WRDGAllocator* Get()
@@ -241,17 +241,19 @@ enum class EAccess : uint16
 	SRVCompute          = 1 << 3,
 	SRVGraphics         = 1 << 4,
 	CopySrc             = 1 << 5,
+	DSVRead             = 1 << 6,
 
-	UAVCompute          = 1 << 6,
-	UAVGraphics         = 1 << 7,
-	RTV                 = 1 << 8,
-	CopyDst             = 1 << 9,
+	UAVCompute          = 1 << 7,
+	UAVGraphics         = 1 << 8,
+	RTV                 = 1 << 9,
+	CopyDst             = 1 << 10,
+	DSVWrite            = 1 << 11,
 
 	SRV                 = SRVCompute | SRVGraphics,
 	UAV                 = UAVCompute | UAVGraphics,
 
-	ReadOnly            = HostReading | Present | VertexOrIndexBuffer | SRVCompute | SRVGraphics | CopySrc,
-	WriteOnly           = RTV | CopyDst,
+	ReadOnly            = HostReading | Present | VertexOrIndexBuffer | SRVCompute | SRVGraphics | CopySrc | DSVRead,
+	WriteOnly           = RTV | CopyDst | DSVWrite,
 
 	Readable            = ReadOnly | UAV,
 	Writable            = WriteOnly | UAV,

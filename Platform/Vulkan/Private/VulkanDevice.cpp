@@ -15,7 +15,7 @@ namespace Vulkan
 	VulkanDevice::VulkanDevice(VulkanGPU *pInGPU, VkDeviceCreateInfo* pInfo, WEngine::WArray<QueueStack>& InQueueStack)
 		: pGPU(pInGPU), m_queues(InQueueStack)
 	{
-		RE_ASSERT(vkCreateDevice(*pInGPU->GetHandle(), pInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &Device) == VK_SUCCESS, "Failed to Create Device.");
+		RE_ASSERT(vkCreateDevice(*pInGPU->GetHandle(), pInfo, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), &Device) == VK_SUCCESS, "Failed to Create Device.");
 
 		pMemoryManager = new VulkanMemoryManager(this);
 		pStagingBufferManager = new VulkanStagingBufferManager(this);
@@ -89,183 +89,18 @@ namespace Vulkan
 			eventCreateInfo.sType = VK_STRUCTURE_TYPE_EVENT_CREATE_INFO;
 		}
 
-		VkEvent* pEvent = (VkEvent*)NormalAllocator::Get()->Allocate(sizeof(VkEvent));
-		vkCreateEvent(Device, &eventCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), pEvent);
+		VkEvent* pEvent = (VkEvent*)GetCPUAllocator()->Allocate(sizeof(VkEvent));
+		vkCreateEvent(Device, &eventCreateInfo, static_cast<VulkanAllocator*>(GetCPUAllocator())->GetCallbacks(), pEvent);
 		
-		RHIEvent *event = (RHIEvent*)NormalAllocator::Get()->Allocate(sizeof(VulkanEvent));
+		RHIEvent *event = (RHIEvent*)GetCPUAllocator()->Allocate(sizeof(VulkanEvent));
 		::new (event) VulkanEvent(pEvent);
 
 		return event;
 	}
 
-	WVertexShaderRHIRef VulkanDevice::CreateVertexShader(RHIShaderDescriptor* descriptor)
+	WShaderRHIRef VulkanDevice::CreateShader(RHIShaderDescriptor* descriptor)
 	{
-		VkShaderModuleCreateInfo ShaderModuleCreateInfo = {};
-		ShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		ShaderModuleCreateInfo.codeSize = descriptor->codeSize;
-		ShaderModuleCreateInfo.pCode = descriptor->pCode;
-
-		return new VulkanVertexShader(this, &ShaderModuleCreateInfo);
-	}
-
-	WPixelShaderRHIRef VulkanDevice::CreatePixelShader(RHIShaderDescriptor* descriptor)
-	{
-		VkShaderModuleCreateInfo ShaderModuleCreateInfo = {};
-		ShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		ShaderModuleCreateInfo.codeSize = descriptor->codeSize;
-		ShaderModuleCreateInfo.pCode = descriptor->pCode;
-
-		return new VulkanPixelShader(this, &ShaderModuleCreateInfo);
-	}
-
-	WGeometryShaderRHIRef VulkanDevice::CreateGeometryShader(RHIShaderDescriptor* descriptor)
-	{
-		VkShaderModuleCreateInfo ShaderModuleCreateInfo = {};
-		ShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		ShaderModuleCreateInfo.codeSize = descriptor->codeSize;
-		ShaderModuleCreateInfo.pCode = descriptor->pCode;
-
-		return new VulkanGeometryShader(this, &ShaderModuleCreateInfo);
-	}
-
-	WComputeShaderRHIRef VulkanDevice::CreateComputeShader(RHIShaderDescriptor* descriptor)
-	{
-		VkShaderModuleCreateInfo ShaderModuleCreateInfo = {};
-		ShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		ShaderModuleCreateInfo.codeSize = descriptor->codeSize;
-		ShaderModuleCreateInfo.pCode = descriptor->pCode;
-
-		return new VulkanComputeShader(this, &ShaderModuleCreateInfo);
-	}
-
-	WRenderPassRHIRef VulkanDevice::GetOrCreateRenderPass(RHIRenderPassDescriptor* descriptor)
-	{
-		uint32 RenderPassID = WEngine::MemCrc32(descriptor, sizeof(RHIRenderPassDescriptor));
-
-		WRenderPassRHIRef RenderPass = RHIRenderPassManager::GetRenderPass(RenderPassID);
-		if (RenderPass)
-		{
-			return RenderPass;
-		}
-
-		WEngine::WArray<VkAttachmentDescription> Attachments(descriptor->ColorAttachmentCount + (descriptor->bHasDepthStencilAttachment ? 1 : 0));
-		WEngine::WArray<VkAttachmentReference> ColorReferences(descriptor->ColorAttachmentCount);
-		for (uint32 ColorIndex = 0; ColorIndex < descriptor->ColorAttachmentCount; ++ColorIndex)
-		{
-			Attachments[ColorIndex].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			Attachments[ColorIndex].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			Attachments[ColorIndex].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
-			Attachments[ColorIndex].stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
-
-			Attachments[ColorIndex].format = WEngine::ToVulkan(descriptor->ColorAttachmentDescriptors[ColorIndex].attachmentFormat);
-			Attachments[ColorIndex].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;//WEngine::ToVulkan(descriptor->ColorAttachmentDescriptors[ColorIndex].attachmentLoadOP);
-			Attachments[ColorIndex].storeOp = WEngine::ToVulkan(descriptor->ColorAttachmentDescriptors[ColorIndex].attachmentStoreOP);
-			Attachments[ColorIndex].samples = WEngine::ToVulkan(descriptor->ColorAttachmentDescriptors[ColorIndex].sampleCount);
-
-			ColorReferences[ColorIndex].attachment = ColorIndex;
-			ColorReferences[ColorIndex].layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-		}
-		
-		VkAttachmentReference DepthStencilReference = {};
-		if (descriptor->bHasDepthStencilAttachment)
-		{
-			Attachments[descriptor->ColorAttachmentCount].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-			Attachments[descriptor->ColorAttachmentCount].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-			Attachments[descriptor->ColorAttachmentCount].format = WEngine::ToVulkan(descriptor->DepthStencilAttachmentDescriptor.attachmentFormat);
-			Attachments[descriptor->ColorAttachmentCount].loadOp = WEngine::ToVulkan(descriptor->DepthStencilAttachmentDescriptor.attachmentLoadOP);
-			Attachments[descriptor->ColorAttachmentCount].stencilLoadOp = WEngine::ToVulkan(descriptor->DepthStencilAttachmentDescriptor.stencilLoadOP);
-			Attachments[descriptor->ColorAttachmentCount].samples = WEngine::ToVulkan(descriptor->DepthStencilAttachmentDescriptor.sampleCount);
-			if (Attachments[descriptor->ColorAttachmentCount].samples == VK_SAMPLE_COUNT_1_BIT)
-			{
-				Attachments[descriptor->ColorAttachmentCount].storeOp = WEngine::ToVulkan(descriptor->DepthStencilAttachmentDescriptor.attachmentStoreOP);
-				Attachments[descriptor->ColorAttachmentCount].stencilStoreOp = WEngine::ToVulkan(descriptor->DepthStencilAttachmentDescriptor.stencilStoreOP);
-			}
-			else
-			{
-				Attachments[descriptor->ColorAttachmentCount].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-				Attachments[descriptor->ColorAttachmentCount].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-			}
-
-			DepthStencilReference.attachment = descriptor->ColorAttachmentCount;
-			DepthStencilReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		}
-		
-		WEngine::WArray<VkSubpassDescription> Subpasses(8);
-		uint32 NumSubpass = 0;
-
-		//main sub-pass
-		{
-			VkSubpassDescription& subpass = Subpasses[NumSubpass++];
-			subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-			subpass.colorAttachmentCount = ColorReferences.Size();
-			subpass.pColorAttachments = ColorReferences.GetData();
-			subpass.pDepthStencilAttachment = descriptor->bHasDepthStencilAttachment ? &DepthStencilReference : nullptr;
-		}
-
-		VkRenderPassCreateInfo RenderPassCreateInfo = {};
-		{
-			RenderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-			RenderPassCreateInfo.attachmentCount = Attachments.Size();
-			RenderPassCreateInfo.pAttachments = Attachments.GetData();
-			RenderPassCreateInfo.subpassCount = NumSubpass;
-			RenderPassCreateInfo.pSubpasses = Subpasses.GetData();
-			RenderPassCreateInfo.dependencyCount = 0;
-			RenderPassCreateInfo.pDependencies = nullptr;
-		}
-
-		RenderPass = new VulkanRenderPass(this, &RenderPassCreateInfo);
-		RHIRenderPassManager::AddRenderPass(RenderPassID, RenderPass);
-		return RenderPass;
-	}
-
-	WFramebufferRHIRef VulkanDevice::GetOrCreateFramebuffer(RHIFramebufferDescriptor* descriptor, RHIRenderPass *RenderPass)
-	{
-		uint32 FramebufferID = WEngine::MemCrc32(descriptor, sizeof(RHIFramebufferDescriptor));
-		WFramebufferRHIRef Framebuffer = RHIFramebufferManager::GetFramebuffer(FramebufferID);
-		if (Framebuffer)
-		{
-			return Framebuffer;
-		}
-
-		WEngine::WArray<VkImageView> ImageViews(descriptor->AttachmentCount);
-		for (uint32 Index = 0; Index < ImageViews.Size(); ++Index)
-		{
-			VulkanTexture *TextureRHI = static_cast<VulkanTexture*>(descriptor->Attachments[Index]);
-
-			VkImageViewCreateInfo ImageViewCreateInfo = {};
-			{
-				ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-				ImageViewCreateInfo.image = TextureRHI->GetHandle();
-				ImageViewCreateInfo.format = WEngine::ToVulkan(TextureRHI->GetDesc().Format);
-				ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
-				ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;
-				ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_B;
-				ImageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_A;
-				ImageViewCreateInfo.viewType = TextureRHI->GetViewType(TextureRHI->GetDesc().Dimension);
-				ImageViewCreateInfo.subresourceRange.aspectMask = TextureRHI->GetAspect(TextureRHI->GetDesc().Format);
-				ImageViewCreateInfo.subresourceRange.layerCount = TextureRHI->GetDesc().ArraySize;
-				ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-				ImageViewCreateInfo.subresourceRange.levelCount = TextureRHI->GetDesc().NumMips;
-				ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-			}
-			vkCreateImageView(Device, &ImageViewCreateInfo, static_cast<VulkanAllocator*>(NormalAllocator::Get())->GetCallbacks(), &ImageViews[Index]);
-		}
-
-		VkFramebufferCreateInfo FramebufferCreateInfo = {};
-		{
-			FramebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-			FramebufferCreateInfo.renderPass = static_cast<VulkanRenderPass*>(RenderPass)->GetHandle();
-			FramebufferCreateInfo.attachmentCount = ImageViews.Size();
-			FramebufferCreateInfo.pAttachments = ImageViews.GetData();
-			FramebufferCreateInfo.width = descriptor->Extent.width;
-			FramebufferCreateInfo.height = descriptor->Extent.height;
-			FramebufferCreateInfo.layers = descriptor->Extent.depth;
-		}
-		
-		Framebuffer = new VulkanFramebuffer(this, &FramebufferCreateInfo);
-		RHIFramebufferManager::AddFramebuffer(FramebufferID, Framebuffer);
-		return Framebuffer;
+		return new VulkanShader(this, descriptor);
 	}
 
 	WTextureRHIRef VulkanDevice::CreateTexture(const RHITextureDesc& InDesc)
@@ -290,13 +125,13 @@ namespace Vulkan
 
 	RHIScissor* VulkanDevice::CreateScissor(RHIScissorDescriptor* descriptor)
 	{
-		VkRect2D *pScissor = (VkRect2D*)NormalAllocator::Get()->Allocate(sizeof(VkRect2D));
+		VkRect2D *pScissor = (VkRect2D*)GetCPUAllocator()->Allocate(sizeof(VkRect2D));
 		pScissor->offset.x = descriptor->offsetX;
 		pScissor->offset.y = descriptor->offsetY;
 		pScissor->extent.width = descriptor->width;
 		pScissor->extent.height = descriptor->height;
 
-		VulkanScissor *scissor = (VulkanScissor*)NormalAllocator::Get()->Allocate(sizeof(VulkanScissor));
+		VulkanScissor *scissor = (VulkanScissor*)GetCPUAllocator()->Allocate(sizeof(VulkanScissor));
 		::new (scissor) VulkanScissor(pScissor);
 
 		return scissor;

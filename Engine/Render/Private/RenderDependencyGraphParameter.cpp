@@ -120,6 +120,13 @@ RHIFramebufferDescriptor WRDGParameterStruct::GetFramebufferInfo() const
 		descriptor.Extent.depth = Texture->Desc.Extent.depth < descriptor.Extent.depth ? Texture->Desc.Extent.depth : descriptor.Extent.depth;
 	});
 
+	if (NumColorAttachment == 0)
+	{
+		descriptor.Offset.x = descriptor.Extent.width;
+		descriptor.Offset.y = descriptor.Extent.height;
+		descriptor.Offset.z = 0;
+	}
+
 	WRDGTexture *DepthStencil = RenderTargets.DepthStencilTexture.Texture;
 	if (DepthStencil)
 	{
